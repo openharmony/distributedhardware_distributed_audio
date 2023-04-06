@@ -57,8 +57,6 @@
 ├── common                                 # 分布式音频公共模块
 ├── interfaces                             # 分布式音频对外接口模块
 ├── sa_profile                             # 分布式音频SA配置模块
-├── hdf_interface                          # 分布式音频hdf接口模块
-├── hdf_service                            # 分布式音频hdf服务模块
 ├── services                               # 分布式音频服务模块
 │   ├── audioclient                        # 分布式音频客户端
 │   ├── audiocontrol                       # 分布式音频控制管理模块
