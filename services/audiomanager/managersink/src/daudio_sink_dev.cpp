@@ -15,6 +15,8 @@
 
 #include "daudio_sink_dev.h"
 
+#include <random>
+
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
 #include "daudio_log.h"
