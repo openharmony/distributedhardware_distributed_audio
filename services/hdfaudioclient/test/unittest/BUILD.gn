@@ -125,15 +125,13 @@ ohos_unittest("AudioAdapterInternalTest") {
   sources = [ "audio_adapter_internal/audio_adapter_internal_test.cpp" ]
 
   deps = [
-    "${services_path}/hdfaudioclient:daudio_client",
     "${hdf_interfaces_path}/audio/v1_0:libdaudio_proxy_1.0",
+    "${services_path}/hdfaudioclient:daudio_client",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
 
-  external_deps = [
-    "c_utils:utils",
-  ]
+  external_deps = [ "c_utils:utils" ]
 
   defines = [
     "HI_LOG_ENABLE",
@@ -155,8 +153,8 @@ group("audio_adapter_hdi_test") {
   testonly = true
   deps = [
     ":AudioAdapterHdiTest",
-    ":AudioRenderInternalTest",
-    ":AudioCaptureInternalTest",
     ":AudioAdapterInternalTest",
-    ]
+    ":AudioCaptureInternalTest",
+    ":AudioRenderInternalTest",
+  ]
 }

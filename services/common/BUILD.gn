@@ -20,7 +20,7 @@ config("daudio_common_pub_config") {
   include_dirs = [
     "audiodata/include",
     "audioparam",
-    "${common_path}/include"
+    "${common_path}/include",
   ]
 }
 
@@ -40,18 +40,18 @@ config("daudio_common_private_config") {
 }
 
 ohos_shared_library("distributed_audio_utils") {
-  configs = [":daudio_common_private_config"]
+  configs = [ ":daudio_common_private_config" ]
 
-  public_configs = [":daudio_common_pub_config"]
+  public_configs = [ ":daudio_common_pub_config" ]
 
   sources = [
-    "audiodata/src/audio_data.cpp",
-    "taskProcessor/src/task_impl.cpp",
-    "taskProcessor/src/task_queue.cpp",
     "${common_path}/dfx_utils/src/daudio_hisysevent.cpp",
     "${common_path}/dfx_utils/src/daudio_hitrace.cpp",
     "${common_path}/src/daudio_log.cpp",
     "${common_path}/src/daudio_util.cpp",
+    "audiodata/src/audio_data.cpp",
+    "taskProcessor/src/task_impl.cpp",
+    "taskProcessor/src/task_queue.cpp",
   ]
 
   external_deps = [

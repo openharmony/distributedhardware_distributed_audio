@@ -50,9 +50,7 @@ ohos_unittest("DAudioHdiHandlerTest") {
     "//third_party/googletest:gtest_main",
   ]
 
-  external_deps = [
-    "c_utils:utils",
-  ]
+  external_deps = [ "c_utils:utils" ]
 }
 
 group("daudio_hdi_handler_test") {

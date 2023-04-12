@@ -53,11 +53,11 @@ ohos_unittest("ControlSourceTest") {
 
   deps = [
     "${services_path}/audiomanager/servicesource:distributed_audio_source",
-    "//third_party/googletest:gmock",
-    "//third_party/googletest:gtest_main",
-    "//base/security/access_token/interfaces/innerkits/token_setproc:libtoken_setproc",
     "//base/security/access_token/interfaces/innerkits/accesstoken:libaccesstoken_sdk",
     "//base/security/access_token/interfaces/innerkits/nativetoken:libnativetoken",
+    "//base/security/access_token/interfaces/innerkits/token_setproc:libtoken_setproc",
+    "//third_party/googletest:gmock",
+    "//third_party/googletest:gtest_main",
   ]
 }
 

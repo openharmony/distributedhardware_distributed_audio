@@ -15,12 +15,12 @@ import("//drivers/hdf_core/adapter/uhdf2/hdi.gni")
 hdi("daudio") {
   module_name = "daudio"
   sources = [
+    "AudioTypes.idl",
     "IAudioAdapter.idl",
+    "IAudioCallback.idl",
     "IAudioCapture.idl",
     "IAudioManager.idl",
     "IAudioRender.idl",
-    "AudioTypes.idl",
-    "IAudioCallback.idl",
   ]
   language = "cpp"
   root = "ohos.hdi://foundation/distributedhardware/distributed_audio/hdf_interfaces/"

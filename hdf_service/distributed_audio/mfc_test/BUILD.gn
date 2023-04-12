@@ -23,9 +23,7 @@ ohos_executable("audio_test_distributed_fifo") {
     "//foundation/distributedhardware/distributed_audio/hdf_service/distributed_audio/hdi_service/common/include",
   ]
 
-  sources = [
-    "distributedaudiotest.cpp",
-  ]
+  sources = [ "distributedaudiotest.cpp" ]
 
   deps = [
     "$hdf_uhdf_path/utils:libhdf_utils",
@@ -35,7 +33,7 @@ ohos_executable("audio_test_distributed_fifo") {
   external_deps = [
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
-]
+  ]
 
   defines = [
     "HI_LOG_ENABLE",

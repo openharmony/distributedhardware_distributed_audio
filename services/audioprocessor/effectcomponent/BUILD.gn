@@ -13,10 +13,10 @@
 
 import("//build/ohos.gni")
 import("//build/ohos_var.gni")
-import("//foundation/distributedhardware/distributed_audio/distributedaudio.gni")
+import(
+    "//foundation/distributedhardware/distributed_audio/distributedaudio.gni")
 
-ohos_shared_library("daudio_effect_component")
-{
+ohos_shared_library("daudio_effect_component") {
   include_dirs = [
     "./audiopipeline/include",
     "./pipelinemanager/include",
@@ -29,18 +29,16 @@ ohos_shared_library("daudio_effect_component")
 
   sources = [
     "${services_path}/audioprocessor/effectcomponent/audiopipeline/src/pipeline_impl.cpp",
-    "${services_path}/audioprocessor/effectcomponent/pipelinemanager/src/pipeline_manager.cpp",
     "${services_path}/audioprocessor/effectcomponent/element_factoy/src/element_factory.cpp",
     "${services_path}/audioprocessor/effectcomponent/elements/src/down_stream_element.cpp",
     "${services_path}/audioprocessor/effectcomponent/elements/src/render_sink_element.cpp",
     "${services_path}/audioprocessor/effectcomponent/elements/src/source_element.cpp",
+    "${services_path}/audioprocessor/effectcomponent/pipelinemanager/src/pipeline_manager.cpp",
   ]
 
-  deps = [ "${services_path}/common:distributed_audio_utils", ]
+  deps = [ "${services_path}/common:distributed_audio_utils" ]
 
-  external_deps = [
-    "c_utils:utils",
-  ]
+  external_deps = [ "c_utils:utils" ]
 
   defines = [
     "HI_LOG_ENABLE",

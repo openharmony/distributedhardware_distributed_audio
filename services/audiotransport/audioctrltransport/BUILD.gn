@@ -37,9 +37,9 @@ ohos_shared_library("distributed_audio_control") {
     "${audio_transport_path}/audiochannel/audioctrlchannel/include",
   ]
 
-  sources = [ 
-    "src/audio_ctrl_transport.cpp",
+  sources = [
     "${audio_transport_path}/audiochannel/audioctrlchannel/src/audio_ctrl_channel.cpp",
+    "src/audio_ctrl_transport.cpp",
   ]
 
   deps = [

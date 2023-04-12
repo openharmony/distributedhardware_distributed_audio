@@ -39,7 +39,7 @@ ohos_shared_library("distributed_audio_source_sdk") {
     "src/daudio_source_proxy.cpp",
   ]
 
-  deps = [ "${services_path}/common:distributed_audio_utils", ]
+  deps = [ "${services_path}/common:distributed_audio_utils" ]
 
   external_deps = [
     "c_utils:utils",

@@ -55,9 +55,7 @@ ohos_unittest("DAudioManagerCallbackTest") {
     "//third_party/googletest:gtest_main",
   ]
 
-  external_deps = [
-    "c_utils:utils",
-  ]
+  external_deps = [ "c_utils:utils" ]
 }
 
 group("daudio_manager_callback_test") {

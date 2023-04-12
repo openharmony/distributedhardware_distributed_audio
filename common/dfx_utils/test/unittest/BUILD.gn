@@ -76,9 +76,8 @@ config("module_private_config") {
 ohos_unittest("DAudioDfxTest") {
   module_out_path = module_out_path
 
-  sources = [
-    "${common_path}/dfx_utils/test/unittest/src/daudio_hidumper_test.cpp",
-  ]
+  sources =
+      [ "${common_path}/dfx_utils/test/unittest/src/daudio_hidumper_test.cpp" ]
 
   configs = [ ":module_private_config" ]
 

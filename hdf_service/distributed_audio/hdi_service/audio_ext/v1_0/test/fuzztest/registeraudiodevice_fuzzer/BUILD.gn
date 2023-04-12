@@ -20,7 +20,8 @@ import(
 ##############################fuzztest##########################################
 ohos_fuzztest("RegisterAudioDeviceFuzzTest") {
   module_out_path = "distributed_audio/registeraudiodevice_fuzzer"
-  fuzz_config_file = "${hdf_ser_aud_ext_path}/test/fuzztest/registeraudiodevice_fuzzer"
+  fuzz_config_file =
+      "${hdf_ser_aud_ext_path}/test/fuzztest/registeraudiodevice_fuzzer"
 
   cflags = [
     "-g",
@@ -45,8 +46,8 @@ ohos_fuzztest("RegisterAudioDeviceFuzzTest") {
   ]
 
   deps = [
-    "${hdf_ser_aud_ext_path}:libdaudio_manager_daudio_ext_service_1.0",
     "${hdf_interfaces_path}/audioext/v1_0:libdaudioext_stub_1.0",
+    "${hdf_ser_aud_ext_path}:libdaudio_manager_daudio_ext_service_1.0",
   ]
 
   external_deps = [

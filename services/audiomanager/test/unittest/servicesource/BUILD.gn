@@ -22,7 +22,7 @@ module_out_path = "distributed_audio/services/audiomanager/service_source_test"
 config("module_private_config") {
   visibility = [ ":*" ]
 
-    include_dirs = [
+  include_dirs = [
     "//foundation/multimedia/audio_framework/services/audio_service/client/include",
     "${audio_framework_path}/audiopolicy/include",
 
@@ -89,27 +89,25 @@ config("module_private_config") {
 ohos_unittest("DaudioSourceServiceTest") {
   module_out_path = module_out_path
 
-  sources = [
-    "${services_path}/audiomanager/test/unittest/servicesource/src/daudio_source_service_test.cpp",
-  ]
+  sources = [ "${services_path}/audiomanager/test/unittest/servicesource/src/daudio_source_service_test.cpp" ]
 
   configs = [ ":module_private_config" ]
 
   deps = [
+    "${services_path}/audiomanager/servicesource:distributed_audio_source",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
-    "${services_path}/audiomanager/servicesource:distributed_audio_source",
   ]
 
   external_deps = [
     "c_utils:utils",
     "hitrace_native:hitrace_meter",
     "ipc:ipc_core",
+    "multimedia_audio_framework:audio_capturer",
+    "multimedia_audio_framework:audio_client",
+    "multimedia_audio_framework:audio_renderer",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "multimedia_audio_framework:audio_client",
-    "multimedia_audio_framework:audio_capturer",
-    "multimedia_audio_framework:audio_renderer",
   ]
 }
 

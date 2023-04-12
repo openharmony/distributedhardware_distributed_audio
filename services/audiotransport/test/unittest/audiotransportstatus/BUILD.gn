@@ -52,9 +52,10 @@ config("module_private_config") {
 ohos_unittest("TransportStatusTest") {
   module_out_path = module_output_path
 
-  sources = [ "src/audio_transport_pause_status_test.cpp",
-  "src/audio_transport_stop_status_test.cpp",
-  "src/audio_transport_start_status_test.cpp",
+  sources = [
+    "src/audio_transport_pause_status_test.cpp",
+    "src/audio_transport_start_status_test.cpp",
+    "src/audio_transport_stop_status_test.cpp",
   ]
 
   configs = [ ":module_private_config" ]

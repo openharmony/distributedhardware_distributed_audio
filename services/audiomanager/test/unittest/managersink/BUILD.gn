@@ -22,7 +22,7 @@ module_out_path = "distributed_audio/services/audiomanager/manager_sink_test"
 config("module_private_config") {
   visibility = [ ":*" ]
 
-    include_dirs = [
+  include_dirs = [
     "//third_party/json/include",
     "//foundation/multimedia/audio_framework/services/audio_service/client/include",
     "${audio_framework_path}/audiopolicy/include",
@@ -67,31 +67,29 @@ config("module_private_config") {
 ohos_unittest("DaudioSinkDevTest") {
   module_out_path = module_out_path
 
-  sources = [
-    "${services_path}/audiomanager/test/unittest/managersink/src/daudio_sink_dev_test.cpp",
-  ]
+  sources = [ "${services_path}/audiomanager/test/unittest/managersink/src/daudio_sink_dev_test.cpp" ]
 
   configs = [ ":module_private_config" ]
 
   deps = [
+    "${services_path}/audiomanager/servicesink:distributed_audio_sink",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
-    "${services_path}/audiomanager/servicesink:distributed_audio_sink",
   ]
 
   external_deps = [
     "c_utils:utils",
     "drivers_interface_audio:libaudio_proxy_1.0",
     "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
     "hitrace_native:hitrace_meter",
-    "hdf_core:libhdf_utils",
     "ipc:ipc_core",
+    "multimedia_audio_framework:audio_capturer",
+    "multimedia_audio_framework:audio_client",
+    "multimedia_audio_framework:audio_renderer",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "multimedia_audio_framework:audio_client",
-    "multimedia_audio_framework:audio_capturer",
-    "multimedia_audio_framework:audio_renderer",
   ]
 }
 
@@ -99,38 +97,36 @@ ohos_unittest("DaudioSinkDevTest") {
 ohos_unittest("DAudioSinkManagerTest") {
   module_out_path = module_out_path
 
-  sources = [
-    "${services_path}/audiomanager/test/unittest/managersink/src/daudio_sink_manager_test.cpp",
-  ]
+  sources = [ "${services_path}/audiomanager/test/unittest/managersink/src/daudio_sink_manager_test.cpp" ]
 
   configs = [ ":module_private_config" ]
 
   deps = [
+    "${services_path}/audiomanager/servicesink:distributed_audio_sink",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
-    "${services_path}/audiomanager/servicesink:distributed_audio_sink",
   ]
 
   external_deps = [
     "c_utils:utils",
     "drivers_interface_audio:libaudio_proxy_1.0",
     "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
     "hitrace_native:hitrace_meter",
-    "hdf_core:libhdf_utils",
     "ipc:ipc_core",
+    "multimedia_audio_framework:audio_capturer",
+    "multimedia_audio_framework:audio_client",
+    "multimedia_audio_framework:audio_renderer",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "multimedia_audio_framework:audio_client",
-    "multimedia_audio_framework:audio_capturer",
-    "multimedia_audio_framework:audio_renderer",
   ]
 }
 
 group("manager_sink_test") {
   testonly = true
   deps = [
-    ":DaudioSinkDevTest",
     ":DAudioSinkManagerTest",
+    ":DaudioSinkDevTest",
   ]
 }

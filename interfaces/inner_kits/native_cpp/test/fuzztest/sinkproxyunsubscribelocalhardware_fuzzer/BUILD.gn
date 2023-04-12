@@ -45,9 +45,8 @@ ohos_fuzztest("SinkProxyUnsubscribeLocalHardwareFuzzTest") {
     "${innerkits_path}/native_cpp/audio_sink/include",
   ]
 
-  deps = [
-    "${innerkits_path}/native_cpp/audio_sink:distributed_audio_sink_sdk",
-  ]
+  deps =
+      [ "${innerkits_path}/native_cpp/audio_sink:distributed_audio_sink_sdk" ]
 
   defines = [
     "HI_LOG_ENABLE",
