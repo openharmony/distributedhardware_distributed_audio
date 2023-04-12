@@ -107,7 +107,7 @@ HWTEST_F(DSpeakerClientTest, StopRender001, TestSize.Level1)
     speakerClient_->PlayStatusChange(args);
     speakerClient_->SetAudioParameters(event);
     speakerClient_->SetMute(event);
-    for(size_t i =0; i<10; i++) {
+    for (size_t i =0; i<10; i++) {
         std::shared_ptr<AudioData> data = std::make_shared<AudioData>(4096);
         speakerClient_->dataQueue_.push(data);
     }

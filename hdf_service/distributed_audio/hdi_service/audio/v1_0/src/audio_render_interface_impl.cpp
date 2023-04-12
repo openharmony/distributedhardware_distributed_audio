@@ -92,7 +92,7 @@ int32_t AudioRenderInterfaceImpl::RenderFrame(const std::vector<int8_t> &frame, 
 {
     DHLOGI("Render frame[sampleRate: %d, channelCount: %d, format: %d, frameSize: %d].", devAttrs_.sampleRate,
         devAttrs_.channelCount, devAttrs_.format, devAttrs_.frameSize);
-    int64_t timeOffset = UpdateTimeOffset(frameIndex_, framePeriodNs_, AUDIO_OFFSET_FRAME_NUM, startTime_);
+    int64_t timeOffset = UpdateTimeOffset(frameIndex_, framePeriodNs_, startTime_);
     DHLOGD("Render frameIndex: %lld, timeOffset: %lld.", frameIndex_, timeOffset);
 
     std::lock_guard<std::mutex> renderLck(renderMtx_);

@@ -604,8 +604,8 @@ void DAudioSinkDev::OnTaskResult(int32_t resultCode, const std::string &result, 
 
 void DAudioSinkDev::NotifySourceDev(const AudioEventType type, const std::string dhId, const int32_t result)
 {
-    srand(static_cast<int32_t>(time(0)));
-    const int32_t randomTaskCode = rand();
+    std::random_device rd;
+    const uint32_t randomTaskCode = rd();
     json jEvent;
     jEvent[KEY_DH_ID] = dhId;
     jEvent[KEY_RESULT] = result;

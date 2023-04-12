@@ -65,7 +65,6 @@ ohos_shared_library("distributed_audio_sink") {
     "${services_path}/common/audiodata/include",
     "${services_path}/audiomanager/managersink/include",
     "${softbusadapter_path}/include",
-    "//drivers/hdf_core/framework/include/osal",
   ]
 
   sources = [

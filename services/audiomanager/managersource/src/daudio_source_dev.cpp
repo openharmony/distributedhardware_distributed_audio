@@ -815,8 +815,8 @@ void DAudioSourceDev::OnTaskResult(int32_t resultCode, const std::string &result
 
 int32_t DAudioSourceDev::NotifySinkDev(const AudioEventType type, const json Param, const std::string dhId)
 {
-    srand(static_cast<int32_t>(time(0)));
-    const int32_t randomTaskCode = rand();
+    std::random_device rd;
+    const uint32_t randomTaskCode = rd();
     constexpr uint32_t eventOffset = 4;
     json jParam = { { KEY_DH_ID, dhId },
                     { KEY_EVENT_TYPE, type },

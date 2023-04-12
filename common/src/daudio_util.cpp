@@ -270,13 +270,12 @@ int64_t CalculateOffset(const int64_t frameIndex, const int64_t framePeriodNs, c
     return totalOffset - frameIndex * framePeriodNs;
 }
 
-int64_t UpdateTimeOffset(const int64_t frameIndex, const int64_t framePeriodNs, const int64_t updateInterval,
-    int64_t &startTime)
+int64_t UpdateTimeOffset(const int64_t frameIndex, const int64_t framePeriodNs, int64_t &startTime)
 {
     int64_t timeOffset = 0;
     if (frameIndex == 0) {
         startTime = GetCurNano();
-    } else if (frameIndex % updateInterval == 0) {
+    } else if (frameIndex % AUDIO_OFFSET_FRAME_NUM == 0) {
         timeOffset = CalculateOffset(frameIndex, framePeriodNs, startTime);
     }
     return timeOffset;
