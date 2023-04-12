@@ -187,11 +187,7 @@ int32_t AudioEncodeTransport::RegisterChannelListener(const PortCapType capType)
 int32_t AudioEncodeTransport::RegisterProcessorListener(const AudioParam &localParam, const AudioParam &remoteParam)
 {
     DHLOGI("Register processor listener.");
-    if (localParam.renderOpts.renderFlags == NORMAL_MODE || localParam.captureOpts.capturerFlags == NORMAL_MODE) {
-        DHLOGE("Encode trans normal mode. renderFlags: %d, captureFlags: %d",
-            localParam.renderOpts.renderFlags, localParam.captureOpts.capturerFlags);
-        processor_ = std::make_shared<AudioEncoderProcessor>();
-    }
+    processor_ = std::make_shared<AudioEncoderProcessor>();
     if (audioChannel_ == nullptr) {
         DHLOGE("Create audio processor failed.");
         return ERR_DH_AUDIO_TRANS_ERROR;
