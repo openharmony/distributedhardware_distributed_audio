@@ -26,10 +26,8 @@
 
 #include "audio_capture_interface_impl.h"
 #include "audio_capture_interface_impl_base.h"
-#include "audio_capture_lowlatency_impl.h"
 #include "audio_render_interface_impl.h"
 #include "audio_render_interface_impl_base.h"
-#include "audio_render_lowlatency_impl.h"
 
 namespace OHOS {
 namespace HDI {
@@ -37,6 +35,7 @@ namespace DistributedAudio {
 namespace Audio {
 namespace V1_0 {
 using OHOS::HDI::DistributedAudio::Audioext::V1_0::DAudioEvent;
+using OHOS::HDI::DistributedAudio::Audioext::V1_0::PortOperationMode;
 using OHOS::HDI::DistributedAudio::Audioext::V1_0::AudioParameter;
 using OHOS::HDI::DistributedAudio::Audioext::V1_0::IDAudioCallback;
 
@@ -62,11 +61,6 @@ typedef enum {
     EVENT_GET_MAX_VOLUME = 3,
     EVENT_IS_STREAM_MUTE = 4,
 } VolumeEventType;
-
-typedef enum {
-    NORMAL_FLAG = 0,
-    MMAP_FLAG = 1,
-} RenderCaptureFlag;
 
 class AudioAdapterInterfaceImpl : public IAudioAdapter {
 public:
@@ -156,8 +150,8 @@ private:
     uint32_t timeInterval_ = 5;
 
     // mmap param
-    int32_t renderFlags_ = NORMAL_FLAG;
-    int32_t capturerFlags_ = NORMAL_FLAG;
+    PortOperationMode renderFlags_ = Audioext::V1_0::NORMAL_MODE;
+    PortOperationMode capturerFlags_ = Audioext::V1_0::NORMAL_MODE;
 
     const std::string NOT_MUTE_STATUS = "0";
     const std::string IS_MUTE_STATUS = "1";

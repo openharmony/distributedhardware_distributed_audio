@@ -81,6 +81,7 @@ HWTEST_F(AudioDataChannelTest, OpenSession_002, TestSize.Level1)
     dataChannel_->OnStreamReceived(sessionIdTmp, &data, ext, param);
     delete[] data.buf;
 
+    EXPECT_NE(DH_SUCCESS, dataChannel_->CreateSession(channelListener, DATA_SPEAKER_SESSION_NAME));
     EXPECT_EQ(ERR_DH_AUDIO_TRANS_ERROR, dataChannel_->OpenSession());
     EXPECT_EQ(DH_SUCCESS, dataChannel_->CloseSession());
 }

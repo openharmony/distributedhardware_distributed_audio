@@ -63,6 +63,10 @@ constexpr uint32_t DAUDIO_MAX_TASKQUEUE_LEN = 100;
 constexpr uint32_t DAUDIO_MAX_RECV_DATA_LEN = 104857600;
 constexpr uint32_t DAUDIO_MAX_JSON_LEN = 1024;
 
+static constexpr int64_t AUDIO_OFFSET_FRAME_NUM = 10;
+static constexpr int64_t LOW_LATENCY_INTERVAL_NS = 5000000;
+static constexpr int64_t LOW_LATENCY_CLIENT_INTERVAL_NS = 20000000;
+
 const std::string DAUDIO_LOG_TITLE_TAG = "DAUDIO";
 const std::string DAUDIO_PREFIX = "DISTRIBUTED_AUDIO";
 const std::string AUDIO_PREFIX = "AUDIO";
@@ -97,6 +101,7 @@ constexpr const char *KEY_RESULT = "result";
 constexpr const char *KEY_EVENT_TYPE = "eventType";
 constexpr const char *KEY_AUDIO_PARAM = "audioParam";
 constexpr const char *KEY_ATTRS = "attrs";
+constexpr const char *KEY_RANDOM_TASK_CODE = "randomTaskCode";
 
 constexpr const char *KEY_SAMPLING_RATE = "samplingRate";
 constexpr const char *KEY_CHANNELS = "channels";

@@ -100,8 +100,8 @@ int32_t DAudioManagerCallback::GetAudioParamHDF(const AudioParameter& param, Aud
     paramHDF.frameSize = param.frameSize;
     paramHDF.period = param.period;
     paramHDF.ext = param.ext;
-    paramHDF.renderFlags = param.renderFlags;
-    paramHDF.capturerFlags = param.capturerFlags;
+    paramHDF.renderFlags = static_cast<OHOS::DistributedHardware::PortOperationMode>(param.renderFlags);
+    paramHDF.capturerFlags = static_cast<OHOS::DistributedHardware::PortOperationMode>(param.capturerFlags);
     DHLOGI("HDF Param: sample rate %d, channel %d, bit format %d, stream usage %d, frame size %zu, " +
         "period %zu, renderFlags %d, capturerFlags %d, ext {%s}.", paramHDF.sampleRate, paramHDF.channelMask,
         paramHDF.bitFormat, paramHDF.streamUsage, paramHDF.frameSize, paramHDF.period, paramHDF.renderFlags,
@@ -149,18 +149,6 @@ int32_t DAudioManagerCallback::NotifyEvent(const std::string& adpName, int32_t d
             break;
         case AudioEventHDF::AUDIO_EVENT_CHANGE_PLAY_STATUS:
             newEvent.type = AudioEventType::CHANGE_PLAY_STATUS;
-            break;
-        case AudioEventHDF::AUDIO_EVENT_MMAP_START:
-            newEvent.type = AudioEventType::MMAP_START;
-            break;
-        case AudioEventHDF::AUDIO_EVENT_MMAP_STOP:
-            newEvent.type = AudioEventType::MMAP_STOP;
-            break;
-        case AudioEventHDF::AUDIO_EVENT_MIC_MMAP_START:
-            newEvent.type = AudioEventType::MMAP_START_MIC;
-            break;
-        case AudioEventHDF::AUDIO_EVENT_MIC_MMAP_STOP:
-            newEvent.type = AudioEventType::MMAP_STOP_MIC;
             break;
         case AudioEventHDF::AUDIO_EVENT_START:
             newEvent.type = AudioEventType::AUDIO_START;
@@ -233,38 +221,23 @@ int32_t DAudioManagerCallback::ReadStreamData(const std::string &adpName, int32_
 }
 
 int32_t DAudioManagerCallback::ReadMmapPosition(const std::string &adpName, int32_t devId,
-    uint64_t &frames, uint64_t &timeStamp)
+    uint64_t &frames, OHOS::HDI::DistributedAudio::Audioext::V1_0::CurrentTime &time)
 {
-    DHLOGI("Read mmap position.");
-    if (callback_ == nullptr) {
-        DHLOGE("Register hdi callback is nullptr.");
-        return HDF_FAILURE;
-    }
-
-    int32_t ret = callback_->ReadMmapPosition(adpName, devId, frames, timeStamp);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Read mmap postion failed.");
-        return HDF_FAILURE;
-    }
-    DHLOGI("Read mmap position success.");
+    (void) adpName;
+    (void) devId;
+    (void) frames;
+    (void) time;
     return HDF_SUCCESS;
 }
 
 int32_t DAudioManagerCallback::RefreshAshmemInfo(const std::string &adpName, int32_t devId,
     int fd, int32_t ashmemLength, int32_t lengthPerTrans)
 {
-    DHLOGI("Refresh ashmem info.");
-    if (callback_ == nullptr) {
-        DHLOGE("Register hdi callback is nullptr.");
-        return HDF_FAILURE;
-    }
-
-    int32_t ret = callback_->RefreshAshmemInfo(adpName, devId, fd, ashmemLength, lengthPerTrans);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("RefreshAshmemInfo failed.");
-        return HDF_FAILURE;
-    }
-    DHLOGI("RefreshAshmemInfo success.");
+    (void) adpName;
+    (void) devId;
+    (void) fd;
+    (void) ashmemLength;
+    (void) lengthPerTrans;
     return HDF_SUCCESS;
 }
 } // DistributedHardware

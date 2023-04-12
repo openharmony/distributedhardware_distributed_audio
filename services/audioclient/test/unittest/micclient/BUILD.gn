@@ -29,6 +29,7 @@ config("module_private_config") {
   ]
 
   include_dirs += [
+    "${audio_client_path}/interface",
     "${audio_client_path}/micclient/include",
     "${audio_client_path}/test/unittest/micclient/include",
     "${audio_client_path}/test/unittest/audioclienttestutils/include",

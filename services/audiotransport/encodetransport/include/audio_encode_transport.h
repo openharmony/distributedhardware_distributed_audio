@@ -64,7 +64,6 @@ private:
 
 private:
     static const constexpr uint8_t SESSION_WAIT_SECONDS = 5;
-    static constexpr int32_t MMAP_FLAG = 1;
 
     std::weak_ptr<IAudioDataTransCallback> dataTransCallback_;
     std::shared_ptr<IAudioChannel> audioChannel_ = nullptr;

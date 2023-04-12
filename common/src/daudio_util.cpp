@@ -40,6 +40,7 @@ constexpr int32_t WORD_WIDTH_4 = 4;
 constexpr size_t INT32_SHORT_ID_LENGTH = 20;
 constexpr size_t INT32_MIN_ID_LENGTH = 3;
 constexpr size_t INT32_PLAINTEXT_LENGTH = 4;
+constexpr uint8_t MAX_KEY_DH_ID_LEN = 20;
 
 std::map<std::string, JsonTypeCheckFunc> typeCheckMap = {
     std::map<std::string, JsonTypeCheckFunc>::value_type(KEY_TYPE, &DistributedHardware::IsInt32),
@@ -50,6 +51,7 @@ std::map<std::string, JsonTypeCheckFunc> typeCheckMap = {
     std::map<std::string, JsonTypeCheckFunc>::value_type(KEY_EVENT_TYPE, &DistributedHardware::IsInt32),
     std::map<std::string, JsonTypeCheckFunc>::value_type(KEY_AUDIO_PARAM, &DistributedHardware::IsAudioParam),
     std::map<std::string, JsonTypeCheckFunc>::value_type(KEY_ATTRS, &DistributedHardware::IsString),
+    std::map<std::string, JsonTypeCheckFunc>::value_type(KEY_RANDOM_TASK_CODE, &DistributedHardware::IsString),
     std::map<std::string, JsonTypeCheckFunc>::value_type(KEY_SAMPLING_RATE, &DistributedHardware::IsInt32),
     std::map<std::string, JsonTypeCheckFunc>::value_type(KEY_CHANNELS, &DistributedHardware::IsInt32),
     std::map<std::string, JsonTypeCheckFunc>::value_type(KEY_FORMAT, &DistributedHardware::IsInt32),
@@ -126,6 +128,16 @@ int32_t GetDevTypeByDHId(int32_t dhId)
         return AUDIO_DEVICE_TYPE_SPEAKER;
     }
     return AUDIO_DEVICE_TYPE_UNKNOWN;
+}
+
+void GetCurrentTime(int64_t &tvSec, int64_t &tvNSec)
+{
+    struct timespec time;
+    if (clock_gettime(CLOCK_MONOTONIC, &time) < 0) {
+        DHLOGE("Get current time failed");
+    }
+    tvSec = time.tv_sec;
+    tvNSec = time.tv_nsec;
 }
 
 int64_t GetNowTimeUs()
@@ -216,7 +228,7 @@ bool IsAudioParam(const json &jsonObj, const std::string &key)
 
 int32_t CalculateSampleNum(uint32_t sampleRate, uint32_t timems)
 {
-    return sampleRate * timems / AUDIO_MS_PER_SECOND;
+    return (sampleRate * timems) / AUDIO_MS_PER_SECOND;
 }
 
 int64_t GetCurNano()
@@ -249,8 +261,40 @@ int32_t AbsoluteSleep(int64_t nanoTime)
     if (ret != 0) {
         DHLOGE("AbsoluteSleep may failed, ret is : %d", ret);
     }
-
     return ret;
+}
+
+int64_t CalculateOffset(const int64_t frameIndex, const int64_t framePeriodNs, const int64_t startTime)
+{
+    int64_t totalOffset = GetCurNano() - startTime;
+    return totalOffset - frameIndex * framePeriodNs;
+}
+
+int64_t UpdateTimeOffset(const int64_t frameIndex, const int64_t framePeriodNs, const int64_t updateInterval,
+    int64_t &startTime)
+{
+    int64_t timeOffset = 0;
+    if (frameIndex == 0) {
+        startTime = GetCurNano();
+    } else if (frameIndex % updateInterval == 0) {
+        timeOffset = CalculateOffset(frameIndex, framePeriodNs, startTime);
+    }
+    return timeOffset;
+}
+
+bool CheckIsNum(const std::string &jsonString)
+{
+    if (jsonString.empty() || jsonString.size() > MAX_KEY_DH_ID_LEN) {
+        DHLOGE("Json string size %d, is zero or too long.", jsonString.size());
+        return false;
+    }
+    for (char const &c : jsonString) {
+        if (!std::isdigit(c)) {
+            DHLOGE("Json string is not number.");
+            return false;
+        }
+    }
+    return true;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

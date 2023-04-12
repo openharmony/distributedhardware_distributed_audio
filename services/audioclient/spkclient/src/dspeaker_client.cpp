@@ -153,6 +153,8 @@ int32_t DSpeakerClient::StopRender()
             "daudio renderer is nullptr.");
         return ERR_DH_AUDIO_CLIENT_RENDER_OR_TRANS_IS_NULL;
     }
+
+    FlushJitterQueue();
     isRenderReady_.store(false);
     if (renderDataThread_.joinable()) {
         renderDataThread_.join();
@@ -174,6 +176,8 @@ void DSpeakerClient::PlayThreadRunning()
     if (pthread_setname_np(pthread_self(), RENDERTHREAD) != DH_SUCCESS) {
         DHLOGE("Render data thread setname failed.");
     }
+
+    FillJitterQueue();
     while (audioRenderer_ != nullptr && isRenderReady_.load()) {
         std::shared_ptr<AudioData> audioData = nullptr;
         {
@@ -183,10 +187,11 @@ void DSpeakerClient::PlayThreadRunning()
             if (dataQueue_.empty()) {
                 continue;
             }
-
             audioData = dataQueue_.front();
             dataQueue_.pop();
+            DHLOGD("Pop spk data, dataqueue size: %d.", dataQueue_.size());
         }
+
         int32_t writeOffSet = 0;
         while (writeOffSet < static_cast<int32_t>(audioData->Capacity())) {
             int32_t writeLen = audioRenderer_->Write(audioData->Data() + writeOffSet,
@@ -198,6 +203,32 @@ void DSpeakerClient::PlayThreadRunning()
             }
             writeOffSet += writeLen;
         }
+    }
+}
+
+void DSpeakerClient::FillJitterQueue()
+{
+    while (true) {
+        {
+            std::lock_guard<std::mutex> lock(dataQueueMtx_);
+            if (dataQueue_.size() >= DATA_QUEUE_SIZE) {
+                break;
+            }
+        }
+        usleep(SLEEP_TIME);
+    }
+}
+
+void DSpeakerClient::FlushJitterQueue()
+{
+    while (true) {
+        {
+            std::lock_guard<std::mutex> lock(dataQueueMtx_);
+            if (dataQueue_.empty()) {
+                break;
+            }
+        }
+        usleep(SLEEP_TIME);
     }
 }
 
@@ -394,6 +425,7 @@ int32_t DSpeakerClient::SetMute(const AudioEvent &event)
 void DSpeakerClient::Pause()
 {
     DHLOGI("Pause and flush");
+    FlushJitterQueue();
     isRenderReady_.store(false);
     if (renderDataThread_.joinable()) {
         renderDataThread_.join();

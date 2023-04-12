@@ -74,12 +74,12 @@ HWTEST_F(EncodeTransportTest, encode_transport_test_001, TestSize.Level1)
         },
         {
             SOURCE_TYPE_INVALID,
-            0
+            NORMAL_MODE
         },
         {
             CONTENT_TYPE_UNKNOWN,
             STREAM_USAGE_UNKNOWN,
-            0
+            NORMAL_MODE
         }
     };
     AudioParam testRemoteParaEnc = {
@@ -91,12 +91,12 @@ HWTEST_F(EncodeTransportTest, encode_transport_test_001, TestSize.Level1)
         },
         {
             SOURCE_TYPE_INVALID,
-            0
+            NORMAL_MODE
         },
         {
             CONTENT_TYPE_UNKNOWN,
             STREAM_USAGE_UNKNOWN,
-            0
+            NORMAL_MODE
         }
     };
     EXPECT_NE(DH_SUCCESS, encodeTrans_->SetUp(testLocalParaEnc, testRemoteParaEnc, transCallback_, ROLE_TEST));
@@ -140,12 +140,12 @@ HWTEST_F(EncodeTransportTest, encode_transport_test_003, TestSize.Level1)
         },
         {
             SOURCE_TYPE_INVALID,
-            0
+            NORMAL_MODE
         },
         {
             CONTENT_TYPE_UNKNOWN,
             STREAM_USAGE_UNKNOWN,
-            0
+            NORMAL_MODE
         }
     };
     AudioParam testRemoteParaEnc = {
@@ -157,20 +157,55 @@ HWTEST_F(EncodeTransportTest, encode_transport_test_003, TestSize.Level1)
         },
         {
             SOURCE_TYPE_INVALID,
-            0
+            NORMAL_MODE
         },
         {
             CONTENT_TYPE_UNKNOWN,
             STREAM_USAGE_UNKNOWN,
-            0
+            NORMAL_MODE
         }
     };
+
+    EXPECT_EQ(ERR_DH_AUDIO_TRANS_ERROR, encodeTrans_->RegisterProcessorListener(testLocalParaEnc, testRemoteParaEnc));
+    EXPECT_EQ(ERR_DH_AUDIO_TRANS_ERROR,
+        encodeTrans_->InitAudioEncodeTrans(testLocalParaEnc, testRemoteParaEnc, ROLE_TEST));
     encodeTrans_->context_ = std::make_shared<AudioTransportContext>();
     auto stateContext = std::shared_ptr<AudioTransportContext>(encodeTrans_->context_);
     encodeTrans_->context_->currentState_ =
         AudioTransportStatusFactory::GetInstance().CreateState(TRANSPORT_STATE_PAUSE, stateContext);
     EXPECT_EQ(DH_SUCCESS, encodeTrans_->Pause());
     EXPECT_EQ(ERR_DH_AUDIO_TRANS_ERROR, encodeTrans_->Restart(testLocalParaEnc, testRemoteParaEnc));
+}
+
+/**
+ * @tc.name: encode_transport_test_004
+ * @tc.desc: Verify encode_transport_test function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5U
+ */
+HWTEST_F(EncodeTransportTest, encode_transport_test_004, TestSize.Level1)
+{
+    std::shared_ptr<AudioData> audioData = nullptr;
+    AudioEvent event;
+    encodeTrans_->OnSessionOpened();
+    encodeTrans_->OnSessionClosed();
+    encodeTrans_->OnDataReceived(audioData);
+    encodeTrans_->OnEventReceived(event);
+    encodeTrans_->OnStateNotify(event);
+    encodeTrans_->OnAudioDataDone(audioData);
+
+    EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE, encodeTrans_->FeedAudioData(audioData));
+}
+
+/**
+ * @tc.name: encode_transport_test_005
+ * @tc.desc: Verify RegisterChannelListener function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5U
+ */
+HWTEST_F(EncodeTransportTest, encode_transport_test_005, TestSize.Level1)
+{
+    EXPECT_EQ(ERR_DH_AUDIO_TRANS_ERROR, encodeTrans_->RegisterChannelListener(ROLE_TEST));
 }
 } // namespace DistributedHardware
 } // namespace OHOS

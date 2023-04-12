@@ -34,7 +34,7 @@ config("module_private_config") {
   ]
 }
 
-## UnitTest hdi_service_audio_test
+## UnitTest hdi_service_adapter_test
 ohos_unittest("HDIServiceAudioAdapterTest") {
   module_out_path = module_out_path
 

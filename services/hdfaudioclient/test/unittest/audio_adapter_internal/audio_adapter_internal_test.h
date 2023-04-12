@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#ifndef DAUDIO_ADAPTER_INTERNAL_TEST_H
+#define DAUDIO_ADAPTER_INTERNAL_TEST_H
+
 #include <sys/mman.h>
 
 #include "daudio_adapter_internal.h"
@@ -134,3 +137,4 @@ public:
 };
 } // DistributedHardware
 } // OHOS
+#endif

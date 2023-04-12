@@ -33,6 +33,7 @@ config("module_private_config") {
   ]
 
   include_dirs += [
+    "${audio_client_path}/interface",
     "${audio_client_path}/spkclient/include",
     "${audio_client_path}/test/unittest/spkclient/include",
     "${audio_client_path}/test/unittest/audioclienttestutils/include",

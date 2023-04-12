@@ -52,10 +52,6 @@ DAudioSourceDev::DAudioSourceDev(const std::string &devId, const std::shared_ptr
     memberFuncMap_[AUDIO_FOCUS_CHANGE] = &DAudioSourceDev::HandleFocusChange;
     memberFuncMap_[AUDIO_RENDER_STATE_CHANGE] = &DAudioSourceDev::HandleRenderStateChange;
     memberFuncMap_[CHANGE_PLAY_STATUS] = &DAudioSourceDev::HandlePlayStatusChange;
-    memberFuncMap_[MMAP_START] = &DAudioSourceDev::HandleMmapStart;
-    memberFuncMap_[MMAP_STOP] = &DAudioSourceDev::HandleMmapStop;
-    memberFuncMap_[MMAP_START_MIC] = &DAudioSourceDev::HandleMicMmapStart;
-    memberFuncMap_[MMAP_STOP_MIC] = &DAudioSourceDev::HandleMicMmapStop;
 
     eventNotifyMap_[NOTIFY_OPEN_SPEAKER_RESULT] = EVENT_NOTIFY_OPEN_SPK;
     eventNotifyMap_[NOTIFY_CLOSE_SPEAKER_RESULT] = EVENT_NOTIFY_CLOSE_SPK;
@@ -390,54 +386,6 @@ int32_t DAudioSourceDev::HandlePlayStatusChange(const AudioEvent &event)
         DHLOGE("Play status error.");
         return ERR_DH_AUDIO_FAILED;
     }
-}
-
-int32_t DAudioSourceDev::HandleMmapStart(const AudioEvent &event)
-{
-    DHLOGI("Mmap start, content: %s.", event.content.c_str());
-    if (speaker_ == nullptr) {
-        DHLOGE("Mmap start, speaker is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
-    speaker_->MmapStart();
-    return DH_SUCCESS;
-}
-
-int32_t DAudioSourceDev::HandleMmapStop(const AudioEvent &event)
-{
-    DHLOGI("Mmap stop, content: %s.", event.content.c_str());
-    if (speaker_ == nullptr) {
-        DHLOGE("Mmap stop, speaker is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
-    speaker_->MmapStop();
-    return DH_SUCCESS;
-}
-
-int32_t DAudioSourceDev::HandleMicMmapStart(const AudioEvent &event)
-{
-    DHLOGI("Mmap start, content: %s.", event.content.c_str());
-    if (mic_ == nullptr) {
-        DHLOGE("Mmap start, mic is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
-    if (mic_->MmapStart() != DH_SUCCESS) {
-        return ERR_DH_AUDIO_FAILED;
-    }
-    return DH_SUCCESS;
-}
-
-int32_t DAudioSourceDev::HandleMicMmapStop(const AudioEvent &event)
-{
-    DHLOGI("Mmap stop, content: %s.", event.content.c_str());
-    if (mic_ == nullptr) {
-        DHLOGE("Mmap stop, mic is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
-    if (mic_->MmapStop() != DH_SUCCESS) {
-        return ERR_DH_AUDIO_FAILED;
-    }
-    return DH_SUCCESS;
 }
 
 int32_t DAudioSourceDev::WaitForRPC(const AudioEventType type)
@@ -867,10 +815,14 @@ void DAudioSourceDev::OnTaskResult(int32_t resultCode, const std::string &result
 
 int32_t DAudioSourceDev::NotifySinkDev(const AudioEventType type, const json Param, const std::string dhId)
 {
+    srand(static_cast<int32_t>(time(0)));
+    const int32_t randomTaskCode = rand();
     constexpr uint32_t eventOffset = 4;
     json jParam = { { KEY_DH_ID, dhId },
                     { KEY_EVENT_TYPE, type },
-                    { KEY_AUDIO_PARAM, Param } };
+                    { KEY_AUDIO_PARAM, Param },
+                    { KEY_RANDOM_TASK_CODE, std::to_string(randomTaskCode) } };
+    DHLOGI("Notify sin dev, random task code: %d", randomTaskCode);
     DAudioSourceManager::GetInstance().DAudioNotify(devId_, dhId, type, jParam.dump());
     return WaitForRPC(static_cast<AudioEventType>(static_cast<int32_t>(type) + eventOffset));
 }
@@ -921,21 +873,6 @@ void DAudioSourceDev::to_json(json &j, const AudioParam &param)
         { KEY_RENDER_FLAGS, param.renderOpts.renderFlags }, { KEY_CAPTURE_FLAGS, param.captureOpts.capturerFlags },
         { KEY_SOURCE_TYPE, param.captureOpts.sourceType },
     };
-}
-
-bool DAudioSourceDev::CheckIsNum(const std::string &jsonString)
-{
-    if (jsonString.empty() || jsonString.size() > MAX_KEY_DH_ID_LEN) {
-        DHLOGE("Json string size %d, is zero or too long.", jsonString.size());
-        return false;
-    }
-    for (char const &c : jsonString) {
-        if (!std::isdigit(c)) {
-            DHLOGE("Json string is not number.");
-            return false;
-        }
-    }
-    return true;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

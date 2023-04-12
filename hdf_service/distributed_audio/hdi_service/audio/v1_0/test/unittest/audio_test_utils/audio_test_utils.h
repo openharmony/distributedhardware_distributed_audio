@@ -34,6 +34,7 @@ namespace V1_0 {
 using OHOS::HDI::DistributedAudio::Audioext::V1_0::DAudioEvent;
 using OHOS::HDI::DistributedAudio::Audioext::V1_0::AudioData;
 using OHOS::HDI::DistributedAudio::Audioext::V1_0::AudioParameter;
+using OHOS::HDI::DistributedAudio::Audioext::V1_0::CurrentTime;
 using OHOS::HDI::DistributedAudio::Audioext::V1_0::IDAudioCallback;
 using OHOS::HDI::DistributedAudio::Audio::V1_0::IAudioCallback;
 class MockIDAudioCallback : public IDAudioCallback {
@@ -71,7 +72,8 @@ public:
         return DistributedHardware::DH_SUCCESS;
     }
 
-    int32_t ReadMmapPosition(const std::string &adpName, int32_t devId, uint64_t &frames, uint64_t &timeStamp) override
+    int32_t ReadMmapPosition(const std::string &adpName, int32_t devId, uint64_t &frames,
+        CurrentTime &time) override
     {
         return DistributedHardware::DH_SUCCESS;
     }
@@ -514,7 +516,8 @@ public:
         return DistributedHardware::ERR_DH_AUDIO_HDF_FAIL;
     }
 
-    int32_t ReadMmapPosition(const std::string &adpName, int32_t devId, uint64_t &frames, uint64_t &timeStamp) override
+    int32_t ReadMmapPosition(const std::string &adpName, int32_t devId, uint64_t &frames,
+        CurrentTime &time) override
     {
         return DistributedHardware::DH_SUCCESS;
     }

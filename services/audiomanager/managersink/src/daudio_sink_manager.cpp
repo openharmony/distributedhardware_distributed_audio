@@ -91,6 +91,17 @@ int32_t DAudioSinkManager::HandleDAudioNotify(const std::string &devId, const st
     const int32_t eventType, const std::string &eventContent)
 {
     DHLOGI("Receive audio event from devId: %s, event type: %d.", GetAnonyString(devId).c_str(), eventType);
+
+    if (eventContent.length() > DAUDIO_MAX_JSON_LEN || eventContent.empty()) {
+        return ERR_DH_AUDIO_FAILED;
+    }
+
+    json jParam = json::parse(eventContent, nullptr, false);
+    if (JsonParamCheck(jParam, { KEY_RANDOM_TASK_CODE }) && CheckIsNum((std::string)jParam[KEY_RANDOM_TASK_CODE])) {
+        int32_t randomCode = std::stoi((std::string)jParam[KEY_RANDOM_TASK_CODE]);
+        DHLOGI("Receive audio notify from source, random task code: %d", randomCode);
+    }
+
     std::lock_guard<std::mutex> lock(devMapMutex_);
     auto iter = audioDevMap_.find(devId);
     if (iter == audioDevMap_.end() && CreateAudioDevice(devId) != DH_SUCCESS) {

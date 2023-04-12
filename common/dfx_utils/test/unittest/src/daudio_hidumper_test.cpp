@@ -43,9 +43,6 @@ void DAudioHidumperTest::TearDown()
 HWTEST_F(DAudioHidumperTest, Dump_001, TestSize.Level1)
 {
     std::string result;
-    int32_t taskId = 1;
-    DaudioStartAsyncTrace(result, taskId);
-    DaudioFinishAsyncTrace(result, taskId);
     std::vector<std::string> args;
     EXPECT_EQ(true, hidumper_->Dump(args, result));
     args = { "-h"};

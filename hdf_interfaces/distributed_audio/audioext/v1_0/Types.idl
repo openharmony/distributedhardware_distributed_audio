@@ -14,6 +14,10 @@
  */
 
 package ohos.hdi.distributed_audio.audioext.v1_0;
+enum PortOperationMode {
+    NORMAL_MODE = 0,
+    MMAP_MODE = 1,
+};
 struct AudioParameter {
     unsigned int format;
     unsigned int channelCount;
@@ -21,8 +25,8 @@ struct AudioParameter {
     unsigned int period;
     unsigned int frameSize;
     unsigned int streamUsage;
-    int renderFlags;
-    int capturerFlags;
+    enum PortOperationMode renderFlags;
+    enum PortOperationMode capturerFlags;
     String ext;
 };
 struct AudioData {
@@ -32,4 +36,8 @@ struct AudioData {
 struct DAudioEvent {
     int type;
     String content;
+};
+struct CurrentTime {
+    long tvSec;
+    long tvNSec;
 };

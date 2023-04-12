@@ -45,6 +45,11 @@ int32_t CalculateSampleNum(uint32_t sampleRate, uint32_t timems);
 int64_t GetCurNano();
 
 int32_t AbsoluteSleep(int64_t nanoTime);
+
+int64_t CalculateOffset(const int64_t frameindex, const int64_t framePeriodNs, const int64_t startTime);
+
+int64_t UpdateTimeOffset(const int64_t frameIndex, const int64_t framePeriodNs, const int64_t updateInterval,
+    int64_t &startTime);
 } // DistributedHardware
 } // OHOS
 #endif

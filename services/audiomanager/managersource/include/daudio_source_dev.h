@@ -89,10 +89,6 @@ private:
     int32_t HandleFocusChange(const AudioEvent &event);
     int32_t HandleRenderStateChange(const AudioEvent &event);
     int32_t HandlePlayStatusChange(const AudioEvent &event);
-    int32_t HandleMmapStart(const AudioEvent &event);
-    int32_t HandleMmapStop(const AudioEvent &event);
-    int32_t HandleMicMmapStart(const AudioEvent &event);
-    int32_t HandleMicMmapStop(const AudioEvent &event);
 
     int32_t NotifySinkDev(const AudioEventType type, const json Param, const std::string dhId);
     int32_t NotifyHDF(const AudioEventType type, const std::string result);
@@ -100,7 +96,6 @@ private:
     int32_t CloseCtrlTrans(const AudioEvent &event, bool isSpk);
     AudioEventType getEventTypeFromArgs(const std::string &args);
     void to_json(json &j, const AudioParam &param);
-    bool CheckIsNum(const std::string &jsonString);
 
 private:
     static constexpr uint8_t RPC_WAIT_SECONDS = 2;
@@ -111,7 +106,6 @@ private:
     static constexpr uint8_t EVENT_NOTIFY_CLOSE_MIC = 0x08;
     static constexpr uint8_t EVENT_NOTIFY_OPEN_CTRL = 0x10;
     static constexpr uint8_t EVENT_NOTIFY_CLOSE_CTRL = 0x20;
-    static constexpr uint8_t MAX_KEY_DH_ID_LEN = 10;
 
     std::string devId_;
     std::shared_ptr<DAudioSourceMgrCallback> mgrCallback_;
