@@ -1,7 +1,7 @@
 {
     "name":"@ohos/distributed_audio",
     "description":"distributed audio",
-    "version":"3.1",
+    "version":"4.0",
     "author":{},
     "repository":"https://gitee.com/openharmony/distributed_audio",
     "license":"Apache License 2.0",
@@ -21,8 +21,8 @@
         "adapted_system_type":[
             "standard"
         ],
-        "rom":"2000k",
-        "ram":"6M",
+        "rom":"2000KB",
+        "ram":"6MB",
         "hisysevent_config": [
             "//foundation/distributedhardware/distributed_audio/hisysevent.yaml"
         ],

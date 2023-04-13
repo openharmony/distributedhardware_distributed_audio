@@ -13,8 +13,7 @@
 
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-import(
-    "//foundation/distributedhardware/distributed_audio/distributedaudio.gni")
+import("../../../../../../../distributedaudio.gni")
 
 group("hdi_service_audio_test") {
   testonly = true
