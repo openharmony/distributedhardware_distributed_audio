@@ -24,9 +24,6 @@ config("module_private_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
-    "//base/hiviewdfx/hitrace/interfaces/native/innerkits/include/hitrace_meter",
-    "//foundation/communication/dsoftbus/interfaces/kits/transport",
     "${fwk_common_path}/utils/include",
     "${mediastandard_path}/interfaces/innerkits/native/media/include",
     "${mediastandardfwk_path}/audiocommon/include",
@@ -66,6 +63,8 @@ ohos_unittest("TransportStatusTest") {
     "${services_path}/common:distributed_audio_utils",
     "//third_party/googletest:gtest_main",
   ]
+
+  external_deps = [ "dsoftbus:softbus_client" ]
 
   defines = [
     "HI_LOG_ENABLE",
