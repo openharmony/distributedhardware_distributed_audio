@@ -14,8 +14,7 @@
 #####################hydra-fuzz###################
 import("//build/config/features.gni")
 import("//build/test.gni")
-import(
-    "//foundation/distributedhardware/distributed_audio/distributedaudio.gni")
+import("../../../../../../distributedaudio.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("SourceHandlerRegisterDistributedHardwareFuzzTest") {
@@ -38,7 +37,6 @@ ohos_fuzztest("SourceHandlerRegisterDistributedHardwareFuzzTest") {
     "${fwk_common_path}/log/include",
     "${fwk_common_path}/utils/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-
   ]
 
   include_dirs += [

@@ -14,8 +14,7 @@
 import("//build/ohos.gni")
 import("//build/ohos_var.gni")
 import("//build/test.gni")
-import(
-    "//foundation/distributedhardware/distributed_audio/distributedaudio.gni")
+import("../../../../../distributedaudio.gni")
 
 module_out_path =
     "distributed_audio/services/audiohdiproxy/daudio_manager_callback"
@@ -55,9 +54,7 @@ ohos_unittest("DAudioManagerCallbackTest") {
     "//third_party/googletest:gtest_main",
   ]
 
-  external_deps = [
-    "c_utils:utils",
-  ]
+  external_deps = [ "c_utils:utils" ]
 }
 
 group("daudio_manager_callback_test") {

@@ -52,7 +52,7 @@ int32_t DAudioSinkStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Mess
     const auto &iter = memberFuncMap_.find(code);
     if (iter == memberFuncMap_.end()) {
         DHLOGE("Invalid request code.");
-        return ERR_DH_AUDIO_SA_INVALID_REQUEST_CODE;
+        return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
     DAudioSinkServiceFunc &func = iter->second;
     return (this->*func)(data, reply, option);

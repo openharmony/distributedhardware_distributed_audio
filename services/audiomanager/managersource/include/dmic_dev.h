@@ -18,12 +18,10 @@
 
 #include <queue>
 #include <set>
-#include <thread>
 #include "nlohmann/json.hpp"
 
 #include "audio_param.h"
 #include "audio_status.h"
-#include "ashmem.h"
 #include "daudio_hdi_handler.h"
 #include "iaudio_datatrans_callback.h"
 #include "iaudio_data_transport.h"
@@ -51,12 +49,6 @@ public:
     int32_t WriteStreamData(const std::string &devId, const int32_t dhId, std::shared_ptr<AudioData> &data) override;
     int32_t ReadStreamData(const std::string &devId, const int32_t dhId, std::shared_ptr<AudioData> &data) override;
     int32_t NotifyEvent(const std::string &devId, const int32_t dhId, const AudioEvent &event) override;
-    int32_t ReadMmapPosition(const std::string &devId, const int32_t dhId,
-        uint64_t &frames, uint64_t &timeStamp) override;
-    int32_t RefreshAshmemInfo(const std::string &devId, const int32_t dhId,
-        int32_t fd, int32_t ashmemLength, int32_t lengthPerTrans) override;
-    int32_t MmapStart();
-    int32_t MmapStop();
 
     int32_t SetUp();
     int32_t Start();
@@ -72,21 +64,19 @@ public:
 private:
     int32_t EnableDevice(const int32_t dhId, const std::string &capability);
     int32_t DisableDevice(const int32_t dhId);
-    void EnqueueThread();
 
 private:
     static constexpr uint8_t CHANNEL_WAIT_SECONDS = 5;
     static constexpr size_t DATA_QUEUE_MAX_SIZE = 10;
     static constexpr size_t DATA_QUEUE_HALF_SIZE = DATA_QUEUE_MAX_SIZE >> 1U;
-    static constexpr int64_t periodNanoSec_ = 5000000;
-    static constexpr int32_t CAPTURE_MMAP_FLAG = 1;
+    static constexpr size_t LOW_LATENCY_DATA_QUEUE_MAX_SIZE = 40;
+    static constexpr size_t LOW_LATENCY_DATA_QUEUE_HALF_SIZE = LOW_LATENCY_DATA_QUEUE_MAX_SIZE >> 1U;
     static constexpr const char* ENQUEUE_THREAD = "micEnqueueTh";
 
     std::string devId_;
     std::weak_ptr<IAudioEventCallback> audioEventCallback_;
     std::mutex dataQueueMtx_;
     std::mutex channelWaitMutex_;
-    std::mutex writeAshmemtMutex_;
     std::condition_variable channelWaitCond_;
     int32_t curPort_ = 0;
     std::atomic<bool> isTransReady_ = false;
@@ -99,15 +89,6 @@ private:
     // Mic capture parameters
     AudioParamHDF paramHDF_;
     AudioParam param_;
-
-    // Ashmem
-    sptr<Ashmem> ashmem_ = nullptr;
-    std::atomic<bool> isEnqueueRunning_ = false;
-    int32_t writeIndex_ = -1;
-    int32_t ashmemLength_ = -1;
-    int32_t lengthPerTrans_ = -1;
-    std::thread enqueueDataThread_;
-    std::condition_variable dataQueueCond_;
 };
 } // DistributedHardware
 } // OHOS

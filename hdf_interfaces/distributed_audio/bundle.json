@@ -1,13 +1,15 @@
 {
-    "name": "drivers_interface_distributed_audio",
+    "name": "@ohos/drivers_interface_distributed_audio",
     "description": "distributed audio device driver interface",
-    "version": "1.0",
+    "version": "4.0",
     "license": "Apache License 2.0",
     "component": {
         "name": "drivers_interface_distributed_audio",
         "subsystem": "distributedhardware",
         "syscap": [""],
-        "adapter_system_type": ["standard"],
+        "adapted_system_type":[
+            "standard"
+        ],
         "rom": "675KB",
         "ram": "1024KB",
         "deps": {

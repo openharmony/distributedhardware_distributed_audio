@@ -14,8 +14,7 @@
 #####################hydra-fuzz###################
 import("//build/config/features.gni")
 import("//build/test.gni")
-import(
-    "//foundation/distributedhardware/distributed_audio/distributedaudio.gni")
+import("../../../../../../distributedaudio.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("OnRemoteSourceSvrDiedFuzzTest") {

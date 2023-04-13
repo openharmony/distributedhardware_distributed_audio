@@ -168,68 +168,6 @@ int32_t DSpeakerDev::NotifyEvent(const std::string &devId, int32_t dhId, const A
     return DH_SUCCESS;
 }
 
-int32_t DSpeakerDev::MmapStart()
-{
-    if (ashmem_ == nullptr || speakerTrans_ == nullptr) {
-        DHLOGE("Ashmem or trans is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
-    isEnqueueRunning_.store(true);
-    enqueueDataThread_ = std::thread(&DSpeakerDev::EnqueueThread, this);
-    if (pthread_setname_np(enqueueDataThread_.native_handle(), ENQUEUE_THREAD) != DH_SUCCESS) {
-        DHLOGE("Enqueue data thread setname failed.");
-    }
-    return DH_SUCCESS;
-}
-
-void DSpeakerDev::EnqueueThread()
-{
-    readIndex_ = 0;
-    readNum_ = 0;
-    DHLOGI("lengthPerRead length: %d", lengthPerTrans_);
-    std::this_thread::sleep_for(std::chrono::microseconds(readStartDelayms_));
-    int64_t startTime = GetCurNano();
-    uint64_t readCount = 0;
-    while (isEnqueueRunning_.load()) {
-        auto readData = ashmem_->ReadFromAshmem(lengthPerTrans_, readIndex_);
-        DHLOGI("Read from ashmem success! read index: %d, readLength: %d", readIndex_, lengthPerTrans_);
-        std::shared_ptr<AudioData> audioData = std::make_shared<AudioData>(lengthPerTrans_);
-        if (readData != nullptr) {
-            const uint8_t *readAudioData = reinterpret_cast<const uint8_t *>(readData);
-            int32_t ret = memcpy_s(audioData->Data(), audioData->Capacity(), readAudioData, param_.comParam.frameSize);
-            if (ret != EOK) {
-                DHLOGE("Copy audio data failed. errno: %d", ret);
-            }
-        }
-
-        if (speakerTrans_ == nullptr) {
-            DHLOGE("Write stream data, speaker trans is null.");
-            return;
-        }
-        int32_t ret = speakerTrans_->FeedAudioData(audioData);
-        if (ret != DH_SUCCESS) {
-            DHLOGE("Write stream data failed, ret: %d.", ret);
-        }
-        readIndex_ += lengthPerTrans_;
-        if (readIndex_ >= ashmemLength_) {
-            readIndex_ = 0;
-        }
-        readNum_ += static_cast<uint64_t>(CalculateSampleNum(param_.comParam.sampleRate, timeInterval_));
-        readTimeStamp_ = 0;
-        readCount++;
-        AbsoluteSleep(startTime + readCount * periodNanoSec_);
-    }
-}
-
-int32_t DSpeakerDev::MmapStop()
-{
-    isEnqueueRunning_.store(false);
-    if (enqueueDataThread_.joinable()) {
-        enqueueDataThread_.join();
-    }
-    return DH_SUCCESS;
-}
-
 int32_t DSpeakerDev::SetUp()
 {
     DHLOGI("Set up speaker device.");
@@ -291,12 +229,6 @@ int32_t DSpeakerDev::Stop()
 int32_t DSpeakerDev::Release()
 {
     DHLOGI("Release speaker device.");
-    if (ashmem_ != nullptr) {
-        ashmem_->UnmapAshmem();
-        ashmem_->CloseAshmem();
-        ashmem_ = nullptr;
-        DHLOGI("UnInitAshmem success.");
-    }
     if (speakerTrans_ == nullptr) {
         DHLOGE("Speaker trans is null.");
         return DH_SUCCESS;
@@ -353,6 +285,7 @@ int32_t DSpeakerDev::ReadStreamData(const std::string &devId, const int32_t dhId
     (void)devId;
     (void)dhId;
     (void)data;
+    DHLOGI("Dspeaker dev not support read stream data.");
     return DH_SUCCESS;
 }
 
@@ -367,37 +300,6 @@ int32_t DSpeakerDev::WriteStreamData(const std::string &devId, const int32_t dhI
     if (ret != DH_SUCCESS) {
         DHLOGE("Write stream data failed, ret: %d.", ret);
         return ret;
-    }
-    return DH_SUCCESS;
-}
-
-int32_t DSpeakerDev::ReadMmapPosition(const std::string &devId, const int32_t dhId,
-    uint64_t &frames, uint64_t &timeStamp)
-{
-    DHLOGI("Read mmap position");
-    frames = readNum_;
-    timeStamp = readTimeStamp_;
-    return DH_SUCCESS;
-}
-
-int32_t DSpeakerDev::RefreshAshmemInfo(const std::string &devId, const int32_t dhId,
-    int32_t fd, int32_t ashmemLength, int32_t lengthPerTrans)
-{
-    DHLOGI("RefreshAshmemInfo: fd: %d, ashmemLength: %d, lengthPerTrans: %d", fd, ashmemLength, lengthPerTrans);
-    if (param_.renderOpts.renderFlags == 1) {
-        DHLOGI("Dspeaker dev low-latency mode");
-        if (ashmem_ == nullptr) {
-            ashmem_ = new Ashmem(fd, ashmemLength);
-            ashmemLength_ = ashmemLength;
-            lengthPerTrans_ = lengthPerTrans;
-            DHLOGI("Create ashmem success. fd: %d, ashmem length: %d, lengthPerTrans: %d",
-                fd, ashmemLength_, lengthPerTrans_);
-            bool mapRet = ashmem_->MapReadAndWriteAshmem();
-            if (!mapRet) {
-                DHLOGE("Mmap ashmem failed");
-                return ERR_DH_AUDIO_NULLPTR;
-            }
-        }
     }
     return DH_SUCCESS;
 }

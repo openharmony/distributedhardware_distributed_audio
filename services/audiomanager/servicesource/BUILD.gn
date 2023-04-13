@@ -13,8 +13,7 @@
 
 import("//build/ohos.gni")
 import("//build/ohos_var.gni")
-import(
-    "//foundation/distributedhardware/distributed_audio/distributedaudio.gni")
+import("../../../distributedaudio.gni")
 
 ohos_shared_library("distributed_audio_source") {
   include_dirs = [
@@ -66,9 +65,6 @@ ohos_shared_library("distributed_audio_source") {
   ]
 
   sources = [
-    "src/daudio_ipc_callback_proxy.cpp",
-    "src/daudio_source_service.cpp",
-    "src/daudio_source_stub.cpp",
     "${audio_control_path}/controlsource/src/daudio_source_dev_ctrl_manager.cpp",
     "${audio_hdi_proxy_path}/src/daudio_hdf_operate.cpp",
     "${audio_hdi_proxy_path}/src/daudio_hdi_handler.cpp",
@@ -81,6 +77,9 @@ ohos_shared_library("distributed_audio_source") {
     "${services_path}/audiomanager/managersource/src/daudio_source_mgr_callback.cpp",
     "${services_path}/audiomanager/managersource/src/dmic_dev.cpp",
     "${services_path}/audiomanager/managersource/src/dspeaker_dev.cpp",
+    "src/daudio_ipc_callback_proxy.cpp",
+    "src/daudio_source_service.cpp",
+    "src/daudio_source_stub.cpp",
   ]
 
   deps = [
@@ -89,8 +88,8 @@ ohos_shared_library("distributed_audio_source") {
     "${audio_transport_path}/encodetransport:distributed_audio_encode_transport",
     "${distributedaudio_path}/audiohandler:distributed_audio_handler",
     "${hdf_interfaces_path}/audioext/v1_0:libdaudioext_proxy_1.0",
-    "${services_path}/hdfaudioclient:daudio_client",
     "${services_path}/common:distributed_audio_utils",
+    "${services_path}/hdfaudioclient:daudio_client",
   ]
 
   external_deps = [

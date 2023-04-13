@@ -261,6 +261,7 @@ HWTEST_F(DMicDevTest, Release_001, TestSize.Level1)
  */
 HWTEST_F(DMicDevTest, ReadStreamData_001, TestSize.Level1)
 {
+    mic_->curStatus_ = AudioStatus::STATUS_START;
     const size_t capacity = 1;
     auto writeData = std::make_shared<AudioData>(capacity);
     EXPECT_EQ(DH_SUCCESS, mic_->WriteStreamData(DEV_ID, DH_ID, writeData));

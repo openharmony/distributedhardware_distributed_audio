@@ -37,20 +37,23 @@
 #include "iaudio_data_transport.h"
 #include "iaudio_datatrans_callback.h"
 #include "iaudio_event_callback.h"
+#include "imic_client.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class DMicClient : public IAudioDataTransCallback, public std::enable_shared_from_this<DMicClient> {
+class DMicClient : public IAudioDataTransCallback,
+    public IMicClient,
+    public std::enable_shared_from_this<DMicClient> {
 public:
     DMicClient(const std::string &devId, const std::shared_ptr<IAudioEventCallback> &callback)
         : devId_(devId), eventCallback_(callback) {};
     ~DMicClient() override;
     int32_t OnStateChange(const AudioEventType type) override;
     int32_t OnDecodeTransDataDone(const std::shared_ptr<AudioData> &audioData) override;
-    int32_t SetUp(const AudioParam &param);
-    int32_t Release();
-    int32_t StartCapture();
-    int32_t StopCapture();
+    int32_t SetUp(const AudioParam &param) override;
+    int32_t Release() override;
+    int32_t StartCapture() override;
+    int32_t StopCapture() override;
 
 private:
     void CaptureThreadRunning();

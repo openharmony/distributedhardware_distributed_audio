@@ -71,12 +71,12 @@ HWTEST_F(DecodeTransportTest, decode_transport_test_001, TestSize.Level1)
         },
         {
             SOURCE_TYPE_INVALID,
-            0
+            NORMAL_MODE
         },
         {
             CONTENT_TYPE_UNKNOWN,
             STREAM_USAGE_UNKNOWN,
-            0
+            NORMAL_MODE
         }
     };
     AudioParam testRemoteParaEnc = {
@@ -88,12 +88,12 @@ HWTEST_F(DecodeTransportTest, decode_transport_test_001, TestSize.Level1)
         },
         {
             SOURCE_TYPE_INVALID,
-            0
+            NORMAL_MODE
         },
         {
             CONTENT_TYPE_UNKNOWN,
             STREAM_USAGE_UNKNOWN,
-            0
+            NORMAL_MODE
         }
     };
     EXPECT_NE(DH_SUCCESS, decodeTrans_->SetUp(testLocalParaEnc, testRemoteParaEnc, transCallback_, ROLE_TEST));
@@ -115,6 +115,9 @@ HWTEST_F(DecodeTransportTest, decode_transport_test_002, TestSize.Level1)
     EXPECT_EQ(DH_SUCCESS, decodeTrans_->Release());
 
     decodeTrans_->audioChannel_ = std::make_shared<MockIAudioChannel>();
+    decodeTrans_->context_ = std::make_shared<AudioTransportContext>();
+    decodeTrans_->capType_ = CAP_MIC;
+    EXPECT_EQ(ERR_DH_AUDIO_TRANS_SESSION_NOT_OPEN, decodeTrans_->Start());
     EXPECT_NE(DH_SUCCESS, decodeTrans_->Release());
 }
 
@@ -135,12 +138,12 @@ HWTEST_F(DecodeTransportTest, decode_transport_test_003, TestSize.Level1)
         },
         {
             SOURCE_TYPE_INVALID,
-            0
+            NORMAL_MODE
         },
         {
             CONTENT_TYPE_UNKNOWN,
             STREAM_USAGE_UNKNOWN,
-            0
+            NORMAL_MODE
         }
     };
     AudioParam testRemoteParaEnc = {
@@ -152,14 +155,17 @@ HWTEST_F(DecodeTransportTest, decode_transport_test_003, TestSize.Level1)
         },
         {
             SOURCE_TYPE_INVALID,
-            0
+            NORMAL_MODE
         },
         {
             CONTENT_TYPE_UNKNOWN,
             STREAM_USAGE_UNKNOWN,
-            0
+            NORMAL_MODE
         }
     };
+    EXPECT_EQ(ERR_DH_AUDIO_BAD_VALUE, decodeTrans_->RegisterProcessorListener(testLocalParaEnc, testRemoteParaEnc));
+    EXPECT_EQ(ERR_DH_AUDIO_TRANS_ERROR,
+        decodeTrans_->InitAudioDecodeTransport(testLocalParaEnc, testRemoteParaEnc, ROLE_TEST));
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, decodeTrans_->Pause());
     EXPECT_EQ(ERR_DH_AUDIO_TRANS_ERROR, decodeTrans_->Restart(testLocalParaEnc, testRemoteParaEnc));
 }
@@ -182,6 +188,17 @@ HWTEST_F(DecodeTransportTest, decode_transport_test_004, TestSize.Level1)
     decodeTrans_->OnAudioDataDone(audioData);
 
     EXPECT_EQ(DH_SUCCESS, decodeTrans_->FeedAudioData(audioData));
+}
+
+/**
+ * @tc.name: decode_transport_test_005
+ * @tc.desc: Verify the RegisterChannelListener function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5U
+ */
+HWTEST_F(DecodeTransportTest, decode_transport_test_005, TestSize.Level1)
+{
+    EXPECT_EQ(ERR_DH_AUDIO_TRANS_ERROR, decodeTrans_->RegisterChannelListener(ROLE_TEST));
 }
 } // namespace DistributedHardware
 } // namespace OHOS

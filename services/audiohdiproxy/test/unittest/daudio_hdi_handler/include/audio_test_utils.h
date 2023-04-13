@@ -84,18 +84,6 @@ public:
     {
         return DH_SUCCESS;
     }
-
-    int32_t ReadMmapPosition(const std::string &devId, const int32_t dhId,
-        uint64_t &frames, uint64_t &timeStamp) override
-    {
-        return DH_SUCCESS;
-    }
-
-    virtual int32_t RefreshAshmemInfo(const std::string &devId, const int32_t dhId,
-        int32_t fd, int32_t ashmemLength, int32_t lengthPerTrans) override
-    {
-        return DH_SUCCESS;
-    }
 };
 } // DistributedHardware
 } // OHOS

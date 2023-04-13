@@ -60,6 +60,7 @@ HWTEST_F(AudioTransportPauseStatusTest, transport_pause_test_001, TestSize.Level
     std::shared_ptr<IAudioChannel> audioChannel_ = std::make_shared<MockAudioDataChannel>(peerDevId);
     std::shared_ptr<IAudioProcessor> processor_ = std::make_shared<MockIAudioProcessor>();
     EXPECT_EQ(ERR_DH_AUDIO_TRANS_ILLEGAL_OPERATION, audioStatus_->Start(audioChannel_, processor_));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, audioStatus_->Stop(nullptr, processor_));
 }
 
 /**
@@ -107,12 +108,12 @@ HWTEST_F(AudioTransportPauseStatusTest, transport_pause_test_004, TestSize.Level
         },
         {
             SOURCE_TYPE_INVALID,
-            0
+            NORMAL_MODE,
         },
         {
             CONTENT_TYPE_UNKNOWN,
             STREAM_USAGE_UNKNOWN,
-            0
+            NORMAL_MODE,
         }
     };
     AudioParam testRemoteParaEnc = {
@@ -124,18 +125,31 @@ HWTEST_F(AudioTransportPauseStatusTest, transport_pause_test_004, TestSize.Level
         },
         {
             SOURCE_TYPE_INVALID,
-            0
+            NORMAL_MODE,
         },
         {
             CONTENT_TYPE_UNKNOWN,
             STREAM_USAGE_UNKNOWN,
-            0
+            NORMAL_MODE,
         }
     };
     std::string peerDevId = "peerDevId";
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, audioStatus_->Restart(testLocalParaEnc, testRemoteParaEnc, nullptr));
+
     std::shared_ptr<IAudioChannel> audioChannel_ = std::make_shared<MockAudioDataChannel>(peerDevId);
     std::shared_ptr<IAudioProcessor> processor_ = std::make_shared<MockIAudioProcessor>();
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, audioStatus_->Restart(testLocalParaEnc, testRemoteParaEnc, processor_));
+}
+
+/**
+ * @tc.name: transport_getstatetype_test_001
+ * @tc.desc: Verify pause action when status is start.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5U
+ */
+HWTEST_F(AudioTransportPauseStatusTest, transport_getstatetype_test_001, TestSize.Level1)
+{
+    EXPECT_EQ(TRANSPORT_STATE_PAUSE, audioStatus_->GetStateType());
 }
 } // namespace DistributedHardware
 } // namespace OHOS

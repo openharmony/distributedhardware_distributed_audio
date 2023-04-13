@@ -50,12 +50,6 @@ public:
     int32_t WriteStreamData(const std::string &devId, const int32_t dhId, std::shared_ptr<AudioData> &data) override;
     int32_t ReadStreamData(const std::string &devId, const int32_t dhId, std::shared_ptr<AudioData> &data) override;
     int32_t NotifyEvent(const std::string &devId, const int32_t dhId, const AudioEvent &event) override;
-    int32_t ReadMmapPosition(const std::string &devId, const int32_t dhId,
-        uint64_t &frames, uint64_t &timeStamp) override;
-    int32_t RefreshAshmemInfo(const std::string &devId, const int32_t dhId,
-        int32_t fd, int32_t ashmemLength, int32_t lengthPerTrans) override;
-    int32_t MmapStart();
-    int32_t MmapStop();
 
     int32_t OnStateChange(const AudioEventType type) override;
     int32_t OnDecodeTransDataDone(const std::shared_ptr<AudioData> &audioData) override;
@@ -74,7 +68,6 @@ public:
 private:
     int32_t EnableDevice(const int32_t dhId, const std::string &capability);
     int32_t DisableDevice(const int32_t dhId);
-    void EnqueueThread();
 
 private:
     static constexpr const char* ENQUEUE_THREAD = "spkEnqueueTh";
@@ -92,19 +85,6 @@ private:
     // Speaker render parameters
     AudioParamHDF paramHDF_;
     AudioParam param_;
-
-    // mmap parameters
-    uint32_t timeInterval_ = 5;
-    uint32_t readStartDelayms_ = 2000;
-    int64_t periodNanoSec_ = 5000000;
-    sptr<Ashmem> ashmem_ = nullptr;
-    int32_t ashmemLength_ = -1;
-    int32_t lengthPerTrans_ = -1;
-    std::atomic<bool> isEnqueueRunning_ = false;
-    uint64_t readNum_ = 0;
-    int32_t readIndex_ = 0;
-    uint64_t readTimeStamp_ = 0;
-    std::thread enqueueDataThread_;
 };
 } // DistributedHardware
 } // OHOS

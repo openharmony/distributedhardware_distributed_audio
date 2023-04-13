@@ -97,6 +97,8 @@ private:
     int32_t FadeInProcess(const uint32_t durationFrame, int8_t* frameData, const size_t frameLength);
 
 private:
+    static constexpr int64_t AUDIO_OFFSET_FRAME_NUM = 10;
+
     std::string adapterName_;
     AudioDeviceDescriptor devDesc_;
     AudioSampleAttributes devAttrs_;
@@ -110,6 +112,10 @@ private:
     sptr<IDAudioCallback> audioExtCallback_ = nullptr;
     sptr<IAudioCallback> renderCallback_ = nullptr;
     bool firstOpenFlag = true;
+
+    int64_t frameIndex_ = 0;
+    int64_t framePeriodNs_ = 0;
+    int64_t startTime_ = 0;
 };
 } // V1_0
 } // Audio

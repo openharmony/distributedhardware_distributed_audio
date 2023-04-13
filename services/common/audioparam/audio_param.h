@@ -77,6 +77,11 @@ typedef enum {
     STREAM_USAGE_NOTIFICATION_RINGTONE = 6
 } StreamUsage;
 
+typedef enum {
+    NORMAL_MODE = 0,
+    MMAP_MODE = 1,
+} PortOperationMode;
+
 typedef struct AudioCommonParam {
     AudioSampleRate sampleRate = SAMPLE_RATE_8000;
     AudioChannel channelMask = MONO;
@@ -85,16 +90,15 @@ typedef struct AudioCommonParam {
     uint32_t frameSize = 0;
 } AudioCommonParam;
 
-
 typedef struct AudioCaptureOptions {
     SourceType sourceType = SOURCE_TYPE_INVALID;
-    int32_t capturerFlags = 0;
+    PortOperationMode capturerFlags = NORMAL_MODE;
 } AudioCaptureOptions;
 
 typedef struct AudioRenderOptions {
     ContentType contentType = CONTENT_TYPE_UNKNOWN;
     StreamUsage streamUsage = STREAM_USAGE_UNKNOWN;
-    int32_t renderFlags = 0;
+    PortOperationMode renderFlags = NORMAL_MODE;
 } AudioRenderOptions;
 
 typedef struct AudioParamHDF {
@@ -104,8 +108,8 @@ typedef struct AudioParamHDF {
     StreamUsage streamUsage = STREAM_USAGE_UNKNOWN;
     uint32_t frameSize = 0;
     uint32_t period = 0;
-    int32_t renderFlags = 0;
-    int32_t capturerFlags = 0;
+    PortOperationMode renderFlags = NORMAL_MODE;
+    PortOperationMode capturerFlags = NORMAL_MODE;
     std::string ext;
 } AudioParamHDF;
 
@@ -126,6 +130,11 @@ typedef enum {
     CAP_SPK = 1,
     CAP_MIC = 2,
 } PortCapType;
+
+typedef struct {
+    int64_t tvSec;
+    int64_t tvNSec;
+} CurrentTimeHDF;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DAUDIO_AUDIO_PARAM_H

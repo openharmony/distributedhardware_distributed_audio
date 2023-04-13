@@ -1,7 +1,7 @@
 {
     "name":"@ohos/distributed_audio",
     "description":"distributed audio",
-    "version":"3.1",
+    "version":"4.0",
     "author":{},
     "repository":"https://gitee.com/openharmony/distributed_audio",
     "license":"Apache License 2.0",
@@ -21,8 +21,8 @@
         "adapted_system_type":[
             "standard"
         ],
-        "rom":"2000k",
-        "ram":"6M",
+        "rom":"2000KB",
+        "ram":"6MB",
         "hisysevent_config": [
             "//foundation/distributedhardware/distributed_audio/hisysevent.yaml"
         ],
@@ -65,8 +65,7 @@
                 "//foundation/distributedhardware/distributed_audio/services/audiotransport/audiochannel/audiodatachannel:distributed_audio_data_channel",
                 "//foundation/distributedhardware/distributed_audio/services/audiotransport/audiotransportstatus:distributed_audio_transport_status",
                 "//foundation/distributedhardware/distributed_audio/services/audiotransport/decodetransport:distributed_audio_decode_transport",
-                "//foundation/distributedhardware/distributed_audio/services/audiotransport/encodetransport:distributed_audio_encode_transport",
-                "//foundation/distributedhardware/distributed_audio/services/audioprocessor/effectcomponent:daudio_effect_component"
+                "//foundation/distributedhardware/distributed_audio/services/audiotransport/encodetransport:distributed_audio_encode_transport"
             ],
             "inner_kits":[
                 {
@@ -86,6 +85,17 @@
                         "header_base": "//foundation/distributedhardware/distributed_audio/interfaces/inner_kits/native_cpp/audio_source/include",
                         "header_files": [
                             "idaudio_source.h"
+                        ]
+                    }
+                },
+                {
+                    "type": "so",
+                    "name": "//foundation/distributedhardware/distributed_audio/services/common:distributed_audio_utils",
+                    "header": {
+                        "header_base": "//foundation/distributedhardware/distributed_audio/services/common/",
+                        "header_files": [
+                            "audiodata/include/audio_data.h",
+                            "audioparam/audio_param.h"
                         ]
                     }
                 }

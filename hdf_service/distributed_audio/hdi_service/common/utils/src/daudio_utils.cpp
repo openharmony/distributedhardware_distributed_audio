@@ -108,12 +108,12 @@ int32_t GetDevTypeByDHId(int32_t dhId)
 uint32_t CalculateFrameSize(uint32_t sampleRate, uint32_t channelCount,
     int32_t format, uint32_t timeInterval, bool isMMAP)
 {
-    return isMMAP ? sampleRate * channelCount * format * timeInterval / AUDIO_MS_PER_SECOND : DEFAULT_AUDIO_DATA_SIZE;
+    return isMMAP ? (sampleRate * channelCount * format * timeInterval) / AUDIO_MS_PER_SECOND : DEFAULT_AUDIO_DATA_SIZE;
 }
 
 int32_t CalculateSampleNum(uint32_t sampleRate, uint32_t timems)
 {
-    return sampleRate * timems / AUDIO_MS_PER_SECOND;
+    return (sampleRate * timems) / AUDIO_MS_PER_SECOND;
 }
 
 int64_t GetCurNano()
@@ -141,8 +141,24 @@ int32_t AbsoluteSleep(int64_t nanoTime)
 
     clockid_t clockId = CLOCK_MONOTONIC;
     ret = clock_nanosleep(clockId, TIMER_ABSTIME, &time, nullptr);
-
     return ret;
+}
+
+int64_t CalculateOffset(const int64_t frameIndex, const int64_t framePeriodNs, const int64_t startTime)
+{
+    int64_t totalOffset = GetCurNano() - startTime;
+    return totalOffset - frameIndex * framePeriodNs;
+}
+
+int64_t UpdateTimeOffset(const int64_t frameIndex, const int64_t framePeriodNs, int64_t &startTime)
+{
+    int64_t timeOffset = 0;
+    if (frameIndex == 0) {
+        startTime = GetCurNano();
+    } else if (frameIndex % AUDIO_OFFSET_FRAME_NUM == 0) {
+        timeOffset = CalculateOffset(frameIndex, framePeriodNs, startTime);
+    }
+    return timeOffset;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

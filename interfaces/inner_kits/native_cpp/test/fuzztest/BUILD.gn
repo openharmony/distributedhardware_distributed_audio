@@ -13,13 +13,26 @@
 
 import("//build/ohos.gni")
 import("//build/ohos_var.gni")
-import(
-    "//foundation/distributedhardware/distributed_audio/distributedaudio.gni")
+import("../../../../../distributedaudio.gni")
 
 group("fuzztest") {
   testonly = true
 
   deps = [
+    "${hdf_ser_aud_ext_path}/test/fuzztest/notifyevent_fuzzer:fuzztest",
+    "${hdf_ser_aud_ext_path}/test/fuzztest/registeraudiodevice_fuzzer:fuzztest",
+    "${hdf_ser_aud_ext_path}/test/fuzztest/unregisteraudiodevice_fuzzer:fuzztest",
+    "${hdf_ser_aud_path}/test/fuzztest/captureframe_fuzzer:fuzztest",
+    "${hdf_ser_aud_path}/test/fuzztest/createcapture_fuzzer:fuzztest",
+    "${hdf_ser_aud_path}/test/fuzztest/createrender_fuzzer:fuzztest",
+    "${hdf_ser_aud_path}/test/fuzztest/destroycapture_fuzzer:fuzztest",
+    "${hdf_ser_aud_path}/test/fuzztest/destroyrender_fuzzer:fuzztest",
+    "${hdf_ser_aud_path}/test/fuzztest/getalladapters_fuzzer:fuzztest",
+    "${hdf_ser_aud_path}/test/fuzztest/getextraparams_fuzzer:fuzztest",
+    "${hdf_ser_aud_path}/test/fuzztest/loadadapter_fuzzer:fuzztest",
+    "${hdf_ser_aud_path}/test/fuzztest/renderframe_fuzzer:fuzztest",
+    "${hdf_ser_aud_path}/test/fuzztest/setextraparams_fuzzer:fuzztest",
+    "${hdf_ser_aud_path}/test/fuzztest/unloadadapter_fuzzer:fuzztest",
     "onremotesinksvrdied_fuzzer:fuzztest",
     "onremotesourcesvrdied_fuzzer:fuzztest",
     "sinkhandlerfinishstartsa_fuzzer:fuzztest",
@@ -46,19 +59,5 @@ group("fuzztest") {
     "sourceproxyinitsource_fuzzer:fuzztest",
     "sourceproxyregisterdistributedhardware_fuzzer:fuzztest",
     "sourceproxyunregisterdistributedhardware_fuzzer:fuzztest",
-    "${hdf_ser_aud_ext_path}/test/fuzztest/notifyevent_fuzzer:fuzztest",
-    "${hdf_ser_aud_ext_path}/test/fuzztest/unregisteraudiodevice_fuzzer:fuzztest",
-    "${hdf_ser_aud_ext_path}/test/fuzztest/registeraudiodevice_fuzzer:fuzztest",
-    "${hdf_ser_aud_path}/test/fuzztest/captureframe_fuzzer:fuzztest",
-    "${hdf_ser_aud_path}/test/fuzztest/getalladapters_fuzzer:fuzztest",
-    "${hdf_ser_aud_path}/test/fuzztest/loadadapter_fuzzer:fuzztest",
-    "${hdf_ser_aud_path}/test/fuzztest/unloadadapter_fuzzer:fuzztest",
-    "${hdf_ser_aud_path}/test/fuzztest/renderframe_fuzzer:fuzztest",
-    "${hdf_ser_aud_path}/test/fuzztest/createrender_fuzzer:fuzztest",
-    "${hdf_ser_aud_path}/test/fuzztest/destroycapture_fuzzer:fuzztest",
-    "${hdf_ser_aud_path}/test/fuzztest/destroyrender_fuzzer:fuzztest",
-    "${hdf_ser_aud_path}/test/fuzztest/createcapture_fuzzer:fuzztest",
-    "${hdf_ser_aud_path}/test/fuzztest/setextraparams_fuzzer:fuzztest",
-    "${hdf_ser_aud_path}/test/fuzztest/getextraparams_fuzzer:fuzztest",
   ]
 }

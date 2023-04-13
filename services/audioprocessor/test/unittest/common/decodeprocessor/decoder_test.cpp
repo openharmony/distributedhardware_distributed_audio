@@ -75,6 +75,7 @@ HWTEST_F(DecoderTest, decode_test_001, TestSize.Level1)
 {
     EXPECT_EQ(DH_SUCCESS, audiodecoder_->ConfigureAudioCodec(LOC_COMPARA_ENC_TEST, decodeCb_));
     audiodecoder_ = std::make_shared<AudioDecoder>();
+    EXPECT_EQ(ERR_DH_AUDIO_BAD_VALUE, audiodecoder_->ConfigureAudioCodec(LOC_COMPARA_ENC_TEST, nullptr));
 }
 
 /**
@@ -210,6 +211,31 @@ HWTEST_F(DecoderTest, ProcessData_001, TestSize.Level1)
     Media::AVCodecBufferFlag flag = static_cast<Media::AVCodecBufferFlag>(0);
     EXPECT_EQ(ERR_DH_AUDIO_BAD_VALUE, audiodecoder_->ProcessData(inputData, bufferIndex));
     audiodecoder_->OnOutputBufferAvailable(index, info, flag);
+}
+
+/**
+ * @tc.name: IsInDecodeRange_001
+ * @tc.desc: Verify IsInDecodeRange function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5U
+ */
+HWTEST_F(DecoderTest, IsInDecodeRange_001, TestSize.Level1)
+{
+    AudioCommonParam codecParam;
+    EXPECT_EQ(false, audiodecoder_->IsInDecodeRange(codecParam));
+}
+
+/**
+ * @tc.name: IsInDecodeRange_002
+ * @tc.desc: Verify IsInDecodeRange function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5U
+ */
+HWTEST_F(DecoderTest, IsInDecodeRange_002, TestSize.Level1)
+{
+    AudioCommonParam codecParam;
+    codecParam.bitFormat = SAMPLE_S16LE;
+    EXPECT_EQ(true, audiodecoder_->IsInDecodeRange(codecParam));
 }
 } // namespace DistributedHardware
 } // namespace OHOS

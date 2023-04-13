@@ -12,11 +12,9 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import(
-    "//foundation/distributedhardware/distributed_audio/distributedaudio.gni")
+import("../../../../../distributedaudio.gni")
 
-module_out_path =
-    "distributed_audio/services/audiomanager/source_device_test"
+module_out_path = "distributed_audio/services/audiomanager/source_device_test"
 
 config("module_private_config") {
   visibility = [ ":*" ]
@@ -75,8 +73,8 @@ ohos_unittest("DaudioSourceDevTest") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "${services_path}/audiomanager/servicesource:distributed_audio_source",
     "${hdf_interfaces_path}/audioext/v1_0:libdaudioext_proxy_1.0",
+    "${services_path}/audiomanager/servicesource:distributed_audio_source",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
   ]
@@ -92,8 +90,8 @@ ohos_unittest("DMicDevTest") {
 
   deps = [
     "${audio_transport_path}/decodetransport:distributed_audio_decode_transport",
-    "${services_path}/audiomanager/servicesource:distributed_audio_source",
     "${hdf_interfaces_path}/audioext/v1_0:libdaudioext_proxy_1.0",
+    "${services_path}/audiomanager/servicesource:distributed_audio_source",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
   ]
@@ -109,8 +107,8 @@ ohos_unittest("DSpeakerDevTest") {
 
   deps = [
     "${audio_transport_path}/encodetransport:distributed_audio_encode_transport",
-    "${services_path}/audiomanager/servicesource:distributed_audio_source",
     "${hdf_interfaces_path}/audioext/v1_0:libdaudioext_proxy_1.0",
+    "${services_path}/audiomanager/servicesource:distributed_audio_source",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
   ]
@@ -118,9 +116,9 @@ ohos_unittest("DSpeakerDevTest") {
 
 group("daudio_source_dev_test") {
   testonly = true
-  deps = [ 
-    ":DaudioSourceDevTest",
+  deps = [
     ":DMicDevTest",
     ":DSpeakerDevTest",
+    ":DaudioSourceDevTest",
   ]
 }

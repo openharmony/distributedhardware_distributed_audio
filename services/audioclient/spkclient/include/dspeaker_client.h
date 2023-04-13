@@ -39,10 +39,12 @@
 #include "iaudio_data_transport.h"
 #include "iaudio_datatrans_callback.h"
 #include "iaudio_event_callback.h"
+#include "ispk_client.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 class DSpeakerClient : public IAudioDataTransCallback,
+    public ISpkClient,
     public AudioStandard::VolumeKeyEventCallback,
     public AudioStandard::AudioRendererCallback,
     public std::enable_shared_from_this<DSpeakerClient> {
@@ -57,23 +59,27 @@ public:
     int32_t OnDecodeTransDataDone(const std::shared_ptr<AudioData> &audioData) override;
     void OnVolumeKeyEvent(AudioStandard::VolumeEvent volumeEvent) override;
     void OnInterrupt(const AudioStandard::InterruptEvent &interruptEvent) override;
-    int32_t SetUp(const AudioParam &param);
-    int32_t Release();
-    int32_t StartRender();
-    int32_t StopRender();
-    int32_t SetMute(const AudioEvent &event);
-    int32_t SetAudioParameters(const AudioEvent &event);
-    std::string GetVolumeLevel();
-    void PlayStatusChange(const std::string &args);
+    int32_t SetUp(const AudioParam &param) override;
+    int32_t Release() override;
+    int32_t StartRender() override;
+    int32_t StopRender() override;
+    int32_t SetMute(const AudioEvent &event) override;
+    int32_t SetAudioParameters(const AudioEvent &event) override;
+    void PlayStatusChange(const std::string &args) override;
 
 private:
+    std::string GetVolumeLevel();
     void PlayThreadRunning();
     void Pause();
     void ReStart();
+    void FillJitterQueue();
+    void FlushJitterQueue();
 
 private:
-    constexpr static size_t DATA_QUEUE_MAX_SIZE = 5;
+    constexpr static size_t DATA_QUEUE_MAX_SIZE = 12;
     constexpr static size_t REQUEST_DATA_WAIT = 10;
+    constexpr static size_t DATA_QUEUE_SIZE = 8;
+    constexpr static size_t SLEEP_TIME = 5000;
     static constexpr const char* RENDERTHREAD = "renderThread";
 
     std::string devId_;

@@ -13,8 +13,7 @@
 
 import("//build/ohos.gni")
 import("//build/ohos_var.gni")
-import(
-    "//foundation/distributedhardware/distributed_audio/distributedaudio.gni")
+import("../../../distributedaudio.gni")
 
 ohos_shared_library("distributed_audio_decode_transport") {
   include_dirs = [
@@ -33,7 +32,6 @@ ohos_shared_library("distributed_audio_decode_transport") {
     "${common_path}/dfx_utils/include",
     "${audio_processor_path}/decoder/include",
     "${audio_processor_path}/decodeprocessor/include",
-    "${audio_processor_path}/lowlatencyprocessor/include",
     "${audio_processor_path}/interface",
     "${audio_transport_path}/audiochannel/interface",
     "${audio_transport_path}/audiochannel/audiodatachannel/include",
@@ -46,12 +44,11 @@ ohos_shared_library("distributed_audio_decode_transport") {
   ]
 
   sources = [
-    "src/audio_decode_transport.cpp",
+    "${audio_processor_path}/decodeprocessor/src/audio_decoder_processor.cpp",
     "${audio_processor_path}/decoder/src/audio_decoder.cpp",
     "${audio_processor_path}/decoder/src/audio_decoder_callback.cpp",
-    "${audio_processor_path}/decodeprocessor/src/audio_decoder_processor.cpp",
-    "${audio_processor_path}/lowlatencyprocessor/src/audio_lowlatency_processor.cpp",
     "${services_path}/common/audiodata/src/audio_data.cpp",
+    "src/audio_decode_transport.cpp",
   ]
 
   deps = [

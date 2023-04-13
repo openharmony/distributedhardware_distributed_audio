@@ -44,8 +44,8 @@ public:
     int32_t ReadStreamData(const std::string &adpName, int32_t devId,
         OHOS::HDI::DistributedAudio::Audioext::V1_0::AudioData &data) override;
 
-    int32_t ReadMmapPosition(const std::string &adpName, int32_t devId,
-        uint64_t &frames, uint64_t &timeStamp) override;
+    int32_t ReadMmapPosition(const std::string &adpName, int32_t devId, uint64_t &frames,
+        OHOS::HDI::DistributedAudio::Audioext::V1_0::CurrentTime &time) override;
 
     int32_t RefreshAshmemInfo(const std::string &adpName, int32_t devId,
         int fd, int32_t ashmemLength, int32_t lengthPerTrans) override;

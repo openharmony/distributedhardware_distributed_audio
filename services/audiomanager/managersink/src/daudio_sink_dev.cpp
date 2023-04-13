@@ -15,6 +15,8 @@
 
 #include "daudio_sink_dev.h"
 
+#include <random>
+
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
 #include "daudio_log.h"
@@ -388,8 +390,10 @@ int32_t DAudioSinkDev::TaskOpenDSpeaker(const std::string &args)
         return ret;
     }
 
-    if (audioParam.renderOpts.renderFlags == 1) {
-        DHLOGI("dsink dev low-latency mode");
+    if (speakerClient_ == nullptr) {
+        if (audioParam.renderOpts.renderFlags == NORMAL_MODE) {
+            speakerClient_ = std::make_shared<DSpeakerClient>(devId_, shared_from_this());
+        }
     }
 
     if (speakerClient_ == nullptr) {
@@ -456,7 +460,9 @@ int32_t DAudioSinkDev::TaskOpenDMic(const std::string &args)
 
     do {
         if (micClient_ == nullptr) {
-            micClient_ = std::make_shared<DMicClient>(devId_, shared_from_this());
+            if (audioParam.captureOpts.capturerFlags == NORMAL_MODE) {
+                micClient_ = std::make_shared<DMicClient>(devId_, shared_from_this());
+            }
         }
         ret = micClient_->SetUp(audioParam);
         if (ret != DH_SUCCESS) {
@@ -600,10 +606,15 @@ void DAudioSinkDev::OnTaskResult(int32_t resultCode, const std::string &result, 
 
 void DAudioSinkDev::NotifySourceDev(const AudioEventType type, const std::string dhId, const int32_t result)
 {
+    std::random_device rd;
+    const uint32_t randomTaskCode = rd();
     json jEvent;
     jEvent[KEY_DH_ID] = dhId;
     jEvent[KEY_RESULT] = result;
     jEvent[KEY_EVENT_TYPE] = type;
+    jEvent[KEY_RANDOM_TASK_CODE] = std::to_string(randomTaskCode);
+
+    DHLOGI("notify source dev, random task code: %d", randomTaskCode);
     DAudioSinkManager::GetInstance().DAudioNotify(devId_, dhId, type, jEvent.dump());
 }
 

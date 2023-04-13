@@ -148,17 +148,6 @@ HWTEST_F(SoftbusAdapterTest, OnSoftbusSessionOpened_002, TestSize.Level1)
     int32_t result = 0;
 
     EXPECT_EQ(ERR_DH_AUDIO_TRANS_ERROR, softbusAdapter.OnSoftbusSessionOpened(sessionId, result));
-}
-
-/**
- * @tc.name: OnSoftbusSessionClosed_001
- * @tc.desc: Verify the OnSoftbusSessionClosed function.
- * @tc.type: FUNC
- * @tc.require: AR000H0E5U
- */
-HWTEST_F(SoftbusAdapterTest, OnSoftbusSessionClosed_001, TestSize.Level1)
-{
-    int32_t sessionId = 1;
     softbusAdapter.OnSoftbusSessionClosed(sessionId);
 }
 } // namespace DistributedHardware

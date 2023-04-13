@@ -12,8 +12,7 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import(
-    "//foundation/distributedhardware/distributed_audio/distributedaudio.gni")
+import("../../../../../../distributedaudio.gni")
 
 module_out_path = "distributed_audio/interfaces/audio_sink_test"
 
@@ -41,8 +40,8 @@ ohos_unittest("AudioSinkTest") {
 
   sources = [
     "${interfaces_path}/inner_kits/native_cpp/test/unittest/audiosinktest/src/daudio_sink_handler_test.cpp",
-    "${interfaces_path}/inner_kits/native_cpp/test/unittest/audiosinktest/src/daudio_sink_proxy_test.cpp"
-    ]
+    "${interfaces_path}/inner_kits/native_cpp/test/unittest/audiosinktest/src/daudio_sink_proxy_test.cpp",
+  ]
 
   configs = [ ":module_private_config" ]
 

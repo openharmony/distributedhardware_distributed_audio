@@ -17,7 +17,6 @@
 
 #include "audio_data_channel.h"
 #include "audio_encoder_processor.h"
-#include "audio_lowlatency_processor.h"
 #include "audio_param.h"
 #include "daudio_errorcode.h"
 #include "daudio_log.h"
@@ -188,13 +187,7 @@ int32_t AudioEncodeTransport::RegisterChannelListener(const PortCapType capType)
 int32_t AudioEncodeTransport::RegisterProcessorListener(const AudioParam &localParam, const AudioParam &remoteParam)
 {
     DHLOGI("Register processor listener.");
-    if (localParam.renderOpts.renderFlags == MMAP_FLAG || localParam.captureOpts.capturerFlags == MMAP_FLAG) {
-        DHLOGE("Encode trans low-latency mode. renderFlags: %d, captureFlags: %d",
-            localParam.renderOpts.renderFlags, localParam.captureOpts.capturerFlags);
-        processor_ = std::make_shared<AudioLowlatencyProcessor>();
-    } else {
-        processor_ = std::make_shared<AudioEncoderProcessor>();
-    }
+    processor_ = std::make_shared<AudioEncoderProcessor>();
     if (audioChannel_ == nullptr) {
         DHLOGE("Create audio processor failed.");
         return ERR_DH_AUDIO_TRANS_ERROR;

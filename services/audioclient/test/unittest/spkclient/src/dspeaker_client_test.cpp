@@ -88,6 +88,9 @@ HWTEST_F(DSpeakerClientTest, StartRender001, TestSize.Level1)
 {
     EXPECT_NE(DH_SUCCESS, speakerClient_->StartRender());
     EXPECT_NE(DH_SUCCESS, speakerClient_->StopRender());
+
+    speakerClient_->clientStatus_ = STATUS_START;
+    EXPECT_EQ(ERR_DH_AUDIO_SA_STATUS_ERR, speakerClient_->StopRender());
 }
 
 /**
@@ -104,7 +107,10 @@ HWTEST_F(DSpeakerClientTest, StopRender001, TestSize.Level1)
     speakerClient_->PlayStatusChange(args);
     speakerClient_->SetAudioParameters(event);
     speakerClient_->SetMute(event);
-
+    for (size_t i =0; i<10; i++) {
+        std::shared_ptr<AudioData> data = std::make_shared<AudioData>(4096);
+        speakerClient_->dataQueue_.push(data);
+    }
     args = "restart";
     speakerClient_->PlayStatusChange(args);
 
@@ -127,12 +133,24 @@ HWTEST_F(DSpeakerClientTest, OnDecodeTransDataDone001, TestSize.Level1)
 {
     std::shared_ptr<AudioData> audioData = nullptr;
     EXPECT_EQ(ERR_DH_AUDIO_CLIENT_PARAM_IS_NULL, speakerClient_->OnDecodeTransDataDone(audioData));
-    for (size_t i = 0; i < 6; i++) {
+    for (size_t i = 0; i < 10; i++) {
         std::shared_ptr<AudioData> data = std::make_shared<AudioData>(4096);
         speakerClient_->dataQueue_.push(data);
     }
     audioData = std::make_shared<AudioData>(4096);
     EXPECT_EQ(DH_SUCCESS, speakerClient_->OnDecodeTransDataDone(audioData));
+}
+
+/**
+ * @tc.name: Release_001
+ * @tc.desc: Verify the Release function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6G
+ */
+HWTEST_F(DSpeakerClientTest, Release001, TestSize.Level1)
+{
+    speakerClient_->Pause();
+    EXPECT_EQ(ERR_DH_AUDIO_SA_STATUS_ERR, speakerClient_->Release());
 }
 } // DistributedHardware
 } // OHOS
