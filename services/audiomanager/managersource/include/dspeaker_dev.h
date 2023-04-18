@@ -22,7 +22,6 @@
 #include "nlohmann/json.hpp"
 
 #include "audio_param.h"
-#include "ashmem.h"
 #include "idaudio_hdi_callback.h"
 #include "daudio_hdi_handler.h"
 #include "iaudio_data_transport.h"

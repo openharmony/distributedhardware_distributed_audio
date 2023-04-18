@@ -108,12 +108,12 @@ HWTEST_F(AudioTransportPauseStatusTest, transport_pause_test_004, TestSize.Level
         },
         {
             SOURCE_TYPE_INVALID,
-            NORMAL_MODE,
+            NORMAL_MODE
         },
         {
             CONTENT_TYPE_UNKNOWN,
             STREAM_USAGE_UNKNOWN,
-            NORMAL_MODE,
+            NORMAL_MODE
         }
     };
     AudioParam testRemoteParaEnc = {
@@ -125,12 +125,12 @@ HWTEST_F(AudioTransportPauseStatusTest, transport_pause_test_004, TestSize.Level
         },
         {
             SOURCE_TYPE_INVALID,
-            NORMAL_MODE,
+            NORMAL_MODE
         },
         {
             CONTENT_TYPE_UNKNOWN,
             STREAM_USAGE_UNKNOWN,
-            NORMAL_MODE,
+            NORMAL_MODE
         }
     };
     std::string peerDevId = "peerDevId";

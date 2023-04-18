@@ -133,10 +133,11 @@ int32_t DAudioSourceManager::HandleDAudioNotify(const std::string &devId, const 
     }
 
     json jParam = json::parse(eventContent, nullptr, false);
-    if (JsonParamCheck(jParam, { KEY_RANDOM_TASK_CODE }) && CheckIsNum((std::string)jParam[KEY_RANDOM_TASK_CODE])) {
-        int32_t randomCode = std::stoi((std::string)jParam[KEY_RANDOM_TASK_CODE]);
-        DHLOGI("Handle distributed audio notify from sink, random task code: %d", randomCode);
+    if (JsonParamCheck(jParam, { KEY_RANDOM_TASK_CODE })) {
+        DHLOGI("Receive audio notify from sink, random task code: %s",
+            ((std::string)jParam[KEY_RANDOM_TASK_CODE]).c_str());
     }
+
     std::lock_guard<std::mutex> lock(devMapMtx_);
     auto dev = audioDevMap_.find(devId);
     if (dev == audioDevMap_.end()) {

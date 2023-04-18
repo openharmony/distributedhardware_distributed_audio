@@ -614,7 +614,7 @@ void DAudioSinkDev::NotifySourceDev(const AudioEventType type, const std::string
     jEvent[KEY_EVENT_TYPE] = type;
     jEvent[KEY_RANDOM_TASK_CODE] = std::to_string(randomTaskCode);
 
-    DHLOGI("notify source dev, random task code: %d", randomTaskCode);
+    DHLOGI("notify source dev, random task code: %s", std::to_string(randomTaskCode).c_str());
     DAudioSinkManager::GetInstance().DAudioNotify(devId_, dhId, type, jEvent.dump());
 }
 
