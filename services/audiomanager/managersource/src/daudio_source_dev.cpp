@@ -824,7 +824,7 @@ int32_t DAudioSourceDev::NotifySinkDev(const AudioEventType type, const json Par
                     { KEY_EVENT_TYPE, type },
                     { KEY_AUDIO_PARAM, Param },
                     { KEY_RANDOM_TASK_CODE, std::to_string(randomTaskCode) } };
-    DHLOGI("Notify sin dev, random task code: %d", randomTaskCode);
+    DHLOGI("Notify sink dev, random task code: %s", std::to_string(randomTaskCode).c_str());
     DAudioSourceManager::GetInstance().DAudioNotify(devId_, dhId, type, jParam.dump());
     return WaitForRPC(static_cast<AudioEventType>(static_cast<int32_t>(type) + eventOffset));
 }

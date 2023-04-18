@@ -156,7 +156,7 @@ HWTEST_F(AudioCtrlChannelTest, SendMsg_001, TestSize.Level1)
     StreamFrameInfo *streamFrameInfo;
     ctrlChannel_->OnStreamReceived(sessionId, datas, ext, streamFrameInfo);
 
-    string message = "sendMag";
+    string message = "sendMsg";
     EXPECT_NE(ERR_DH_AUDIO_CTRL_CHANNEL_SEND_MSG_FAIL, ctrlChannel_->SendMsg(message));
 }
 } // namespace DistributedHardware

@@ -30,9 +30,9 @@ public:
 
     virtual int32_t CloseDevice(const std::string &devId, const int32_t dhId) = 0;
 
-    virtual int32_t SetParameters(const std::string &devId, const int32_t dhId, const AudioParamHDF& param) = 0;
+    virtual int32_t SetParameters(const std::string &devId, const int32_t dhId, const AudioParamHDF &param) = 0;
 
-    virtual int32_t NotifyEvent(const std::string &devId, const int32_t dhId, const AudioEvent& event) = 0;
+    virtual int32_t NotifyEvent(const std::string &devId, const int32_t dhId, const AudioEvent &event) = 0;
 
     virtual int32_t WriteStreamData(const std::string &devId, const int32_t dhId, std::shared_ptr<AudioData> &data) = 0;
 
