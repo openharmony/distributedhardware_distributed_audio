@@ -51,6 +51,8 @@ HWTEST_F(AudioAdapterInterfaceImpTest, InitAllPorts_001, TestSize.Level1)
 {
     sptr<IDAudioCallback> speakerCallback = nullptr;
     AdapterTest_->SetSpeakerCallback(speakerCallback);
+    speakerCallback = new MockIDAudioCallback();
+    AdapterTest_->SetSpeakerCallback(speakerCallback);
 
     sptr<IDAudioCallback> micCallback = nullptr;
     AdapterTest_->SetMicCallback(micCallback);

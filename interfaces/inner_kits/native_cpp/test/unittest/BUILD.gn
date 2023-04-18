@@ -13,25 +13,24 @@
 
 import("//build/ohos.gni")
 import("//build/ohos_var.gni")
-import(
-    "//foundation/distributedhardware/distributed_audio/distributedaudio.gni")
+import("../../../../../distributedaudio.gni")
 
 group("unittest") {
   testonly = true
   deps = [
+    "${distributedaudio_path}/audiohandler/test/unittest:audio_handler_test",
+    "${hdf_service_path}/hdi_service/audio/v1_0/test/unittest:hdi_service_audio_test",
+    "${hdf_service_path}/hdi_service/audio_ext/v1_0/test/unittest:hdi_service_audio_ext_test",
     "${interfaces_path}/inner_kits/native_cpp/test/unittest/audiosinktest:audio_sink_test",
     "${interfaces_path}/inner_kits/native_cpp/test/unittest/audiosourcetest:audio_source_test",
-    "${distributedaudio_path}/audiohandler/test/unittest:audio_handler_test",
     "${services_path}/audioclient/test/unittest:daudio_client_test",
     "${services_path}/audiocontrol/test/unittest:daudio_control_test",
     "${services_path}/audiohdiproxy/test/unittest:daudio_hdi_proxy_test",
+    "${services_path}/audiomanager/test/unittest:daudio_manager_test",
     "${services_path}/audioprocessor/test/unittest:daudio_processor_test",
     "${services_path}/audiotransport/test/unittest:daudio_transport_test",
-    "${services_path}/audiomanager/test/unittest:daudio_manager_test",
-    "${services_path}/softbusadapter/test/unittest:audio_soft_bus_adapter_test",
     "${services_path}/common/taskProcessor/test/unittest:task_processor_test",
     "${services_path}/hdfaudioclient/test/unittest:audio_adapter_hdi_test",
-    "${hdf_service_path}/hdi_service/audio/v1_0/test/unittest:hdi_service_audio_test",
-    "${hdf_service_path}/hdi_service/audio_ext/v1_0/test/unittest:hdi_service_audio_ext_test",
+    "${services_path}/softbusadapter/test/unittest:audio_soft_bus_adapter_test",
   ]
 }

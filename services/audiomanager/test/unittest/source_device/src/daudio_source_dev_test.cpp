@@ -173,6 +173,18 @@ HWTEST_F(DAudioSourceDevTest, HandlePlayStatusChange_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: WaitForRPC_001
+ * @tc.desc: Verify the WaitForRPC function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, WaitForRPC_001, TestSize.Level1)
+{
+    AudioEventType type = NOTIFY_OPEN_SPEAKER_RESULT;
+    EXPECT_EQ(ERR_DH_AUDIO_SA_RPC_WAIT_TIMEOUT, sourceDev_->WaitForRPC(type));
+}
+
+/**
  * @tc.name: HandleDMicClosed_001
  * @tc.desc: Verify the HandleDMicClosed function.
  * @tc.type: FUNC
@@ -196,6 +208,55 @@ HWTEST_F(DAudioSourceDevTest, HandleDMicClosed_002, TestSize.Level1)
     AudioEvent event;
     sourceDev_->mic_ = std::make_shared<DMicDev>(DEV_ID, sourceDev_);
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleDMicClosed(event));
+}
+
+/**
+ * @tc.name: OpenCtrlTrans_001
+ * @tc.desc: Verify the OpenCtrlTrans function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, OpenCtrlTrans_001, TestSize.Level1)
+{
+    AudioEvent event;
+    EXPECT_EQ(ERR_DH_AUDIO_SA_OPEN_CTRL_FAILED, sourceDev_->OpenCtrlTrans(event));
+}
+
+/**
+ * @tc.name: CloseCtrlTrans_001
+ * @tc.desc: Verify the CloseCtrlTrans function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, CloseCtrlTrans_001, TestSize.Level1)
+{
+    AudioEvent event;
+    bool isSpk = false;
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->CloseCtrlTrans(event, isSpk));
+}
+
+/**
+ * @tc.name: HandleOpenCtrlTrans_001
+ * @tc.desc: Verify the HandleOpenCtrlTrans function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, HandleOpenCtrlTrans_001, TestSize.Level1)
+{
+    AudioEvent event;
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->HandleOpenCtrlTrans(event));
+}
+
+/**
+ * @tc.name: HandleCloseCtrlTrans_001
+ * @tc.desc: Verify the HandleCloseCtrlTrans function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, HandleCloseCtrlTrans_001, TestSize.Level1)
+{
+    AudioEvent event;
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->HandleCloseCtrlTrans(event));
 }
 
 /**
@@ -635,20 +696,6 @@ HWTEST_F(DAudioSourceDevTest, NotifySinkDev_001, TestSize.Level1)
 {
     json jAudioParam;
     EXPECT_EQ(ERR_DH_AUDIO_SA_RPC_WAIT_TIMEOUT, sourceDev_->NotifySinkDev(CLOSE_MIC, jAudioParam, DH_ID_SPK));
-}
-
-/**
- * @tc.name: CheckIsNum_001
- * @tc.desc: Verify the CheckIsNum function.
- * @tc.type: FUNC
- * @tc.require: AR000H0E5F
- */
-HWTEST_F(DAudioSourceDevTest, CheckIsNum_001, TestSize.Level1)
-{
-    json jAudioParam;
-    EXPECT_FALSE(sourceDev_->CheckIsNum(""));
-    EXPECT_FALSE(sourceDev_->CheckIsNum("a5q"));
-    EXPECT_TRUE(sourceDev_->CheckIsNum("11"));
 }
 } // namespace DistributedHardware
 } // namespace OHOS

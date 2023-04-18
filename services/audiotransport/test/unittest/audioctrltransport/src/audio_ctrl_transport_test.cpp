@@ -88,6 +88,7 @@ HWTEST_F(AudioCtrlTransportTest, Release_002, TestSize.Level1)
  */
 HWTEST_F(AudioCtrlTransportTest, Start_001, TestSize.Level1)
 {
+    trans->OnSessionOpened();
     EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE, trans->Start());
 }
 
@@ -112,6 +113,9 @@ HWTEST_F(AudioCtrlTransportTest, Start_002, TestSize.Level1)
  */
 HWTEST_F(AudioCtrlTransportTest, Stop_001, TestSize.Level1)
 {
+    AudioEvent event;
+    trans->OnEventReceived(event);
+    trans->OnSessionClosed();
     EXPECT_EQ(DH_SUCCESS, trans->Stop());
 }
 
@@ -178,6 +182,20 @@ HWTEST_F(AudioCtrlTransportTest, RegisterChannelListener_002, TestSize.Level1)
     trans->audioChannel_ = std::make_shared<MockAudioCtrlChannel>(peerDevId);
     std::shared_ptr<IAudioChannelListener> listener = std::make_shared<MockIAudioChannelListener>();
     EXPECT_EQ(DH_SUCCESS, trans->RegisterChannelListener());
+}
+
+/**
+ * @tc.name: InitAudioCtrlTrans_002
+ * @tc.desc: Verify the InitAudioCtrlTrans function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5U
+ */
+HWTEST_F(AudioCtrlTransportTest, InitAudioCtrlTrans_002, TestSize.Level1)
+{
+    std::string peerDevId = "peerDevId";
+    const std::string netWorkId = "netWorkId";
+    trans->audioChannel_ = std::make_shared<MockAudioCtrlChannel>(peerDevId);
+    EXPECT_EQ(DH_SUCCESS, trans->InitAudioCtrlTrans(netWorkId));
 }
 } // namespace DistributedHardware
 } // namespace OHOS

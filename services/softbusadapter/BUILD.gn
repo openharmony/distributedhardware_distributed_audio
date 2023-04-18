@@ -13,8 +13,7 @@
 
 import("//build/ohos.gni")
 import("//build/ohos_var.gni")
-import(
-    "//foundation/distributedhardware/distributed_audio/distributedaudio.gni")
+import("../../distributedaudio.gni")
 
 ohos_shared_library("distributed_audio_softbus_adapter") {
   include_dirs = [
@@ -36,7 +35,7 @@ ohos_shared_library("distributed_audio_softbus_adapter") {
     "src/softbus_adapter.cpp",
   ]
 
-  deps = [ "${services_path}/common:distributed_audio_utils", ]
+  deps = [ "${services_path}/common:distributed_audio_utils" ]
 
   external_deps = [
     "c_utils:utils",

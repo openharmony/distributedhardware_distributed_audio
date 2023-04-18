@@ -12,8 +12,7 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import(
-    "//foundation/distributedhardware/distributed_audio/distributedaudio.gni")
+import("../../../../../distributedaudio.gni")
 
 module_out_path =
     "distributed_audio/services/audiotransport/audio_ctrl_channel_test"
@@ -50,8 +49,8 @@ ohos_unittest("AudioCtrlChannelTest") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "${services_path}/common:distributed_audio_utils",
     "${audio_transport_path}/audioctrltransport:distributed_audio_control",
+    "${services_path}/common:distributed_audio_utils",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
   ]

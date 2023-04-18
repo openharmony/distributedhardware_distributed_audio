@@ -43,7 +43,7 @@ int32_t DAudioIpcCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &dat
     std::map<int32_t, DAudioCallbackFunc>::iterator iter = memberFuncMap_.find(code);
     if (iter == memberFuncMap_.end()) {
         DHLOGE("Invalid request code.");
-        return ERR_DH_AUDIO_SA_INVALID_REQUEST_CODE;
+        return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
     DAudioCallbackFunc &func = iter->second;
     return (this->*func)(data, reply, option);

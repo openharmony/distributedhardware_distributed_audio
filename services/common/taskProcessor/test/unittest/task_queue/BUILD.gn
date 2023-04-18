@@ -14,15 +14,14 @@
 import("//build/ohos.gni")
 import("//build/ohos_var.gni")
 import("//build/test.gni")
-import(
-    "//foundation/distributedhardware/distributed_audio/distributedaudio.gni")
+import("../../../../../../distributedaudio.gni")
 
 module_out_path = "distributed_audio/services/common/taskProcessor/test"
 
 config("module_private_config") {
   visibility = [ ":*" ]
 
-  include_dirs = [ "//third_party/json/include", ]
+  include_dirs = [ "//third_party/json/include" ]
 
   include_dirs += [
     "${common_path}/include",
@@ -37,16 +36,14 @@ config("module_private_config") {
 ohos_unittest("TaskQueueTest") {
   module_out_path = module_out_path
 
-  sources = [
-    "${services_path}/common/taskProcessor/test/unittest/task_queue/src/task_queue_test.cpp",
-  ]
+  sources = [ "${services_path}/common/taskProcessor/test/unittest/task_queue/src/task_queue_test.cpp" ]
 
   configs = [ ":module_private_config" ]
 
   deps = [
+    "${services_path}/common:distributed_audio_utils",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
-    "${services_path}/common:distributed_audio_utils",
   ]
 }
 

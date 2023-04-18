@@ -14,8 +14,7 @@
 #####################hydra-fuzz###################
 import("//build/config/features.gni")
 import("//build/test.gni")
-import(
-    "//foundation/distributedhardware/distributed_audio/distributedaudio.gni")
+import("../../../../../../distributedaudio.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("SinkOnLoadSystemAbilityFailFuzzTest") {
@@ -45,9 +44,8 @@ ohos_fuzztest("SinkOnLoadSystemAbilityFailFuzzTest") {
     "${innerkits_path}/native_cpp/audio_sink/include",
   ]
 
-  deps = [
-    "${innerkits_path}/native_cpp/audio_sink:distributed_audio_sink_sdk",
-  ]
+  deps =
+      [ "${innerkits_path}/native_cpp/audio_sink:distributed_audio_sink_sdk" ]
 
   defines = [
     "HI_LOG_ENABLE",

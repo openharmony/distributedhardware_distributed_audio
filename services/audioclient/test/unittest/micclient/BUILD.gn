@@ -14,8 +14,7 @@
 import("//build/ohos.gni")
 import("//build/ohos_var.gni")
 import("//build/test.gni")
-import(
-    "//foundation/distributedhardware/distributed_audio/distributedaudio.gni")
+import("../../../../../distributedaudio.gni")
 
 module_out_path = "distributed_audio/services/audioclient/mic_client_test"
 
@@ -29,6 +28,7 @@ config("module_private_config") {
   ]
 
   include_dirs += [
+    "${audio_client_path}/interface",
     "${audio_client_path}/micclient/include",
     "${audio_client_path}/test/unittest/micclient/include",
     "${audio_client_path}/test/unittest/audioclienttestutils/include",

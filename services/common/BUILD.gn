@@ -13,10 +13,17 @@
 
 import("//build/ohos.gni")
 import("//build/ohos_var.gni")
-import(
-    "//foundation/distributedhardware/distributed_audio/distributedaudio.gni")
+import("../../distributedaudio.gni")
 
-ohos_shared_library("distributed_audio_utils") {
+config("daudio_common_pub_config") {
+  include_dirs = [
+    "audiodata/include",
+    "audioparam",
+    "${common_path}/include",
+  ]
+}
+
+config("daudio_common_private_config") {
   include_dirs = [
     "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
     "//base/hiviewdfx/hitrace/interfaces/native/innerkits/include/hitrace_meter",
@@ -25,21 +32,25 @@ ohos_shared_library("distributed_audio_utils") {
   ]
 
   include_dirs += [
-    "audiodata/include",
-    "audioparam",
     "taskProcessor/include",
     "${common_path}/include",
     "${common_path}/dfx_utils/include",
   ]
+}
+
+ohos_shared_library("distributed_audio_utils") {
+  configs = [ ":daudio_common_private_config" ]
+
+  public_configs = [ ":daudio_common_pub_config" ]
 
   sources = [
-    "audiodata/src/audio_data.cpp",
-    "taskProcessor/src/task_impl.cpp",
-    "taskProcessor/src/task_queue.cpp",
     "${common_path}/dfx_utils/src/daudio_hisysevent.cpp",
     "${common_path}/dfx_utils/src/daudio_hitrace.cpp",
     "${common_path}/src/daudio_log.cpp",
     "${common_path}/src/daudio_util.cpp",
+    "audiodata/src/audio_data.cpp",
+    "taskProcessor/src/task_impl.cpp",
+    "taskProcessor/src/task_queue.cpp",
   ]
 
   external_deps = [

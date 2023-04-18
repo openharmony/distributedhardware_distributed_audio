@@ -13,8 +13,7 @@
 
 import("//build/ohos.gni")
 import("//build/ohos_var.gni")
-import(
-    "//foundation/distributedhardware/distributed_audio/distributedaudio.gni")
+import("../../../distributedaudio.gni")
 
 ohos_shared_library("distributed_audio_sink") {
   include_dirs = [
@@ -40,6 +39,7 @@ ohos_shared_library("distributed_audio_sink") {
     "${audio_client_path}/micclient/include",
     "${audio_client_path}/spkclient/include",
     "${audio_control_path}/controlsink/include",
+    "${audio_client_path}/interface",
     "${audio_processor_path}/encodeprocessor/include",
     "${audio_processor_path}/decodeprocessor/include",
     "${audio_processor_path}/interface",
@@ -67,17 +67,17 @@ ohos_shared_library("distributed_audio_sink") {
   ]
 
   sources = [
-    "src/daudio_sink_service.cpp",
-    "src/daudio_sink_stub.cpp",
-    "${audio_client_path}/spkclient/src/dspeaker_client.cpp",
     "${audio_client_path}/micclient/src/dmic_client.cpp",
+    "${audio_client_path}/spkclient/src/dspeaker_client.cpp",
     "${audio_control_path}/controlsink/src/daudio_sink_dev_ctrl_manager.cpp",
     "${innerkits_path}/native_cpp/audio_sink/src/daudio_sink_handler.cpp",
-    "${innerkits_path}/native_cpp/audio_sink/src/daudio_sink_proxy.cpp",
     "${innerkits_path}/native_cpp/audio_sink/src/daudio_sink_load_callback.cpp",
+    "${innerkits_path}/native_cpp/audio_sink/src/daudio_sink_proxy.cpp",
     "${innerkits_path}/native_cpp/audio_source/src/daudio_source_proxy.cpp",
     "${services_path}/audiomanager/managersink/src/daudio_sink_dev.cpp",
     "${services_path}/audiomanager/managersink/src/daudio_sink_manager.cpp",
+    "src/daudio_sink_service.cpp",
+    "src/daudio_sink_stub.cpp",
   ]
 
   deps = [
@@ -89,13 +89,16 @@ ohos_shared_library("distributed_audio_sink") {
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_audio:libaudio_proxy_1.0",
+    "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libhdi",
     "hitrace_native:hitrace_meter",
     "ipc:ipc_core",
+    "multimedia_audio_framework:audio_capturer",
+    "multimedia_audio_framework:audio_client",
+    "multimedia_audio_framework:audio_renderer",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "multimedia_audio_framework:audio_client",
-    "multimedia_audio_framework:audio_capturer",
-    "multimedia_audio_framework:audio_renderer",
   ]
 
   defines = [

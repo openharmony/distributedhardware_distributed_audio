@@ -13,8 +13,7 @@
 
 import("//build/ohos.gni")
 import("//build/ohos_var.gni")
-import(
-    "//foundation/distributedhardware/distributed_audio/distributedaudio.gni")
+import("../../../../distributedaudio.gni")
 
 ohos_shared_library("distributed_audio_data_channel") {
   include_dirs = [

@@ -64,34 +64,58 @@ HWTEST_F(AudioTransportStartStatusTest, transport_start_test_001, TestSize.Level
 }
 
 /**
- * @tc.name: transport_start_test_002
- * @tc.desc: Verify stop action when status is start.
+ * @tc.name: transport_Stop_test_001
+ * @tc.desc: Verify stop action when status is stop.
  * @tc.type: FUNC
  * @tc.require: AR000H0E5U
  */
-HWTEST_F(AudioTransportStartStatusTest, transport_start_test_002, TestSize.Level1)
+HWTEST_F(AudioTransportStartStatusTest, transport_Stop_test_001, TestSize.Level1)
 {
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, audioStatus_->Stop(audioChannel_, processor_));
 }
 
 /**
- * @tc.name: transport_start_test_003
+ * @tc.name: transport_stop_test_002
+ * @tc.desc: Verify stop action when status is start.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5U
+ */
+HWTEST_F(AudioTransportStartStatusTest, transport_stop_test_002, TestSize.Level1)
+{
+    std::shared_ptr<IAudioProcessor> processor_ = std::make_shared<MockIAudioProcessor>();
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, audioStatus_->Stop(audioChannel_, processor_));
+}
+
+/**
+ * @tc.name: transport_Pause_test_001
  * @tc.desc: Verify pause action when status is start.
  * @tc.type: FUNC
  * @tc.require: AR000H0E5U
  */
-HWTEST_F(AudioTransportStartStatusTest, transport_start_test_003, TestSize.Level1)
+HWTEST_F(AudioTransportStartStatusTest, transport_pause_test_001, TestSize.Level1)
 {
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, audioStatus_->Pause(processor_));
 }
 
 /**
- * @tc.name: transport_start_test_004
+ * @tc.name: transport_Pause_test_002
+ * @tc.desc: Verify pause action when status is start.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5U
+ */
+HWTEST_F(AudioTransportStartStatusTest, transport_Pause_test_002, TestSize.Level1)
+{
+    processor_ = std::make_shared<MockIAudioProcessor>();
+    EXPECT_EQ(ERR_DH_AUDIO_BAD_VALUE, audioStatus_->Pause(processor_));
+}
+
+/**
+ * @tc.name: transport_Restart_test_001
  * @tc.desc: Verify action when status is start.
  * @tc.type: FUNC
  * @tc.require: AR000H0E5U
  */
-HWTEST_F(AudioTransportStartStatusTest, transport_start_test_004, TestSize.Level1)
+HWTEST_F(AudioTransportStartStatusTest, transport_restart_test_001, TestSize.Level1)
 {
     AudioParam testLocalParaEnc = {
         {
@@ -102,12 +126,12 @@ HWTEST_F(AudioTransportStartStatusTest, transport_start_test_004, TestSize.Level
         },
         {
             SOURCE_TYPE_INVALID,
-            0
+            NORMAL_MODE
         },
         {
             CONTENT_TYPE_UNKNOWN,
             STREAM_USAGE_UNKNOWN,
-            0
+            NORMAL_MODE
         }
     };
     AudioParam testRemoteParaEnc = {
@@ -119,15 +143,26 @@ HWTEST_F(AudioTransportStartStatusTest, transport_start_test_004, TestSize.Level
         },
         {
             SOURCE_TYPE_INVALID,
-            0
+            NORMAL_MODE
         },
         {
             CONTENT_TYPE_UNKNOWN,
             STREAM_USAGE_UNKNOWN,
-            0
+            NORMAL_MODE
         }
     };
     EXPECT_EQ(DH_SUCCESS, audioStatus_->Restart(testLocalParaEnc, testRemoteParaEnc, processor_));
+}
+
+/**
+ * @tc.name: transport_getstatetype_test_001
+ * @tc.desc: Verify pause action when status is start.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5U
+ */
+HWTEST_F(AudioTransportStartStatusTest, transport_getstatetype_test_001, TestSize.Level1)
+{
+    EXPECT_EQ(TRANSPORT_STATE_START, audioStatus_->GetStateType());
 }
 } // namespace DistributedHardware
 } // namespace OHOS

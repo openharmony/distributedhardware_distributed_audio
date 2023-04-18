@@ -13,8 +13,7 @@
 
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-import(
-    "//foundation/distributedhardware/distributed_audio/distributedaudio.gni")
+import("../../../../../../../distributedaudio.gni")
 
 group("hdi_service_audio_test") {
   testonly = true
@@ -23,7 +22,5 @@ group("hdi_service_audio_test") {
     "${hdf_ser_aud_path}/test/unittest/audio_capture_interface:hdi_service_audio_capture_test",
     "${hdf_ser_aud_path}/test/unittest/audio_manager_interface:hdi_service_audio_manager_test",
     "${hdf_ser_aud_path}/test/unittest/audio_render_interface:hdi_service_audio_render_test",
-    "${hdf_ser_aud_path}/test/unittest/audio_render_lowlatency:hdi_service_audio_render_lowlatency_test",
-    "${hdf_ser_aud_path}/test/unittest/audio_capture_lowlatency:hdi_service_audio_capture_lowlatency_test",
   ]
 }

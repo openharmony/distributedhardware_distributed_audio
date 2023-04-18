@@ -113,7 +113,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, CaptureFrame_003, TestSize.Level1)
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, Start_001, TestSize.Level1)
 {
-    EXPECT_EQ(HDF_SUCCESS, audioCaptureInterfaceImpl_->Start());
+    EXPECT_EQ(HDF_FAILURE, audioCaptureInterfaceImpl_->Start());
 }
 
 /**
@@ -124,7 +124,7 @@ HWTEST_F(AudioCaptureInterfaceImplTest, Start_001, TestSize.Level1)
  */
 HWTEST_F(AudioCaptureInterfaceImplTest, Stop_001, TestSize.Level1)
 {
-    EXPECT_EQ(HDF_SUCCESS, audioCaptureInterfaceImpl_->Stop());
+    EXPECT_EQ(HDF_FAILURE, audioCaptureInterfaceImpl_->Stop());
 }
 
 /**

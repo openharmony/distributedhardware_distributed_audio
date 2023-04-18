@@ -66,13 +66,13 @@ constexpr uint32_t AUDIO_FORMAT_DEFAULT = 16;
 
 constexpr int32_t MILLISECOND_PER_SECOND = 1000;
 constexpr uint32_t DEFAULT_AUDIO_DATA_SIZE = 4096;
-constexpr int32_t AUDIO_OFFSET_FRAME_NUM = 10;
+constexpr int64_t AUDIO_OFFSET_FRAME_NUM = 10;
 
 constexpr uint32_t AUDIO_DEFAULT_MAX_VOLUME_LEVEL = 15;
 constexpr uint32_t AUDIO_DEFAULT_MIN_VOLUME_LEVEL = 0;
 
-constexpr uint32_t DAUDIO_MAX_ASHMEM_LEN = 100000;
-constexpr uint32_t DAUDIO_MIN_ASHMEM_LEN = 10;
+constexpr int32_t DAUDIO_MAX_ASHMEM_LEN = 100000;
+constexpr int32_t DAUDIO_MIN_ASHMEM_LEN = 10;
 } // DistributeHardware
 } // OHOS
 #endif // OHOS_DAUDIO_CONSTANTS_H

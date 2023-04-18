@@ -14,8 +14,7 @@
 import("//build/ohos.gni")
 import("//build/ohos_var.gni")
 import("//build/test.gni")
-import(
-    "//foundation/distributedhardware/distributed_audio/distributedaudio.gni")
+import("../../../../../distributedaudio.gni")
 
 module_output_path =
     "distributed_audio/services/audiotransport/transport_status_test"
@@ -24,9 +23,6 @@ config("module_private_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
-    "//base/hiviewdfx/hitrace/interfaces/native/innerkits/include/hitrace_meter",
-    "//foundation/communication/dsoftbus/interfaces/kits/transport",
     "${fwk_common_path}/utils/include",
     "${mediastandard_path}/interfaces/innerkits/native/media/include",
     "${mediastandardfwk_path}/audiocommon/include",
@@ -52,9 +48,10 @@ config("module_private_config") {
 ohos_unittest("TransportStatusTest") {
   module_out_path = module_output_path
 
-  sources = [ "src/audio_transport_pause_status_test.cpp",
-  "src/audio_transport_stop_status_test.cpp",
-  "src/audio_transport_start_status_test.cpp",
+  sources = [
+    "src/audio_transport_pause_status_test.cpp",
+    "src/audio_transport_start_status_test.cpp",
+    "src/audio_transport_stop_status_test.cpp",
   ]
 
   configs = [ ":module_private_config" ]
@@ -65,6 +62,8 @@ ohos_unittest("TransportStatusTest") {
     "${services_path}/common:distributed_audio_utils",
     "//third_party/googletest:gtest_main",
   ]
+
+  external_deps = [ "dsoftbus:softbus_client" ]
 
   defines = [
     "HI_LOG_ENABLE",

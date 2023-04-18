@@ -26,6 +26,8 @@
 #include "dmic_client.h"
 #include "dspeaker_client.h"
 #include "task_queue.h"
+#include "imic_client.h"
+#include "ispk_client.h"
 #include "iaudio_event_callback.h"
 
 using json = nlohmann::json;
@@ -88,8 +90,8 @@ private:
     std::string spkDhId_;
     std::string micDhId_;
     std::shared_ptr<TaskQueue> taskQueue_ = nullptr;
-    std::shared_ptr<DSpeakerClient> speakerClient_ = nullptr;
-    std::shared_ptr<DMicClient> micClient_ = nullptr;
+    std::shared_ptr<ISpkClient> speakerClient_ = nullptr;
+    std::shared_ptr<IMicClient> micClient_ = nullptr;
     std::shared_ptr<DAudioSinkDevCtrlMgr> audioCtrlMgr_ = nullptr;
 
     using DAudioSinkDevFunc = int32_t (DAudioSinkDev::*)(const AudioEvent &audioEvent);

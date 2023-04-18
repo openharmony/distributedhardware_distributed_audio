@@ -14,8 +14,7 @@
 import("//build/ohos.gni")
 import("//build/ohos_var.gni")
 import("//build/test.gni")
-import(
-    "//foundation/distributedhardware/distributed_audio/distributedaudio.gni")
+import("../../../../../distributedaudio.gni")
 
 module_output_path =
     "distributed_audio/services/audiotransport/encode_transport_test"
@@ -55,8 +54,8 @@ ohos_unittest("EncodeTransportTest") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "${audio_transport_path}/encodetransport:distributed_audio_encode_transport",
     "${audio_transport_path}/audiotransportstatus:distributed_audio_transport_status",
+    "${audio_transport_path}/encodetransport:distributed_audio_encode_transport",
     "${services_path}/common:distributed_audio_utils",
     "//third_party/googletest:gtest_main",
   ]

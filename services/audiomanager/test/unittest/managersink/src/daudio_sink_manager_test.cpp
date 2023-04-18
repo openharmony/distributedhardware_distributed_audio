@@ -53,6 +53,23 @@ HWTEST_F(DAudioSinkManagerTest, CreateAudioDevice_001, TestSize.Level1)
     std::string devId = "devId";
     EXPECT_EQ(DH_SUCCESS, daudioSinkManager.CreateAudioDevice(devId));
     daudioSinkManager.ClearAudioDev(devId);
+    daudioSinkManager.OnSinkDevReleased(devId);
+}
+
+/**
+ * @tc.name: DAudioNotify_001
+ * @tc.desc: Verify the DAudioNotify function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkManagerTest, DAudioNotify_001, TestSize.Level1)
+{
+    std::string devId = "devId";
+    std::string dhId = "dhId";
+    const int32_t eventType = 1;
+    const std::string eventContent = "eventContent";
+    EXPECT_EQ(ERR_DH_AUDIO_SA_GET_REMOTE_SINK_FAILED,
+        daudioSinkManager.DAudioNotify(devId, dhId, eventType, eventContent));
 }
 } // DistributedHardware
 } // OHOS

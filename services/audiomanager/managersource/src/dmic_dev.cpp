@@ -161,74 +161,18 @@ int32_t DMicDev::NotifyEvent(const std::string &devId, const int32_t dhId, const
         DHLOGE("Event callback is null");
         return ERR_DH_AUDIO_SA_EVENT_CALLBACK_NULL;
     }
-    if (event.type == AudioEventType::AUDIO_START) {
-        curStatus_ = AudioStatus::STATUS_START;
-        return DH_SUCCESS;
-    }
-    if (event.type == AudioEventType::AUDIO_STOP) {
-        curStatus_ = AudioStatus::STATUS_STOP;
-        return DH_SUCCESS;
+    switch (event.type) {
+        case AudioEventType::AUDIO_START:
+            curStatus_ = AudioStatus::STATUS_START;
+            break;
+        case AudioEventType::AUDIO_STOP:
+            curStatus_ = AudioStatus::STATUS_STOP;
+            break;
+        default:
+            break;
     }
     AudioEvent audioEvent(event.type, event.content);
     cbObj->NotifyEvent(audioEvent);
-    return DH_SUCCESS;
-}
-
-int32_t DMicDev::MmapStart()
-{
-    if (ashmem_ == nullptr || micTrans_ == nullptr) {
-        DHLOGE("Ashmem or trans is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
-    std::lock_guard<std::mutex> lock(writeAshmemtMutex_);
-    isEnqueueRunning_.store(true);
-    enqueueDataThread_ = std::thread(&DMicDev::EnqueueThread, this);
-    if (pthread_setname_np(enqueueDataThread_.native_handle(), ENQUEUE_THREAD) != DH_SUCCESS) {
-        DHLOGE("Enqueue data thread setname failed.");
-    }
-    return DH_SUCCESS;
-}
-
-void DMicDev::EnqueueThread()
-{
-    writeIndex_ = 0;
-    DHLOGI("lengthPerRead length: %d", lengthPerTrans_);
-    int64_t startTime = GetCurNano();
-    uint64_t writeCount = 0;
-    while (isEnqueueRunning_.load()) {
-        std::shared_ptr<AudioData> audioData = nullptr;
-        {
-            std::lock_guard<std::mutex> lock(dataQueueMtx_);
-            if (dataQueue_.empty()) {
-                DHLOGI("Data queue is empty.");
-                audioData = std::make_shared<AudioData>(param_.comParam.frameSize);
-            } else {
-                audioData = dataQueue_.front();
-                dataQueue_.pop();
-            }
-        }
-        bool writeRet = ashmem_->WriteToAshmem(audioData->Data(), audioData->Size(), writeIndex_);
-        if (writeRet) {
-            DHLOGI("Write to ashmem success! write index: %d, writeLength: %d", writeIndex_, lengthPerTrans_);
-        } else {
-            DHLOGE("Write daTa to ashmem failed.");
-        }
-        writeIndex_ += lengthPerTrans_;
-        if (writeIndex_ >= ashmemLength_) {
-            writeIndex_ = 0;
-        }
-        writeCount++;
-        AbsoluteSleep(startTime + writeCount * periodNanoSec_);
-    }
-}
-
-int32_t DMicDev::MmapStop()
-{
-    std::lock_guard<std::mutex> lock(writeAshmemtMutex_);
-    isEnqueueRunning_.store(false);
-    if (enqueueDataThread_.joinable()) {
-        enqueueDataThread_.join();
-    }
     return DH_SUCCESS;
 }
 
@@ -290,12 +234,6 @@ int32_t DMicDev::Stop()
 int32_t DMicDev::Release()
 {
     DHLOGI("Release mic device.");
-    if (ashmem_ != nullptr) {
-        ashmem_->UnmapAshmem();
-        ashmem_->CloseAshmem();
-        ashmem_ = nullptr;
-        DHLOGI("UnInitAshmem success.");
-    }
     if (micTrans_ == nullptr) {
         DHLOGE("Mic trans is null.");
         return DH_SUCCESS;
@@ -338,40 +276,6 @@ int32_t DMicDev::ReadStreamData(const std::string &devId, const int32_t dhId, st
     }
     return DH_SUCCESS;
 }
-
-int32_t DMicDev::ReadMmapPosition(const std::string &devId, const int32_t dhId, uint64_t &frames, uint64_t &timeStamp)
-{
-    DHLOGI("Read mmap position.");
-    (void)devId;
-    (void)dhId;
-    (void)frames;
-    (void)timeStamp;
-    return DH_SUCCESS;
-}
-
-int32_t DMicDev::RefreshAshmemInfo(const std::string &devId, const int32_t dhId,
-    int32_t fd, int32_t ashmemLength, int32_t lengthPerTrans)
-{
-    DHLOGI("RefreshAshmemInfo: fd: %d, ashmemLength: %d, lengthPerTrans: %d", fd, ashmemLength, lengthPerTrans);
-    if (param_.captureOpts.capturerFlags == CAPTURE_MMAP_FLAG) {
-        DHLOGI("Dmic dev low-latency mode");
-        if (ashmem_ != nullptr) {
-            return DH_SUCCESS;
-        }
-        ashmem_ = new Ashmem(fd, ashmemLength);
-        ashmemLength_ = ashmemLength;
-        lengthPerTrans_ = lengthPerTrans;
-        DHLOGI("Create ashmem success. fd: %d, ashmem length: %d, lengthPerTrans: %d",
-            fd, ashmemLength_, lengthPerTrans_);
-        bool mapRet = ashmem_->MapReadAndWriteAshmem();
-        if (!mapRet) {
-            DHLOGE("Mmap ashmem failed");
-            return ERR_DH_AUDIO_NULLPTR;
-        }
-    }
-    return DH_SUCCESS;
-}
-
 
 AudioParam DMicDev::GetAudioParam() const
 {
@@ -421,7 +325,8 @@ int32_t DMicDev::OnDecodeTransDataDone(const std::shared_ptr<AudioData> &audioDa
     }
     std::lock_guard<std::mutex> lock(dataQueueMtx_);
     size_t dataQueSize = curStatus_ != AudioStatus::STATUS_START ?
-                                       DATA_QUEUE_HALF_SIZE : DATA_QUEUE_MAX_SIZE;
+        (param_.captureOpts.capturerFlags == MMAP_MODE ? LOW_LATENCY_DATA_QUEUE_HALF_SIZE : DATA_QUEUE_HALF_SIZE) :
+        (param_.captureOpts.capturerFlags == MMAP_MODE ? LOW_LATENCY_DATA_QUEUE_MAX_SIZE : DATA_QUEUE_MAX_SIZE);
     while (dataQueue_.size() > dataQueSize) {
         DHLOGI("Data queue overflow. buf current size: %d", dataQueue_.size());
         dataQueue_.pop();

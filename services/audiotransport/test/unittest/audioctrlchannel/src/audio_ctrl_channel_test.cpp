@@ -133,12 +133,12 @@ HWTEST_F(AudioCtrlChannelTest, OnSessionClosed_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: OnBytesReceived_001
- * @tc.desc: Verify the OnBytesReceived function.
+ * @tc.name: SendMsg_001
+ * @tc.desc: Verify the SendMsg function.
  * @tc.type: FUNC
  * @tc.require: AR000H0E5U
  */
-HWTEST_F(AudioCtrlChannelTest, OnBytesReceived_001, TestSize.Level1)
+HWTEST_F(AudioCtrlChannelTest, SendMsg_001, TestSize.Level1)
 {
     std::shared_ptr<IAudioChannelListener> listener = std::make_shared<MockIAudioChannelListener>();
     ctrlChannel_->channelListener_ = listener;
@@ -155,6 +155,9 @@ HWTEST_F(AudioCtrlChannelTest, OnBytesReceived_001, TestSize.Level1)
     StreamData *ext;
     StreamFrameInfo *streamFrameInfo;
     ctrlChannel_->OnStreamReceived(sessionId, datas, ext, streamFrameInfo);
+
+    string message = "sendMag";
+    EXPECT_NE(ERR_DH_AUDIO_CTRL_CHANNEL_SEND_MSG_FAIL, ctrlChannel_->SendMsg(message));
 }
 } // namespace DistributedHardware
 } // namespace OHOS

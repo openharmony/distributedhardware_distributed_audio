@@ -14,8 +14,7 @@
 import("//build/ohos.gni")
 import("//build/ohos_var.gni")
 import("//build/test.gni")
-import(
-    "//foundation/distributedhardware/distributed_audio/distributedaudio.gni")
+import("../../../../../distributedaudio.gni")
 
 module_out_path = "distributed_audio/services/audiohdiproxy/daudio_hdi_handler"
 
@@ -50,9 +49,7 @@ ohos_unittest("DAudioHdiHandlerTest") {
     "//third_party/googletest:gtest_main",
   ]
 
-  external_deps = [
-    "c_utils:utils",
-  ]
+  external_deps = [ "c_utils:utils" ]
 }
 
 group("daudio_hdi_handler_test") {

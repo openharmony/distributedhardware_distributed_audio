@@ -75,6 +75,7 @@ HWTEST_F(EncoderTest, encode_test_001, TestSize.Level1)
 {
     EXPECT_EQ(DH_SUCCESS, audioEncoder_->ConfigureAudioCodec(LOC_COMPARA_ENC_TEST, encodeCb_));
     audioEncoder_ = std::make_shared<AudioEncoder>();
+    EXPECT_EQ(ERR_DH_AUDIO_BAD_VALUE, audioEncoder_->ConfigureAudioCodec(LOC_COMPARA_ENC_TEST, nullptr));
 }
 
 /**

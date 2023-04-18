@@ -13,26 +13,28 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_AEC_TEST_H
-#define OHOS_AEC_TEST_H
+#ifndef OHOS_ISPK_CLIENT_H
+#define OHOS_ISPK_CLIENT_H
 
-#include "local_audio.h"
+#include <memory>
+
+#include "audio_param.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class AecTest {
+class ISpkClient {
 public:
-    AecTest() = default;
-    ~AecTest() = default;
+    ISpkClient() = default;
+    virtual ~ISpkClient() = default;
 
-    int32_t Init();
-    int32_t Process();
-    void Release();
-private:
-    AudioRenderObj render_;
-    AudioCaptureObj capture_;
-    AudioBufferInfo info_;
+    virtual int32_t SetUp(const AudioParam &param) = 0;
+    virtual int32_t Release() = 0;
+    virtual int32_t StartRender() = 0;
+    virtual int32_t StopRender() = 0;
+    virtual int32_t SetMute(const AudioEvent &event) = 0;
+    virtual int32_t SetAudioParameters(const AudioEvent &event) = 0;
+    virtual void PlayStatusChange(const std::string &args) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_AEC_TEST_H
+#endif // OHOS_ISPK_CLIENT_H

@@ -60,7 +60,11 @@ void AudioTransportStopStatusTest::TearDown(void)
  */
 HWTEST_F(AudioTransportStopStatusTest, transport_stop_test_001, TestSize.Level1)
 {
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, audioStatus_->Start(audioChannel_, processor_));
+    std::string peerDevId = "peerDevId";
+    std::shared_ptr<IAudioChannel> audioChannel_ = std::make_shared<MockAudioDataChannel>(peerDevId);
+    std::shared_ptr<IAudioProcessor> processor_ = std::make_shared<MockIAudioProcessor>();
+    EXPECT_EQ(ERR_DH_AUDIO_BAD_VALUE, audioStatus_->Start(audioChannel_, processor_));
+    EXPECT_EQ(DH_SUCCESS, audioStatus_->Stop(audioChannel_, processor_));
 }
 
 /**
@@ -71,6 +75,7 @@ HWTEST_F(AudioTransportStopStatusTest, transport_stop_test_001, TestSize.Level1)
  */
 HWTEST_F(AudioTransportStopStatusTest, transport_stop_test_002, TestSize.Level1)
 {
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, audioStatus_->Start(audioChannel_, nullptr));
     EXPECT_EQ(DH_SUCCESS, audioStatus_->Stop(audioChannel_, processor_));
 }
 
@@ -102,12 +107,12 @@ HWTEST_F(AudioTransportStopStatusTest, transport_stop_test_004, TestSize.Level1)
         },
         {
             SOURCE_TYPE_INVALID,
-            0
+            NORMAL_MODE
         },
         {
             CONTENT_TYPE_UNKNOWN,
             STREAM_USAGE_UNKNOWN,
-            0
+            NORMAL_MODE
         }
     };
     AudioParam testRemoteParaEnc = {
@@ -119,16 +124,27 @@ HWTEST_F(AudioTransportStopStatusTest, transport_stop_test_004, TestSize.Level1)
         },
         {
             SOURCE_TYPE_INVALID,
-            0
+            NORMAL_MODE
         },
         {
             CONTENT_TYPE_UNKNOWN,
             STREAM_USAGE_UNKNOWN,
-            0
+            NORMAL_MODE
         }
     };
     EXPECT_EQ(ERR_DH_AUDIO_TRANS_ILLEGAL_OPERATION,
         audioStatus_->Restart(testLocalParaEnc, testRemoteParaEnc, processor_));
+}
+
+/**
+ * @tc.name: transport_getstatetype_test_001
+ * @tc.desc: Verify pause action when status is start.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5U
+ */
+HWTEST_F(AudioTransportStopStatusTest, transport_getstatetype_test_001, TestSize.Level1)
+{
+    EXPECT_EQ(TRANSPORT_STATE_STOP, audioStatus_->GetStateType());
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -24,6 +24,6 @@ import ohos.hdi.distributed_audio.audioext.v1_0.Types;
     NotifyEvent([in] String adpName, [in] int devId, [in] struct DAudioEvent event);
     WriteStreamData([in] String adpName, [in] int devId, [in] struct AudioData data);
     ReadStreamData([in] String adpName, [in] int devId, [out] struct AudioData data);
-    ReadMmapPosition([in] String adpName, [in] int devId, [out] unsigned long frames, [out] unsigned long timeStamp);
+    ReadMmapPosition([in] String adpName, [in] int devId, [out] unsigned long frames, [out] struct CurrentTime time);
     RefreshAshmemInfo([in] String adpName, [in] int devId, [in] FileDescriptor fd, [in] int ashmemLength, [in] int lengthPerTrans);
 }

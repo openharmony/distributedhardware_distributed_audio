@@ -13,8 +13,7 @@
 
 import("//build/ohos.gni")
 import("//build/ohos_var.gni")
-import(
-    "//foundation/distributedhardware/distributed_audio/distributedaudio.gni")
+import("../../../distributedaudio.gni")
 
 ohos_shared_library("distributed_audio_encode_transport") {
   include_dirs = [
@@ -32,7 +31,6 @@ ohos_shared_library("distributed_audio_encode_transport") {
     "${common_path}/include",
     "${common_path}/dfx_utils/include",
     "${audio_processor_path}/encodeprocessor/include",
-    "${audio_processor_path}/lowlatencyprocessor/include",
     "${audio_processor_path}/encoder/include",
     "${audio_processor_path}/interface",
     "${audio_transport_path}/audiochannel/interface",
@@ -46,12 +44,11 @@ ohos_shared_library("distributed_audio_encode_transport") {
   ]
 
   sources = [
-    "src/audio_encode_transport.cpp",
     "${audio_processor_path}/encodeprocessor/src/audio_encoder_processor.cpp",
-    "${audio_processor_path}/lowlatencyprocessor/src/audio_lowlatency_processor.cpp",
     "${audio_processor_path}/encoder/src/audio_encoder.cpp",
     "${audio_processor_path}/encoder/src/audio_encoder_callback.cpp",
     "${services_path}/common/audiodata/src/audio_data.cpp",
+    "src/audio_encode_transport.cpp",
   ]
 
   deps = [
@@ -65,7 +62,6 @@ ohos_shared_library("distributed_audio_encode_transport") {
     "hitrace_native:hitrace_meter",
     "multimedia_player_framework:media_client",
   ]
-
 
   defines = [
     "HI_LOG_ENABLE",

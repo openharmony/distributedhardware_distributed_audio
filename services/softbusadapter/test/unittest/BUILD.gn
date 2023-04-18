@@ -12,8 +12,7 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import(
-    "//foundation/distributedhardware/distributed_audio/distributedaudio.gni")
+import("../../../../distributedaudio.gni")
 
 module_out_path = "distributed_audio/services/softbusadapter"
 

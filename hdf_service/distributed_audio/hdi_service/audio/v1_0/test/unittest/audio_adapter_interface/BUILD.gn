@@ -14,8 +14,7 @@
 import("//build/ohos.gni")
 import("//build/test.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-import(
-    "//foundation/distributedhardware/distributed_audio/distributedaudio.gni")
+import("../../../../../../../../distributedaudio.gni")
 
 module_out_path = "distributed_audio/hdf_service/hdi_service/audio"
 
@@ -34,7 +33,7 @@ config("module_private_config") {
   ]
 }
 
-## UnitTest hdi_service_audio_test
+## UnitTest hdi_service_adapter_test
 ohos_unittest("HDIServiceAudioAdapterTest") {
   module_out_path = module_out_path
 
@@ -48,9 +47,7 @@ ohos_unittest("HDIServiceAudioAdapterTest") {
     "//third_party/googletest:gtest_main",
   ]
 
-  external_deps = [
-    "c_utils:utils",
-  ]
+  external_deps = [ "c_utils:utils" ]
 }
 
 group("hdi_service_audio_adapter_test") {

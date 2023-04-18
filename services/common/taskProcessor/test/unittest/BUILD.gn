@@ -13,12 +13,9 @@
 
 import("//build/ohos.gni")
 import("//build/ohos_var.gni")
-import(
-    "//foundation/distributedhardware/distributed_audio/distributedaudio.gni")
+import("../../../../../distributedaudio.gni")
 
 group("task_processor_test") {
   testonly = true
-  deps = [
-    "${services_path}/common/taskProcessor/test/unittest/task_queue:task_queue_test",
-  ]
+  deps = [ "${services_path}/common/taskProcessor/test/unittest/task_queue:task_queue_test" ]
 }

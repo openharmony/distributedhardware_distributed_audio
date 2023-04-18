@@ -57,7 +57,8 @@ public:
         return 0;
     }
 
-    int32_t ReadMmapPosition(const std::string &adpName, int32_t devId, uint64_t &frames, uint64_t &timeStamp) override
+    int32_t ReadMmapPosition(const std::string &adpName, int32_t devId, uint64_t &frames,
+        CurrentTime &time) override
     {
         return 0;
     }

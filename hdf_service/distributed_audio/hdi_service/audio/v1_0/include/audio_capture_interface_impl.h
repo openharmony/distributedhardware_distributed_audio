@@ -80,14 +80,14 @@ public:
     int32_t TurnStandbyMode() override;
     int32_t AudioDevDump(int32_t range, int32_t fd) override;
     int32_t IsSupportsPauseAndResume(bool &supportPause, bool &supportResume) override;
-    int64_t CalculateOffset(int64_t count);
 
 private:
+    static constexpr int64_t AUDIO_OFFSET_FRAME_NUM = 10;
     std::string adapterName_;
     AudioDeviceDescriptor devDesc_;
     AudioSampleAttributes devAttrs_;
     uint32_t timeInterval_ = 5;
-    int32_t frameIdx_ = 0;
+    int64_t frameIndex_ = 0;
     int64_t framePeriodNs_ = 0;
     int64_t startTime_ = 0;
 

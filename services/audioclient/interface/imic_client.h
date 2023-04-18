@@ -13,30 +13,25 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DAUDIO_TEST_UTILS_H
-#define OHOS_DAUDIO_TEST_UTILS_H
+#ifndef OHOS_IMIC_CLIENT_H
+#define OHOS_IMIC_CLIENT_H
 
-#include <string>
+#include <memory>
+
+#include "audio_param.h"
+
 namespace OHOS {
 namespace DistributedHardware {
-class DAudioTestUtils {
+class IMicClient {
 public:
-    DAudioTestUtils() = default;
-    ~DAudioTestUtils() = default;
-    void DoAudioTest();
+    IMicClient() = default;
+    virtual ~IMicClient() = default;
 
-private:
-    void LocalCapture();
-    void LocalRender();
-    void AudioCycleTest();
-    void HDFCapture();
-    void HDFRender();
-
-private:
-    int32_t time_ = 0;
-    std::string path_;
+    virtual int32_t SetUp(const AudioParam &param) = 0;
+    virtual int32_t Release() = 0;
+    virtual int32_t StartCapture() = 0;
+    virtual int32_t StopCapture() = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-
-#endif // OHOS_DAUDIO_TEST_UTILS_H
+#endif // OHOS_IMIC_CLIENT_H

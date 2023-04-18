@@ -13,18 +13,17 @@
 
 import("//build/ohos.gni")
 import("//build/ohos_var.gni")
-import(
-    "//foundation/distributedhardware/distributed_audio/distributedaudio.gni")
+import("../../../../distributedaudio.gni")
 
 group("daudio_manager_test") {
   testonly = true
   deps = [
-    "${services_path}/audiomanager/test/unittest/managersink:manager_sink_test",
-    "${services_path}/audiomanager/test/unittest/source_device:daudio_source_dev_test",
-    "${services_path}/audiomanager/test/unittest/sourcemanager:daudio_source_mgr_test",
     "${common_path}/dfx_utils/test/unittest:DAudioDfxTest",
+    "${services_path}/audiomanager/test/unittest/managersink:manager_sink_test",
     "${services_path}/audiomanager/test/unittest/servicesink:DaudioSinkServiceTest",
     "${services_path}/audiomanager/test/unittest/servicesource:DaudioSourceServiceTest",
+    "${services_path}/audiomanager/test/unittest/source_device:daudio_source_dev_test",
+    "${services_path}/audiomanager/test/unittest/sourcemanager:daudio_source_mgr_test",
     "${services_path}/common/test/unittest/audiodata:audio_data_test",
   ]
 }
