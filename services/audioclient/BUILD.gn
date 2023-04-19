@@ -13,67 +13,65 @@
 
 import("//build/ohos.gni")
 import("//build/ohos_var.gni")
-import("../../../distributedaudio.gni")
+import("../../distributedaudio.gni")
 
-config("encode_transport_pub_config") {
+config("daudio_client_pub_config"){
   include_dirs = [
-    "include",
-    "../audiotransportstatus/include",
-    "../audiotransportstatus/interface",
-    "../interface",
-    "../audiochannel/interface",
-    "../audiochannel/audiodatachannel/include",
+      "interface",
   ]
 }
 
-ohos_shared_library("distributed_audio_encode_transport") {
+ohos_shared_library("distributed_audio_sink_client") {
   include_dirs = [
     "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
     "//base/hiviewdfx/hitrace/interfaces/native/innerkits/include/hitrace_meter",
-    "//foundation/communication/dsoftbus/interfaces/kits/transport",
-    "${fwk_common_path}/utils/include",
-    "${mediastandard_path}/interfaces/innerkits/native/media/include",
-    "${mediastandardfwk_path}/audiocommon/include",
+    "//foundation/multimedia/audio_framework/frameworks/native/common/include",
+    "//foundation/multimedia/audio_framework/interfaces/inner_api/native/audiocapturer/include",
     "//third_party/json/include",
+    "${mediastandardfwk_path}/audiocapturer/include",
+    "${mediastandardfwk_path}/audiocommon/include",
+    "${mediastandardfwk_path}/audiorenderer/include",
+    "${mediastandardfwk_path}/audiomanager/include",
   ]
 
   include_dirs += [
     "include",
-    "${common_path}/include",
-    "${common_path}/dfx_utils/include",
+    "${audio_client_path}/micclient/include",
+    "${audio_client_path}/spkclient/include",
+    "${audio_client_path}/interface",
     "${audio_processor_path}/encodeprocessor/include",
-    "${audio_processor_path}/encoder/include",
+    "${audio_processor_path}/decodeprocessor/include",
     "${audio_processor_path}/interface",
     "${audio_transport_path}/audiochannel/interface",
     "${audio_transport_path}/audiochannel/audiodatachannel/include",
-    "${audio_transport_path}/audiotransportstatus/include",
-    "${audio_transport_path}/audiotransportstatus/interface",
+    "${audio_transport_path}/decodetransport/include",
+    "${audio_transport_path}/encodetransport/include",
     "${audio_transport_path}/interface",
+    "${common_path}/include",
+    "${common_path}/dfx_utils/include",
+    "${fwk_common_path}/utils/include",
     "${services_path}/common/audioparam",
+    "${services_path}/common/audioeventcallback",
     "${services_path}/common/audiodata/include",
-    "${softbusadapter_path}/include",
   ]
 
-  public_configs = [ :"encode_transport_pub_config" ]
+  public_configs = [ ":daudio_client_pub_config" ]
 
   sources = [
-    "${audio_processor_path}/encodeprocessor/src/audio_encoder_processor.cpp",
-    "${audio_processor_path}/encoder/src/audio_encoder.cpp",
-    "${audio_processor_path}/encoder/src/audio_encoder_callback.cpp",
-    "${services_path}/common/audiodata/src/audio_data.cpp",
-    "src/audio_encode_transport.cpp",
+    "${audio_client_path}/micclient/src/dmic_client.cpp",
+    "${audio_client_path}/spkclient/src/dspeaker_client.cpp",
   ]
 
   deps = [
-    "${audio_transport_path}/audiochannel/audiodatachannel:distributed_audio_data_channel",
-    "${audio_transport_path}/audiotransportstatus:distributed_audio_transport_status",
+    "${audio_transport_path}/decodetransport:distributed_audio_decode_transport",
+    "${audio_transport_path}/encodetransport:distributed_audio_encode_transport",
     "${services_path}/common:distributed_audio_utils",
   ]
 
   external_deps = [
-    "c_utils:utils",
-    "hitrace_native:hitrace_meter",
-    "multimedia_player_framework:media_client",
+    "multimedia_audio_framework:audio_capturer",
+    "multimedia_audio_framework:audio_client",
+    "multimedia_audio_framework:audio_renderer",
   ]
 
   defines = [

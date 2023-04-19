@@ -18,8 +18,10 @@ import("../../distributedaudio.gni")
 config("daudio_common_pub_config") {
   include_dirs = [
     "audiodata/include",
+    "audioeventcallback",
     "audioparam",
     "${common_path}/include",
+    "${common_path}/dfxutils/include",
   ]
 }
 
