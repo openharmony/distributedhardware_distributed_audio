@@ -60,7 +60,7 @@ ohos_unittest("MicClientTest") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "${services_path}/audio_client:distributed_audio_sink_client",
+    "${services_path}/audioclient:distributed_audio_sink_client",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
   ]
