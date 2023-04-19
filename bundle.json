@@ -91,9 +91,9 @@
                 },
                 {
                     "type": "so",
-                    "name": "//foundation/distributedhardware/distributed_audio/services/audio_client:distributed_audio_sink_client",
+                    "name": "//foundation/distributedhardware/distributed_audio/services/audioclient:distributed_audio_sink_client",
                     "header": {
-                        "header_base": "//foundation/distributedhardware/distributed_audio/services/audio_client",
+                        "header_base": "//foundation/distributedhardware/distributed_audio/services/audioclient",
                         "header_files": [
                             "interface/imic_client.h",
                             "interface/ispk_client.h"
