@@ -23,15 +23,7 @@ config("daudio_client_pub_config"){
 
 ohos_shared_library("distributed_audio_sink_client") {
   include_dirs = [
-    "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
-    "//base/hiviewdfx/hitrace/interfaces/native/innerkits/include/hitrace_meter",
-    "//foundation/multimedia/audio_framework/frameworks/native/common/include",
-    "//foundation/multimedia/audio_framework/interfaces/inner_api/native/audiocapturer/include",
     "//third_party/json/include",
-    "${mediastandardfwk_path}/audiocapturer/include",
-    "${mediastandardfwk_path}/audiocommon/include",
-    "${mediastandardfwk_path}/audiorenderer/include",
-    "${mediastandardfwk_path}/audiomanager/include",
   ]
 
   include_dirs += [
@@ -69,6 +61,8 @@ ohos_shared_library("distributed_audio_sink_client") {
   ]
 
   external_deps = [
+    "hisysevent_native:libhisysevent",
+    "hitrace_native:hitrace_meter",
     "multimedia_audio_framework:audio_capturer",
     "multimedia_audio_framework:audio_client",
     "multimedia_audio_framework:audio_renderer",
