@@ -29,7 +29,6 @@ namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
 namespace V1_0 {
-
 typedef enum {
     RENDER_STATUS_OPEN = 0,
     RENDER_STATUS_CLOSE,

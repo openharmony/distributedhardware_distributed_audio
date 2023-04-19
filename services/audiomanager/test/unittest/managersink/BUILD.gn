@@ -72,6 +72,7 @@ ohos_unittest("DaudioSinkDevTest") {
 
   deps = [
     "${services_path}/audiomanager/servicesink:distributed_audio_sink",
+    "${services_path}/audioclient:distributed_audio_sink_client",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
   ]
