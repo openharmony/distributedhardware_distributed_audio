@@ -54,7 +54,7 @@ ohos_shared_library("distributed_audio_decode_transport") {
     "${softbusadapter_path}/include",
   ]
 
-  public_configs = [ :"decode_transport_pub_config" ]
+  public_configs = [ ":decode_transport_pub_config" ]
 
   sources = [
     "${audio_processor_path}/decodeprocessor/src/audio_decoder_processor.cpp",
