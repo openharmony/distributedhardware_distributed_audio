@@ -15,16 +15,12 @@ import("//build/ohos.gni")
 import("//build/ohos_var.gni")
 import("../../distributedaudio.gni")
 
-config("daudio_client_pub_config"){
-  include_dirs = [
-      "interface",
-  ]
+config("daudio_client_pub_config") {
+  include_dirs = [ "interface" ]
 }
 
 ohos_shared_library("distributed_audio_sink_client") {
-  include_dirs = [
-    "//third_party/json/include",
-  ]
+  include_dirs = [ "//third_party/json/include" ]
 
   include_dirs += [
     "include",
