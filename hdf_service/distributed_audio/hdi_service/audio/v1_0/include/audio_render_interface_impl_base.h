@@ -29,6 +29,15 @@ namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
 namespace V1_0 {
+
+typedef enum {
+    RENDER_STATUS_OPEN = 0,
+    RENDER_STATUS_CLOSE,
+    RENDER_STATUS_START,
+    RENDER_STATUS_STOP,
+    RENDER_STATUS_PAUSE,
+} AudioRenderStatus;
+
 class AudioRenderInterfaceImplBase : public IAudioRender {
 public:
     AudioRenderInterfaceImplBase(const AudioDeviceDescriptor &desc);

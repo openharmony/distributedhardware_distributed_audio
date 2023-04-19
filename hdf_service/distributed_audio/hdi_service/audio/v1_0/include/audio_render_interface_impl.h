@@ -38,13 +38,6 @@ using OHOS::HDI::DistributedAudio::Audioext::V1_0::IDAudioCallback;
 
 constexpr uint32_t DURATION_FRAMES = 100;
 constexpr uint32_t CUR_FRAME_INIT_VALUE = 0;
-typedef enum {
-    RENDER_STATUS_OPEN = 0,
-    RENDER_STATUS_CLOSE,
-    RENDER_STATUS_START,
-    RENDER_STATUS_STOP,
-    RENDER_STATUS_PAUSE,
-} AudioRenderStatus;
 
 class AudioRenderInterfaceImpl : public AudioRenderInterfaceImplBase {
 public:

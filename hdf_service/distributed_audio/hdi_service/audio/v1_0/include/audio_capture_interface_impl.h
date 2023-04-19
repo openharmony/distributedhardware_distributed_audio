@@ -35,14 +35,6 @@ using OHOS::HDI::DistributedAudio::Audioext::V1_0::AudioParameter;
 using OHOS::HDI::DistributedAudio::Audioext::V1_0::DAudioEvent;
 using OHOS::HDI::DistributedAudio::Audioext::V1_0::IDAudioCallback;
 
-typedef enum {
-    CAPTURE_STATUS_OPEN = 0,
-    CAPTURE_STATUS_CLOSE,
-    CAPTURE_STATUS_START,
-    CAPTURE_STATUS_STOP,
-    CAPTURE_STATUS_PAUSE,
-} AudioCaptureStatus;
-
 class AudioCaptureInterfaceImpl : public AudioCaptureInterfaceImplBase {
 public:
     AudioCaptureInterfaceImpl(const std::string &adpName, const AudioDeviceDescriptor &desc,
