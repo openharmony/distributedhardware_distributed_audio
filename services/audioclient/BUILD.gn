@@ -23,7 +23,6 @@ ohos_shared_library("distributed_audio_sink_client") {
   include_dirs = [ "//third_party/json/include" ]
 
   include_dirs += [
-    "include",
     "${audio_client_path}/interface",
     "${audio_client_path}/micclient/include",
     "${audio_client_path}/spkclient/include",
