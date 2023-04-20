@@ -71,4 +71,3 @@ ohos_shared_library("distributed_audio_sink_client") {
   subsystem_name = "distributedhardware"
   part_name = "distributed_audio"
 }
-
