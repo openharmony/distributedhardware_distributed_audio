@@ -29,8 +29,8 @@
 #include "unistd.h"
 #include "distributedaudiotest.h"
 
-const std::string SERVER_FIFO = "/data/seqnum_sv";
-const std::string CLIENT_FIFO_TEMPLATE = "/data/seqnum_sv";
+static const std::string SERVER_FIFO = "/data/seqnum_sv";
+static const std::string CLIENT_FIFO_TEMPLATE = "/data/seqnum_cl.%ld";
 const size_t CLIENT_FIFO_NAME_LEN = (sizeof(CLIENT_FIFO_TEMPLATE) + 20);
 
 struct Request {
@@ -46,11 +46,11 @@ struct Response {
 };
 
 using namespace OHOS::DistributedHardware;
-AudioManager *g_manager = nullptr;
-AudioAdapter *g_adapter = nullptr;
-AudioRender *g_render = nullptr;
-AudioCapture *g_capture = nullptr;
-AudioAdapterDescriptor *g_devices = nullptr;
+static AudioManager *g_manager = nullptr;
+static AudioAdapter *g_adapter = nullptr;
+static AudioRender *g_render = nullptr;
+static AudioCapture *g_capture = nullptr;
+static AudioAdapterDescriptor *g_devices = nullptr;
 
 static constexpr const char* PLAY_THREAD = "playThread";
 static constexpr const char* CAPTURE_THREAD = "captureThread";
@@ -60,19 +60,19 @@ int32_t g_frameNum = 0;
 int32_t g_frameIndex = 0;
 int32_t g_micFrameNum = 0;
 bool g_isInitRenderData = false;
-std::vector<uint8_t*> renderData;
+static std::vector<uint8_t*> renderData;
 
 static DeviceStatus g_spkStatus = DEVICE_IDLE;
 static DeviceStatus g_micStatus = DEVICE_IDLE;
 
-std::thread g_palyingThread;
-std::thread g_capingThread;
+static std::thread g_palyingThread;
+static std::thread g_capingThread;
 FILE *g_micFile = nullptr;
 
 static std::string CloseSpk();
 static std::string CloseMic();
 
-int64_t GetNowTimeUs()
+static int64_t GetNowTimeUs()
 {
     std::chrono::microseconds nowUs =
         std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch());
@@ -136,8 +136,8 @@ static void HandleDevError(const char *condition, const char *value)
     std::cout << "Receive abnormal event, Demo quit." << std::endl;
 }
 
-static int32_t ParamEventCallback(enum AudioExtParamKey key, const char *condition, const char *value, void *reserved,
-    void *cookie)
+static int32_t ParamEventCallback(enum AudioExtParamKey key, const char *condition, const char *value, int8_t &reserved,
+    int8_t &cookie)
 {
     std::string val(value);
     std::string con(condition);
@@ -222,7 +222,7 @@ static std::string OpenSpk(const std::string &devId)
     return "true";
 }
 
-void WriteStreamWait(const int64_t &startTime)
+static void WriteStreamWait(const int64_t &startTime)
 {
     int64_t endTime = GetNowTimeUs();
     int64_t passTime = endTime - startTime;
@@ -417,7 +417,7 @@ static std::string OpenMic(const std::string &devId)
     return "true";
 }
 
-void ReadStreamWait(const int64_t &startTime)
+static void ReadStreamWait(const int64_t &startTime)
 {
     int64_t endTime = GetNowTimeUs();
     int32_t passTime = endTime - startTime;
@@ -569,7 +569,7 @@ static std::string GetVolume()
     return "true;"+volStr;
 }
 
-std::string SpkMicPlayEvent(const std::string &cmd)
+static std::string SpkMicPlayEvent(const std::string &cmd)
 {
     if (cmd == CMD_START_SPK || cmd == CMD_START_SPK_EXT) {
         return StartRender();
@@ -593,7 +593,7 @@ std::string SpkMicPlayEvent(const std::string &cmd)
     return "";
 }
 
-void HandleAudioEvent(const std::string& cmd, std::string& cmdResString, struct Request& req)
+static void HandleAudioEvent(const std::string& cmd, std::string& cmdResString, struct Request& req)
 {
     // find audio device
     if (cmd == CMD_FIND || cmd == CMD_FIND_EXT) {
@@ -628,11 +628,11 @@ void HandleAudioEvent(const std::string& cmd, std::string& cmdResString, struct 
     }
 }
 
-int GenerateFifoName(int& clientFd, char clientFifo[], struct Response& resp,
+static int GenerateFifoName(int& clientFd, char clientFifo[], struct Response& resp,
     std::string& cmdResString, struct Request& req)
 {
     if (snprintf_s(clientFifo, CLIENT_FIFO_NAME_LEN, CLIENT_FIFO_NAME_LEN,
-        CLIENT_FIFO_TEMPLATE.c_str(), (long)(req.pid)) < 0) {
+        CLIENT_FIFO_TEMPLATE.c_str(), static_cast<long>(req.pid)) < 0) {
         return -1;
     }
     clientFd = open(clientFifo, O_WRONLY);
