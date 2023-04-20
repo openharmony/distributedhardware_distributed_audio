@@ -26,10 +26,8 @@ ohos_shared_library("libaudio_manager_daudio_primary_service_1.0") {
   sources = [
     "./src/audio_adapter_interface_impl.cpp",
     "./src/audio_capture_interface_impl.cpp",
-    "./src/audio_capture_interface_impl_base.cpp",
     "./src/audio_manager_interface_impl.cpp",
     "./src/audio_render_interface_impl.cpp",
-    "./src/audio_render_interface_impl_base.cpp",
   ]
 
   public_deps = [

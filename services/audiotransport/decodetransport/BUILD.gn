@@ -15,6 +15,18 @@ import("//build/ohos.gni")
 import("//build/ohos_var.gni")
 import("../../../distributedaudio.gni")
 
+config("decode_transport_pub_config") {
+  include_dirs = [
+    "include",
+    "../audiotransportstatus/include",
+    "../audiotransportstatus/interface",
+    "../interface",
+    "../audiochannel/interface",
+    "../audiochannel/audiodatachannel/include",
+    "../../audioprocessor/interface",
+  ]
+}
+
 ohos_shared_library("distributed_audio_decode_transport") {
   include_dirs = [
     "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
@@ -42,6 +54,8 @@ ohos_shared_library("distributed_audio_decode_transport") {
     "${services_path}/common/audiodata/include",
     "${softbusadapter_path}/include",
   ]
+
+  public_configs = [ ":decode_transport_pub_config" ]
 
   sources = [
     "${audio_processor_path}/decodeprocessor/src/audio_decoder_processor.cpp",

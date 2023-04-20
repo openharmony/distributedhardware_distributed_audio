@@ -35,7 +35,7 @@ namespace Audio {
 namespace V1_0 {
 AudioRenderInterfaceImpl::AudioRenderInterfaceImpl(const std::string &adpName, const AudioDeviceDescriptor &desc,
     const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> &callback)
-    : AudioRenderInterfaceImplBase(desc), adapterName_(adpName), devDesc_(desc),
+    : adapterName_(adpName), devDesc_(desc),
     devAttrs_(attrs), audioExtCallback_(callback)
 {
     devAttrs_.frameSize = CalculateFrameSize(attrs.sampleRate, attrs.channelCount, attrs.format, timeInterval_, false);
@@ -398,6 +398,42 @@ int32_t AudioRenderInterfaceImpl::GetFrameBufferSize(uint64_t &bufferSize)
     DHLOGI("Get frame buffer size, not support yet.");
     (void)bufferSize;
     return HDF_SUCCESS;
+}
+
+const AudioDeviceDescriptor &AudioRenderInterfaceImpl::GetRenderDesc()
+{
+    return devDesc_;
+}
+
+void AudioRenderInterfaceImpl::SetVolumeInner(const uint32_t vol)
+{
+    std::lock_guard<std::mutex> volLck(volMtx_);
+    vol_ = vol;
+}
+
+void AudioRenderInterfaceImpl::SetVolumeRangeInner(const uint32_t volMax, const uint32_t volMin)
+{
+    std::lock_guard<std::mutex> volLck(volMtx_);
+    volMin_ = volMin;
+    volMax_ = volMax;
+}
+
+uint32_t AudioRenderInterfaceImpl::GetVolumeInner()
+{
+    std::lock_guard<std::mutex> volLck(volMtx_);
+    return vol_;
+}
+
+uint32_t AudioRenderInterfaceImpl::GetMaxVolumeInner()
+{
+    std::lock_guard<std::mutex> volLck(volMtx_);
+    return volMax_;
+}
+
+uint32_t AudioRenderInterfaceImpl::GetMinVolumeInner()
+{
+    std::lock_guard<std::mutex> volLck(volMtx_);
+    return volMin_;
 }
 } // V1_0
 } // Audio

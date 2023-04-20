@@ -13,60 +13,61 @@
 
 import("//build/ohos.gni")
 import("//build/ohos_var.gni")
-import("//build/test.gni")
-import("../../../../../distributedaudio.gni")
+import("../../distributedaudio.gni")
 
-module_out_path = "distributed_audio/services/audioclient/mic_client_test"
+config("daudio_client_pub_config") {
+  include_dirs = [ "interface" ]
+}
 
-config("module_private_config") {
-  visibility = [ ":*" ]
-
-  include_dirs = [
-    "//foundation/multimedia/audio_framework/frameworks/native/common/include",
-    "//foundation/multimedia/audio_framework/interfaces/inner_api/native/audiocapturer/include",
-    "${mediastandardfwk_path}/audiocommon/include",
-  ]
+ohos_shared_library("distributed_audio_sink_client") {
+  include_dirs = [ "//third_party/json/include" ]
 
   include_dirs += [
     "${audio_client_path}/interface",
     "${audio_client_path}/micclient/include",
-    "${audio_client_path}/test/unittest/micclient/include",
-    "${audio_client_path}/test/unittest/audioclienttestutils/include",
+    "${audio_client_path}/spkclient/include",
     "${audio_processor_path}/encodeprocessor/include",
+    "${audio_processor_path}/decodeprocessor/include",
     "${audio_processor_path}/interface",
     "${audio_transport_path}/audiochannel/interface",
     "${audio_transport_path}/audiochannel/audiodatachannel/include",
-    "${audio_transport_path}/audiotransportstatus/include",
-    "${audio_transport_path}/audiotransportstatus/interface",
+    "${audio_transport_path}/decodetransport/include",
     "${audio_transport_path}/encodetransport/include",
     "${audio_transport_path}/interface",
+    "${common_path}/dfx_utils/include",
     "${common_path}/include",
     "${fwk_common_path}/utils/include",
     "${services_path}/common/audioeventcallback",
     "${services_path}/common/audiodata/include",
     "${services_path}/common/audioparam",
-    "${softbusadapter_path}/include",
   ]
-}
 
-## UnitTest dmic_client_test
-ohos_unittest("MicClientTest") {
-  module_out_path = module_out_path
+  public_configs = [ ":daudio_client_pub_config" ]
 
   sources = [
-    "${audio_client_path}/test/unittest/micclient/src/dmic_client_test.cpp",
+    "${audio_client_path}/micclient/src/dmic_client.cpp",
+    "${audio_client_path}/spkclient/src/dspeaker_client.cpp",
   ]
-
-  configs = [ ":module_private_config" ]
 
   deps = [
-    "${services_path}/audioclient:distributed_audio_sink_client",
-    "//third_party/googletest:gmock",
-    "//third_party/googletest:gtest_main",
+    "${audio_transport_path}/decodetransport:distributed_audio_decode_transport",
+    "${audio_transport_path}/encodetransport:distributed_audio_encode_transport",
+    "${services_path}/common:distributed_audio_utils",
   ]
-}
 
-group("mic_client_test") {
-  testonly = true
-  deps = [ ":MicClientTest" ]
+  external_deps = [
+    "hisysevent_native:libhisysevent",
+    "hitrace_native:hitrace_meter",
+    "multimedia_audio_framework:audio_capturer",
+    "multimedia_audio_framework:audio_client",
+    "multimedia_audio_framework:audio_renderer",
+  ]
+
+  defines = [
+    "HI_LOG_ENABLE",
+    "LOG_DOMAIN=0xD004100",
+  ]
+
+  subsystem_name = "distributedhardware"
+  part_name = "distributed_audio"
 }

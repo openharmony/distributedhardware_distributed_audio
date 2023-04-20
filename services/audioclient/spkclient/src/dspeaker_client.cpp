@@ -18,7 +18,6 @@
 #include "daudio_constants.h"
 #include "daudio_hisysevent.h"
 #include "daudio_util.h"
-#include "dh_utils_tool.h"
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DSpeakerClient"

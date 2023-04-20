@@ -35,14 +35,6 @@ using OHOS::HDI::DistributedAudio::Audioext::V1_0::AudioParameter;
 using OHOS::HDI::DistributedAudio::Audioext::V1_0::DAudioEvent;
 using OHOS::HDI::DistributedAudio::Audioext::V1_0::IDAudioCallback;
 
-typedef enum {
-    CAPTURE_STATUS_OPEN = 0,
-    CAPTURE_STATUS_CLOSE,
-    CAPTURE_STATUS_START,
-    CAPTURE_STATUS_STOP,
-    CAPTURE_STATUS_PAUSE,
-} AudioCaptureStatus;
-
 class AudioCaptureInterfaceImpl : public AudioCaptureInterfaceImplBase {
 public:
     AudioCaptureInterfaceImpl(const std::string &adpName, const AudioDeviceDescriptor &desc,
@@ -80,6 +72,7 @@ public:
     int32_t TurnStandbyMode() override;
     int32_t AudioDevDump(int32_t range, int32_t fd) override;
     int32_t IsSupportsPauseAndResume(bool &supportPause, bool &supportResume) override;
+    const AudioDeviceDescriptor &GetCaptureDesc() override;
 
 private:
     static constexpr int64_t AUDIO_OFFSET_FRAME_NUM = 10;

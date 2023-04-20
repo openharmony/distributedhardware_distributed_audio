@@ -28,10 +28,6 @@ ohos_shared_library("distributed_audio_sink") {
     "//third_party/json/include",
     "//utils/system/safwk/native/include",
     "${fwk_common_path}/utils/include",
-    "${mediastandardfwk_path}/audiocapturer/include",
-    "${mediastandardfwk_path}/audiocommon/include",
-    "${mediastandardfwk_path}/audiorenderer/include",
-    "${mediastandardfwk_path}/audiomanager/include",
   ]
 
   include_dirs += [
@@ -39,7 +35,6 @@ ohos_shared_library("distributed_audio_sink") {
     "${audio_client_path}/micclient/include",
     "${audio_client_path}/spkclient/include",
     "${audio_control_path}/controlsink/include",
-    "${audio_client_path}/interface",
     "${audio_processor_path}/encodeprocessor/include",
     "${audio_processor_path}/decodeprocessor/include",
     "${audio_processor_path}/interface",
@@ -67,8 +62,6 @@ ohos_shared_library("distributed_audio_sink") {
   ]
 
   sources = [
-    "${audio_client_path}/micclient/src/dmic_client.cpp",
-    "${audio_client_path}/spkclient/src/dspeaker_client.cpp",
     "${audio_control_path}/controlsink/src/daudio_sink_dev_ctrl_manager.cpp",
     "${innerkits_path}/native_cpp/audio_sink/src/daudio_sink_handler.cpp",
     "${innerkits_path}/native_cpp/audio_sink/src/daudio_sink_load_callback.cpp",
@@ -84,6 +77,7 @@ ohos_shared_library("distributed_audio_sink") {
     "${audio_transport_path}/audioctrltransport:distributed_audio_control",
     "${audio_transport_path}/decodetransport:distributed_audio_decode_transport",
     "${audio_transport_path}/encodetransport:distributed_audio_encode_transport",
+    "${services_path}/audioclient:distributed_audio_sink_client",
     "${services_path}/common:distributed_audio_utils",
   ]
 

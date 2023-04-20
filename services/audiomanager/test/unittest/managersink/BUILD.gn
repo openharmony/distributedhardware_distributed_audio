@@ -71,6 +71,7 @@ ohos_unittest("DaudioSinkDevTest") {
   configs = [ ":module_private_config" ]
 
   deps = [
+    "${services_path}/audioclient:distributed_audio_sink_client",
     "${services_path}/audiomanager/servicesink:distributed_audio_sink",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
@@ -101,6 +102,7 @@ ohos_unittest("DAudioSinkManagerTest") {
   configs = [ ":module_private_config" ]
 
   deps = [
+    "${services_path}/audioclient:distributed_audio_sink_client",
     "${services_path}/audiomanager/servicesink:distributed_audio_sink",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
