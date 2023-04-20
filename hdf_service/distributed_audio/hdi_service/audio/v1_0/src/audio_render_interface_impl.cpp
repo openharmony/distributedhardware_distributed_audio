@@ -425,7 +425,7 @@ uint32_t AudioRenderInterfaceImpl::GetVolumeInner()
 }
 
 uint32_t AudioRenderInterfaceImpl::GetMaxVolumeInner()
-{ 
+{
     std::lock_guard<std::mutex> volLck(volMtx_);
     return volMax_;
 }
