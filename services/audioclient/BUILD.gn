@@ -24,9 +24,9 @@ ohos_shared_library("distributed_audio_sink_client") {
 
   include_dirs += [
     "include",
+    "${audio_client_path}/interface",
     "${audio_client_path}/micclient/include",
     "${audio_client_path}/spkclient/include",
-    "${audio_client_path}/interface",
     "${audio_processor_path}/encodeprocessor/include",
     "${audio_processor_path}/decodeprocessor/include",
     "${audio_processor_path}/interface",
@@ -35,12 +35,12 @@ ohos_shared_library("distributed_audio_sink_client") {
     "${audio_transport_path}/decodetransport/include",
     "${audio_transport_path}/encodetransport/include",
     "${audio_transport_path}/interface",
-    "${common_path}/include",
     "${common_path}/dfx_utils/include",
+    "${common_path}/include",
     "${fwk_common_path}/utils/include",
-    "${services_path}/common/audioparam",
     "${services_path}/common/audioeventcallback",
     "${services_path}/common/audiodata/include",
+    "${services_path}/common/audioparam",
   ]
 
   public_configs = [ ":daudio_client_pub_config" ]
