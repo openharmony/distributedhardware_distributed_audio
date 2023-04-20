@@ -72,6 +72,7 @@ public:
     int32_t TurnStandbyMode() override;
     int32_t AudioDevDump(int32_t range, int32_t fd) override;
     int32_t IsSupportsPauseAndResume(bool &supportPause, bool &supportResume) override;
+    const AudioDeviceDescriptor &GetCaptureDesc() override;
 
 private:
     static constexpr int64_t AUDIO_OFFSET_FRAME_NUM = 10;

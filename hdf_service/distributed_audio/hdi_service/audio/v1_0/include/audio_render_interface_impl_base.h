@@ -39,22 +39,15 @@ typedef enum {
 
 class AudioRenderInterfaceImplBase : public IAudioRender {
 public:
-    AudioRenderInterfaceImplBase(const AudioDeviceDescriptor &desc);
-    ~AudioRenderInterfaceImplBase();
+    AudioRenderInterfaceImplBase() = default;
+    virtual ~AudioRenderInterfaceImplBase() = default;
 
-    const AudioDeviceDescriptor &GetRenderDesc();
-    void SetVolumeInner(const uint32_t vol);
-    void SetVolumeRangeInner(const uint32_t volMax, const uint32_t volMin);
-    uint32_t GetVolumeInner();
-    uint32_t GetMaxVolumeInner();
-    uint32_t GetMinVolumeInner();
-
-private:
-    AudioDeviceDescriptor baseDevDesc_;
-    std::mutex volMtx_;
-    uint32_t vol_ = 0;
-    uint32_t volMax_ = 0;
-    uint32_t volMin_ = 0;
+    virtual const AudioDeviceDescriptor &GetRenderDesc() = 0;
+    virtual void SetVolumeInner(const uint32_t vol) = 0;
+    virtual void SetVolumeRangeInner(const uint32_t volMax, const uint32_t volMin) = 0;
+    virtual uint32_t GetVolumeInner() = 0;
+    virtual uint32_t GetMaxVolumeInner() = 0;
+    virtual uint32_t GetMinVolumeInner() = 0;
 };
 } // V1_0
 } // Audio

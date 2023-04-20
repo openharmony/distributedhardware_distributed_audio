@@ -85,6 +85,13 @@ public:
     int32_t AudioDevDump(int32_t range, int32_t fd) override;
     int32_t IsSupportsPauseAndResume(bool &supportPause, bool &supportResume) override;
 
+    const AudioDeviceDescriptor &GetRenderDesc() override;
+    void SetVolumeInner(const uint32_t vol) override;
+    void SetVolumeRangeInner(const uint32_t volMax, const uint32_t volMin) override;
+    uint32_t GetVolumeInner() override;
+    uint32_t GetMaxVolumeInner() override;
+    uint32_t GetMinVolumeInner() override;
+
 private:
     float GetFadeRate(uint32_t currentIndex, const uint32_t durationIndex);
     int32_t FadeInProcess(const uint32_t durationFrame, int8_t* frameData, const size_t frameLength);
@@ -109,6 +116,11 @@ private:
     int64_t frameIndex_ = 0;
     int64_t framePeriodNs_ = 0;
     int64_t startTime_ = 0;
+
+    std::mutex volMtx_;
+    uint32_t vol_ = 0;
+    uint32_t volMax_ = 0;
+    uint32_t volMin_ = 0;
 };
 } // V1_0
 } // Audio

@@ -23,6 +23,7 @@ config("encode_transport_pub_config") {
     "../interface",
     "../audiochannel/interface",
     "../audiochannel/audiodatachannel/include",
+    "../../audioprocessor/interface",
   ]
 }
 

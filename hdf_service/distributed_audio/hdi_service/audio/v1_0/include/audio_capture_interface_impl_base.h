@@ -39,13 +39,10 @@ typedef enum {
 
 class AudioCaptureInterfaceImplBase : public IAudioCapture {
 public:
-    AudioCaptureInterfaceImplBase(const AudioDeviceDescriptor &desc);
-    ~AudioCaptureInterfaceImplBase();
+    AudioCaptureInterfaceImplBase() = default;
+    virtual ~AudioCaptureInterfaceImplBase() = default;
 
-    const AudioDeviceDescriptor &GetCaptureDesc();
-
-private:
-    AudioDeviceDescriptor baseDevDesc_;
+    virtual const AudioDeviceDescriptor &GetCaptureDesc() = 0;
 };
 } // V1_0
 } // Audio
