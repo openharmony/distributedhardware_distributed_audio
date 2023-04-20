@@ -20,8 +20,8 @@ config("daudio_common_pub_config") {
     "audiodata/include",
     "audioeventcallback",
     "audioparam",
-    "${common_path}/include",
     "${common_path}/dfxutils/include",
+    "${common_path}/include",
   ]
 }
 

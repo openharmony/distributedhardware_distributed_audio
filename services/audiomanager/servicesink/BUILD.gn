@@ -75,9 +75,9 @@ ohos_shared_library("distributed_audio_sink") {
 
   deps = [
     "${audio_transport_path}/audioctrltransport:distributed_audio_control",
-    "${services_path}/audioclient:distributed_audio_sink_client",
     "${audio_transport_path}/decodetransport:distributed_audio_decode_transport",
     "${audio_transport_path}/encodetransport:distributed_audio_encode_transport",
+    "${services_path}/audioclient:distributed_audio_sink_client",
     "${services_path}/common:distributed_audio_utils",
   ]
 

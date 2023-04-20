@@ -20,9 +20,9 @@ config("encode_transport_pub_config") {
     "include",
     "../audiotransportstatus/include",
     "../audiotransportstatus/interface",
-    "../interface",
-    "../audiochannel/interface",
     "../audiochannel/audiodatachannel/include",
+    "../audiochannel/interface",
+    "../interface",
     "../../audioprocessor/interface",
   ]
 }
