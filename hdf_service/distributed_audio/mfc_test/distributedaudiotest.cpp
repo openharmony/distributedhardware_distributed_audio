@@ -65,8 +65,8 @@ static std::vector<uint8_t*> renderData;
 static DeviceStatus g_spkStatus = DEVICE_IDLE;
 static DeviceStatus g_micStatus = DEVICE_IDLE;
 
-std::thread g_palyingThread;
-std::thread g_capingThread;
+static std::thread g_palyingThread;
+static std::thread g_capingThread;
 FILE *g_micFile = nullptr;
 
 static std::string CloseSpk();
