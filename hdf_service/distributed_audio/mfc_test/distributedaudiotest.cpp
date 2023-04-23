@@ -136,8 +136,8 @@ static void HandleDevError(const char *condition, const char *value)
     std::cout << "Receive abnormal event, Demo quit." << std::endl;
 }
 
-static int32_t ParamEventCallback(enum AudioExtParamKey key, const char *condition, const char *value, void *reserved,
-    void *cookie)
+static int32_t ParamEventCallback(enum AudioExtParamKey key, const char *condition, const char *value, int8_t &reserved,
+    int8_t &cookie)
 {
     std::string val(value);
     std::string con(condition);
