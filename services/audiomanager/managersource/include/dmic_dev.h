@@ -18,6 +18,7 @@
 
 #include <queue>
 #include <set>
+#include <thread>
 #include "nlohmann/json.hpp"
 
 #include "audio_param.h"
@@ -71,6 +72,7 @@ public:
 private:
     int32_t EnableDevice(const int32_t dhId, const std::string &capability);
     int32_t DisableDevice(const int32_t dhId);
+    void EnqueueThread();
 
 private:
     static constexpr uint8_t CHANNEL_WAIT_SECONDS = 5;

@@ -324,7 +324,7 @@ int32_t DSpeakerDev::RefreshAshmemInfo(const std::string &devId, const int32_t d
     int32_t fd, int32_t ashmemLength, int32_t lengthPerTrans)
 {
     DHLOGI("RefreshAshmemInfo: fd:%d, ashmemLength: %d, lengthPerTrans: %d", fd, ashmemLength, lengthPerTrans);
-    if (param.renderOpts.renderFlags == MMAP_MODE) {
+    if (param_.renderOpts.renderFlags == MMAP_MODE) {
         DHLOGI("DSpeaker dev low-latency mode");
         if (ashmem_ != nullptr) {
             return DH_SUCCESS;
@@ -349,9 +349,6 @@ int32_t DSpeakerDev::MmapStart()
         DHLOGE("Ashmem is nullptr");
         return ERR_DH_AUDIO_NULLPTR;
     }
-    std::lock_guard<std::mutex> lock(writeAshmemMutex_);
-    frameIndex_ = 0;
-    startTime_ = 0;
     isEnqueueRunning_.store(true);
     enqueueDataThread_ = std::thread(&DSpeakerDev::EnqueueThread, this);
     if (pthread_setname_np(enqueueDataThread_.native_handle(), ENQUEUE_THREAD) != DH_SUCCESS) {
@@ -365,7 +362,7 @@ void DSpeakerDev::EnqueueThread()
     readIndex_ = 0;
     readNum_ = 0;
     DHLOGI("Enqueue thread start, lengthPerRead length: %d.", lengthPerTrans_);
-    while (ashmem != nullptr && isEnqueueRunning_.load()) {
+    while (ashmem_ != nullptr && isEnqueueRunning_.load()) {
         int64_t timeOffset = UpdateTimeOffset(frameIndex_, LOW_LATENCY_INTERVAL_NS,
             startTime_);
         DHLOGD("Read frameIndex: %lld, timeOffset: %lld.", frameIndex_, timeOffset);
@@ -388,7 +385,7 @@ void DSpeakerDev::EnqueueThread()
             DHLOGE("Speaker enqueue thread, write stream data failed, ret: %d.", ret);
         }
         readIndex_ += lengthPerTrans_;
-        if (reafIndex_ >= ashmemLength_) {
+        if (readIndex_ >= ashmemLength_) {
             readIndex_ = 0;
         }
         readNum_ += static_cast<uint64_t>(CalculateSampleNum(param_.comParam.sampleRate, timeInterval_));

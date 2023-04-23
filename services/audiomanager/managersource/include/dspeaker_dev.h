@@ -74,6 +74,7 @@ public:
 private:
     int32_t EnableDevice(const int32_t dhId, const std::string &capability);
     int32_t DisableDevice(const int32_t dhId);
+    void EnqueueThread();
 
 private:
     static constexpr const char* ENQUEUE_THREAD = "spkEnqueueTh";
@@ -93,7 +94,6 @@ private:
     AudioParam param_;
     
     uint32_t timeInterval_ = 5;
-    uint32_t readStartDelayms_ = 2000;
     sptr<Ashmem> ashmem_ = nullptr;
     std::atomic<bool> isEnqueueRunning_ = false;
     int32_t ashmemLength_ = -1;
@@ -103,7 +103,7 @@ private:
     int64_t startTime_ = 0;
     uint64_t readNum_ = 0;
     int64_t readTvSec_ = 0;
-    int64_t reafTvNSec_ = 0;
+    int64_t readTvNSec_ = 0;
     std::thread enqueueDataThread_;
 };
 } // DistributedHardware

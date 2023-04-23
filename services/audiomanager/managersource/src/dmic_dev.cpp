@@ -293,11 +293,12 @@ int32_t DMicDev::ReadMmapPosition(const std::string &devId, const int32_t dhId,
     time.tvNSec = writeTvNSec_;
     return DH_SUCCESS;
 }
+
 int32_t DMicDev::RefreshAshmemInfo(const std::string &devId, const int32_t dhId,
     int32_t fd, int32_t ashmemLength, int32_t lengthPerTrans)
 {
     DHLOGI("RefreshAshmemInfo: fd:%d, ashmemLength: %d, lengthPerTrans: %d", fd, ashmemLength, lengthPerTrans);
-    if (param.captureOpts.capturerFlags == MMAP_MODE) {
+    if (param_.captureOpts.capturerFlags == MMAP_MODE) {
         DHLOGI("DMic dev low-latency mode");
         if (ashmem_ != nullptr) {
             return DH_SUCCESS;
@@ -338,7 +339,7 @@ void DMicDev::EnqueueThread()
     writeIndex_ = 0;
     writeNum_ = 0;
     DHLOGI("Enqueue thread start, lengthPerWrite length: %d.", lengthPerTrans_);
-    while (ashmem != nullptr && isEnqueueRunning_.load()) {
+    while (ashmem_ != nullptr && isEnqueueRunning_.load()) {
         int64_t timeOffset = UpdateTimeOffset(frameIndex_, LOW_LATENCY_INTERVAL_NS,
             startTime_);
         DHLOGD("Write frameIndex: %lld, timeOffset: %lld.", frameIndex_, timeOffset);
