@@ -72,7 +72,7 @@ FILE *g_micFile = nullptr;
 static std::string CloseSpk();
 static std::string CloseMic();
 
-int64_t GetNowTimeUs()
+static int64_t GetNowTimeUs()
 {
     std::chrono::microseconds nowUs =
         std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch());
