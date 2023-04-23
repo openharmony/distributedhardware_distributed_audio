@@ -70,7 +70,7 @@ int32_t AudioDirectProcessor::FeedAudioProcessor(const std::shared_ptr<AudioData
         return ERR_DH_AUDIO_BAD_VALUE;
     }
     cbObj->OnAudioDataDone(inputData);
-    return DH_SUCCESS; 
+    return DH_SUCCESS;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

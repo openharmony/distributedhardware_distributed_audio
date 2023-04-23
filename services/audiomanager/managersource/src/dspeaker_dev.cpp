@@ -371,8 +371,7 @@ void DSpeakerDev::EnqueueThread()
         std::shared_ptr<AudioData> audioData = std::make_shared<AudioData>(lengthPerTrans_);
         if (readData != nullptr) {
             const uint8_t *readAudioData = reinterpret_cast<const uint8_t *>(readData);
-            int32_t ret = memcpy_s(audioData->Data(), audioData->Capacity(), readAudioData, param_.comParam.frameSize);
-            if (ret != EOK) {
+            if (memcpy_s(audioData->Data(), audioData->Capacity(), readAudioData, param_.comParam.frameSize) != EOK) {
                 DHLOGE("Copy audio data failed. errno: %d.", ret);
             }
         }
