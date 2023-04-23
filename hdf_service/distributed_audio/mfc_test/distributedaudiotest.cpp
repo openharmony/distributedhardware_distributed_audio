@@ -60,7 +60,7 @@ int32_t g_frameNum = 0;
 int32_t g_frameIndex = 0;
 int32_t g_micFrameNum = 0;
 bool g_isInitRenderData = false;
-std::vector<uint8_t*> renderData;
+static std::vector<uint8_t*> renderData;
 
 static DeviceStatus g_spkStatus = DEVICE_IDLE;
 static DeviceStatus g_micStatus = DEVICE_IDLE;
