@@ -57,6 +57,18 @@ public:
         data = std::make_shared<AudioData>(DEFAULT_AUDIO_DATA_SIZE);
         return DH_SUCCESS;
     }
+
+    int32_t ReadMmapPosition(const std::string &devId, const int32_t dhId,
+        uint64_t frames, CurrentTimeHDF &time)
+    {
+        return DH_SUCCESS;
+    }
+
+    int32_t RefreshAshmemInfo(const std::string &devId, const int32_t dhId,
+        int32_t fd, int32_t ashmemLength, int32_t lengthPerTrans)
+    {
+        return DH_SUCCESS;
+    }
 };
 } // DistributedHardware
 } // OHOS

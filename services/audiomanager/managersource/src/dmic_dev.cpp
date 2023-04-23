@@ -234,6 +234,12 @@ int32_t DMicDev::Stop()
 int32_t DMicDev::Release()
 {
     DHLOGI("Release mic device.");
+    if (ashmem_ != nullptr) {
+        ashmem_->UnmapAshmem();
+        ashmem_->CloseAshmem();
+        ashmem_ = nullptr;
+        DHLOGI("UnInit ashmem success.");
+    }
     if (micTrans_ == nullptr) {
         DHLOGE("Mic trans is null.");
         return DH_SUCCESS;
@@ -273,6 +279,103 @@ int32_t DMicDev::ReadStreamData(const std::string &devId, const int32_t dhId, st
     } else {
         data = dataQueue_.front();
         dataQueue_.pop();
+    }
+    return DH_SUCCESS;
+}
+
+int32_t DMicDev::ReadMmapPosition(const std::string &devId, const int32_t dhId,
+    uint64_t frames, CurrentTimeHDF &time)
+{
+    DHLOGI("Read mmap position. frames: %lu, tvsec: %lu, tvNSec:%lu",
+        writeNum_, writeTvSec_, writeTvNSec_);
+    frames = writeNum_;
+    time.tvSec = writeTvSec_;
+    time.tvNSec = writeTvNSec_;
+    return DH_SUCCESS;
+}
+int32_t DMicDev::RefreshAshmemInfo(const std::string &devId, const int32_t dhId,
+    int32_t fd, int32_t ashmemLength, int32_t lengthPerTrans)
+{
+    DHLOGI("RefreshAshmemInfo: fd:%d, ashmemLength: %d, lengthPerTrans: %d", fd, ashmemLength, lengthPerTrans);
+    if (param.captureOpts.capturerFlags == MMAP_MODE) {
+        DHLOGI("DMic dev low-latency mode");
+        if (ashmem_ != nullptr) {
+            return DH_SUCCESS;
+        }
+        ashmem_ = new Ashmem(fd, ashmemLength);
+        ashmemLength_ = ashmemLength;
+        lengthPerTrans_ = lengthPerTrans;
+        DHLOGI("Create ashmem success. fd:%d, ashmem length: %d, lengthPreTrans: %d",
+            fd, ashmemLength_, lengthPerTrans_);
+        bool mapRet = ashmem_->MapReadAndWriteAshmem();
+        if (!mapRet) {
+            DHLOGE("Mmap ashmem failed.");
+            return ERR_DH_AUDIO_NULLPTR;
+        }
+    }
+    return DH_SUCCESS;
+}
+
+int32_t DMicDev::MmapStart()
+{
+    if (ashmem_ == nullptr) {
+        DHLOGE("Ashmem is nullptr");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    std::lock_guard<std::mutex> lock(writeAshmemMutex_);
+    frameIndex_ = 0;
+    startTime_ = 0;
+    isEnqueueRunning_.store(true);
+    enqueueDataThread_ = std::thread(&DMicDev::EnqueueThread, this);
+    if (pthread_setname_np(enqueueDataThread_.native_handle(), ENQUEUE_THREAD) != DH_SUCCESS) {
+        DHLOGE("Enqueue data thread setname failed.");
+    }
+    return DH_SUCCESS;
+}
+
+void DMicDev::EnqueueThread()
+{
+    writeIndex_ = 0;
+    writeNum_ = 0;
+    DHLOGI("Enqueue thread start, lengthPerWrite length: %d.", lengthPerTrans_);
+    while (ashmem != nullptr && isEnqueueRunning_.load()) {
+        int64_t timeOffset = UpdateTimeOffset(frameIndex_, LOW_LATENCY_INTERVAL_NS,
+            startTime_);
+        DHLOGD("Write frameIndex: %lld, timeOffset: %lld.", frameIndex_, timeOffset);
+        std::shared_ptr<AudioData> audioData = nullptr;
+        {
+            std::lock_guard<std::mutex> lock(dataQueueMtx_);
+            if (dataQueue_.empty()) {
+                DHLOGI("Data queue is Empty.");
+                audioData = std::make_shared<AudioData>(param_.comParam.frameSize);
+            } else {
+                audioData = dataQueue_.front();
+                dataQueue_.pop();
+            }
+        }
+        bool writeRet = ashmem_->WriteToAshmem(audioData->Data(), audioData->Size(), writeIndex_);
+        if (writeRet) {
+            DHLOGD("Write to ashmem success! write index: %d, writeLength: %d.", writeIndex_, lengthPerTrans_);
+        } else {
+            DHLOGE("Write data to ashmem failed.");
+        }
+        writeIndex_ += lengthPerTrans_;
+        if (writeIndex_ >= ashmemLength_) {
+            writeIndex_ = 0;
+        }
+        writeNum_ += static_cast<uint64_t>(CalculateSampleNum(param_.comParam.sampleRate, timeInterval_));
+        GetCurrentTime(writeTvSec_, writeTvNSec_);
+        frameIndex_++;
+        AbsoluteSleep(startTime_ + frameIndex_ * LOW_LATENCY_INTERVAL_NS - timeOffset);
+    }
+}
+
+int32_t DMicDev::MmapStop()
+{
+    std::lock_guard<std::mutex> lock(writeAshmemMutex_);
+    isEnqueueRunning_.store(false);
+    if (enqueueDataThread_.joinable()) {
+        enqueueDataThread_.join();
     }
     return DH_SUCCESS;
 }

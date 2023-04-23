@@ -229,6 +229,12 @@ int32_t DSpeakerDev::Stop()
 int32_t DSpeakerDev::Release()
 {
     DHLOGI("Release speaker device.");
+    if (ashmem_ != nullptr) {
+        ashmem_->UnmapAshmem();
+        ashmem_->CloseAshmem();
+        ashmem_ = nullptr;
+        DHLOGI("UnInit ashmem success.");
+    }
     if (speakerTrans_ == nullptr) {
         DHLOGE("Speaker trans is null.");
         return DH_SUCCESS;
@@ -300,6 +306,103 @@ int32_t DSpeakerDev::WriteStreamData(const std::string &devId, const int32_t dhI
     if (ret != DH_SUCCESS) {
         DHLOGE("Write stream data failed, ret: %d.", ret);
         return ret;
+    }
+    return DH_SUCCESS;
+}
+
+int32_t DSpeakerDev::ReadMmapPosition(const std::string &devId, const int32_t dhId,
+    uint64_t frames, CurrentTimeHDF &time)
+{
+    DHLOGI("Read mmap position. frames: %lu, tvsec: %lu, tvNSec:%lu",
+        readNum_, readTvSec_, readTvNSec_);
+    frames = readNum_;
+    time.tvSec = readTvSec_;
+    time.tvNSec = readTvNSec_;
+    return DH_SUCCESS;
+}
+int32_t DSpeakerDev::RefreshAshmemInfo(const std::string &devId, const int32_t dhId,
+    int32_t fd, int32_t ashmemLength, int32_t lengthPerTrans)
+{
+    DHLOGI("RefreshAshmemInfo: fd:%d, ashmemLength: %d, lengthPerTrans: %d", fd, ashmemLength, lengthPerTrans);
+    if (param.renderOpts.renderFlags == MMAP_MODE) {
+        DHLOGI("DSpeaker dev low-latency mode");
+        if (ashmem_ != nullptr) {
+            return DH_SUCCESS;
+        }
+        ashmem_ = new Ashmem(fd, ashmemLength);
+        ashmemLength_ = ashmemLength;
+        lengthPerTrans_ = lengthPerTrans;
+        DHLOGI("Create ashmem success. fd:%d, ashmem length: %d, lengthPreTrans: %d",
+            fd, ashmemLength_, lengthPerTrans_);
+        bool mapRet = ashmem_->MapReadAndWriteAshmem();
+        if (!mapRet) {
+            DHLOGE("Mmap ashmem failed.");
+            return ERR_DH_AUDIO_NULLPTR;
+        }
+    }
+    return DH_SUCCESS;
+}
+
+int32_t DSpeakerDev::MmapStart()
+{
+    if (ashmem_ == nullptr) {
+        DHLOGE("Ashmem is nullptr");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    std::lock_guard<std::mutex> lock(writeAshmemMutex_);
+    frameIndex_ = 0;
+    startTime_ = 0;
+    isEnqueueRunning_.store(true);
+    enqueueDataThread_ = std::thread(&DSpeakerDev::EnqueueThread, this);
+    if (pthread_setname_np(enqueueDataThread_.native_handle(), ENQUEUE_THREAD) != DH_SUCCESS) {
+        DHLOGE("Enqueue data thread setname failed.");
+    }
+    return DH_SUCCESS;
+}
+
+void DSpeakerDev::EnqueueThread()
+{
+    readIndex_ = 0;
+    readNum_ = 0;
+    DHLOGI("Enqueue thread start, lengthPerRead length: %d.", lengthPerTrans_);
+    while (ashmem != nullptr && isEnqueueRunning_.load()) {
+        int64_t timeOffset = UpdateTimeOffset(frameIndex_, LOW_LATENCY_INTERVAL_NS,
+            startTime_);
+        DHLOGD("Read frameIndex: %lld, timeOffset: %lld.", frameIndex_, timeOffset);
+        auto readData = ashmem_->ReadFromAshmem(lengthPerTrans_, readIndex_);
+        DHLOGD("Read from ashmem success! read index: %d, readLength: %d.", readIndex_, lengthPerTrans_);
+        std::shared_ptr<AudioData> audioData = std::make_shared<AudioData>(lengthPerTrans_);
+        if (readData != nullptr) {
+            const uint8_t *readAudioData = reinterpret_cast<const uint8_t *>(readData);
+            int32_t ret = memcpy_s(audioData->Data(), audioData->Capacity(), readAudioData, param_.comParam.frameSize);
+            if (ret != EOK) {
+                DHLOGE("Copy audio data failed. errno: %d.", ret);
+            }
+        }
+        if (speakerTrans_ == nullptr) {
+            DHLOGE("Speaker enqueue thread, trans is nullptr.");
+            return;
+        }
+        int32_t ret = speakerTrans_->FeedAudioData(audioData);
+        if (ret != DH_SUCCESS) {
+            DHLOGE("Speaker enqueue thread, write stream data failed, ret: %d.", ret);
+        }
+        readIndex_ += lengthPerTrans_;
+        if (reafIndex_ >= ashmemLength_) {
+            readIndex_ = 0;
+        }
+        readNum_ += static_cast<uint64_t>(CalculateSampleNum(param_.comParam.sampleRate, timeInterval_));
+        GetCurrentTime(readTvSec_, readTvNSec_);
+        frameIndex_++;
+        AbsoluteSleep(startTime_ + frameIndex_ * LOW_LATENCY_INTERVAL_NS - timeOffset);
+    }
+}
+
+int32_t DSpeakerDev::MmapStop()
+{
+    isEnqueueRunning_.store(false);
+    if (enqueueDataThread_.joinable()) {
+        enqueueDataThread_.join();
     }
     return DH_SUCCESS;
 }

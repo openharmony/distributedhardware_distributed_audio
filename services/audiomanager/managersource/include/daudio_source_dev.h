@@ -89,6 +89,10 @@ private:
     int32_t HandleFocusChange(const AudioEvent &event);
     int32_t HandleRenderStateChange(const AudioEvent &event);
     int32_t HandlePlayStatusChange(const AudioEvent &event);
+    int32_t HandleSpkMmapStart(const AudioEvent &event);
+    int32_t HandleSpkMmapStop(const AudioEvent &event);
+    int32_t HandleMicMmapStart(const AudioEvent &event);
+    int32_t HandleMicMmapStop(const AudioEvent &event);
 
     int32_t NotifySinkDev(const AudioEventType type, const json Param, const std::string dhId);
     int32_t NotifyHDF(const AudioEventType type, const std::string result);
