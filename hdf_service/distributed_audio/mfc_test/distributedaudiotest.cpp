@@ -29,8 +29,8 @@
 #include "unistd.h"
 #include "distributedaudiotest.h"
 
-const std::string SERVER_FIFO = "/data/seqnum_sv";
-const std::string CLIENT_FIFO_TEMPLATE = "/data/seqnum_sv";
+static const std::string SERVER_FIFO = "/data/seqnum_sv";
+static const std::string CLIENT_FIFO_TEMPLATE = "/data/seqnum_cl.%ld";
 const size_t CLIENT_FIFO_NAME_LEN = (sizeof(CLIENT_FIFO_TEMPLATE) + 20);
 
 struct Request {
