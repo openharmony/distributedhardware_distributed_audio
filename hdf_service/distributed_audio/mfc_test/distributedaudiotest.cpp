@@ -222,7 +222,7 @@ static std::string OpenSpk(const std::string &devId)
     return "true";
 }
 
-void WriteStreamWait(const int64_t &startTime)
+static void WriteStreamWait(const int64_t &startTime)
 {
     int64_t endTime = GetNowTimeUs();
     int64_t passTime = endTime - startTime;
@@ -417,7 +417,7 @@ static std::string OpenMic(const std::string &devId)
     return "true";
 }
 
-void ReadStreamWait(const int64_t &startTime)
+static void ReadStreamWait(const int64_t &startTime)
 {
     int64_t endTime = GetNowTimeUs();
     int32_t passTime = endTime - startTime;
