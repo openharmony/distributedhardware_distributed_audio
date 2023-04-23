@@ -628,11 +628,11 @@ void HandleAudioEvent(const std::string& cmd, std::string& cmdResString, struct 
     }
 }
 
-int GenerateFifoName(int& clientFd, char clientFifo[], struct Response& resp,
+static int GenerateFifoName(int& clientFd, char clientFifo[], struct Response& resp,
     std::string& cmdResString, struct Request& req)
 {
     if (snprintf_s(clientFifo, CLIENT_FIFO_NAME_LEN, CLIENT_FIFO_NAME_LEN,
-        CLIENT_FIFO_TEMPLATE.c_str(), (long)(req.pid)) < 0) {
+        CLIENT_FIFO_TEMPLATE.c_str(), static_cast<long>(req.pid)) < 0) {
         return -1;
     }
     clientFd = open(clientFifo, O_WRONLY);
