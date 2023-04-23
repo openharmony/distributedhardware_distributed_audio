@@ -569,7 +569,7 @@ static std::string GetVolume()
     return "true;"+volStr;
 }
 
-std::string SpkMicPlayEvent(const std::string &cmd)
+static std::string SpkMicPlayEvent(const std::string &cmd)
 {
     if (cmd == CMD_START_SPK || cmd == CMD_START_SPK_EXT) {
         return StartRender();
@@ -593,7 +593,7 @@ std::string SpkMicPlayEvent(const std::string &cmd)
     return "";
 }
 
-void HandleAudioEvent(const std::string& cmd, std::string& cmdResString, struct Request& req)
+static void HandleAudioEvent(const std::string& cmd, std::string& cmdResString, struct Request& req)
 {
     // find audio device
     if (cmd == CMD_FIND || cmd == CMD_FIND_EXT) {
