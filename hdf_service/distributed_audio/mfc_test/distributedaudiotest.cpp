@@ -46,11 +46,11 @@ struct Response {
 };
 
 using namespace OHOS::DistributedHardware;
-AudioManager *g_manager = nullptr;
-AudioAdapter *g_adapter = nullptr;
-AudioRender *g_render = nullptr;
-AudioCapture *g_capture = nullptr;
-AudioAdapterDescriptor *g_devices = nullptr;
+static AudioManager *g_manager = nullptr;
+static AudioAdapter *g_adapter = nullptr;
+static AudioRender *g_render = nullptr;
+static AudioCapture *g_capture = nullptr;
+static AudioAdapterDescriptor *g_devices = nullptr;
 
 static constexpr const char* PLAY_THREAD = "playThread";
 static constexpr const char* CAPTURE_THREAD = "captureThread";
