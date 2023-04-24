@@ -99,12 +99,12 @@ ohos_unittest("DaudioSourceServiceTest") {
   ]
 
   external_deps = [
+    "audio_framework:audio_capturer",
+    "audio_framework:audio_client",
+    "audio_framework:audio_renderer",
     "c_utils:utils",
     "hitrace_native:hitrace_meter",
     "ipc:ipc_core",
-    "multimedia_audio_framework:audio_capturer",
-    "multimedia_audio_framework:audio_client",
-    "multimedia_audio_framework:audio_renderer",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
