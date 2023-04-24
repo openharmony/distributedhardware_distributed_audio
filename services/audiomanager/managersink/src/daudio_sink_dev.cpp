@@ -402,7 +402,7 @@ int32_t DAudioSinkDev::TaskOpenDSpeaker(const std::string &args)
             DHLOGE("Dlsym GetDirectSpkClient error.");
             return ERR_DH_AUDIO_FAILED;
         }
-        speakerClient_ = GetDirectSpkClient_();
+        speakerClient_ = std::shared_ptr<ISpkClient>(GetDirectSpkClient_());
         speakerClient_->SetAttrs(devId_, shared_from_this());
     }
     ret = speakerClient_->SetUp(audioParam);
@@ -476,7 +476,7 @@ int32_t DAudioSinkDev::TaskOpenDMic(const std::string &args)
                 DHLOGE("Dlsym GetDirectMicClient error.");
                 return ERR_DH_AUDIO_FAILED;
             }
-            micClient_ = GetDirectMicClient_();
+            micClient_ = std::shared_ptr<IMicClient>(GetDirectMicClient_());
             micClient_->SetAttrs(devId_, shared_from_this());
         }
         ret = micClient_->SetUp(audioParam);
