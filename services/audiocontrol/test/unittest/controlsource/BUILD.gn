@@ -20,7 +20,6 @@ config("module_private_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "//commonlibrary/c_utils/base/include",
     "${fwk_common_path}/utils/include",
   ]
 
@@ -36,9 +35,6 @@ config("module_private_config") {
     "${audio_transport_path}/audioctrltransport/interface",
     "${audio_control_path}/controlsource/include",
     "${audio_control_path}/test/unittest/audiocontrolutils/inlcude",
-    "//base/security/access_token/interfaces/innerkits/token_setproc/include",
-    "//base/security/access_token/interfaces/innerkits/nativetoken/include",
-    "//base/security/access_token/interfaces/innerkits/accesstoken/include",
   ]
 }
 
@@ -57,6 +53,7 @@ ohos_unittest("ControlSourceTest") {
   ]
 
   external_deps = [
+    "c_utils:utils",
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",

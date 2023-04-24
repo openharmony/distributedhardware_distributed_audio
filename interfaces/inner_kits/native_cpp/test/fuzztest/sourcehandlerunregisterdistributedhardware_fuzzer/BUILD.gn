@@ -31,13 +31,10 @@ ohos_fuzztest("SourceHandlerUnregisterDistributedHardwareFuzzTest") {
   sources = [ "sourcehandlerunregisterdistributedhardware_fuzzer.cpp" ]
 
   include_dirs = [
-    "//commonlibrary/c_utils/base/include",
-    "//utils/system/safwk/native/include",
     "${fwk_utils_path}/include/log",
     "${fwk_utils_path}/include",
     "${fwk_common_path}/log/include",
     "${fwk_common_path}/utils/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
   ]
 
   include_dirs += [
@@ -51,6 +48,11 @@ ohos_fuzztest("SourceHandlerUnregisterDistributedHardwareFuzzTest") {
   deps = [
     "${fwk_services_path}/distributedhardwarefwkservice:distributedhardwarefwksvr",
     "${innerkits_path}/native_cpp/audio_source:distributed_audio_source_sdk",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "ipc:ipc_core",
   ]
 
   defines = [

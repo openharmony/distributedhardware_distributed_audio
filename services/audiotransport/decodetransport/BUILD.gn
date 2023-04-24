@@ -29,8 +29,6 @@ config("decode_transport_pub_config") {
 
 ohos_shared_library("distributed_audio_decode_transport") {
   include_dirs = [
-    "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
-    "//base/hiviewdfx/hitrace/interfaces/native/innerkits/include/hitrace_meter",
     "//foundation/communication/dsoftbus/interfaces/kits/transport",
     "${fwk_common_path}/utils/include",
     "${mediastandard_path}/interfaces/innerkits/native/media/include",
@@ -44,7 +42,6 @@ ohos_shared_library("distributed_audio_decode_transport") {
     "${common_path}/dfx_utils/include",
     "${audio_processor_path}/decoder/include",
     "${audio_processor_path}/decodeprocessor/include",
-    "${audio_processor_path}/directprocessor/include",
     "${audio_processor_path}/interface",
     "${audio_transport_path}/audiochannel/interface",
     "${audio_transport_path}/audiochannel/audiodatachannel/include",
@@ -62,7 +59,6 @@ ohos_shared_library("distributed_audio_decode_transport") {
     "${audio_processor_path}/decodeprocessor/src/audio_decoder_processor.cpp",
     "${audio_processor_path}/decoder/src/audio_decoder.cpp",
     "${audio_processor_path}/decoder/src/audio_decoder_callback.cpp",
-    "${audio_processor_path}/directprocessor/src/audio_direct_processor.cpp",
     "${services_path}/common/audiodata/src/audio_data.cpp",
     "src/audio_decode_transport.cpp",
   ]
@@ -75,6 +71,7 @@ ohos_shared_library("distributed_audio_decode_transport") {
 
   external_deps = [
     "c_utils:utils",
+    "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "multimedia_player_framework:media_client",
   ]

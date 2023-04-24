@@ -20,7 +20,6 @@ config("module_private_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "//commonlibrary/c_utils/base/include",
     "${fwk_common_path}/utils/include",
   ]
 
@@ -51,6 +50,10 @@ ohos_unittest("ControlSinkTest") {
     "${services_path}/audiomanager/servicesink:distributed_audio_sink",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
   ]
 }
 

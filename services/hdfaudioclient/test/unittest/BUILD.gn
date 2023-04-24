@@ -25,7 +25,6 @@ config("module_private_config") {
     "${common_path}/include",
     "${services_path}/hdfaudioclient/include",
     "audio_adapter_internal/",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
   ]
 }
 
@@ -41,6 +40,8 @@ ohos_unittest("AudioAdapterHdiTest") {
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
+
+  external_deps = [ "ipc:ipc_core" ]
 
   defines = [
     "HI_LOG_ENABLE",

@@ -23,7 +23,6 @@ config("module_private_config") {
 
   include_dirs = [
     "//third_party/json/include",
-    "//foundation/multimedia/audio_framework/services/audio_service/client/include",
     "${audio_framework_path}/audiopolicy/include",
     "${mediastandardfwk_path}/audiocapturer/include",
     "${mediastandardfwk_path}/audiocommon/include",
@@ -88,6 +87,9 @@ ohos_unittest("DaudioSinkDevTest") {
     "hdf_core:libhdi",
     "hitrace_native:hitrace_meter",
     "ipc:ipc_core",
+    "multimedia_audio_framework:audio_capturer",
+    "multimedia_audio_framework:audio_client",
+    "multimedia_audio_framework:audio_renderer",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
@@ -119,6 +121,9 @@ ohos_unittest("DAudioSinkManagerTest") {
     "hdf_core:libhdi",
     "hitrace_native:hitrace_meter",
     "ipc:ipc_core",
+    "multimedia_audio_framework:audio_capturer",
+    "multimedia_audio_framework:audio_client",
+    "multimedia_audio_framework:audio_renderer",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]

@@ -22,20 +22,10 @@ config("module_private_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "//foundation/multimedia/audio_framework/services/audio_service/client/include",
     "${audio_framework_path}/audiopolicy/include",
-
-    "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
-    "//base/hiviewdfx/hitrace/interfaces/native/innerkits/include/hitrace_meter",
     "//drivers/peripheral/audio/interfaces/include",
-    "//commonlibrary/c_utils/base/include",
     "//foundation/communication/dsoftbus/interfaces/kits/transport",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
-    "//foundation/multimedia/audio_framework/frameworks/native/common/include",
-    "//foundation/multinedia/audio_framework/interfaces/inner_api/native/audiocapturer/include",
     "//third_party/json/include",
-    "//utils/system/safwk/native/include",
     "${fwk_common_path}/utils/include",
     "${mediastandardfwk_path}/audiocapturer/include",
     "${mediastandardfwk_path}/audiocommon/include",
@@ -103,8 +93,12 @@ ohos_unittest("DaudioSourceServiceTest") {
     "audio_framework:audio_client",
     "audio_framework:audio_renderer",
     "c_utils:utils",
+    "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "ipc:ipc_core",
+    "multimedia_audio_framework:audio_capturer",
+    "multimedia_audio_framework:audio_client",
+    "multimedia_audio_framework:audio_renderer",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]

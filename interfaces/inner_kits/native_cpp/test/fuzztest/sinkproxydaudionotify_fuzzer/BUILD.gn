@@ -31,8 +31,6 @@ ohos_fuzztest("SinkProxyDAudioNotifyFuzzTest") {
   sources = [ "sinkproxydaudionotify_fuzzer.cpp" ]
 
   include_dirs = [
-    "//commonlibrary/c_utils/base/include",
-    "//utils/system/safwk/native/include",
     "${fwk_utils_path}/include/log",
     "${fwk_utils_path}/include",
     "${fwk_common_path}/log/include",

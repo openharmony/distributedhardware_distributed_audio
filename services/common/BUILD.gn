@@ -27,9 +27,6 @@ config("daudio_common_pub_config") {
 
 config("daudio_common_private_config") {
   include_dirs = [
-    "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
-    "//base/hiviewdfx/hitrace/interfaces/native/innerkits/include/hitrace_meter",
-    "//commonlibrary/c_utils/base/include",
     "//third_party/json/include",
   ]
 

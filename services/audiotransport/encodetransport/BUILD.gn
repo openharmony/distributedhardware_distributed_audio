@@ -29,9 +29,6 @@ config("encode_transport_pub_config") {
 
 ohos_shared_library("distributed_audio_encode_transport") {
   include_dirs = [
-    "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
-    "//base/hiviewdfx/hitrace/interfaces/native/innerkits/include/hitrace_meter",
-    "//foundation/communication/dsoftbus/interfaces/kits/transport",
     "${fwk_common_path}/utils/include",
     "${mediastandard_path}/interfaces/innerkits/native/media/include",
     "${mediastandardfwk_path}/audiocommon/include",
@@ -75,6 +72,8 @@ ohos_shared_library("distributed_audio_encode_transport") {
 
   external_deps = [
     "c_utils:utils",
+    "dsoftbus:softbus_client",
+    "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "multimedia_player_framework:media_client",
   ]

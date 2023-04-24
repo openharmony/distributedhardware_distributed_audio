@@ -52,16 +52,8 @@ config("module_private_config") {
     "${services_path}/common/audioeventcallback",
     "${services_path}/audiomanager/managersource/include",
     "${softbusadapter_path}/include",
-    "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
-    "//base/hiviewdfx/hitrace/interfaces/native/innerkits/include/hitrace_meter",
-    "//commonlibrary/c_utils/base/include",
     "//foundation/communication/dsoftbus/interfaces/kits/transport",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
-    "//foundation/multimedia/audio_framework/frameworks/native/common/include",
-    "//foundation/multinedia/audio_framework/interfaces/inner_api/native/audiocapturer/include",
     "//third_party/json/include",
-    "//utils/system/safwk/native/include",
     "${fwk_common_path}/utils/include",
     "${mediastandardfwk_path}/audiocapturer/include",
     "${mediastandardfwk_path}/audiocommon/include",
@@ -85,6 +77,15 @@ ohos_unittest("DAudioDfxTest") {
     "${services_path}/common:distributed_audio_utils",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hisysevent_native:libhisysevent",
+    "hitrace_native:hitrace_meter",
+    "ipc:ipc_core",
+    "multimedia_audio_framework:audio_capturer",
+    "samgr:samgr_proxy",
   ]
 }
 

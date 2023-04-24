@@ -22,8 +22,6 @@ config("module_private_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "//foundation/multimedia/audio_framework/frameworks/native/common/include",
-    "//foundation/multimedia/audio_framework/interfaces/inner_api/native/audiocapturer/include",
     "${mediastandardfwk_path}/audiocommon/include",
   ]
 
@@ -63,6 +61,10 @@ ohos_unittest("MicClientTest") {
     "${services_path}/audioclient:distributed_audio_sink_client",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "multimedia_audio_framework:audio_capturer",
   ]
 }
 

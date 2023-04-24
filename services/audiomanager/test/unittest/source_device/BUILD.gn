@@ -20,13 +20,10 @@ config("module_private_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "//commonlibrary/c_utils/base/include",
     "//drivers/peripheral/audio/interfaces/include",
     "//foundation/communication/dsoftbus/interfaces/kits/transport",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
     "//third_party/json/include",
-    "//utils/system/safwk/native/include",
     "${fwk_common_path}/utils/include",
     "${mediastandardfwk_path}/audiocapturer/include",
     "${mediastandardfwk_path}/audiocommon/include",
@@ -78,6 +75,11 @@ ohos_unittest("DaudioSourceDevTest") {
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
   ]
+
+  external_deps = [
+    "c_utils:utils",
+    "samgr:samgr_proxy",
+  ]
 }
 
 ## UnitTest daudio_source_dev_test
@@ -95,6 +97,10 @@ ohos_unittest("DMicDevTest") {
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
   ]
+
+  external_deps = [
+    "samgr:samgr_proxy",
+  ]
 }
 
 ## UnitTest daudio_source_dev_test
@@ -111,6 +117,10 @@ ohos_unittest("DSpeakerDevTest") {
     "${services_path}/audiomanager/servicesource:distributed_audio_source",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "samgr:samgr_proxy",
   ]
 }
 

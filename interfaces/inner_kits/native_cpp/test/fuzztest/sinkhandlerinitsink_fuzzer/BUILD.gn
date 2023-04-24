@@ -31,13 +31,10 @@ ohos_fuzztest("SinkHandlerInitSinkFuzzTest") {
   sources = [ "sinkhandlerinitsink_fuzzer.cpp" ]
 
   include_dirs = [
-    "//commonlibrary/c_utils/base/include",
-    "//utils/system/safwk/native/include",
     "${fwk_utils_path}/include/log",
     "${fwk_utils_path}/include",
     "${fwk_common_path}/log/include",
     "${fwk_common_path}/utils/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
   ]
 
   include_dirs += [
@@ -48,6 +45,10 @@ ohos_fuzztest("SinkHandlerInitSinkFuzzTest") {
 
   deps =
       [ "${innerkits_path}/native_cpp/audio_sink:distributed_audio_sink_sdk" ]
+
+  external_deps = [
+    "c_utils:utils",
+  ]
 
   defines = [
     "HI_LOG_ENABLE",

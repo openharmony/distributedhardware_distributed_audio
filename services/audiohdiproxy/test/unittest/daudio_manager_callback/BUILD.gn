@@ -34,7 +34,6 @@ config("module_private_config") {
     "${services_path}/common/audiodata/include",
     "${services_path}/common/audioparam",
     "${services_path}/common/audiodata/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
   ]
 }
 
@@ -54,7 +53,10 @@ ohos_unittest("DAudioManagerCallbackTest") {
     "//third_party/googletest:gtest_main",
   ]
 
-  external_deps = [ "c_utils:utils" ]
+  external_deps = [
+    "c_utils:utils",
+    "ipc:ipc_core",
+  ]
 }
 
 group("daudio_manager_callback_test") {

@@ -20,13 +20,9 @@ config("module_private_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "//commonlibrary/c_utils/base/include",
     "//drivers/peripheral/audio/interfaces/include",
     "//foundation/communication/dsoftbus/interfaces/kits/transport",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
     "//third_party/json/include",
-    "//utils/system/safwk/native/include",
     "${fwk_common_path}/utils/include",
     "${mediastandardfwk_path}/audiocapturer/include",
     "${mediastandardfwk_path}/audiocommon/include",

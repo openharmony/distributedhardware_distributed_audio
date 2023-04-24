@@ -30,8 +30,6 @@ ohos_fuzztest("SourceIpcCallbackOnNotifyUnregResultFuzzTest") {
   sources = [ "sourceipccallbackonnotifyunregresult_fuzzer.cpp" ]
 
   include_dirs = [
-    "//commonlibrary/c_utils/base/include",
-    "//utils/system/safwk/native/include",
     "${fwk_utils_path}/include/log",
     "${fwk_utils_path}/include",
     "${fwk_common_path}/log/include",
