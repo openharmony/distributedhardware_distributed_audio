@@ -321,6 +321,12 @@ int32_t AudioCaptureInterfaceImpl::GetFrameBufferSize(uint64_t &bufferSize)
     return HDF_SUCCESS;
 }
 
+void AudioCaptureInterfaceImpl::SetAttrs(const std::string &adpName, const AudioDeviceDescriptor &desc,
+        const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> &callback)
+{
+    DHLOGI("Set attrs, not support yet.");
+}
+
 const AudioDeviceDescriptor &AudioCaptureInterfaceImpl::GetCaptureDesc()
 {
     return devDesc_;

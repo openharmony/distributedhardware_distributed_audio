@@ -435,6 +435,12 @@ uint32_t AudioRenderInterfaceImpl::GetMinVolumeInner()
     std::lock_guard<std::mutex> volLck(volMtx_);
     return volMin_;
 }
+
+void AudioRenderInterfaceImpl::SetAttrs(const std::string &adpName, const AudioDeviceDescriptor &desc,
+        const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> &callback)
+{
+    DHLOGI("Set attrs, not support yet.");
+}
 } // V1_0
 } // Audio
 } // Distributedaudio

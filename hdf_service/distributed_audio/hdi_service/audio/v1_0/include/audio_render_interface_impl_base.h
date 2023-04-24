@@ -48,6 +48,8 @@ public:
     virtual uint32_t GetVolumeInner() = 0;
     virtual uint32_t GetMaxVolumeInner() = 0;
     virtual uint32_t GetMinVolumeInner() = 0;
+    virtual void SetAttrs(const std::string &adpName, const AudioDeviceDescriptor &desc,
+        const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> &callback) = 0;
 };
 } // V1_0
 } // Audio

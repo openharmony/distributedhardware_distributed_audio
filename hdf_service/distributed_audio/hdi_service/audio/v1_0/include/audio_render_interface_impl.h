@@ -91,6 +91,8 @@ public:
     uint32_t GetVolumeInner() override;
     uint32_t GetMaxVolumeInner() override;
     uint32_t GetMinVolumeInner() override;
+    void SetAttrs(const std::string &adpName, const AudioDeviceDescriptor &desc,
+        const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> &callback) override;
 
 private:
     float GetFadeRate(uint32_t currentIndex, const uint32_t durationIndex);
