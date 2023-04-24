@@ -43,8 +43,6 @@ ohos_shared_library("distributed_audio_handler") {
     "audio_framework:audio_capturer",
     "audio_framework:audio_client",
     "c_utils:utils",
-    "multimedia_audio_framework:audio_capturer",
-    "multimedia_audio_framework:audio_client",
     "multimedia_image_framework:image_native",
   ]
 
