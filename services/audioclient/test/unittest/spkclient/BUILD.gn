@@ -69,7 +69,7 @@ ohos_unittest("SpeakerClientTest") {
   ]
 
   external_deps = [
-    "multimedia_audio_framework:audio_client",
+    "audio_framework:audio_client",
   ]
 }
 

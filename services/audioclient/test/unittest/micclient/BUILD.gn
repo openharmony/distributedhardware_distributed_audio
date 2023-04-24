@@ -64,7 +64,7 @@ ohos_unittest("MicClientTest") {
   ]
 
   external_deps = [
-    "multimedia_audio_framework:audio_capturer",
+    "audio_framework:audio_capturer",
   ]
 }
 
