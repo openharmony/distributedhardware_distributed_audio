@@ -96,6 +96,14 @@ private:
 
     using DAudioSinkDevFunc = int32_t (DAudioSinkDev::*)(const AudioEvent &audioEvent);
     std::map<AudioEventType, DAudioSinkDevFunc> memberFuncMap_;
+
+    ISpkClient *(*GetDirectSpkClient_)() = nullptr;
+    IMicClient *(*GetDirectMicClient_)() = nullptr;
+#ifdef __aarch64__
+    char resolvedPath_[100] = "/system/lib64/libdistributed_direct_client.z.so";
+#else
+    char resolvedPath_[100] = "/system/lib/libdistributed_direct_client.z.so";
+#endif
 };
 } // DistributedHardware
 } // OHOS

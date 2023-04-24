@@ -234,5 +234,10 @@ int32_t DMicClient::StopCapture()
     }
     return DH_SUCCESS;
 }
+
+void DMicClient::SetAttrs(const std::string &devId, const std::shared_ptr<IAudioEventCallback> &callback)
+{
+    DHLOGE("Set attrs, not support yet.");
+}
 } // DistributedHardware
 } // OHOS
