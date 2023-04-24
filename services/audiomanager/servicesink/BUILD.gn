@@ -84,9 +84,6 @@ ohos_shared_library("distributed_audio_sink") {
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "ipc:ipc_core",
-    "multimedia_audio_framework:audio_capturer",
-    "multimedia_audio_framework:audio_client",
-    "multimedia_audio_framework:audio_renderer",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
