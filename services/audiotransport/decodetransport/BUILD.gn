@@ -60,9 +60,9 @@ ohos_shared_library("distributed_audio_decode_transport") {
 
   sources = [
     "${audio_processor_path}/decodeprocessor/src/audio_decoder_processor.cpp",
-    "${audio_processor_path}/directprocessor/src/audio_direct_processor.cpp",
     "${audio_processor_path}/decoder/src/audio_decoder.cpp",
     "${audio_processor_path}/decoder/src/audio_decoder_callback.cpp",
+    "${audio_processor_path}/directprocessor/src/audio_direct_processor.cpp",
     "${services_path}/common/audiodata/src/audio_data.cpp",
     "src/audio_decode_transport.cpp",
   ]

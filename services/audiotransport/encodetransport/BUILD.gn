@@ -59,8 +59,8 @@ ohos_shared_library("distributed_audio_encode_transport") {
   public_configs = [ ":encode_transport_pub_config" ]
 
   sources = [
-    "${audio_processor_path}/encodeprocessor/src/audio_encoder_processor.cpp",
     "${audio_processor_path}/directprocessor/src/audio_direct_processor.cpp",
+    "${audio_processor_path}/encodeprocessor/src/audio_encoder_processor.cpp",
     "${audio_processor_path}/encoder/src/audio_encoder.cpp",
     "${audio_processor_path}/encoder/src/audio_encoder_callback.cpp",
     "${services_path}/common/audiodata/src/audio_data.cpp",
