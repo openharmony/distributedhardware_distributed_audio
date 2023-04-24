@@ -372,7 +372,7 @@ void DSpeakerDev::EnqueueThread()
         if (readData != nullptr) {
             const uint8_t *readAudioData = reinterpret_cast<const uint8_t *>(readData);
             if (memcpy_s(audioData->Data(), audioData->Capacity(), readAudioData, param_.comParam.frameSize) != EOK) {
-                DHLOGE("Copy audio data failed. errno: %d.", ret);
+                DHLOGE("Copy audio data failed.");
             }
         }
         if (speakerTrans_ == nullptr) {
