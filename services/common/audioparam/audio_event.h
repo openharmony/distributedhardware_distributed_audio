@@ -63,6 +63,10 @@ typedef enum {
 
     CHANGE_PLAY_STATUS = 71,
 
+    MMAP_SPK_START = 81,
+    MMAP_SPK_STOP = 82,
+    MMAP_MIC_START = 83,
+    MMAP_MIC_STOP = 84,
     AUDIO_START = 85,
     AUDIO_STOP = 86,
 } AudioEventType;

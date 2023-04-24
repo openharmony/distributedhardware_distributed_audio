@@ -54,6 +54,10 @@ DAudioSourceDev::DAudioSourceDev(const std::string &devId, const std::shared_ptr
     memberFuncMap_[AUDIO_FOCUS_CHANGE] = &DAudioSourceDev::HandleFocusChange;
     memberFuncMap_[AUDIO_RENDER_STATE_CHANGE] = &DAudioSourceDev::HandleRenderStateChange;
     memberFuncMap_[CHANGE_PLAY_STATUS] = &DAudioSourceDev::HandlePlayStatusChange;
+    memberFuncMap_[MMAP_SPK_START] = &DAudioSourceDev::HandleSpkMmapStart;
+    memberFuncMap_[MMAP_SPK_STOP] = &DAudioSourceDev::HandleSpkMmapStop;
+    memberFuncMap_[MMAP_MIC_START] = &DAudioSourceDev::HandleMicMmapStart;
+    memberFuncMap_[MMAP_MIC_STOP] = &DAudioSourceDev::HandleMicMmapStop;
 
     eventNotifyMap_[NOTIFY_OPEN_SPEAKER_RESULT] = EVENT_NOTIFY_OPEN_SPK;
     eventNotifyMap_[NOTIFY_CLOSE_SPEAKER_RESULT] = EVENT_NOTIFY_CLOSE_SPK;
@@ -388,6 +392,62 @@ int32_t DAudioSourceDev::HandlePlayStatusChange(const AudioEvent &event)
         DHLOGE("Play status error.");
         return ERR_DH_AUDIO_FAILED;
     }
+}
+
+int32_t DAudioSourceDev::HandleSpkMmapStart(const AudioEvent &event)
+{
+    DHLOGI("Spk mmap start, content: %s.", event.content.c_str());
+    if (speaker_ == nullptr) {
+        DHLOGE("Spk mmap start, speaker is nullptr.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    int32_t ret = speaker_->MmapStart();
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Spk mmap start fail, error code: %d.", ret);
+    }
+    return ret;
+}
+
+int32_t DAudioSourceDev::HandleSpkMmapStop(const AudioEvent &event)
+{
+    DHLOGI("Spk mmap stop, content: %s.", event.content.c_str());
+    if (speaker_ == nullptr) {
+        DHLOGE("Spk mmap stop, speaker is nullptr.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    int32_t ret = speaker_->MmapStop();
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Spk mmap stop fail, error code: %d.", ret);
+    }
+    return ret;
+}
+
+int32_t DAudioSourceDev::HandleMicMmapStart(const AudioEvent &event)
+{
+    DHLOGI("Mic mmap start, content: %s.", event.content.c_str());
+    if (mic_ == nullptr) {
+        DHLOGE("Mic mmap start, speaker is nullptr.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    int32_t ret = mic_ ->MmapStart();
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Mic mmap start fail, error code: %d.", ret);
+    }
+    return ret;
+}
+
+int32_t DAudioSourceDev::HandleMicMmapStop(const AudioEvent &event)
+{
+    DHLOGI("Mic mmap stop, content: %s.", event.content.c_str());
+    if (mic_ == nullptr) {
+        DHLOGE("mic mmap stop, speaker is nullptr.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    int32_t ret = mic_ ->MmapStop();
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Mic mmap stop fail, error code: %d.", ret);
+    }
+    return ret;
 }
 
 int32_t DAudioSourceDev::WaitForRPC(const AudioEventType type)

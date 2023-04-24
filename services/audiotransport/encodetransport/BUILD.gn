@@ -43,6 +43,7 @@ ohos_shared_library("distributed_audio_encode_transport") {
     "${common_path}/include",
     "${common_path}/dfx_utils/include",
     "${audio_processor_path}/encodeprocessor/include",
+    "${audio_processor_path}/directprocessor/include",
     "${audio_processor_path}/encoder/include",
     "${audio_processor_path}/interface",
     "${audio_transport_path}/audiochannel/interface",
@@ -58,6 +59,7 @@ ohos_shared_library("distributed_audio_encode_transport") {
   public_configs = [ ":encode_transport_pub_config" ]
 
   sources = [
+    "${audio_processor_path}/directprocessor/src/audio_direct_processor.cpp",
     "${audio_processor_path}/encodeprocessor/src/audio_encoder_processor.cpp",
     "${audio_processor_path}/encoder/src/audio_encoder.cpp",
     "${audio_processor_path}/encoder/src/audio_encoder_callback.cpp",

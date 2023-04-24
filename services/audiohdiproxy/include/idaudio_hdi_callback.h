@@ -37,6 +37,12 @@ public:
     virtual int32_t WriteStreamData(const std::string &devId, const int32_t dhId, std::shared_ptr<AudioData> &data) = 0;
 
     virtual int32_t ReadStreamData(const std::string &devId, const int32_t dhId, std::shared_ptr<AudioData> &data) = 0;
+
+    virtual int32_t ReadMmapPosition(const std::string &devId, const int32_t dhId,
+        uint64_t frames, CurrentTimeHDF &time) = 0;
+
+    virtual int32_t RefreshAshmemInfo(const std::string &devId, const int32_t dhId,
+        int32_t fd, int32_t ashmemLength, int32_t lengthPerTrans) = 0;
 };
 } // DistributedHardware
 } // OHOS

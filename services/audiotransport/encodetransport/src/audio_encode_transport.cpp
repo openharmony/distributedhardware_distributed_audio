@@ -17,6 +17,7 @@
 
 #include "audio_data_channel.h"
 #include "audio_encoder_processor.h"
+#include "audio_direct_processor.h"
 #include "audio_param.h"
 #include "daudio_errorcode.h"
 #include "daudio_log.h"
@@ -187,7 +188,13 @@ int32_t AudioEncodeTransport::RegisterChannelListener(const PortCapType capType)
 int32_t AudioEncodeTransport::RegisterProcessorListener(const AudioParam &localParam, const AudioParam &remoteParam)
 {
     DHLOGI("Register processor listener.");
-    processor_ = std::make_shared<AudioEncoderProcessor>();
+    if (localParam.renderOpts.renderFlags == MMAP_MODE || localParam.captureOpts.capturerFlags == MMAP_MODE) {
+        DHLOGI("Use direct processor, renderFlags: %d, capturerFlags: %d.",
+            localParam.renderOpts.renderFlags, localParam.captureOpts.capturerFlags);
+        processor_ = std::make_shared<AudioDirectProcessor>();
+    } else {
+        processor_ = std::make_shared<AudioEncoderProcessor>();
+    }
     if (audioChannel_ == nullptr) {
         DHLOGE("Create audio processor failed.");
         return ERR_DH_AUDIO_TRANS_ERROR;

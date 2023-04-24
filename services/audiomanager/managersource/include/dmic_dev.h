@@ -18,10 +18,12 @@
 
 #include <queue>
 #include <set>
+#include <thread>
 #include "nlohmann/json.hpp"
 
 #include "audio_param.h"
 #include "audio_status.h"
+#include "ashmem.h"
 #include "daudio_hdi_handler.h"
 #include "iaudio_datatrans_callback.h"
 #include "iaudio_data_transport.h"
@@ -49,6 +51,12 @@ public:
     int32_t WriteStreamData(const std::string &devId, const int32_t dhId, std::shared_ptr<AudioData> &data) override;
     int32_t ReadStreamData(const std::string &devId, const int32_t dhId, std::shared_ptr<AudioData> &data) override;
     int32_t NotifyEvent(const std::string &devId, const int32_t dhId, const AudioEvent &event) override;
+    int32_t ReadMmapPosition(const std::string &devId, const int32_t dhId,
+        uint64_t frames, CurrentTimeHDF &time) override;
+    int32_t RefreshAshmemInfo(const std::string &devId, const int32_t dhId,
+        int32_t fd, int32_t ashmemLength, int32_t lengthPerTrans) override;
+    int32_t MmapStart();
+    int32_t MmapStop();
 
     int32_t SetUp();
     int32_t Start();
@@ -64,6 +72,7 @@ public:
 private:
     int32_t EnableDevice(const int32_t dhId, const std::string &capability);
     int32_t DisableDevice(const int32_t dhId);
+    void EnqueueThread();
 
 private:
     static constexpr uint8_t CHANNEL_WAIT_SECONDS = 5;
@@ -89,6 +98,21 @@ private:
     // Mic capture parameters
     AudioParamHDF paramHDF_;
     AudioParam param_;
+
+    uint32_t timeInterval_ = 5;
+    sptr<Ashmem> ashmem_ = nullptr;
+    std::atomic<bool> isEnqueueRunning_ = false;
+    int32_t ashmemLength_ = -1;
+    int32_t lengthPerTrans_ = -1;
+    int32_t writeIndex_ = -1;
+    int64_t frameIndex_ = 0;
+    int64_t startTime_ = 0;
+    uint64_t writeNum_ = 0;
+    int64_t writeTvSec_ = 0;
+    int64_t writeTvNSec_ = 0;
+    std::thread enqueueDataThread_;
+    std::mutex writeAshmemMutex_;
+    std::condition_variable dataQueueCond_;
 };
 } // DistributedHardware
 } // OHOS
