@@ -156,12 +156,12 @@ private:
     const std::string NOT_MUTE_STATUS = "0";
     const std::string IS_MUTE_STATUS = "1";
 
-    AudioCaptureInterfaceImplBase *(*GetLowlatencyCaptureImpl_)() = nullptr;
-    AudioRenderInterfaceImplBase *(*GetLowlatencyRenderImpl_)() = nullptr;
+    AudioCaptureInterfaceImplBase *(*GetExternCaptureImpl_)() = nullptr;
+    AudioRenderInterfaceImplBase *(*GetExternRenderImpl_)() = nullptr;
 #ifdef __aarch64__
-    char resolvedPath_[100] = "/system/lib64/libdaudio_lowlatency_hdf_service.z.so";
+    char resolvedPath_[100] = "/system/lib64/libdaudio_extern_hdf_service.z.so";
 #else
-    char resolvedPath_[100] = "/system/lib/libdaudio_lowlatency_hdf_service.z.so";
+    char resolvedPath_[100] = "/system/lib/libdaudio_extern_hdf_service.z.so";
 #endif
 };
 } // V1_0
