@@ -15,6 +15,7 @@
 
 #include "daudio_sink_dev.h"
 
+#include <dlfcn.h>
 #include <random>
 
 #include "daudio_constants.h"
@@ -399,7 +400,7 @@ int32_t DAudioSinkDev::TaskOpenDSpeaker(const std::string &args)
         GetDirectSpkClient_ = (ISpkClient *(*)())(dlsym(handle, "GetDirectSpkClient"));
         if (GetDirectSpkClient_ == nullptr) {
             DHLOGE("Dlsym GetDirectSpkClient error.");
-            return HDF_FAILURE;
+            return ERR_DH_AUDIO_FAILED;
         }
         speakerClient_ = GetDirectSpkClient_();
         speakerClient_->SetAttrs(devId_, shared_from_this());
@@ -473,7 +474,7 @@ int32_t DAudioSinkDev::TaskOpenDMic(const std::string &args)
             GetDirectMicClient_ = (IMicClient *(*)())(dlsym(handle, "GetDirectMicClient"));
             if (GetDirectMicClient_ == nullptr) {
                 DHLOGE("Dlsym GetDirectMicClient error.");
-                return HDF_FAILURE;
+                return ERR_DH_AUDIO_FAILED;
             }
             micClient_ = GetDirectMicClient_();
             micClient_->SetAttrs(devId_, shared_from_this());
