@@ -159,9 +159,9 @@ private:
     AudioCaptureInterfaceImplBase *(*GetCaptureImplExt_)() = nullptr;
     AudioRenderInterfaceImplBase *(*GetRenderImplExt_)() = nullptr;
 #ifdef __aarch64__
-    char resolvedPath_[100] = "/system/lib64/libdaudio_ext_hdf_service.z.so";
+    char resolvedPath_[100] = "/vendor/lib64/libdaudio_ext_hdf_service.z.so";
 #else
-    char resolvedPath_[100] = "/system/lib/libdaudio_ext_hdf_service.z.so";
+    char resolvedPath_[100] = "/vendor/lib/libdaudio_ext_hdf_service.z.so";
 #endif
 };
 } // V1_0
