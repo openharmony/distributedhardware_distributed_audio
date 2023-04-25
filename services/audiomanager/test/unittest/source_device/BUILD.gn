@@ -78,6 +78,7 @@ ohos_unittest("DaudioSourceDevTest") {
 
   external_deps = [
     "c_utils:utils",
+    "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]
 }
@@ -98,7 +99,10 @@ ohos_unittest("DMicDevTest") {
     "//third_party/googletest:gtest_main",
   ]
 
-  external_deps = [ "samgr:samgr_proxy" ]
+  external_deps = [
+    "ipc:ipc_core",
+    "samgr:samgr_proxy",
+  ]
 }
 
 ## UnitTest daudio_source_dev_test
@@ -117,7 +121,10 @@ ohos_unittest("DSpeakerDevTest") {
     "//third_party/googletest:gtest_main",
   ]
 
-  external_deps = [ "samgr:samgr_proxy" ]
+  external_deps = [
+    "ipc:ipc_core",
+    "samgr:samgr_proxy",
+  ]
 }
 
 group("daudio_source_dev_test") {
