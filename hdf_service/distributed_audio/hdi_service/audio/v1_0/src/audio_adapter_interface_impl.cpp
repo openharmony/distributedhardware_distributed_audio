@@ -90,12 +90,12 @@ int32_t AudioAdapterInterfaceImpl::CreateRender(const AudioDeviceDescriptor &des
     void *handle = dlopen(resolvedPath_, RTLD_LAZY);
     if (attrs.type == AUDIO_MMAP_NOIRQ && handle != nullptr) {
         DHLOGI("Try to mmap mode.");
-        GetExternRenderImpl_ = (AudioRenderInterfaceImplBase *(*)())(dlsym(handle, "GetExternRenderImpl"));
-        if (GetExternRenderImpl_ == nullptr) {
-            DHLOGE("Dlsym GetExternRenderImpl error.");
+        GetRenderImplExt_ = (AudioRenderInterfaceImplBase *(*)())(dlsym(handle, "GetRenderImplExt"));
+        if (GetRenderImplExt_ == nullptr) {
+            DHLOGE("Dlsym GetRenderImplExt error.");
             return HDF_FAILURE;
         }
-        audioRender_ = GetExternRenderImpl_();
+        audioRender_ = GetRenderImplExt_();
         audioRender_->SetAttrs(adpDescriptor_.adapterName, desc, attrs, extSpkCallback_);
         renderFlags_ = Audioext::V1_0::MMAP_MODE;
     }
@@ -154,12 +154,12 @@ int32_t AudioAdapterInterfaceImpl::CreateCapture(const AudioDeviceDescriptor &de
     void *handle = dlopen(resolvedPath_, RTLD_LAZY);
     if (attrs.type == AUDIO_MMAP_NOIRQ && handle != nullptr) {
         DHLOGI("Try to mmap mode.");
-        GetExternCaptureImpl_ = (AudioCaptureInterfaceImplBase *(*)())(dlsym(handle, "GetExternCaptureImpl"));
-        if (GetExternCaptureImpl_ == nullptr) {
-            DHLOGE("Dlsym GetExternCaptureImpl error.");
+        GetCaptureImplExt_ = (AudioCaptureInterfaceImplBase *(*)())(dlsym(handle, "GetCaptureImplExt"));
+        if (GetCaptureImplExt_ == nullptr) {
+            DHLOGE("Dlsym GetCaptureImplExt error.");
             return HDF_FAILURE;
         }
-        audioCapture_ = GetExternCaptureImpl_();
+        audioCapture_ = GetCaptureImplExt_();
         audioCapture_->SetAttrs(adpDescriptor_.adapterName, desc, attrs, extMicCallback_);
         capturerFlags_ = Audioext::V1_0::MMAP_MODE;
     }
