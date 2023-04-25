@@ -19,9 +19,7 @@ module_out_path = "distributed_audio/services/audiocontrol/control_source_test"
 config("module_private_config") {
   visibility = [ ":*" ]
 
-  include_dirs = [
-    "${fwk_common_path}/utils/include",
-  ]
+  include_dirs = [ "${fwk_common_path}/utils/include" ]
 
   include_dirs += [
     "include",
