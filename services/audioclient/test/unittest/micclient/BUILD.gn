@@ -63,9 +63,7 @@ ohos_unittest("MicClientTest") {
     "//third_party/googletest:gtest_main",
   ]
 
-  external_deps = [
-    "audio_framework:audio_capturer",
-  ]
+  external_deps = [ "audio_framework:audio_capturer" ]
 }
 
 group("mic_client_test") {

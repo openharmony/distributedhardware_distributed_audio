@@ -68,9 +68,7 @@ ohos_unittest("SpeakerClientTest") {
     "//third_party/googletest:gtest_main",
   ]
 
-  external_deps = [
-    "audio_framework:audio_client",
-  ]
+  external_deps = [ "audio_framework:audio_client" ]
 }
 
 group("spk_client_test") {

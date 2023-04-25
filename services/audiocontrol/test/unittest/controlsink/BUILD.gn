@@ -52,9 +52,7 @@ ohos_unittest("ControlSinkTest") {
     "//third_party/googletest:gtest_main",
   ]
 
-  external_deps = [
-    "c_utils:utils",
-  ]
+  external_deps = [ "c_utils:utils" ]
 }
 
 group("control_sink_test") {

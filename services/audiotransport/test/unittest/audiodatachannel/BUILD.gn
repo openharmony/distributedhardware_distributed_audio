@@ -54,9 +54,7 @@ ohos_unittest("AudioDataChannelTest") {
     "//third_party/googletest:gtest_main",
   ]
 
-  external_deps = [
-    "graphic_standard:surface",
-  ]
+  external_deps = [ "graphic_standard:surface" ]
 }
 
 group("audio_data_channel_test") {

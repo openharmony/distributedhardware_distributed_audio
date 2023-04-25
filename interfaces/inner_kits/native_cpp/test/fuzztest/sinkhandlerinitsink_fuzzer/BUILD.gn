@@ -46,9 +46,7 @@ ohos_fuzztest("SinkHandlerInitSinkFuzzTest") {
   deps =
       [ "${innerkits_path}/native_cpp/audio_sink:distributed_audio_sink_sdk" ]
 
-  external_deps = [
-    "c_utils:utils",
-  ]
+  external_deps = [ "c_utils:utils" ]
 
   defines = [
     "HI_LOG_ENABLE",
