@@ -155,6 +155,14 @@ private:
 
     const std::string NOT_MUTE_STATUS = "0";
     const std::string IS_MUTE_STATUS = "1";
+
+    AudioCaptureInterfaceImplBase *(*GetCaptureImplExt_)() = nullptr;
+    AudioRenderInterfaceImplBase *(*GetRenderImplExt_)() = nullptr;
+#ifdef __aarch64__
+    char resolvedPath_[100] = "/system/lib64/libdaudio_ext_hdf_service.z.so";
+#else
+    char resolvedPath_[100] = "/system/lib/libdaudio_ext_hdf_service.z.so";
+#endif
 };
 } // V1_0
 } // Audio

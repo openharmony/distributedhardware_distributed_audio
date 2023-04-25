@@ -66,6 +66,7 @@ public:
     int32_t SetMute(const AudioEvent &event) override;
     int32_t SetAudioParameters(const AudioEvent &event) override;
     void PlayStatusChange(const std::string &args) override;
+    void SetAttrs(const std::string &devId, const std::shared_ptr<IAudioEventCallback> &callback) override;
 
 private:
     std::string GetVolumeLevel();

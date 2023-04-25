@@ -31,6 +31,7 @@ public:
     virtual int32_t Release() = 0;
     virtual int32_t StartCapture() = 0;
     virtual int32_t StopCapture() = 0;
+    virtual void SetAttrs(const std::string &devId, const std::shared_ptr<IAudioEventCallback> &callback) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

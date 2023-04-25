@@ -462,5 +462,10 @@ void DSpeakerClient::PlayStatusChange(const std::string &args)
         DHLOGE("Play status error.");
     }
 }
+
+void DSpeakerClient::SetAttrs(const std::string &devId, const std::shared_ptr<IAudioEventCallback> &callback)
+{
+    DHLOGE("Set attrs, not support yet.");
+}
 } // DistributedHardware
 } // OHOS

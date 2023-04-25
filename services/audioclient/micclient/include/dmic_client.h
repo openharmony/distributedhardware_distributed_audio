@@ -54,6 +54,7 @@ public:
     int32_t Release() override;
     int32_t StartCapture() override;
     int32_t StopCapture() override;
+    void SetAttrs(const std::string &devId, const std::shared_ptr<IAudioEventCallback> &callback) override;
 
 private:
     void CaptureThreadRunning();

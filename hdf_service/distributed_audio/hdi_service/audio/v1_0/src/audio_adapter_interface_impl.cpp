@@ -15,6 +15,7 @@
 
 #include "audio_adapter_interface_impl.h"
 
+#include <dlfcn.h>
 #include <hdf_base.h>
 #include <sstream>
 
@@ -86,6 +87,18 @@ int32_t AudioAdapterInterfaceImpl::CreateRender(const AudioDeviceDescriptor &des
     }
     renderFlags_ = Audioext::V1_0::NORMAL_MODE;
     audioRender_ = new AudioRenderInterfaceImpl(adpDescriptor_.adapterName, desc, attrs, extSpkCallback_);
+    void *handle = dlopen(resolvedPath_, RTLD_LAZY);
+    if (attrs.type == AUDIO_MMAP_NOIRQ && handle != nullptr) {
+        DHLOGI("Try to mmap mode.");
+        GetRenderImplExt_ = (AudioRenderInterfaceImplBase *(*)())(dlsym(handle, "GetRenderImplExt"));
+        if (GetRenderImplExt_ == nullptr) {
+            DHLOGE("Dlsym GetRenderImplExt error.");
+            return HDF_FAILURE;
+        }
+        audioRender_ = GetRenderImplExt_();
+        audioRender_->SetAttrs(adpDescriptor_.adapterName, desc, attrs, extSpkCallback_);
+        renderFlags_ = Audioext::V1_0::MMAP_MODE;
+    }
     if (audioRender_ == nullptr) {
         DHLOGE("Create render failed.");
         return HDF_FAILURE;
@@ -138,6 +151,18 @@ int32_t AudioAdapterInterfaceImpl::CreateCapture(const AudioDeviceDescriptor &de
     }
     capturerFlags_ = Audioext::V1_0::NORMAL_MODE;
     audioCapture_ = new AudioCaptureInterfaceImpl(adpDescriptor_.adapterName, desc, attrs, extMicCallback_);
+    void *handle = dlopen(resolvedPath_, RTLD_LAZY);
+    if (attrs.type == AUDIO_MMAP_NOIRQ && handle != nullptr) {
+        DHLOGI("Try to mmap mode.");
+        GetCaptureImplExt_ = (AudioCaptureInterfaceImplBase *(*)())(dlsym(handle, "GetCaptureImplExt"));
+        if (GetCaptureImplExt_ == nullptr) {
+            DHLOGE("Dlsym GetCaptureImplExt error.");
+            return HDF_FAILURE;
+        }
+        audioCapture_ = GetCaptureImplExt_();
+        audioCapture_->SetAttrs(adpDescriptor_.adapterName, desc, attrs, extMicCallback_);
+        capturerFlags_ = Audioext::V1_0::MMAP_MODE;
+    }
     if (audioCapture_ == nullptr) {
         DHLOGE("Create capture failed.");
         return HDF_FAILURE;

@@ -29,6 +29,9 @@ namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
 namespace V1_0 {
+using OHOS::HDI::DistributedAudio::Audioext::V1_0::AudioData;
+using OHOS::HDI::DistributedAudio::Audioext::V1_0::AudioParameter;
+using OHOS::HDI::DistributedAudio::Audioext::V1_0::IDAudioCallback;
 typedef enum {
     RENDER_STATUS_OPEN = 0,
     RENDER_STATUS_CLOSE,
@@ -48,6 +51,8 @@ public:
     virtual uint32_t GetVolumeInner() = 0;
     virtual uint32_t GetMaxVolumeInner() = 0;
     virtual uint32_t GetMinVolumeInner() = 0;
+    virtual void SetAttrs(const std::string &adpName, const AudioDeviceDescriptor &desc,
+        const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> &callback) = 0;
 };
 } // V1_0
 } // Audio

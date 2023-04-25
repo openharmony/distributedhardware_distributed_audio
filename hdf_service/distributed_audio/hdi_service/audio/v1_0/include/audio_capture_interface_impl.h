@@ -73,6 +73,8 @@ public:
     int32_t AudioDevDump(int32_t range, int32_t fd) override;
     int32_t IsSupportsPauseAndResume(bool &supportPause, bool &supportResume) override;
     const AudioDeviceDescriptor &GetCaptureDesc() override;
+    void SetAttrs(const std::string &adpName, const AudioDeviceDescriptor &desc,
+        const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> &callback) override;
 
 private:
     static constexpr int64_t AUDIO_OFFSET_FRAME_NUM = 10;

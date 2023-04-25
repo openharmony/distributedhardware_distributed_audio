@@ -34,6 +34,7 @@ public:
     virtual int32_t SetMute(const AudioEvent &event) = 0;
     virtual int32_t SetAudioParameters(const AudioEvent &event) = 0;
     virtual void PlayStatusChange(const std::string &args) = 0;
+    virtual void SetAttrs(const std::string &devId, const std::shared_ptr<IAudioEventCallback> &callback) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

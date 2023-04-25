@@ -15,6 +15,7 @@
 
 #include "daudio_sink_dev.h"
 
+#include <dlfcn.h>
 #include <random>
 
 #include "daudio_constants.h"
@@ -391,13 +392,18 @@ int32_t DAudioSinkDev::TaskOpenDSpeaker(const std::string &args)
     }
 
     if (speakerClient_ == nullptr) {
-        if (audioParam.renderOpts.renderFlags == NORMAL_MODE) {
-            speakerClient_ = std::make_shared<DSpeakerClient>(devId_, shared_from_this());
-        }
-    }
-
-    if (speakerClient_ == nullptr) {
         speakerClient_ = std::make_shared<DSpeakerClient>(devId_, shared_from_this());
+    }
+    void *handle = dlopen(resolvedPath_, RTLD_LAZY);
+    if (audioParam.renderOpts.renderFlags == MMAP_MODE && handle != nullptr) {
+        DHLOGI("Try to mmap mode.");
+        GetDirectSpkClient_ = (ISpkClient *(*)())(dlsym(handle, "GetDirectSpkClient"));
+        if (GetDirectSpkClient_ == nullptr) {
+            DHLOGE("Dlsym GetDirectSpkClient error.");
+            return ERR_DH_AUDIO_FAILED;
+        }
+        speakerClient_ = std::shared_ptr<ISpkClient>(GetDirectSpkClient_());
+        speakerClient_->SetAttrs(devId_, shared_from_this());
     }
     ret = speakerClient_->SetUp(audioParam);
     if (ret != DH_SUCCESS) {
@@ -460,9 +466,18 @@ int32_t DAudioSinkDev::TaskOpenDMic(const std::string &args)
 
     do {
         if (micClient_ == nullptr) {
-            if (audioParam.captureOpts.capturerFlags == NORMAL_MODE) {
-                micClient_ = std::make_shared<DMicClient>(devId_, shared_from_this());
+            micClient_ = std::make_shared<DMicClient>(devId_, shared_from_this());
+        }
+        void *handle = dlopen(resolvedPath_, RTLD_LAZY);
+        if (audioParam.captureOpts.capturerFlags == MMAP_MODE && handle != nullptr) {
+            DHLOGI("Try to mmap mode.");
+            GetDirectMicClient_ = (IMicClient *(*)())(dlsym(handle, "GetDirectMicClient"));
+            if (GetDirectMicClient_ == nullptr) {
+                DHLOGE("Dlsym GetDirectMicClient error.");
+                return ERR_DH_AUDIO_FAILED;
             }
+            micClient_ = std::shared_ptr<IMicClient>(GetDirectMicClient_());
+            micClient_->SetAttrs(devId_, shared_from_this());
         }
         ret = micClient_->SetUp(audioParam);
         if (ret != DH_SUCCESS) {
