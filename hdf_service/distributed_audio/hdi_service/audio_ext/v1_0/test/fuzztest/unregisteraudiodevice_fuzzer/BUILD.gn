@@ -36,7 +36,6 @@ ohos_fuzztest("UnRegisterAudioDeviceFuzzTest") {
     "${hdf_service_path}/hdi_service/common/include",
     "${hdf_service_path}/hdi_service/common/log/include",
     "${hdf_service_path}/hdi_service/common/utils/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
   ]
 
   include_dirs += [
@@ -52,6 +51,7 @@ ohos_fuzztest("UnRegisterAudioDeviceFuzzTest") {
   external_deps = [
     "c_utils:utils",
     "hdf_core:libhdf_host",
+    "ipc:ipc_core",
   ]
 
   defines = [

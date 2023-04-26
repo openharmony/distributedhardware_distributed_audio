@@ -21,7 +21,6 @@ config("module_private_config") {
 
   include_dirs = [
     "//third_party/json/include",
-    "//foundation/graphic/standard/interfaces/innerkits/surface",
     "${fwk_common_path}/utils/include",
     "${fwk_utils_path}/include/",
   ]
@@ -48,6 +47,8 @@ ohos_unittest("SoftBusAdapterTest") {
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
   ]
+
+  external_deps = [ "graphic_standard:surface" ]
 }
 
 group("audio_soft_bus_adapter_test") {

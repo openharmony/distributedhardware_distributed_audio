@@ -17,9 +17,6 @@ import("../../../../distributedaudio.gni")
 
 ohos_shared_library("distributed_audio_source_sdk") {
   include_dirs = [
-    "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
-    "//base/hiviewdfx/hitrace/interfaces/native/innerkits/include/hitrace_meter",
-    "//commonlibrary/c_utils/base/include",
     "${fwk_common_path}/utils/include",
     "//third_party/json/include",
   ]
@@ -42,6 +39,7 @@ ohos_shared_library("distributed_audio_source_sdk") {
 
   external_deps = [
     "c_utils:utils",
+    "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "ipc:ipc_core",
     "samgr:samgr_proxy",

@@ -17,16 +17,8 @@ import("../../../distributedaudio.gni")
 
 ohos_shared_library("distributed_audio_sink") {
   include_dirs = [
-    "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
-    "//base/hiviewdfx/hitrace/interfaces/native/innerkits/include/hitrace_meter",
-    "//commonlibrary/c_utils/base/include",
     "//foundation/communication/dsoftbus/interfaces/kits/transport",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
-    "//foundation/multimedia/audio_framework/frameworks/native/common/include",
-    "//foundation/multimedia/audio_framework/interfaces/inner_api/native/audiocapturer/include",
     "//third_party/json/include",
-    "//utils/system/safwk/native/include",
     "${fwk_common_path}/utils/include",
   ]
 
@@ -89,6 +81,7 @@ ohos_shared_library("distributed_audio_sink") {
     "drivers_interface_audio:libaudio_proxy_1.0",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdi",
+    "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",

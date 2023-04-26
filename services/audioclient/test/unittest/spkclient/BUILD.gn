@@ -22,8 +22,6 @@ config("module_private_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "//foundation/multimedia/audio_framework/services/audio_service/client/include",
-    "//foundation/multimedia/audio_framework/frameworks/native/common/include",
     "//foundation/multimedia/audio_framework/frameworks/native/audiopolicy/include",
     "${mediastandardfwk_path}/audiocommon/include",
     "${mediastandardfwk_path}/audiomanager/include",
@@ -69,6 +67,8 @@ ohos_unittest("SpeakerClientTest") {
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
   ]
+
+  external_deps = [ "audio_framework:audio_client" ]
 }
 
 group("spk_client_test") {

@@ -28,7 +28,6 @@ config("module_private_config") {
     "${hdf_service_path}/hdi_service/common/include",
     "${hdf_service_path}/hdi_service/common/log/include",
     "${hdf_service_path}/hdi_service/common/utils/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
   ]
 }
 
@@ -47,7 +46,10 @@ ohos_unittest("HDIServiceRenderTest") {
     "//third_party/googletest:gtest_main",
   ]
 
-  external_deps = [ "c_utils:utils" ]
+  external_deps = [
+    "c_utils:utils",
+    "ipc:ipc_core",
+  ]
 }
 
 group("hdi_service_audio_render_test") {

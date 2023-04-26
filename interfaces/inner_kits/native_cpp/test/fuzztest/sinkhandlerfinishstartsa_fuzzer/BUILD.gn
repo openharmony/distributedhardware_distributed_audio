@@ -30,13 +30,10 @@ ohos_fuzztest("SinkHandlerFinishStartSAFuzzTest") {
   sources = [ "sinkhandlerfinishstartsa_fuzzer.cpp" ]
 
   include_dirs = [
-    "//commonlibrary/c_utils/base/include",
-    "//utils/system/safwk/native/include",
     "${fwk_utils_path}/include/log",
     "${fwk_utils_path}/include",
     "${fwk_common_path}/log/include",
     "${fwk_common_path}/utils/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
   ]
 
   include_dirs += [
@@ -56,6 +53,7 @@ ohos_fuzztest("SinkHandlerFinishStartSAFuzzTest") {
 
   external_deps = [
     "c_utils:utils",
+    "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]
 }

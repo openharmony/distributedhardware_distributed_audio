@@ -17,7 +17,6 @@ import("../../../../distributedaudio.gni")
 
 ohos_shared_library("distributed_audio_data_channel") {
   include_dirs = [
-    "//base/hiviewdfx/hitrace/interfaces/native/innerkits/include/hitrace_meter",
     "//foundation/communication/dsoftbus/interfaces/kits/transport",
     "${fwk_common_path}/utils/include",
     "//third_party/json/include",
