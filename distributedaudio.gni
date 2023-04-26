@@ -11,8 +11,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-distributedaudio_path = "//foundation/distributedhardware/distributed_audio"
 distributedaudio_ext_path = "//foundation/distributedhardware/distributed_audio_ext"
+distributedaudio_path = "//foundation/distributedhardware/distributed_audio"
 distributedhardwarefwk_path = "//foundation/distributedhardware/distributed_hardware_fwk"
 mediastandard_path = "//foundation/multimedia/player_framework"
 mediastandardfwk_path = "//foundation/multimedia/audio_framework/interfaces/inner_api/native"
