@@ -34,7 +34,6 @@ ohos_fuzztest("RenderFrameFuzzTest") {
     "${hdf_service_path}/hdi_service/common/include",
     "${hdf_service_path}/hdi_service/common/log/include",
     "${hdf_service_path}/hdi_service/common/utils/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
   ]
 
   include_dirs += [
@@ -44,7 +43,10 @@ ohos_fuzztest("RenderFrameFuzzTest") {
 
   deps = [ "${hdf_ser_aud_path}:libaudio_manager_daudio_primary_service_1.0" ]
 
-  external_deps = [ "c_utils:utils" ]
+  external_deps = [
+    "c_utils:utils",
+    "ipc:ipc_core",
+  ]
 
   defines = [
     "HI_LOG_ENABLE",

@@ -12,45 +12,37 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//build/ohos_var.gni")
-import("../../../../distributedaudio.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+import("//drivers/peripheral/adapter/base/hidl_adapter.gni")
 
-ohos_shared_library("distributed_audio_source_sdk") {
+ohos_executable("audio_test_distributed_fifo") {
   include_dirs = [
-    "${fwk_common_path}/utils/include",
-    "//third_party/json/include",
+    "./include",
+    "//drivers/peripheral/audio/interfaces/include",
+    "./../../../services/hdfaudioclient/include",
+    "./../../../hdf_service/distributed_audio/hdi_service/common/include",
   ]
 
-  include_dirs += [
-    "include",
-    "${common_path}/include",
-    "${common_path}/dfx_utils/include",
-  ]
+  sources = [ "distributedaudiotest.cpp" ]
 
-  sources = [
-    "src/daudio_ipc_callback.cpp",
-    "src/daudio_ipc_callback_stub.cpp",
-    "src/daudio_source_handler.cpp",
-    "src/daudio_source_load_callback.cpp",
-    "src/daudio_source_proxy.cpp",
+  deps = [
+    "$hdf_uhdf_path/utils:libhdf_utils",
+    "./../../../services/hdfaudioclient:daudio_client",
   ]
-
-  deps = [ "${services_path}/common:distributed_audio_utils" ]
 
   external_deps = [
     "c_utils:utils",
-    "hisysevent_native:libhisysevent",
-    "hitrace_native:hitrace_meter",
-    "ipc:ipc_core",
-    "samgr:samgr_proxy",
+    "hiviewdfx_hilog_native:libhilog",
   ]
 
   defines = [
     "HI_LOG_ENABLE",
+    "DH_LOG_TAG=\"daudioTest\"",
     "LOG_DOMAIN=0xD004100",
   ]
 
+  install_enable = true
+  install_images = [ chipset_base_dir ]
   subsystem_name = "distributedhardware"
-
   part_name = "distributed_audio"
 }

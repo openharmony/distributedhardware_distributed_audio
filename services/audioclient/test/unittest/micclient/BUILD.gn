@@ -21,11 +21,7 @@ module_out_path = "distributed_audio/services/audioclient/mic_client_test"
 config("module_private_config") {
   visibility = [ ":*" ]
 
-  include_dirs = [
-    "//foundation/multimedia/audio_framework/frameworks/native/common/include",
-    "//foundation/multimedia/audio_framework/interfaces/inner_api/native/audiocapturer/include",
-    "${mediastandardfwk_path}/audiocommon/include",
-  ]
+  include_dirs = [ "${mediastandardfwk_path}/audiocommon/include" ]
 
   include_dirs += [
     "${audio_client_path}/interface",
@@ -64,6 +60,8 @@ ohos_unittest("MicClientTest") {
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
   ]
+
+  external_deps = [ "audio_framework:audio_capturer" ]
 }
 
 group("mic_client_test") {

@@ -19,10 +19,7 @@ module_out_path = "distributed_audio/services/audiocontrol/control_sink_test"
 config("module_private_config") {
   visibility = [ ":*" ]
 
-  include_dirs = [
-    "//commonlibrary/c_utils/base/include",
-    "${fwk_common_path}/utils/include",
-  ]
+  include_dirs = [ "${fwk_common_path}/utils/include" ]
 
   include_dirs += [
     "include",
@@ -52,6 +49,8 @@ ohos_unittest("ControlSinkTest") {
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
   ]
+
+  external_deps = [ "c_utils:utils" ]
 }
 
 group("control_sink_test") {

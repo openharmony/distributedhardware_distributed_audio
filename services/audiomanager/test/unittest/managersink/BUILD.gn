@@ -23,7 +23,6 @@ config("module_private_config") {
 
   include_dirs = [
     "//third_party/json/include",
-    "//foundation/multimedia/audio_framework/services/audio_service/client/include",
     "${audio_framework_path}/audiopolicy/include",
     "${mediastandardfwk_path}/audiocapturer/include",
     "${mediastandardfwk_path}/audiocommon/include",
