@@ -11,12 +11,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-distributedaudio_ext_path = "//foundation/distributedhardware/distributed_audio_ext"
+distributedaudio_ext_path =
+    "//foundation/distributedhardware/distributed_audio_ext"
 distributedaudio_path = "//foundation/distributedhardware/distributed_audio"
-distributedhardwarefwk_path = "//foundation/distributedhardware/distributed_hardware_fwk"
+distributedhardwarefwk_path =
+    "//foundation/distributedhardware/distributed_hardware_fwk"
 mediastandard_path = "//foundation/multimedia/player_framework"
-mediastandardfwk_path = "//foundation/multimedia/audio_framework/interfaces/inner_api/native"
-audio_framework_path = "//foundation/multimedia/audio_framework/frameworks/native"
+mediastandardfwk_path =
+    "//foundation/multimedia/audio_framework/interfaces/inner_api/native"
+audio_framework_path =
+    "//foundation/multimedia/audio_framework/frameworks/native"
 
 common_path = "${distributedaudio_path}/common"
 services_path = "${distributedaudio_path}/services"
@@ -27,7 +31,8 @@ audio_processor_path = "${services_path}/audioprocessor"
 audio_transport_path = "${services_path}/audiotransport"
 softbusadapter_path = "${services_path}/softbusadapter"
 interfaces_path = "${distributedaudio_path}/interfaces"
-hdf_interfaces_path = "${distributedaudio_path}/hdf_interfaces/distributed_audio"
+hdf_interfaces_path =
+    "${distributedaudio_path}/hdf_interfaces/distributed_audio"
 hdf_service_path = "${distributedaudio_path}/hdf_service/distributed_audio"
 hdf_ser_aud_path = "${hdf_service_path}/hdi_service/audio/v1_0"
 hdf_ser_aud_ext_path = "${hdf_service_path}/hdi_service/audio_ext/v1_0"
@@ -37,8 +42,8 @@ fwk_common_path = "${distributedhardwarefwk_path}/common"
 fwk_services_path = "${distributedhardwarefwk_path}/services"
 innerkits_path = "${distributedaudio_path}/interfaces/inner_kits"
 
-build_flags = ["-Werror"]
+build_flags = [ "-Werror" ]
 
 declare_args() {
-    distributed_audio_extension = false
+  distributed_audio_extension = false
 }
