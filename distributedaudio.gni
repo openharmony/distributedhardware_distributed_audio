@@ -12,6 +12,7 @@
 # limitations under the License.
 
 distributedaudio_path = "//foundation/distributedhardware/distributed_audio"
+distributedaudio_ext_path = "//foundation/distributedhardware/distributed_audio_ext"
 distributedhardwarefwk_path = "//foundation/distributedhardware/distributed_hardware_fwk"
 mediastandard_path = "//foundation/multimedia/player_framework"
 mediastandardfwk_path = "//foundation/multimedia/audio_framework/interfaces/inner_api/native"
@@ -37,3 +38,7 @@ fwk_services_path = "${distributedhardwarefwk_path}/services"
 innerkits_path = "${distributedaudio_path}/interfaces/inner_kits"
 
 build_flags = ["-Werror"]
+
+declare_args() {
+    distributed_audio_extension = false
+}

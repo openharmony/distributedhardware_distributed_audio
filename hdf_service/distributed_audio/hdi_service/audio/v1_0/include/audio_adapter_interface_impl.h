@@ -28,6 +28,10 @@
 #include "audio_capture_interface_impl_base.h"
 #include "audio_render_interface_impl.h"
 #include "audio_render_interface_impl_base.h"
+#ifdef DAUDIO_SUPPORT_EXTENSION
+#include "audio_capture_ext_impl.h"
+#include "audio_render_ext_impl.h"
+#endif
 
 namespace OHOS {
 namespace HDI {
@@ -155,14 +159,6 @@ private:
 
     const std::string NOT_MUTE_STATUS = "0";
     const std::string IS_MUTE_STATUS = "1";
-
-    AudioCaptureInterfaceImplBase *(*GetCaptureImplExt_)() = nullptr;
-    AudioRenderInterfaceImplBase *(*GetRenderImplExt_)() = nullptr;
-#ifdef __aarch64__
-    char resolvedPath_[100] = "/vendor/lib64/libdaudio_ext_hdf_service.z.so";
-#else
-    char resolvedPath_[100] = "/vendor/lib/libdaudio_ext_hdf_service.z.so";
-#endif
 };
 } // V1_0
 } // Audio

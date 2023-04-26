@@ -394,17 +394,13 @@ int32_t DAudioSinkDev::TaskOpenDSpeaker(const std::string &args)
     if (speakerClient_ == nullptr) {
         speakerClient_ = std::make_shared<DSpeakerClient>(devId_, shared_from_this());
     }
-    void *handle = dlopen(resolvedPath_, RTLD_LAZY);
-    if (audioParam.renderOpts.renderFlags == MMAP_MODE && handle != nullptr) {
+#ifdef DDAUDIO_SUPPORT_DIRECT
+    if (audioParam.renderOpts.renderFlags == MMAP_MODE) {
         DHLOGI("Try to mmap mode.");
-        GetDirectSpkClient_ = (ISpkClient *(*)())(dlsym(handle, "GetDirectSpkClient"));
-        if (GetDirectSpkClient_ == nullptr) {
-            DHLOGE("Dlsym GetDirectSpkClient error.");
-            return ERR_DH_AUDIO_FAILED;
-        }
-        speakerClient_ = std::shared_ptr<ISpkClient>(GetDirectSpkClient_());
+        speakerClient_ = std::shared_ptr<DirectDSpeakerClient>();
         speakerClient_->SetAttrs(devId_, shared_from_this());
     }
+#endif
     ret = speakerClient_->SetUp(audioParam);
     if (ret != DH_SUCCESS) {
         DHLOGE("Setup speaker failed, ret: %d.", ret);
@@ -468,17 +464,13 @@ int32_t DAudioSinkDev::TaskOpenDMic(const std::string &args)
         if (micClient_ == nullptr) {
             micClient_ = std::make_shared<DMicClient>(devId_, shared_from_this());
         }
-        void *handle = dlopen(resolvedPath_, RTLD_LAZY);
-        if (audioParam.captureOpts.capturerFlags == MMAP_MODE && handle != nullptr) {
+#ifdef DDAUDIO_SUPPORT_DIRECT
+        if (audioParam.captureOpts.capturerFlags == MMAP_MODE) {
             DHLOGI("Try to mmap mode.");
-            GetDirectMicClient_ = (IMicClient *(*)())(dlsym(handle, "GetDirectMicClient"));
-            if (GetDirectMicClient_ == nullptr) {
-                DHLOGE("Dlsym GetDirectMicClient error.");
-                return ERR_DH_AUDIO_FAILED;
-            }
-            micClient_ = std::shared_ptr<IMicClient>(GetDirectMicClient_());
+            micClient_ = std::make_shared<DirectDMicClient>();
             micClient_->SetAttrs(devId_, shared_from_this());
         }
+#endif
         ret = micClient_->SetUp(audioParam);
         if (ret != DH_SUCCESS) {
             DHLOGE("Set up mic failed, ret: %d.", ret);
