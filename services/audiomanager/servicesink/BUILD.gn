@@ -57,7 +57,7 @@ ohos_shared_library("distributed_audio_sink") {
     include_dirs += [
       "${distributedaudio_ext_path}/services/audioclient/directmicclient/include",
       "${distributedaudio_ext_path}/services/audioclient/directspkclient/include",
-      ]
+    ]
   }
 
   sources = [
@@ -76,7 +76,7 @@ ohos_shared_library("distributed_audio_sink") {
     sources += [
       "${distributedaudio_ext_path}/services/audioclient/directmicclient/src/direct_dmic_client.cpp",
       "${distributedaudio_ext_path}/services/audioclient/directspkclient/src/direct_dspeaker_client.cpp",
-      ]
+    ]
   }
 
   deps = [
