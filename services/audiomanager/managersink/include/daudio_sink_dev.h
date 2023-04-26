@@ -29,6 +29,10 @@
 #include "imic_client.h"
 #include "ispk_client.h"
 #include "iaudio_event_callback.h"
+#ifdef DDAUDIO_SUPPORT_DIRECT
+#include "direct_dmic_client.h"
+#include "direct_dspeaker_client.h"
+#endif
 
 using json = nlohmann::json;
 
@@ -96,14 +100,6 @@ private:
 
     using DAudioSinkDevFunc = int32_t (DAudioSinkDev::*)(const AudioEvent &audioEvent);
     std::map<AudioEventType, DAudioSinkDevFunc> memberFuncMap_;
-
-    ISpkClient *(*GetDirectSpkClient_)() = nullptr;
-    IMicClient *(*GetDirectMicClient_)() = nullptr;
-#ifdef __aarch64__
-    char resolvedPath_[100] = "/system/lib64/libdistributed_direct_client.z.so";
-#else
-    char resolvedPath_[100] = "/system/lib/libdistributed_direct_client.z.so";
-#endif
 };
 } // DistributedHardware
 } // OHOS
