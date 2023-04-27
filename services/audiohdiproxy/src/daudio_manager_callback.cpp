@@ -150,6 +150,18 @@ int32_t DAudioManagerCallback::NotifyEvent(const std::string& adpName, int32_t d
         case AudioEventHDF::AUDIO_EVENT_CHANGE_PLAY_STATUS:
             newEvent.type = AudioEventType::CHANGE_PLAY_STATUS;
             break;
+        case AudioEventHDF::AUDIO_EVENT_MMAP_START_SPK:
+            newEvent.type = AudioEventType::MMAP_SPK_START;
+            break;
+        case AudioEventHDF::AUDIO_EVENT_MMAP_STOP_SPK:
+            newEvent.type = AudioEventType::MMAP_SPK_STOP;
+            break;
+        case AudioEventHDF::AUDIO_EVENT_MMAP_START_MIC:
+            newEvent.type = AudioEventType::MMAP_MIC_START;
+            break;
+        case AudioEventHDF::AUDIO_EVENT_MMAP_STOP_MIC:
+            newEvent.type = AudioEventType::MMAP_MIC_STOP;
+            break;
         case AudioEventHDF::AUDIO_EVENT_START:
             newEvent.type = AudioEventType::AUDIO_START;
             break;
@@ -223,21 +235,37 @@ int32_t DAudioManagerCallback::ReadStreamData(const std::string &adpName, int32_
 int32_t DAudioManagerCallback::ReadMmapPosition(const std::string &adpName, int32_t devId,
     uint64_t &frames, OHOS::HDI::DistributedAudio::Audioext::V1_0::CurrentTime &time)
 {
-    (void) adpName;
-    (void) devId;
-    (void) frames;
-    (void) time;
+    DHLOGI("Read mmap position");
+    if (callback_ == nullptr) {
+        DHLOGE("Regisiter hdi callback id nullptr.");
+        return HDF_FAILURE;
+    }
+    CurrentTimeHDF timeHdf;
+    int32_t ret = callback_->ReadMmapPosition(adpName, devId, frames, timeHdf);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Read mmap position failed.");
+        return HDF_FAILURE;
+    }
+    time.tvSec = timeHdf.tvSec;
+    time.tvNSec = timeHdf.tvNSec;
+    DHLOGI("Read mmap position success.");
     return HDF_SUCCESS;
 }
 
 int32_t DAudioManagerCallback::RefreshAshmemInfo(const std::string &adpName, int32_t devId,
     int fd, int32_t ashmemLength, int32_t lengthPerTrans)
 {
-    (void) adpName;
-    (void) devId;
-    (void) fd;
-    (void) ashmemLength;
-    (void) lengthPerTrans;
+    DHLOGI("Refresh ashmem info.");
+    if (callback_ == nullptr) {
+        DHLOGE("Regisiter hdi callback id nullptr.");
+        return HDF_FAILURE;
+    }
+    int32_t ret = callback_->RefreshAshmemInfo(adpName, devId, fd, ashmemLength, lengthPerTrans);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Refresh ashmem info failed.");
+        return HDF_FAILURE;
+    }
+    DHLOGI("Refresh ashmem info success.");
     return HDF_SUCCESS;
 }
 } // DistributedHardware
