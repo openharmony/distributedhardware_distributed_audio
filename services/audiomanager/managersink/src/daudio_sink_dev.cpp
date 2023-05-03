@@ -394,7 +394,7 @@ int32_t DAudioSinkDev::TaskOpenDSpeaker(const std::string &args)
     if (speakerClient_ == nullptr) {
         speakerClient_ = std::make_shared<DSpeakerClient>(devId_, shared_from_this());
     }
-#ifdef DDAUDIO_SUPPORT_DIRECT
+#ifdef DAUDIO_SUPPORT_DIRECT
     if (audioParam.renderOpts.renderFlags == MMAP_MODE) {
         DHLOGI("Try to mmap mode.");
         speakerClient_ = std::shared_ptr<DirectDSpeakerClient>();
@@ -464,7 +464,7 @@ int32_t DAudioSinkDev::TaskOpenDMic(const std::string &args)
         if (micClient_ == nullptr) {
             micClient_ = std::make_shared<DMicClient>(devId_, shared_from_this());
         }
-#ifdef DDAUDIO_SUPPORT_DIRECT
+#ifdef DAUDIO_SUPPORT_DIRECT
         if (audioParam.captureOpts.capturerFlags == MMAP_MODE) {
             DHLOGI("Try to mmap mode.");
             micClient_ = std::make_shared<DirectDMicClient>();
