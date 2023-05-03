@@ -17,7 +17,6 @@ import("../../distributedaudio.gni")
 
 ohos_shared_library("distributed_audio_softbus_adapter") {
   include_dirs = [
-    "//foundation/communication/dsoftbus/interfaces/kits/common",
     "${fwk_common_path}/utils/include",
     "//third_party/json/include",
   ]

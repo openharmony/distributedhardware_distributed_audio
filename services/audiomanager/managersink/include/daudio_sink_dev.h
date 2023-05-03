@@ -29,7 +29,7 @@
 #include "imic_client.h"
 #include "ispk_client.h"
 #include "iaudio_event_callback.h"
-#ifdef DDAUDIO_SUPPORT_DIRECT
+#ifdef DAUDIO_SUPPORT_DIRECT
 #include "direct_dmic_client.h"
 #include "direct_dspeaker_client.h"
 #endif
