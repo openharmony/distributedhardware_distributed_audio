@@ -397,7 +397,7 @@ int32_t DAudioSinkDev::TaskOpenDSpeaker(const std::string &args)
 #ifdef DAUDIO_SUPPORT_DIRECT
     if (audioParam.renderOpts.renderFlags == MMAP_MODE) {
         DHLOGI("Try to mmap mode.");
-        speakerClient_ = std::shared_ptr<DirectDSpeakerClient>();
+        speakerClient_ = std::make_shared<DirectDSpeakerClient>();
         speakerClient_->SetAttrs(devId_, shared_from_this());
     }
 #endif

@@ -24,7 +24,6 @@ config("module_private_config") {
   include_dirs = [
     "${audio_framework_path}/audiopolicy/include",
     "//drivers/peripheral/audio/interfaces/include",
-    "//foundation/communication/dsoftbus/interfaces/kits/transport",
     "//third_party/json/include",
     "${fwk_common_path}/utils/include",
     "${mediastandardfwk_path}/audiocapturer/include",
@@ -93,6 +92,7 @@ ohos_unittest("DaudioSourceServiceTest") {
     "audio_framework:audio_client",
     "audio_framework:audio_renderer",
     "c_utils:utils",
+    "dsoftbus:softbus_client",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "ipc:ipc_core",

@@ -23,7 +23,6 @@ config("module_private_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "//foundation/communication/dsoftbus/interfaces/kits/transport",
     "${fwk_common_path}/utils/include",
     "//third_party/json/include",
   ]
@@ -59,6 +58,8 @@ ohos_unittest("EncodeTransportTest") {
     "${services_path}/common:distributed_audio_utils",
     "//third_party/googletest:gtest_main",
   ]
+
+  external_deps = [ "dsoftbus:softbus_client" ]
 
   defines = [
     "HI_LOG_ENABLE",

@@ -29,7 +29,6 @@ config("decode_transport_pub_config") {
 
 ohos_shared_library("distributed_audio_decode_transport") {
   include_dirs = [
-    "//foundation/communication/dsoftbus/interfaces/kits/transport",
     "${fwk_common_path}/utils/include",
     "${mediastandard_path}/interfaces/innerkits/native/media/include",
     "${mediastandardfwk_path}/audiocommon/include",
@@ -73,6 +72,7 @@ ohos_shared_library("distributed_audio_decode_transport") {
 
   external_deps = [
     "c_utils:utils",
+    "dsoftbus:softbus_client",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "multimedia_player_framework:media_client",

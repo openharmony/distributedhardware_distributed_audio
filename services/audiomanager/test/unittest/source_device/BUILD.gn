@@ -21,8 +21,6 @@ config("module_private_config") {
 
   include_dirs = [
     "//drivers/peripheral/audio/interfaces/include",
-    "//foundation/communication/dsoftbus/interfaces/kits/transport",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//third_party/json/include",
     "${fwk_common_path}/utils/include",
     "${mediastandardfwk_path}/audiocapturer/include",
@@ -78,6 +76,7 @@ ohos_unittest("DaudioSourceDevTest") {
 
   external_deps = [
     "c_utils:utils",
+    "dsoftbus:softbus_client",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]
