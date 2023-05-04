@@ -58,7 +58,6 @@ config("module_private_config") {
     "${mediastandardfwk_path}/audiocommon/include",
     "${mediastandardfwk_path}/audiorenderer/include",
     "${mediastandardfwk_path}/audiomanager/include",
-    "//drivers/peripheral/audio/interfaces/include",
   ]
 }
 
@@ -81,6 +80,7 @@ ohos_unittest("DAudioDfxTest") {
   external_deps = [
     "audio_framework:audio_capturer",
     "c_utils:utils",
+    "drivers_interface_audio:libaudio_proxy_1.0",
     "dsoftbus:softbus_client",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
