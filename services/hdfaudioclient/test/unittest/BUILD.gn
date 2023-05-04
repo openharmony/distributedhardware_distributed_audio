@@ -20,8 +20,8 @@ config("module_private_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "//drivers/peripheral/audio/interfaces/include",
     "${common_path}/include",
+    "${driver_audio_path}/include",
     "${services_path}/hdfaudioclient/include",
     "audio_adapter_internal/",
   ]

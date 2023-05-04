@@ -17,9 +17,9 @@ import("../../distributedaudio.gni")
 
 ohos_shared_library("daudio_client") {
   include_dirs = [
-    "//drivers//peripheral/audio/interfaces/include/",
     "./include",
     "${common_path}/include",
+    "${driver_audio_path}/include",
   ]
 
   sources = [
