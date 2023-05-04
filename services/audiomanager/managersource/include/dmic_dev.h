@@ -100,6 +100,9 @@ private:
     AudioParam param_;
 
     uint32_t timeInterval_ = 5;
+    uint32_t insertFrameCnt_ = 0;
+    std::atomic<bool> isExistedEmpty_ = false;
+    size_t dataQueSize_ = 0;
     sptr<Ashmem> ashmem_ = nullptr;
     std::atomic<bool> isEnqueueRunning_ = false;
     int32_t ashmemLength_ = -1;

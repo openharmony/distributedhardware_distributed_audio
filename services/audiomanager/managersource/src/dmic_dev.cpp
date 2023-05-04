@@ -33,6 +33,8 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+static constexpr size_t DATA_QUEUE_EXT_SIZE = 20;
+
 int32_t DMicDev::EnableDMic(const int32_t dhId, const std::string &capability)
 {
     DHLOGI("Enable distributed mic dhId: %d.", dhId);
@@ -164,9 +166,11 @@ int32_t DMicDev::NotifyEvent(const std::string &devId, const int32_t dhId, const
     switch (event.type) {
         case AudioEventType::AUDIO_START:
             curStatus_ = AudioStatus::STATUS_START;
+            isExistedEmpty_.store(false);
             break;
         case AudioEventType::AUDIO_STOP:
             curStatus_ = AudioStatus::STATUS_STOP;
+            isExistedEmpty_.store(false);
             break;
         default:
             break;
@@ -273,10 +277,18 @@ int32_t DMicDev::ReadStreamData(const std::string &devId, const int32_t dhId, st
         return ERR_DH_AUDIO_FAILED;
     }
     std::lock_guard<std::mutex> lock(dataQueueMtx_);
-    if (dataQueue_.empty()) {
-        DHLOGI("Data queue is empty.");
-        data = std::make_shared<AudioData>(param_.comParam.frameSize);
+    uint32_t queSize = dataQueue_.size();
+    if (insertFrameCnt_ >= queSize || queSize == 0) {
+        ++insertFrameCnt_;
+        isExistedEmpty_.store(true);
+        DHLOGI("Data queue is empty, count :%u.", insertFrameCnt_);
+        data = std::make_shared(AudioData)(param_.comParam.frameSize);
     } else {
+        while (insertFrameCnt_ > 0) {
+            DHLOGD("Data discard, count: %u", insertFrameCnt_);
+            dataQueue_.pop();
+            --insertFrameCnt_;
+        }
         data = dataQueue_.front();
         dataQueue_.pop();
     }
@@ -428,10 +440,13 @@ int32_t DMicDev::OnDecodeTransDataDone(const std::shared_ptr<AudioData> &audioDa
         return ERR_DH_AUDIO_NULLPTR;
     }
     std::lock_guard<std::mutex> lock(dataQueueMtx_);
-    size_t dataQueSize = curStatus_ != AudioStatus::STATUS_START ?
+    dataQueSize_ = curStatus_ != AudioStatus::STATUS_START ?
         (param_.captureOpts.capturerFlags == MMAP_MODE ? LOW_LATENCY_DATA_QUEUE_HALF_SIZE : DATA_QUEUE_HALF_SIZE) :
         (param_.captureOpts.capturerFlags == MMAP_MODE ? LOW_LATENCY_DATA_QUEUE_MAX_SIZE : DATA_QUEUE_MAX_SIZE);
-    while (dataQueue_.size() > dataQueSize) {
+    if (isExistedEmpty_.load()) {
+        dataQueSize_ = param_.captureOpts.capturerFlags == MMAP_MODE ? dataQueSize_ : DATA_QUEUE_EXT_SIZE;
+    }
+    while (dataQueue_.size() > dataQueSize_) {
         DHLOGI("Data queue overflow. buf current size: %d", dataQueue_.size());
         dataQueue_.pop();
     }
