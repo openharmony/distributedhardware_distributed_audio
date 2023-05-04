@@ -3,10 +3,12 @@
     "description": "distributed audio device driver interface",
     "version": "4.0",
     "license": "Apache License 2.0",
+    "segment":{
+        "destPath":"foundation/distributedhardware/distributed_audio/hdf_interfaces/"
+    },
     "component": {
         "name": "drivers_interface_distributed_audio",
         "subsystem": "distributedhardware",
-        "syscap": [""],
         "adapted_system_type":[
             "standard"
         ],

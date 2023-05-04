@@ -16,11 +16,10 @@ import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("../../distributedaudio.gni")
 
 ohos_shared_library("daudio_client") {
-  include_dirs = [ "//drivers//peripheral/audio/interfaces/include/" ]
-
-  include_dirs += [
+  include_dirs = [
     "./include",
     "${common_path}/include",
+    "${driver_audio_path}/include",
   ]
 
   sources = [
@@ -39,6 +38,7 @@ ohos_shared_library("daudio_client") {
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_audio:libaudio_proxy_1.0",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",

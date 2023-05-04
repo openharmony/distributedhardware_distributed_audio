@@ -17,7 +17,6 @@ import("../../../../distributedaudio.gni")
 
 ohos_shared_library("distributed_audio_data_channel") {
   include_dirs = [
-    "//foundation/communication/dsoftbus/interfaces/kits/transport",
     "${fwk_common_path}/utils/include",
     "//third_party/json/include",
   ]
@@ -41,6 +40,7 @@ ohos_shared_library("distributed_audio_data_channel") {
 
   external_deps = [
     "c_utils:utils",
+    "dsoftbus:softbus_client",
     "hitrace_native:hitrace_meter",
   ]
 

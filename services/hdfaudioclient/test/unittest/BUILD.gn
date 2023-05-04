@@ -19,10 +19,9 @@ module_output_path = "distributed_audio/hdfaudioclient"
 config("module_private_config") {
   visibility = [ ":*" ]
 
-  include_dirs = [ "//drivers/peripheral/audio/interfaces/include" ]
-
-  include_dirs += [
+  include_dirs = [
     "${common_path}/include",
+    "${driver_audio_path}/include",
     "${services_path}/hdfaudioclient/include",
     "audio_adapter_internal/",
   ]
@@ -41,7 +40,10 @@ ohos_unittest("AudioAdapterHdiTest") {
     "//third_party/googletest:gtest_main",
   ]
 
-  external_deps = [ "ipc:ipc_core" ]
+  external_deps = [
+    "drivers_interface_audio:libaudio_proxy_1.0",
+    "ipc:ipc_core",
+  ]
 
   defines = [
     "HI_LOG_ENABLE",

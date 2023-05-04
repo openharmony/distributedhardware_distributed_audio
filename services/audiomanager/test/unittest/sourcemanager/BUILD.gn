@@ -20,9 +20,8 @@ config("module_private_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "//drivers/peripheral/audio/interfaces/include",
-    "//foundation/communication/dsoftbus/interfaces/kits/transport",
     "//third_party/json/include",
+    "${driver_audio_path}/include",
     "${fwk_common_path}/utils/include",
     "${mediastandardfwk_path}/audiocapturer/include",
     "${mediastandardfwk_path}/audiocommon/include",
@@ -76,6 +75,8 @@ ohos_unittest("DaudioSourceMgrTest") {
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_audio:libaudio_proxy_1.0",
+    "dsoftbus:softbus_client",
     "hdf_core:libhdi",
     "ipc:ipc_core",
     "ipc:ipc_single",

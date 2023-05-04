@@ -22,7 +22,6 @@ config("module_private_config") {
 
   include_dirs = [
     "//third_party/json/include",
-    "//foundation/graphic/standard/interfaces/innerkits/surface",
     "${fwk_common_path}/utils/include",
     "${fwk_utils_path}/include/",
   ]

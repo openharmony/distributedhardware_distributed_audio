@@ -53,8 +53,6 @@ ohos_unittest("AudioCtrlTransportTest") {
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
   ]
-
-  external_deps = [ "graphic_standard:surface" ]
 }
 
 group("audio_ctrl_transport_test") {

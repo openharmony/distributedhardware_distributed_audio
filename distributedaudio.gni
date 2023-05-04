@@ -21,6 +21,7 @@ mediastandardfwk_path =
     "//foundation/multimedia/audio_framework/interfaces/inner_api/native"
 audio_framework_path =
     "//foundation/multimedia/audio_framework/frameworks/native"
+driver_audio_path = "//drivers/peripheral/audio/interfaces"
 
 common_path = "${distributedaudio_path}/common"
 services_path = "${distributedaudio_path}/services"

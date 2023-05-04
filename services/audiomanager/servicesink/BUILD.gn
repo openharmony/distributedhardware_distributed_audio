@@ -17,7 +17,6 @@ import("../../../distributedaudio.gni")
 
 ohos_shared_library("distributed_audio_sink") {
   include_dirs = [
-    "//foundation/communication/dsoftbus/interfaces/kits/transport",
     "//third_party/json/include",
     "${fwk_common_path}/utils/include",
   ]
@@ -93,6 +92,7 @@ ohos_shared_library("distributed_audio_sink") {
     "audio_framework:audio_renderer",
     "c_utils:utils",
     "drivers_interface_audio:libaudio_proxy_1.0",
+    "dsoftbus:softbus_client",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdi",
     "hisysevent_native:libhisysevent",
