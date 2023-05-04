@@ -17,6 +17,7 @@ import("../../../distributedaudio.gni")
 
 ohos_shared_library("distributed_audio_source") {
   include_dirs = [
+    "//drivers//peripheral/audio/interfaces/include/",
     "//third_party/json/include",
     "${fwk_common_path}/utils/include",
     "${mediastandardfwk_path}/audiocapturer/include",
@@ -87,7 +88,7 @@ ohos_shared_library("distributed_audio_source") {
 
   external_deps = [
     "c_utils:utils",
-    "drivers_peripheral_audio:libaudio_proxy_1.0",
+    "drivers_interface_audio:libaudio_proxy_1.0",
     "dsoftbus:softbus_client",
     "hdf_core:libhdi",
     "hisysevent_native:libhisysevent",
