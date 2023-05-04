@@ -282,7 +282,7 @@ int32_t DMicDev::ReadStreamData(const std::string &devId, const int32_t dhId, st
         ++insertFrameCnt_;
         isExistedEmpty_.store(true);
         DHLOGI("Data queue is empty, count :%u.", insertFrameCnt_);
-        data = std::make_shared(AudioData)(param_.comParam.frameSize);
+        data = std::make_shared<AudioData>(param_.comParam.frameSize);
     } else {
         while (insertFrameCnt_ > 0) {
             DHLOGD("Data discard, count: %u", insertFrameCnt_);
