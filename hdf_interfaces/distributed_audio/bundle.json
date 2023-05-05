@@ -8,7 +8,7 @@
     },
     "component": {
         "name": "drivers_interface_distributed_audio",
-        "subsystem": "hdf",
+        "subsystem": "distributedhardware",
         "adapted_system_type":[
             "standard"
         ],
