@@ -296,7 +296,7 @@ int32_t DMicDev::ReadStreamData(const std::string &devId, const int32_t dhId, st
 }
 
 int32_t DMicDev::ReadMmapPosition(const std::string &devId, const int32_t dhId,
-    uint64_t frames, CurrentTimeHDF &time)
+    uint64_t &frames, CurrentTimeHDF &time)
 {
     DHLOGI("Read mmap position. frames: %lu, tvsec: %lu, tvNSec:%lu",
         writeNum_, writeTvSec_, writeTvNSec_);

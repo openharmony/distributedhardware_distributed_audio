@@ -311,7 +311,7 @@ int32_t DSpeakerDev::WriteStreamData(const std::string &devId, const int32_t dhI
 }
 
 int32_t DSpeakerDev::ReadMmapPosition(const std::string &devId, const int32_t dhId,
-    uint64_t frames, CurrentTimeHDF &time)
+    uint64_t &frames, CurrentTimeHDF &time)
 {
     DHLOGI("Read mmap position. frames: %lu, tvsec: %lu, tvNSec:%lu",
         readNum_, readTvSec_, readTvNSec_);

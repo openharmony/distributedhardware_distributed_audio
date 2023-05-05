@@ -51,7 +51,7 @@ public:
     int32_t ReadStreamData(const std::string &devId, const int32_t dhId, std::shared_ptr<AudioData> &data) override;
     int32_t NotifyEvent(const std::string &devId, const int32_t dhId, const AudioEvent &event) override;
     int32_t ReadMmapPosition(const std::string &devId, const int32_t dhId,
-        uint64_t frames, CurrentTimeHDF &time) override;
+        uint64_t &frames, CurrentTimeHDF &time) override;
     int32_t RefreshAshmemInfo(const std::string &devId, const int32_t dhId,
         int32_t fd, int32_t ashmemLength, int32_t lengthPerTrans) override;
     int32_t MmapStart();

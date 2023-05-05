@@ -59,7 +59,7 @@ public:
     }
 
     int32_t ReadMmapPosition(const std::string &devId, const int32_t dhId,
-        uint64_t frames, CurrentTimeHDF &time)
+        uint64_t &frames, CurrentTimeHDF &time)
     {
         return DH_SUCCESS;
     }
