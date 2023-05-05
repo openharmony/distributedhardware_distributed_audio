@@ -21,6 +21,6 @@ hdi("daudioext") {
   ]
   language = "cpp"
   root = "ohos.hdi://foundation/distributedhardware/distributed_audio/hdf_interfaces/"
-  subsystem_name = "distributedhardware"
+  subsystem_name = "hdf"
   part_name = "drivers_interface_distributed_audio"
 }
