@@ -92,7 +92,10 @@ int32_t DAudioSourceDev::EnableDAudio(const std::string &dhId, const std::string
         DHLOGE("Task queue is null.");
         return ERR_DH_AUDIO_NULLPTR;
     }
-
+    if (devId_.empty() || dhId.empty()) {
+        DHLOGE("Json param is incorrect.");
+        return ERR_DH_AUDIO_FAILED;
+    }
     json jParam = { { KEY_DEV_ID, devId_ }, { KEY_DH_ID, dhId }, { KEY_ATTRS, attrs } };
     auto task =
         GenerateTask(this, &DAudioSourceDev::TaskEnableDAudio, jParam.dump(), "", &DAudioSourceDev::OnEnableTaskResult);
