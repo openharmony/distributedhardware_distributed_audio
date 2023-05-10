@@ -94,7 +94,7 @@ int32_t DAudioSourceManager::UnInit()
     return DH_SUCCESS;
 }
 
-static bool CheckEnableParams(const std::string &devId, const std::string &dhId)
+static bool CheckParams(const std::string &devId, const std::string &dhId)
 {
     DHLOGI("Checking oarams of daudio.");
     if (devId.empty() || dhId.empty() ||
@@ -109,7 +109,7 @@ int32_t DAudioSourceManager::EnableDAudio(const std::string &devId, const std::s
 {
     DHLOGI("Enable distributed audio, devId: %s, dhId: %s, version: %s, reqId: %s.", GetAnonyString(devId).c_str(),
         dhId.c_str(), version.c_str(), reqId.c_str());
-    if (!CheckEnableParams(devId, dhId) || attrs.empty()) {
+    if (!CheckParams(devId, dhId) || attrs.empty()) {
         DHLOGE("Enable params are incorrect.");
         return ERR_DH_AUDIO_FAILED;
     }
@@ -128,7 +128,7 @@ int32_t DAudioSourceManager::DisableDAudio(const std::string &devId, const std::
 {
     DHLOGI("Disable distributed audio, devId: %s, dhId: %s, reqId: %s.", GetAnonyString(devId).c_str(), dhId.c_str(),
         reqId.c_str());
-    if (!CheckEnableParams(devId, dhId)) {
+    if (!CheckParams(devId, dhId)) {
         DHLOGE("Enable params are incorrect.");
         return ERR_DH_AUDIO_FAILED;
     }
