@@ -136,13 +136,13 @@ HWTEST_F(DAudioSourceMgrTest, EnableDAudio_004, TestSize.Level1)
     std::string dhId = "";
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceMgr.EnableDAudio(DEV_ID, dhId, "", ATTRS, reqId1));
     EXPECT_EQ(DH_SUCCESS, sourceMgr.UnInit());
-    dhId = std::string(105, "1");
+    dhId = std::string(105, '1');
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceMgr.EnableDAudio(DEV_ID, dhId, "", ATTRS, reqId1));
     EXPECT_EQ(DH_SUCCESS, sourceMgr.UnInit());
     std::string devId = "";
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceMgr.EnableDAudio(devId, DH_ID, "", ATTRS, reqId1));
     EXPECT_EQ(DH_SUCCESS, sourceMgr.UnInit());
-    devId = std::string(205, "a");
+    devId = std::string(205, 'a');
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceMgr.EnableDAudio(devId, DH_ID, "", ATTRS, reqId1));
     EXPECT_EQ(DH_SUCCESS, sourceMgr.UnInit());
     std::string attrs = "";
