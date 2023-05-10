@@ -160,6 +160,15 @@ HWTEST_F(DAudioSourceMgrTest, DisableDAudio_001, TestSize.Level1)
 {
     std::string reqId1 = GetRandomID();
     EXPECT_EQ(DH_SUCCESS, sourceMgr.EnableDAudio(DEV_ID, DH_ID, "", ATTRS, reqId1));
+
+    std::string dhId = "";
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceMgr.DisableDAudio(DEV_ID, dhId, reqId1));
+    dhId = std::string(105, '1');
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceMgr.DisableDAudio(DEV_ID, dhId, reqId1));
+    std::string devId = "";
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceMgr.DisableDAudio(devId, DH_ID, reqId1));
+    devId = std::string(205, 'a');
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceMgr.DisableDAudio(devId, DH_ID, reqId1));
     EXPECT_EQ(ERR_DH_AUDIO_SA_DEVICE_NOT_EXIST, sourceMgr.DisableDAudio("Unknown", DH_ID, reqId1));
     EXPECT_EQ(DH_SUCCESS, sourceMgr.UnInit());
 }
