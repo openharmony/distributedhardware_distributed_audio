@@ -28,6 +28,11 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+namespace {
+constexpr uint32_t MAX_DEVICE_ID_LENGTH = 200;
+constexpr uint32_t MAX_DISTRIBUTED_HAREWARE_ID_LENGTH = 100;
+}
+
 IMPLEMENT_SINGLE_INSTANCE(DAudioSourceManager);
 DAudioSourceManager::DAudioSourceManager()
 {
@@ -89,11 +94,25 @@ int32_t DAudioSourceManager::UnInit()
     return DH_SUCCESS;
 }
 
+static bool CheckParams(const std::string &devId, const std::string &dhId)
+{
+    DHLOGI("Checking oarams of daudio.");
+    if (devId.empty() || dhId.empty() ||
+        devId.size() > MAX_DEVICE_ID_LENGTH || dhId.size() > MAX_DISTRIBUTED_HAREWARE_ID_LENGTH) {
+        return false;
+    }
+    return true;
+}
+
 int32_t DAudioSourceManager::EnableDAudio(const std::string &devId, const std::string &dhId,
     const std::string &version, const std::string &attrs, const std::string &reqId)
 {
     DHLOGI("Enable distributed audio, devId: %s, dhId: %s, version: %s, reqId: %s.", GetAnonyString(devId).c_str(),
         dhId.c_str(), version.c_str(), reqId.c_str());
+    if (!CheckParams(devId, dhId) || attrs.empty()) {
+        DHLOGE("Enable params are incorrect.");
+        return ERR_DH_AUDIO_FAILED;
+    }
     std::lock_guard<std::mutex> lock(devMapMtx_);
     auto dev = audioDevMap_.find(devId);
     if (dev == audioDevMap_.end()) {
@@ -109,6 +128,10 @@ int32_t DAudioSourceManager::DisableDAudio(const std::string &devId, const std::
 {
     DHLOGI("Disable distributed audio, devId: %s, dhId: %s, reqId: %s.", GetAnonyString(devId).c_str(), dhId.c_str(),
         reqId.c_str());
+    if (!CheckParams(devId, dhId)) {
+        DHLOGE("Enable params are incorrect.");
+        return ERR_DH_AUDIO_FAILED;
+    }
     std::lock_guard<std::mutex> lock(devMapMtx_);
     auto dev = audioDevMap_.find(devId);
     if (dev == audioDevMap_.end()) {

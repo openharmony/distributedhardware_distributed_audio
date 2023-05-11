@@ -125,6 +125,32 @@ HWTEST_F(DAudioSourceMgrTest, EnableDAudio_003, TestSize.Level1)
 }
 
 /**
+ * @tc.name: EnableDAudio_004
+ * @tc.desc: Verify the EnableDAudio and DisableDAudio function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceMgrTest, EnableDAudio_004, TestSize.Level1)
+{
+    std::string reqId1 = GetRandomID();
+    std::string dhId = "";
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceMgr.EnableDAudio(DEV_ID, dhId, "", ATTRS, reqId1));
+    EXPECT_EQ(DH_SUCCESS, sourceMgr.UnInit());
+    dhId = std::string(105, '1');
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceMgr.EnableDAudio(DEV_ID, dhId, "", ATTRS, reqId1));
+    EXPECT_EQ(DH_SUCCESS, sourceMgr.UnInit());
+    std::string devId = "";
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceMgr.EnableDAudio(devId, DH_ID, "", ATTRS, reqId1));
+    EXPECT_EQ(DH_SUCCESS, sourceMgr.UnInit());
+    devId = std::string(205, 'a');
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceMgr.EnableDAudio(devId, DH_ID, "", ATTRS, reqId1));
+    EXPECT_EQ(DH_SUCCESS, sourceMgr.UnInit());
+    std::string attrs = "";
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceMgr.EnableDAudio(DEV_ID, DH_ID, "", attrs, reqId1));
+    EXPECT_EQ(DH_SUCCESS, sourceMgr.UnInit());
+}
+
+/**
  * @tc.name: DisableDAudio_001
  * @tc.desc: Verify the DisableDAudio function.
  * @tc.type: FUNC
@@ -134,6 +160,15 @@ HWTEST_F(DAudioSourceMgrTest, DisableDAudio_001, TestSize.Level1)
 {
     std::string reqId1 = GetRandomID();
     EXPECT_EQ(DH_SUCCESS, sourceMgr.EnableDAudio(DEV_ID, DH_ID, "", ATTRS, reqId1));
+
+    std::string dhId = "";
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceMgr.DisableDAudio(DEV_ID, dhId, reqId1));
+    dhId = std::string(105, '1');
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceMgr.DisableDAudio(DEV_ID, dhId, reqId1));
+    std::string devId = "";
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceMgr.DisableDAudio(devId, DH_ID, reqId1));
+    devId = std::string(205, 'a');
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceMgr.DisableDAudio(devId, DH_ID, reqId1));
     EXPECT_EQ(ERR_DH_AUDIO_SA_DEVICE_NOT_EXIST, sourceMgr.DisableDAudio("Unknown", DH_ID, reqId1));
     EXPECT_EQ(DH_SUCCESS, sourceMgr.UnInit());
 }
