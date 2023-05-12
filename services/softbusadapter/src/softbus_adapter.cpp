@@ -84,6 +84,7 @@ int32_t SoftbusAdapter::CreateSoftbusSessionServer(const std::string &pkgName, c
         }
     } else {
         DHLOGI("Session is already created.");
+        return DH_SUCCESS;
     }
 
     mapSessionSet_[sessionName].insert(peerDevId);
@@ -195,6 +196,7 @@ int32_t SoftbusAdapter::RegisterSoftbusListener(const std::shared_ptr<ISoftbusLi
     std::lock_guard<std::mutex> lisLock(listenerMtx_);
     if (mapListenersN_.find(strListenerKey) != mapListenersN_.end()) {
         DHLOGD("Session listener already register.");
+        return DH_SUCCESS;
     }
     mapListenersN_.insert(std::make_pair(strListenerKey, listener));
     return DH_SUCCESS;

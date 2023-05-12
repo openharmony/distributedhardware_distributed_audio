@@ -778,12 +778,14 @@ int32_t DAudioSourceDev::TaskOpenCtrlChannel(const std::string &args)
         return ERR_DH_AUDIO_NULLPTR;
     }
     if (args.length() > DAUDIO_MAX_JSON_LEN || args.empty()) {
+        DHLOGE("Task open ctrl channel, args length is invalid.");
         return ERR_DH_AUDIO_SA_PARAM_INVALID;
     }
 
     json jAudioParam;
     json jParam = json::parse(args, nullptr, false);
     if (!JsonParamCheck(jParam, { KEY_DH_ID })) {
+        DHLOGE("Task open ctrl channel, json param check error.");
         return ERR_DH_AUDIO_FAILED;
     }
     int32_t ret = NotifySinkDev(OPEN_CTRL, jAudioParam, jParam[KEY_DH_ID]);
@@ -805,7 +807,7 @@ int32_t DAudioSourceDev::TaskOpenCtrlChannel(const std::string &args)
         return ret;
     }
 
-    DHLOGI("Open audio ctrl channel success.");
+    DHLOGI("Task open ctrl channel success.");
     return DH_SUCCESS;
 }
 

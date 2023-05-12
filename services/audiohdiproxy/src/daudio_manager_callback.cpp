@@ -212,15 +212,12 @@ int32_t DAudioManagerCallback::WriteStreamData(const std::string &adpName, int32
 int32_t DAudioManagerCallback::ReadStreamData(const std::string &adpName, int32_t devId,
     OHOS::HDI::DistributedAudio::Audioext::V1_0::AudioData &data)
 {
-    DHLOGI("Read stream data.");
+    DHLOGD("Read stream data.");
     if (callback_ == nullptr) {
         DHLOGE("Register hdi callback is nullptr.");
         return HDF_FAILURE;
     }
 
-    DHLOGI("ReadStreamData Audio data parameter frame[sampleRate: %d," +
-        "channelCount: %d, format: %d, frameSize: %d].", data.param.sampleRate,
-        data.param.channelCount, data.param.format, data.param.frameSize);
     std::shared_ptr<AudioData> audioData = nullptr;
     int32_t ret = callback_->ReadStreamData(adpName, devId, audioData);
     if (ret != DH_SUCCESS || audioData == nullptr) {
@@ -228,7 +225,7 @@ int32_t DAudioManagerCallback::ReadStreamData(const std::string &adpName, int32_
         return HDF_FAILURE;
     }
     data.data.assign(audioData->Data(), audioData->Data()+audioData->Capacity());
-    DHLOGI("Read stream data success.");
+    DHLOGD("Read stream data success.");
     return HDF_SUCCESS;
 }
 
