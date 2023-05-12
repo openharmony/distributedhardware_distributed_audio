@@ -146,7 +146,6 @@ void AudioDataChannel::OnSessionClosed(int32_t sessionId)
         return;
     }
     listener->OnSessionClosed();
-    sessionId_ = 0;
 }
 
 void AudioDataChannel::OnBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen)

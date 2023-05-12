@@ -42,12 +42,26 @@ ohos_shared_library("distributed_audio_sink_client") {
     "${services_path}/common/audioparam",
   ]
 
+  if (distributed_audio_extension) {
+    include_dirs += [
+      "${distributedaudio_ext_path}/services/audioclient/directmicclient/include",
+      "${distributedaudio_ext_path}/services/audioclient/directspkclient/include",
+    ]
+  }
+
   public_configs = [ ":daudio_client_pub_config" ]
 
   sources = [
     "${audio_client_path}/micclient/src/dmic_client.cpp",
     "${audio_client_path}/spkclient/src/dspeaker_client.cpp",
   ]
+
+  if (distributed_audio_extension) {
+    sources += [
+      "${distributedaudio_ext_path}/services/audioclient/directmicclient/src/direct_dmic_client.cpp",
+      "${distributedaudio_ext_path}/services/audioclient/directspkclient/src/direct_dspeaker_client.cpp",
+    ]
+  }
 
   deps = [
     "${audio_transport_path}/decodetransport:distributed_audio_decode_transport",
@@ -59,6 +73,10 @@ ohos_shared_library("distributed_audio_sink_client") {
     "audio_framework:audio_capturer",
     "audio_framework:audio_client",
     "audio_framework:audio_renderer",
+    "c_utils:utils",
+    "drivers_interface_audio:libaudio_proxy_1.0",
+    "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libhdi",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
   ]
