@@ -23,10 +23,6 @@ namespace DistributedHardware {
 class IDAudioIpcCallback : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.distributedhardware.distributedaudioipccallback");
-    enum {
-        NOTIFY_REGRESULT = 0,
-        NOTIFY_UNREGRESULT = 1,
-    };
 
     ~IDAudioIpcCallback() override {}
     virtual int32_t OnNotifyRegResult(const std::string &devId, const std::string &dhId, const std::string &reqId,

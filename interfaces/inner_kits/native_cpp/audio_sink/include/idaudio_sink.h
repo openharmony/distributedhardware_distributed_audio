@@ -23,13 +23,6 @@ namespace DistributedHardware {
 class IDAudioSink : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.distributedhardware.distributedaudiosink");
-    enum {
-        INIT_SINK = 0,
-        RELEASE_SINK = 1,
-        SUBSCRIBE_LOCAL_HARDWARE = 2,
-        UNSUBSCRIBE_LOCAL_HARDWARE = 3,
-        DAUDIO_NOTIFY = 4,
-    };
 
     ~IDAudioSink() override = default;
     virtual int32_t InitSink(const std::string &params) = 0;

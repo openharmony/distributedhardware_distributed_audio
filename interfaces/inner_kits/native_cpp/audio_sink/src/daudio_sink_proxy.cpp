@@ -17,6 +17,7 @@
 
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
+#include "daudio_ipc_interface_code.h"
 #include "daudio_log.h"
 
 #undef DH_LOG_TAG
@@ -37,7 +38,7 @@ int32_t DAudioSinkProxy::InitSink(const std::string &params)
         return ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED;
     }
 
-    Remote()->SendRequest(INIT_SINK, data, reply, option);
+    Remote()->SendRequest(static_cast<uint32_t>(IDAudioSinkInterfaceCode::INIT_SINK), data, reply, option);
     int32_t ret = reply.ReadInt32();
     return ret;
 }
@@ -51,7 +52,7 @@ int32_t DAudioSinkProxy::ReleaseSink()
         return ERR_DH_AUDIO_SA_WRITE_INTERFACE_TOKEN_FAILED;
     }
 
-    Remote()->SendRequest(RELEASE_SINK, data, reply, option);
+    Remote()->SendRequest(static_cast<uint32_t>(IDAudioSinkInterfaceCode::RELEASE_SINK), data, reply, option);
     int32_t ret = reply.ReadInt32();
     return ret;
 }
@@ -71,7 +72,8 @@ int32_t DAudioSinkProxy::SubscribeLocalHardware(const std::string &dhId, const s
         return ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED;
     }
 
-    Remote()->SendRequest(SUBSCRIBE_LOCAL_HARDWARE, data, reply, option);
+    Remote()->SendRequest(static_cast<uint32_t>(IDAudioSinkInterfaceCode::SUBSCRIBE_LOCAL_HARDWARE),
+        data, reply, option);
     int32_t ret = reply.ReadInt32();
     return ret;
 }
@@ -91,7 +93,8 @@ int32_t DAudioSinkProxy::UnsubscribeLocalHardware(const std::string &dhId)
         return ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED;
     }
 
-    Remote()->SendRequest(UNSUBSCRIBE_LOCAL_HARDWARE, data, reply, option);
+    Remote()->SendRequest(static_cast<uint32_t>(IDAudioSinkInterfaceCode::UNSUBSCRIBE_LOCAL_HARDWARE),
+        data, reply, option);
     int32_t ret = reply.ReadInt32();
     return ret;
 }
@@ -113,7 +116,7 @@ void DAudioSinkProxy::DAudioNotify(const std::string &devId, const std::string &
         return;
     }
 
-    Remote()->SendRequest(DAUDIO_NOTIFY, data, reply, option);
+    Remote()->SendRequest(static_cast<uint32_t>(IDAudioSinkInterfaceCode::DAUDIO_NOTIFY), data, reply, option);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

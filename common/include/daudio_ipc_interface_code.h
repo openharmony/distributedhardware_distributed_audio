@@ -40,7 +40,7 @@ enum class IDAudioSinkInterfaceCode : uint32_t {
 };
 
 /* SAID: 4805 */
-enum IDAudioIpcCBInterfaceCode : uint32_t {
+enum class IDAudioIpcCBInterfaceCode : uint32_t {
     NOTIFY_REGRESULT = 0,
     NOTIFY_UNREGRESULT = 1,
 };

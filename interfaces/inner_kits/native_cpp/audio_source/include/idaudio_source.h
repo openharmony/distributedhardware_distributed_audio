@@ -25,14 +25,6 @@ namespace DistributedHardware {
 class IDAudioSource : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.distributedhardware.distributedaudiosource");
-    enum {
-        INIT_SOURCE = 0,
-        RELEASE_SOURCE = 1,
-        REGISTER_DISTRIBUTED_HARDWARE = 2,
-        UNREGISTER_DISTRIBUTED_HARDWARE = 3,
-        CONFIG_DISTRIBUTED_HARDWARE = 4,
-        DAUDIO_NOTIFY = 5,
-    };
 
     ~IDAudioSource() override = default;
     virtual int32_t InitSource(const std::string &params, const sptr<IDAudioIpcCallback> &callback) = 0;

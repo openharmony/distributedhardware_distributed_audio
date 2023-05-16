@@ -18,6 +18,7 @@
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
 #include "daudio_ipc_callback_proxy.h"
+#include "daudio_ipc_interface_code.h"
 #include "daudio_log.h"
 
 #undef DH_LOG_TAG
@@ -27,12 +28,18 @@ namespace OHOS {
 namespace DistributedHardware {
 DAudioSourceStub::DAudioSourceStub()
 {
-    memberFuncMap_[INIT_SOURCE] = &DAudioSourceStub::InitSourceInner;
-    memberFuncMap_[RELEASE_SOURCE] = &DAudioSourceStub::ReleaseSourceInner;
-    memberFuncMap_[REGISTER_DISTRIBUTED_HARDWARE] = &DAudioSourceStub::RegisterDistributedHardwareInner;
-    memberFuncMap_[UNREGISTER_DISTRIBUTED_HARDWARE] = &DAudioSourceStub::UnregisterDistributedHardwareInner;
-    memberFuncMap_[CONFIG_DISTRIBUTED_HARDWARE] = &DAudioSourceStub::ConfigDistributedHardwareInner;
-    memberFuncMap_[DAUDIO_NOTIFY] = &DAudioSourceStub::DAudioNotifyInner;
+    memberFuncMap_[static_cast<uint32_t>(IDAudioSourceInterfaceCode::INIT_SOURCE)] =
+        &DAudioSourceStub::InitSourceInner;
+    memberFuncMap_[static_cast<uint32_t>(IDAudioSourceInterfaceCode::RELEASE_SOURCE)] =
+        &DAudioSourceStub::ReleaseSourceInner;
+    memberFuncMap_[static_cast<uint32_t>(IDAudioSourceInterfaceCode::REGISTER_DISTRIBUTED_HARDWARE)] =
+        &DAudioSourceStub::RegisterDistributedHardwareInner;
+    memberFuncMap_[static_cast<uint32_t>(IDAudioSourceInterfaceCode::UNREGISTER_DISTRIBUTED_HARDWARE)] =
+        &DAudioSourceStub::UnregisterDistributedHardwareInner;
+    memberFuncMap_[static_cast<uint32_t>(IDAudioSourceInterfaceCode::CONFIG_DISTRIBUTED_HARDWARE)] =
+        &DAudioSourceStub::ConfigDistributedHardwareInner;
+    memberFuncMap_[static_cast<uint32_t>(IDAudioSourceInterfaceCode::DAUDIO_NOTIFY)] =
+        &DAudioSourceStub::DAudioNotifyInner;
 }
 
 int32_t DAudioSourceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,

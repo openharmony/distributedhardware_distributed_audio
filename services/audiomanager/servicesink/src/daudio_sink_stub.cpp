@@ -17,6 +17,7 @@
 
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
+#include "daudio_ipc_interface_code.h"
 #include "daudio_log.h"
 
 #undef DH_LOG_TAG
@@ -27,11 +28,16 @@ namespace DistributedHardware {
 DAudioSinkStub::DAudioSinkStub()
 {
     DHLOGI("Distributed audio sink stub constructed.");
-    memberFuncMap_[INIT_SINK] = &DAudioSinkStub::InitSinkInner;
-    memberFuncMap_[RELEASE_SINK] = &DAudioSinkStub::ReleaseSinkInner;
-    memberFuncMap_[SUBSCRIBE_LOCAL_HARDWARE] = &DAudioSinkStub::SubscribeLocalHardwareInner;
-    memberFuncMap_[UNSUBSCRIBE_LOCAL_HARDWARE] = &DAudioSinkStub::UnsubscribeLocalHardwareInner;
-    memberFuncMap_[DAUDIO_NOTIFY] = &DAudioSinkStub::DAudioNotifyInner;
+    memberFuncMap_[static_cast<uint32_t>(IDAudioSinkInterfaceCode::INIT_SINK)] =
+        &DAudioSinkStub::InitSinkInner;
+    memberFuncMap_[static_cast<uint32_t>(IDAudioSinkInterfaceCode::RELEASE_SINK)] =
+        &DAudioSinkStub::ReleaseSinkInner;
+    memberFuncMap_[static_cast<uint32_t>(IDAudioSinkInterfaceCode::SUBSCRIBE_LOCAL_HARDWARE)] =
+        &DAudioSinkStub::SubscribeLocalHardwareInner;
+    memberFuncMap_[static_cast<uint32_t>(IDAudioSinkInterfaceCode::UNSUBSCRIBE_LOCAL_HARDWARE)] =
+        &DAudioSinkStub::UnsubscribeLocalHardwareInner;
+    memberFuncMap_[static_cast<uint32_t>(IDAudioSinkInterfaceCode::DAUDIO_NOTIFY)] =
+        &DAudioSinkStub::DAudioNotifyInner;
 }
 
 DAudioSinkStub::~DAudioSinkStub()

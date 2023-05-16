@@ -16,6 +16,7 @@
 #include "daudio_ipc_callback_stub.h"
 
 #include "daudio_errorcode.h"
+#include "daudio_ipc_interface_code.h"
 #include "daudio_log.h"
 
 #undef DH_LOG_TAG
@@ -25,8 +26,10 @@ namespace OHOS {
 namespace DistributedHardware {
 DAudioIpcCallbackStub::DAudioIpcCallbackStub()
 {
-    memberFuncMap_[NOTIFY_REGRESULT] = &DAudioIpcCallbackStub::OnNotifyRegResultInner;
-    memberFuncMap_[NOTIFY_UNREGRESULT] = &DAudioIpcCallbackStub::OnNotifyUnregResultInner;
+    memberFuncMap_[static_cast<uint32_t>(IDAudioIpcCBInterfaceCode::NOTIFY_REGRESULT)] =
+        &DAudioIpcCallbackStub::OnNotifyRegResultInner;
+    memberFuncMap_[static_cast<uint32_t>(IDAudioIpcCBInterfaceCode::NOTIFY_UNREGRESULT)] =
+        &DAudioIpcCallbackStub::OnNotifyUnregResultInner;
 }
 
 int32_t DAudioIpcCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
