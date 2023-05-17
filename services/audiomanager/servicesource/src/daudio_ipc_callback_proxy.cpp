@@ -38,7 +38,7 @@ int32_t DAudioIpcCallbackProxy::OnNotifyRegResult(const std::string &devId, cons
         return ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED;
     }
 
-    Remote()->SendRequest(static_cast<uint32_t>(IDAudioIpcCBInterfaceCode::NOTIFY_REGRESULT), data, reply, option);
+    Remote()->SendRequest(NOTIFY_REGRESULT, data, reply, option);
     int32_t ret = reply.ReadInt32();
     return ret;
 }
@@ -59,7 +59,7 @@ int32_t DAudioIpcCallbackProxy::OnNotifyUnregResult(const std::string &devId, co
         return ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED;
     }
 
-    Remote()->SendRequest(static_cast<uint32_t>(IDAudioIpcCBInterfaceCode::NOTIFY_UNREGRESULT), data, reply, option);
+    Remote()->SendRequest(static_cast<uint32_t>(NOTIFY_UNREGRESULT), data, reply, option);
     int32_t ret = reply.ReadInt32();
     return ret;
 }
