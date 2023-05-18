@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
+#include "daudio_ipc_interface_code.h"
 #include "daudio_log.h"
 
 #undef DH_LOG_TAG
@@ -37,7 +38,7 @@ int32_t DAudioSourceProxy::InitSource(const std::string &params, const sptr<IDAu
         return ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED;
     }
 
-    Remote()->SendRequest(INIT_SOURCE, data, reply, option);
+    Remote()->SendRequest(static_cast<uint32_t>(IDAudioSourceInterfaceCode::INIT_SOURCE), data, reply, option);
     int32_t ret = reply.ReadInt32();
     return ret;
 }
@@ -51,7 +52,7 @@ int32_t DAudioSourceProxy::ReleaseSource()
         return ERR_DH_AUDIO_SA_WRITE_INTERFACE_TOKEN_FAILED;
     }
 
-    Remote()->SendRequest(RELEASE_SOURCE, data, reply, option);
+    Remote()->SendRequest(static_cast<uint32_t>(IDAudioSourceInterfaceCode::RELEASE_SOURCE), data, reply, option);
     int32_t ret = reply.ReadInt32();
     return ret;
 }
@@ -74,7 +75,8 @@ int32_t DAudioSourceProxy::RegisterDistributedHardware(const std::string &devId,
         return ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED;
     }
 
-    Remote()->SendRequest(REGISTER_DISTRIBUTED_HARDWARE, data, reply, option);
+    Remote()->SendRequest(static_cast<uint32_t>(IDAudioSourceInterfaceCode::REGISTER_DISTRIBUTED_HARDWARE),
+        data, reply, option);
     int32_t ret = reply.ReadInt32();
     return ret;
 }
@@ -96,7 +98,8 @@ int32_t DAudioSourceProxy::UnregisterDistributedHardware(const std::string &devI
         return ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED;
     }
 
-    Remote()->SendRequest(UNREGISTER_DISTRIBUTED_HARDWARE, data, reply, option);
+    Remote()->SendRequest(static_cast<uint32_t>(IDAudioSourceInterfaceCode::UNREGISTER_DISTRIBUTED_HARDWARE),
+        data, reply, option);
     int32_t ret = reply.ReadInt32();
     return ret;
 }
@@ -117,7 +120,8 @@ int32_t DAudioSourceProxy::ConfigDistributedHardware(const std::string &devId, c
         return ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED;
     }
 
-    Remote()->SendRequest(CONFIG_DISTRIBUTED_HARDWARE, data, reply, option);
+    Remote()->SendRequest(static_cast<uint32_t>(IDAudioSourceInterfaceCode::CONFIG_DISTRIBUTED_HARDWARE),
+        data, reply, option);
     int32_t ret = reply.ReadInt32();
     return ret;
 }
@@ -139,7 +143,8 @@ void DAudioSourceProxy::DAudioNotify(const std::string &devId, const std::string
         return;
     }
 
-    Remote()->SendRequest(DAUDIO_NOTIFY, data, reply, option);
+    Remote()->SendRequest(static_cast<uint32_t>(IDAudioSourceInterfaceCode::DAUDIO_NOTIFY),
+        data, reply, option);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

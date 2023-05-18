@@ -38,12 +38,6 @@ enum class IDAudioSinkInterfaceCode : uint32_t {
     UNSUBSCRIBE_LOCAL_HARDWARE = 3,
     DAUDIO_NOTIFY = 4,
 };
-
-/* SAID: 4805 */
-enum IDAudioIpcCBInterfaceCode : uint32_t {
-    NOTIFY_REGRESULT = 0,
-    NOTIFY_UNREGRESULT = 1,
-};
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,14 +25,6 @@ namespace DistributedHardware {
 class IDAudioSource : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.distributedhardware.distributedaudiosource");
-    enum {
-        INIT_SOURCE = 0,
-        RELEASE_SOURCE = 1,
-        REGISTER_DISTRIBUTED_HARDWARE = 2,
-        UNREGISTER_DISTRIBUTED_HARDWARE = 3,
-        CONFIG_DISTRIBUTED_HARDWARE = 4,
-        DAUDIO_NOTIFY = 5,
-    };
 
     ~IDAudioSource() override = default;
     virtual int32_t InitSource(const std::string &params, const sptr<IDAudioIpcCallback> &callback) = 0;
