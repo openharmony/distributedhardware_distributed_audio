@@ -39,11 +39,6 @@ size_t AudioData::Size() const
     return rangeLength_;
 }
 
-size_t AudioData::Offset() const
-{
-    return rangeOffset_;
-}
-
 uint8_t *AudioData::Data() const
 {
     return data_ + rangeOffset_;
@@ -60,19 +55,9 @@ int32_t AudioData::SetRange(size_t offset, size_t size)
     return DH_SUCCESS;
 }
 
-void AudioData::SetInt32(const string name, int32_t value)
-{
-    int32Map_[name] = value;
-}
-
 void AudioData::SetInt64(const string name, int64_t value)
 {
     int64Map_[name] = value;
-}
-
-void AudioData::SetString(const string name, string value)
-{
-    stringMap_[name] = value;
 }
 
 bool AudioData::FindInt32(const string &name, int32_t &value)

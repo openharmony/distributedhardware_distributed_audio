@@ -30,14 +30,11 @@ public:
     ~AudioData();
 
     size_t Size() const;
-    size_t Offset() const;
     size_t Capacity() const;
     uint8_t *Data() const;
     int32_t SetRange(size_t offset, size_t size);
 
-    void SetInt32(const string name, int32_t value);
     void SetInt64(const string name, int64_t value);
-    void SetString(const string name, string value);
     bool FindInt32(const string &name, int32_t &value);
     bool FindInt64(const string &name, int64_t &value);
     bool FindString(const string &name, string &value);
