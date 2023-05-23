@@ -51,8 +51,8 @@ ohos_fuzztest("SourceServiceInitSourceFuzzTest") {
   ]
 
   deps = [
-    "${services_path}/audiomanager/servicesource:distributed_audio_source",
     "${innerkits_path}/native_cpp/audio_source:distributed_audio_source_sdk",
+    "${services_path}/audiomanager/servicesource:distributed_audio_source",
   ]
 
   defines = [
@@ -64,8 +64,8 @@ ohos_fuzztest("SourceServiceInitSourceFuzzTest") {
   external_deps = [
     "c_utils:utils",
     "ipc:ipc_core",
-    "samgr:samgr_proxy",
     "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
   ]
 }
 
