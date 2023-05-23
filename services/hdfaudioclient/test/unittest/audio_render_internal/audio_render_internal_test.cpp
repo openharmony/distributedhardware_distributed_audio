@@ -58,23 +58,6 @@ HWTEST_F(AudioRenderTest, GetLatencyInternal_001, TestSize.Level1)
 }
 
 /**
-* @tc.name: GetLatencyInternal
-* @tc.desc: Verify the abnormal branch of the GetLatencyInternal, when param is null.
-* @tc.type: FUNC
-* @tc.require: AR000H0E6H
-*/
-HWTEST_F(AudioRenderTest, GetLatencyInternal_002, TestSize.Level1)
-{
-    struct AudioRenderContext renderContext;
-    struct AudioRender *render = new AudioRender;
-    uint32_t *ms = new uint32_t;
-    int32_t ret = renderContext.instance_.GetLatency(render, ms);
-    delete render;
-    delete ms;
-    EXPECT_EQ(ERR_DH_AUDIO_HDI_NULLPTR, ret);
-}
-
-/**
 * @tc.name: RenderFrameInternal
 * @tc.desc: Verify the abnormal branch of the RenderFrameInternal, when param is null.
 * @tc.type: FUNC

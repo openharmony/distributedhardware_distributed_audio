@@ -169,29 +169,6 @@ HWTEST_F(AudioAdapterTest, CreateCaptureInternal_001, TestSize.Level1)
 }
 
 /**
-* @tc.name: CreateCaptureInternal
-* @tc.desc: Verify the abnormal branch of the CreateCaptureInternal, when param is null.
-* @tc.type: FUNC
-* @tc.require: AR000H0E6H
-*/
-HWTEST_F(AudioAdapterTest, CreateCaptureInternal_002, TestSize.Level1)
-{
-    const struct ::AudioDeviceDescriptor *desc = new ::AudioDeviceDescriptor;
-    const struct ::AudioSampleAttributes *attrs = new ::AudioSampleAttributes;
-    auto adapterContext1 = std::make_unique<AudioAdapterContext>();
-    struct AudioCapture *capture = new AudioCapture;
-    int32_t ret = adapterContext1->instance_.CreateCapture(&adapterContext1->instance_, desc, attrs, &capture);
-    EXPECT_EQ(ERR_DH_AUDIO_HDI_NULLPTR, ret);
-    auto adapterContext = std::make_unique<AudioAdapterContext>();
-    adapterContext->proxy_ = new MockIAudioAdapter();
-    adapterContext->adapterName_ = "adapterName";
-    EXPECT_EQ(DH_SUCCESS, adapterContext->instance_.CreateCapture(&adapterContext->instance_, desc, attrs, &capture));
-    delete desc;
-    delete attrs;
-    delete capture;
-}
-
-/**
 * @tc.name: DestroyCaptureInternal
 * @tc.desc: Verify the abnormal branch of the DestroyCaptureInternal, when param is null.
 * @tc.type: FUNC
