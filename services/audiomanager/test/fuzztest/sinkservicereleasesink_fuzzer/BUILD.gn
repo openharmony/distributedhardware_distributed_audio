@@ -19,8 +19,7 @@ import("../../../../../distributedaudio.gni")
 ##############################fuzztest##########################################
 ohos_fuzztest("SinkServiceReleaseSinkFuzzTest") {
   module_out_path = "distributed_audio/sinkservicereleasesink_fuzzer"
-  fuzz_config_file =
-      "${services_path}/audiomanager/test/fuzztest/sinkservicereleasesink_fuzzer"
+  fuzz_config_file = "${services_path}/audiomanager/test/fuzztest/sinkservicereleasesink_fuzzer"
 
   cflags = [
     "-g",
@@ -44,8 +43,7 @@ ohos_fuzztest("SinkServiceReleaseSinkFuzzTest") {
     "${services_path}/audiomanager/servicesink/include",
   ]
 
-  deps =
-      [ "${services_path}/audiomanager/servicesink:distributed_audio_sink", ]
+  deps = [ "${services_path}/audiomanager/servicesink:distributed_audio_sink", ]
 
   defines = [
     "HI_LOG_ENABLE",
