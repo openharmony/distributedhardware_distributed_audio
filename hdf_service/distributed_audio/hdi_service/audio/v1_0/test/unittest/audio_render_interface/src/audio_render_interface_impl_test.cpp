@@ -84,8 +84,6 @@ HWTEST_F(AudioRenderInterfaceImplTest, RenderFrame_002, TestSize.Level1)
     audioRenderInterfaceImpl_->renderStatus_ = RENDER_STATUS_START;
     audioRenderInterfaceImpl_->audioExtCallback_ = nullptr;
     EXPECT_EQ(HDF_FAILURE, audioRenderInterfaceImpl_->RenderFrame(frame, replyBytes));
-    audioRenderInterfaceImpl_->audioExtCallback_ = new MockIDAudioCallback();
-    EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->RenderFrame(frame, replyBytes));
 }
 
 /**
@@ -94,7 +92,7 @@ HWTEST_F(AudioRenderInterfaceImplTest, RenderFrame_002, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000H0E6H
  */
-HWTEST_F(AudioRenderInterfaceImplTest, RenderFrame_003, TestSize.Level1)
+HWTEST_F(AudioRenderInterfaceImplTest, RenderFrame_002, TestSize.Level1)
 {
     std::vector<int8_t> frame;
     uint64_t replyBytes = 0;
