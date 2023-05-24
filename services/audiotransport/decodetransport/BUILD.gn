@@ -75,7 +75,7 @@ ohos_shared_library("distributed_audio_decode_transport") {
     "dsoftbus:softbus_client",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
-    "multimedia_player_framework:media_client",
+    "player_framework:media_client",
   ]
 
   defines = [

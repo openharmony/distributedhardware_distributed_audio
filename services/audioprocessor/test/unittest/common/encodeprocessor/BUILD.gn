@@ -58,7 +58,7 @@ ohos_unittest("EncodeProcessTest") {
 
   external_deps = [
     "c_utils:utils",
-    "multimedia_player_framework:media_client",
+    "player_framework:media_client",
   ]
 
   defines = [
