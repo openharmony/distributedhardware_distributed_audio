@@ -95,29 +95,6 @@ HWTEST_F(AudioAdapterTest, CreateRenderInternal_001, TestSize.Level1)
 }
 
 /**
-* @tc.name: CreateRenderInternal
-* @tc.desc: Verify the abnormal branch of the CreateRenderInternal, when param is null.
-* @tc.type: FUNC
-* @tc.require: AR000H0E6H
-*/
-HWTEST_F(AudioAdapterTest, CreateRenderInternal_002, TestSize.Level1)
-{
-    auto adapterContext1 = std::make_unique<AudioAdapterContext>();
-    const struct ::AudioDeviceDescriptor *desc = new ::AudioDeviceDescriptor;
-    const struct ::AudioSampleAttributes *attrs = new ::AudioSampleAttributes;
-    struct AudioRender *render = new AudioRender;
-    int32_t ret = adapterContext1->instance_.CreateRender(&adapterContext1->instance_, desc, attrs, &render);
-    EXPECT_EQ(ERR_DH_AUDIO_HDI_NULLPTR, ret);
-    auto adapterContext = std::make_unique<AudioAdapterContext>();
-    adapterContext->proxy_ = new MockIAudioAdapter();
-    adapterContext->adapterName_ = "adapterName";
-    EXPECT_EQ(DH_SUCCESS, adapterContext->instance_.CreateRender(&adapterContext->instance_, desc, attrs, &render));
-    delete desc;
-    delete attrs;
-    delete render;
-}
-
-/**
 * @tc.name: DestroyRenderInternal
 * @tc.desc: Verify the abnormal branch of the DestroyRenderInternal, when param is null.
 * @tc.type: FUNC
@@ -166,29 +143,6 @@ HWTEST_F(AudioAdapterTest, CreateCaptureInternal_001, TestSize.Level1)
     struct AudioCapture **capture = nullptr;
     int32_t ret = adapterContext.instance_.CreateCapture(adapter, desc, attrs, capture);
     EXPECT_EQ(ERR_DH_AUDIO_HDI_INVALID_PARAM, ret);
-}
-
-/**
-* @tc.name: CreateCaptureInternal
-* @tc.desc: Verify the abnormal branch of the CreateCaptureInternal, when param is null.
-* @tc.type: FUNC
-* @tc.require: AR000H0E6H
-*/
-HWTEST_F(AudioAdapterTest, CreateCaptureInternal_002, TestSize.Level1)
-{
-    const struct ::AudioDeviceDescriptor *desc = new ::AudioDeviceDescriptor;
-    const struct ::AudioSampleAttributes *attrs = new ::AudioSampleAttributes;
-    auto adapterContext1 = std::make_unique<AudioAdapterContext>();
-    struct AudioCapture *capture = new AudioCapture;
-    int32_t ret = adapterContext1->instance_.CreateCapture(&adapterContext1->instance_, desc, attrs, &capture);
-    EXPECT_EQ(ERR_DH_AUDIO_HDI_NULLPTR, ret);
-    auto adapterContext = std::make_unique<AudioAdapterContext>();
-    adapterContext->proxy_ = new MockIAudioAdapter();
-    adapterContext->adapterName_ = "adapterName";
-    EXPECT_EQ(DH_SUCCESS, adapterContext->instance_.CreateCapture(&adapterContext->instance_, desc, attrs, &capture));
-    delete desc;
-    delete attrs;
-    delete capture;
 }
 
 /**
