@@ -1,0 +1,12 @@
+{
+    "process": "daudio",
+    "systemability": [
+        {
+            "name": 4805,
+            "libpath": "libdistributed_audio_source.z.so",
+            "run-on-create": false,
+            "distributed": true,
+            "dump_level": 1
+        }
+    ]
+}
