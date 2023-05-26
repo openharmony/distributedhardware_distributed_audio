@@ -73,6 +73,7 @@ private:
     int32_t EnableDevice(const int32_t dhId, const std::string &capability);
     int32_t DisableDevice(const int32_t dhId);
     void EnqueueThread();
+    void FillJitterQueue();
 
 private:
     static constexpr uint8_t CHANNEL_WAIT_SECONDS = 5;
@@ -80,6 +81,7 @@ private:
     static constexpr size_t DATA_QUEUE_HALF_SIZE = DATA_QUEUE_MAX_SIZE >> 1U;
     static constexpr size_t LOW_LATENCY_DATA_QUEUE_MAX_SIZE = 40;
     static constexpr size_t LOW_LATENCY_DATA_QUEUE_HALF_SIZE = LOW_LATENCY_DATA_QUEUE_MAX_SIZE >> 1U;
+    static constexpr uint32_t MMAP_WAIT_FRAME_US = 5000;
     static constexpr const char* ENQUEUE_THREAD = "micEnqueueTh";
 
     std::string devId_;

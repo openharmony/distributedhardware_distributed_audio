@@ -351,6 +351,7 @@ void DMicDev::EnqueueThread()
     writeIndex_ = 0;
     writeNum_ = 0;
     DHLOGI("Enqueue thread start, lengthPerWrite length: %d.", lengthPerTrans_);
+    FillJitterQueue();
     while (ashmem_ != nullptr && isEnqueueRunning_.load()) {
         int64_t timeOffset = UpdateTimeOffset(frameIndex_, LOW_LATENCY_INTERVAL_NS,
             startTime_);
@@ -381,6 +382,20 @@ void DMicDev::EnqueueThread()
         frameIndex_++;
         AbsoluteSleep(startTime_ + frameIndex_ * LOW_LATENCY_INTERVAL_NS - timeOffset);
     }
+}
+
+void DMicDev::FillJitterQueue()
+{
+    while (true) {
+        {
+            std::lock_guard<std::mutex> lock(dataQueueMtx_);
+            if (dataQueue_.size() >= LOW_LATENCY_DATA_QUEUE_HALF_SIZE) {
+                break;
+            }
+        }
+        usleep(MMAP_WAIT_FRAME_US);
+    }
+    DHLOGI("Mic jitter data queue fill end.");
 }
 
 int32_t DMicDev::MmapStop()
