@@ -85,15 +85,20 @@ int32_t AudioAdapterInterfaceImpl::CreateRender(const AudioDeviceDescriptor &des
             return HDF_FAILURE;
         }
     }
-    renderFlags_ = Audioext::V1_0::NORMAL_MODE;
-    audioRender_ = new AudioRenderInterfaceImpl(adpDescriptor_.adapterName, desc, attrs, extSpkCallback_);
 #ifdef DAUDIO_SUPPORT_EXTENSION
     if (attrs.type == AUDIO_MMAP_NOIRQ) {
         DHLOGI("Try to mmap mode.");
+        renderFlags_ = Audioext::V1_0::MMAP_MODE;
         audioRender_ = new AudioRenderExtImpl();
         audioRender_->SetAttrs(adpDescriptor_.adapterName, desc, attrs, extSpkCallback_);
-        renderFlags_ = Audioext::V1_0::MMAP_MODE;
+    } else {
+        DHLOGI("Try to normal mode.");
+        renderFlags_ = Audioext::V1_0::NORMAL_MODE;
+        audioRender_ = new AudioRenderInterfaceImpl(adpDescriptor_.adapterName, desc, attrs, extSpkCallback_);
     }
+#else
+    renderFlags_ = Audioext::V1_0::NORMAL_MODE;
+    audioRender_ = new AudioRenderInterfaceImpl(adpDescriptor_.adapterName, desc, attrs, extSpkCallback_);
 #endif
     if (audioRender_ == nullptr) {
         DHLOGE("Create render failed.");
@@ -145,15 +150,20 @@ int32_t AudioAdapterInterfaceImpl::CreateCapture(const AudioDeviceDescriptor &de
             return HDF_FAILURE;
         }
     }
-    capturerFlags_ = Audioext::V1_0::NORMAL_MODE;
-    audioCapture_ = new AudioCaptureInterfaceImpl(adpDescriptor_.adapterName, desc, attrs, extMicCallback_);
 #ifdef DAUDIO_SUPPORT_EXTENSION
     if (attrs.type == AUDIO_MMAP_NOIRQ) {
         DHLOGI("Try to mmap mode.");
+        capturerFlags_ = Audioext::V1_0::MMAP_MODE;
         audioCapture_ = new AudioCaptureExtImpl();
         audioCapture_->SetAttrs(adpDescriptor_.adapterName, desc, attrs, extMicCallback_);
-        capturerFlags_ = Audioext::V1_0::MMAP_MODE;
+    } else {
+        DHLOGI("Try to normal mode.");
+        capturerFlags_ = Audioext::V1_0::NORMAL_MODE;
+        audioCapture_ = new AudioCaptureInterfaceImpl(adpDescriptor_.adapterName, desc, attrs, extMicCallback_);
     }
+#else
+    capturerFlags_ = Audioext::V1_0::NORMAL_MODE;
+    audioCapture_ = new AudioCaptureInterfaceImpl(adpDescriptor_.adapterName, desc, attrs, extMicCallback_);
 #endif
     if (audioCapture_ == nullptr) {
         DHLOGE("Create capture failed.");
