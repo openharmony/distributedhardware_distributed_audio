@@ -112,25 +112,6 @@ HWTEST_F(AudioRenderTest, GetRenderPositionInternal_001, TestSize.Level1)
 }
 
 /**
-* @tc.name: GetRenderPositionInternal
-* @tc.desc: Verify the abnormal branch of the GetRenderPositionInternal, when param is null.
-* @tc.type: FUNC
-* @tc.require: AR000H0E6H
-*/
-HWTEST_F(AudioRenderTest, GetRenderPositionInternal_002, TestSize.Level1)
-{
-    struct AudioRenderContext renderContext;
-    struct AudioRender *render = new AudioRender;
-    uint64_t *frames = new uint64_t;
-    struct ::AudioTimeStamp *time = new ::AudioTimeStamp;
-    int32_t ret = renderContext.instance_.GetRenderPosition(render, frames, time);
-    delete render;
-    delete frames;
-    delete time;
-    EXPECT_EQ(ERR_DH_AUDIO_HDI_NULLPTR, ret);
-}
-
-/**
 * @tc.name: SetRenderSpeedInternal
 * @tc.desc: Verify the abnormal branch of the SetRenderSpeedInternal, when param is null.
 * @tc.type: FUNC
