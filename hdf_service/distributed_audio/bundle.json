@@ -21,7 +21,7 @@
           "hiviewdfx_hilog_native",
           "c_utils"
         ],
-        "third_part": [
+        "third_party": [
           "bounds_checking_function"
         ]
       },
