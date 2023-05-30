@@ -17,13 +17,11 @@
         "deps": {
             "components": [
                 "ipc",
-                "device_driver_framwork",
+                "hdf_core",
                 "hiviewdfx_hilog_native",
                 "c_utils"
             ],
-            "third_party": [
-                "bounds_checking_function"
-            ]
+            "third_party": []
         },
         "build": {
             "sub_component": [
