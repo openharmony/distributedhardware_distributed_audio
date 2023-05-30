@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef SINKSERVICEINITSINK_FUZZER_H
-#define SINKSERVICEINITSINK_FUZZER_H
+#ifndef AUDIODATASETINIT64_FUZZER_H
+#define AUDIODATASETINIT64_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "sinkserviceinitsink_fuzzer"
+#define FUZZ_PROJECT_NAME "audiodatasetinit64_fuzzer"
 
 #endif
