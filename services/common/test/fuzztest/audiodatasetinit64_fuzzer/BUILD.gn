@@ -30,8 +30,7 @@ ohos_fuzztest("AudioDataInit64FuzzTest") {
   ]
   sources = [ "audiodatasetinit64_fuzzer.cpp" ]
 
-  include_dirs = [
-  ]
+  include_dirs = []
 
   include_dirs += [
     "include",
