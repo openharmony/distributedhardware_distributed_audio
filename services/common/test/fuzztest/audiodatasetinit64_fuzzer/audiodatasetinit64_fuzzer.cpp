@@ -13,29 +13,28 @@
  * limitations under the License.
  */
 
-#include "sinkservicereleasesink_fuzzer.h"
+#include "audiodatasetinit64_fuzzer.h"
 
 #include <cstddef>
 #include <cstdint>
 
-#include "daudio_sink_service.h"
+#include "audio_data.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-void SinkServiceReleaseSinkFuzzTest(const uint8_t* data, size_t size)
+void AudioDataInit64FuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < (sizeof(int32_t)))) {
+    if ((data == nullptr) || (size < (sizeof(int64_t)))) {
         return;
     }
-
-    int32_t saId = *(reinterpret_cast<const int32_t*>(data));
-    bool runOnCreate = *(reinterpret_cast<const bool*>(data));
     
-    auto dAudioSinkService = std::make_shared<DAudioSinkService>(saId, runOnCreate);
-
-    dAudioSinkService->ReleaseSink();
+    size_t capacity = 4096;
+    int64_t value = *(reinterpret_cast<const int64_t*>(data));
+    std::string name(reinterpret_cast<const char*>(data), size);
+    std::shared_ptr<AudioData> audioData = std::make_shared<AudioData>(capacity);
+    audioData->SetInt64(name, value);
 }
 }
 }
@@ -44,7 +43,7 @@ void SinkServiceReleaseSinkFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DistributedHardware::SinkServiceReleaseSinkFuzzTest(data, size);
+    OHOS::DistributedHardware::AudioDataInit64FuzzTest(data, size);
     return 0;
 }
 

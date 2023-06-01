@@ -101,7 +101,7 @@ HWTEST_F(AudioDataTest, FindInt64_001, TestSize.Level1)
 {
     const std::string name = "name";
     int64_t value = 1;
-    audioData->int64Map_.insert(std::make_pair(name, value));
+    audioData->SetInt64(name, value);
     EXPECT_EQ(true, audioData->FindInt64(name, value));
 }
 
