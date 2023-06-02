@@ -295,5 +295,20 @@ bool CheckIsNum(const std::string &jsonString)
     }
     return true;
 }
+
+bool CheckDevIdIsLegal(const std::string &devId)
+{
+    if (devId.empty() || devId.size() > DAUDIO_MAX_DEVICE_ID_LEN) {
+        DHLOGE("DevId size %d, is zero or too long.", devId.size());
+        return false;
+    }
+    for (char const &c : devId) {
+        if (!std::isalnum(c)) {
+            DHLOGE("DevId is not number or letter.");
+            return false;
+        }
+    }
+    return true;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

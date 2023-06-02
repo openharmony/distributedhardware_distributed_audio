@@ -46,6 +46,7 @@ int64_t CalculateOffset(const int64_t frameIndex, const int64_t framePeriodNs, c
 int64_t UpdateTimeOffset(const int64_t frameIndex, const int64_t framePeriodNs, int64_t &startTime);
 void GetCurrentTime(int64_t &tvSec, int64_t &tvNSec);
 bool CheckIsNum(const std::string &jsonString);
+bool CheckDevIdIsLegal(const std::string &devId);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DAUDIO_UTIL_H
