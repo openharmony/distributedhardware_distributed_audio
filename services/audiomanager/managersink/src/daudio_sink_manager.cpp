@@ -93,7 +93,7 @@ int32_t DAudioSinkManager::HandleDAudioNotify(const std::string &devId, const st
     DHLOGI("Receive audio event from devId: %s, event type: %d.", GetAnonyString(devId).c_str(), eventType);
 
     if (eventContent.length() > DAUDIO_MAX_JSON_LEN || eventContent.empty() || !CheckIsNum(dhId)
-        || !CheckDevIdIsLegal(devId)) {
+        || !CheckDevIdIsLegal(devId) || eventType < 0 || eventType > MAX_EVENT_TYPE_NUM) {
         return ERR_DH_AUDIO_FAILED;
     }
 

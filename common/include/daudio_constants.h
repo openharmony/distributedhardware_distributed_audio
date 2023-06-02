@@ -51,6 +51,7 @@ constexpr int32_t PIN_IN_MIC = 1 << 27 | 1 << 0;
 
 constexpr int32_t NONE_ITEM = 0;
 constexpr int32_t SINGLE_ITEM = 1;
+constexpr int32_t MAX_EVENT_TYPE_NUM = 100;
 
 constexpr uint32_t SAMPLE_RATE_DEFAULT = 48000;
 constexpr uint32_t CHANNEL_COUNT_DEFAULT = 2;
