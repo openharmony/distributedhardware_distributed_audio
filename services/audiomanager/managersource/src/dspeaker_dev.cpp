@@ -361,6 +361,7 @@ void DSpeakerDev::EnqueueThread()
 {
     readIndex_ = 0;
     readNum_ = 0;
+    frameIndex_ = 0;
     DHLOGI("Enqueue thread start, lengthPerRead length: %d.", lengthPerTrans_);
     while (ashmem_ != nullptr && isEnqueueRunning_.load()) {
         int64_t timeOffset = UpdateTimeOffset(frameIndex_, LOW_LATENCY_INTERVAL_NS,
