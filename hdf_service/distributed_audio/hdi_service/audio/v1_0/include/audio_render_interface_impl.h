@@ -113,7 +113,7 @@ private:
     AudioRenderStatus renderStatus_ = RENDER_STATUS_CLOSE;
     sptr<IDAudioCallback> audioExtCallback_ = nullptr;
     sptr<IAudioCallback> renderCallback_ = nullptr;
-    bool firstOpenFlag = true;
+    bool firstOpenFlag_ = true;
 
     int64_t frameIndex_ = 0;
     int64_t framePeriodNs_ = 0;

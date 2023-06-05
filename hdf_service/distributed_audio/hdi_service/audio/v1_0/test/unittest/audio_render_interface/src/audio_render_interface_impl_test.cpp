@@ -217,7 +217,7 @@ HWTEST_F(AudioRenderInterfaceImplTest, Start_001, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, Start_002, TestSize.Level1)
 {
-    audioRenderInterfaceImpl_->firstOpenFlag = false;
+    audioRenderInterfaceImpl_->firstOpenFlag_ = false;
     audioRenderInterfaceImpl_->audioExtCallback_ = new MockIDAudioCallback();
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->Start());
 }
@@ -230,7 +230,7 @@ HWTEST_F(AudioRenderInterfaceImplTest, Start_002, TestSize.Level1)
  */
 HWTEST_F(AudioRenderInterfaceImplTest, Start_003, TestSize.Level1)
 {
-    audioRenderInterfaceImpl_->firstOpenFlag = false;
+    audioRenderInterfaceImpl_->firstOpenFlag_ = false;
     audioRenderInterfaceImpl_->audioExtCallback_ = new MockRevertIDAudioCallback();
     EXPECT_EQ(HDF_SUCCESS, audioRenderInterfaceImpl_->Start());
 }

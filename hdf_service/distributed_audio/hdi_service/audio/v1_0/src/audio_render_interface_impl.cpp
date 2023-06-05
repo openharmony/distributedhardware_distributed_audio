@@ -181,8 +181,8 @@ int32_t AudioRenderInterfaceImpl::IsSupportsDrain(bool &support)
 int32_t AudioRenderInterfaceImpl::Start()
 {
     DHLOGI("Start render.");
-    if (firstOpenFlag) {
-        firstOpenFlag = false;
+    if (firstOpenFlag_) {
+        firstOpenFlag_ = false;
     } else {
         DAudioEvent event = { HDF_AUDIO_EVENT_CHANGE_PLAY_STATUS, HDF_EVENT_RESTART };
         int32_t ret = audioExtCallback_->NotifyEvent(adapterName_, devDesc_.pins, event);
