@@ -298,6 +298,58 @@ HWTEST_F(DAudioSourceDevTest, HandleNotifyRPC_003, TestSize.Level1)
 }
 
 /**
+ * @tc.name: HandleSpkMmapStart_001
+ * @tc.desc: Verify the HandleSpkMmapStart function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, HandleSpkMmapStart_001, TestSize.Level1)
+{
+    AudioEvent event;
+    sourceDev_->speaker_ = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleSpkMmapStart(event));
+}
+
+/**
+ * @tc.name: HandleSpkMmapStop_001
+ * @tc.desc: Verify the HandleSpkMmapStop function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, HandleSpkMmapStop_001, TestSize.Level1)
+{
+    AudioEvent event;
+    sourceDev_->speaker_ = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleSpkMmapStop(event));
+}
+
+/**
+ * @tc.name: HandleMicMmapStart_001
+ * @tc.desc: Verify the HandleMicMmapStart function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, HandleMicMmapStart_001, TestSize.Level1)
+{
+    AudioEvent event;
+    sourceDev_->mic_ = std::make_shared<DMicDev>(DEV_ID, sourceDev_);
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleMicMmapStart(event));
+}
+
+/**
+ * @tc.name: HandleMicMmapStop_001
+ * @tc.desc: Verify the HandleMicMmapStop function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, HandleMicMmapStop_001, TestSize.Level1)
+{
+    AudioEvent event;
+    sourceDev_->mic_ = std::make_shared<DMicDev>(DEV_ID, sourceDev_);
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleMicMmapStop(event));
+}
+
+/**
  * @tc.name: TaskEnableDAudio_001
  * @tc.desc: Verify the TaskEnableDAudio function.
  * @tc.type: FUNC
@@ -640,6 +692,64 @@ HWTEST_F(DAudioSourceDevTest, TaskChangeRenderState_001, TestSize.Level1)
 {
     EXPECT_NE(DH_SUCCESS, sourceDev_->TaskChangeRenderState(ARGS));
 }
+
+/**
+ * @tc.name: TaskPlayStatusChange
+ * @tc.desc: Verify the TaskPlayStatusChange function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, TaskPlayStatusChange_001, TestSize.Level1)
+{
+    sourceDev_->audioCtrlMgr_ = std::make_shared<DAudioSourceDevCtrlMgr>(DEV_ID, sourceDev_);
+    EXPECT_NE(DH_SUCCESS, sourceDev_->TaskPlayStatusChange(AUDIO_EVENT_PAUSE));
+    EXPECT_NE(DH_SUCCESS, sourceDev_->TaskPlayStatusChange(AUDIO_EVENT_RESTART));
+}
+
+/**
+ * @tc.name: TaskSpkMmapStart
+ * @tc.desc: Verify the TaskSpkMmapStart function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, TaskSpkMmapStart_001, TestSize.Level1)
+{
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskSpkMmapStart(ARGS));
+}
+
+/**
+ * @tc.name: TaskSpkMmapStop
+ * @tc.desc: Verify the TaskSpkMmapStop function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, TaskSpkMmapStop_001, TestSize.Level1)
+{
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskSpkMmapStop(ARGS));
+}
+
+/**
+ * @tc.name: TaskMicMmapStart
+ * @tc.desc: Verify the TaskMicMmapStart function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, TaskMicMmapStart_001, TestSize.Level1)
+{
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskMicMmapStart(ARGS));
+}
+
+/**
+ * @tc.name: TaskMicMmapStop
+ * @tc.desc: Verify the TaskMicMmapStop function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, TaskMicMmapStop_001, TestSize.Level1)
+{
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskMicMmapStop(ARGS));
+}
+
 
 /**
  * @tc.name: NotifyHDF_001

@@ -66,6 +66,11 @@ private:
     int32_t TaskChangeVolume(const std::string &args);
     int32_t TaskChangeFocus(const std::string &args);
     int32_t TaskChangeRenderState(const std::string &args);
+    int32_t TaskPlayStatusChange(const std::string &args);
+    int32_t TaskSpkMmapStart(const std::string &args);
+    int32_t TaskSpkMmapStop(const std::string &args);
+    int32_t TaskMicMmapStart(const std::string &args);
+    int32_t TaskMicMmapStop(const std::string &args);
 
     void OnDisableTaskResult(int32_t resultCode, const std::string &result, const std::string &funcName);
     void OnEnableTaskResult(int32_t resultCode, const std::string &result, const std::string &funcName);

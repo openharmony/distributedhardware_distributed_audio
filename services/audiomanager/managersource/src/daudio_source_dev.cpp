@@ -366,88 +366,61 @@ int32_t DAudioSourceDev::HandleRenderStateChange(const AudioEvent &event)
 int32_t DAudioSourceDev::HandlePlayStatusChange(const AudioEvent &event)
 {
     DHLOGI("Play status change, content: %s.", event.content.c_str());
-    if (audioCtrlMgr_ == nullptr) {
-        DHLOGE("Audio ctrl mgr not init.");
+    if (taskQueue_ == nullptr) {
+        DHLOGE("Task queue is null.");
         return ERR_DH_AUDIO_NULLPTR;
     }
-    AudioEvent audioEvent(CHANGE_PLAY_STATUS, event.content);
-    int32_t ret = audioCtrlMgr_->SendAudioEvent(audioEvent);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Play status change failed.");
-    }
-
-    if (event.content == AUDIO_EVENT_RESTART) {
-        ret = speaker_->Restart();
-        if (ret != DH_SUCCESS) {
-            DHLOGE("Speaker restart failed.");
-        }
-        return ret;
-    } else if (event.content == AUDIO_EVENT_PAUSE) {
-        ret = speaker_->Pause();
-        if (ret != DH_SUCCESS) {
-            DHLOGE("Speaker Pause failed.");
-        }
-        return ret;
-    } else {
-        DHLOGE("Play status error.");
-        return ERR_DH_AUDIO_FAILED;
-    }
+    auto task = GenerateTask(this, &DAudioSourceDev::TaskPlayStatusChange, event.content, "play state change",
+        &DAudioSourceDev::OnTaskResult);
+    return taskQueue_->Produce(task);
 }
 
 int32_t DAudioSourceDev::HandleSpkMmapStart(const AudioEvent &event)
 {
     DHLOGI("Spk mmap start, content: %s.", event.content.c_str());
-    if (speaker_ == nullptr) {
-        DHLOGE("Spk mmap start, speaker is nullptr.");
+    if (taskQueue_ == nullptr) {
+        DHLOGE("Task queue is null.");
         return ERR_DH_AUDIO_NULLPTR;
     }
-    int32_t ret = speaker_->MmapStart();
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Spk mmap start fail, error code: %d.", ret);
-    }
-    return ret;
+    auto task = GenerateTask(this, &DAudioSourceDev::TaskSpkMmapStart, event.content, "spk mmap start",
+        &DAudioSourceDev::OnTaskResult);
+    return taskQueue_->Produce(task);
 }
 
 int32_t DAudioSourceDev::HandleSpkMmapStop(const AudioEvent &event)
 {
     DHLOGI("Spk mmap stop, content: %s.", event.content.c_str());
-    if (speaker_ == nullptr) {
-        DHLOGE("Spk mmap stop, speaker is nullptr.");
+    if (taskQueue_ == nullptr) {
+        DHLOGE("Task queue is null.");
         return ERR_DH_AUDIO_NULLPTR;
     }
-    int32_t ret = speaker_->MmapStop();
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Spk mmap stop fail, error code: %d.", ret);
-    }
-    return ret;
+    auto task = GenerateTask(this, &DAudioSourceDev::TaskSpkMmapStop, event.content, "spk mmap stop",
+        &DAudioSourceDev::OnTaskResult);
+    return taskQueue_->Produce(task);
 }
 
 int32_t DAudioSourceDev::HandleMicMmapStart(const AudioEvent &event)
 {
     DHLOGI("Mic mmap start, content: %s.", event.content.c_str());
-    if (mic_ == nullptr) {
-        DHLOGE("Mic mmap start, speaker is nullptr.");
+    if (taskQueue_ == nullptr) {
+        DHLOGE("Task queue is null.");
         return ERR_DH_AUDIO_NULLPTR;
     }
-    int32_t ret = mic_ ->MmapStart();
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Mic mmap start fail, error code: %d.", ret);
-    }
-    return ret;
+    auto task = GenerateTask(this, &DAudioSourceDev::TaskMicMmapStart, event.content, "mic mmap start",
+        &DAudioSourceDev::OnTaskResult);
+    return taskQueue_->Produce(task);
 }
 
 int32_t DAudioSourceDev::HandleMicMmapStop(const AudioEvent &event)
 {
     DHLOGI("Mic mmap stop, content: %s.", event.content.c_str());
-    if (mic_ == nullptr) {
-        DHLOGE("mic mmap stop, speaker is nullptr.");
+    if (taskQueue_ == nullptr) {
+        DHLOGE("Task queue is null.");
         return ERR_DH_AUDIO_NULLPTR;
     }
-    int32_t ret = mic_ ->MmapStop();
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Mic mmap stop fail, error code: %d.", ret);
-    }
-    return ret;
+    auto task = GenerateTask(this, &DAudioSourceDev::TaskMicMmapStop, event.content, "mic mmap stop",
+        &DAudioSourceDev::OnTaskResult);
+    return taskQueue_->Produce(task);
 }
 
 int32_t DAudioSourceDev::WaitForRPC(const AudioEventType type)
@@ -866,6 +839,94 @@ int32_t DAudioSourceDev::TaskChangeRenderState(const std::string &args)
 {
     DHLOGI("Task change render state, args: %s.", args.c_str());
     return NotifyHDF(AudioEventType::AUDIO_RENDER_STATE_CHANGE, args);
+}
+
+
+int32_t DAudioSourceDev::TaskPlayStatusChange(const std::string &args)
+{
+    DHLOGI("Task play status change, content: %s.", args.c_str());
+    if (audioCtrlMgr_ == nullptr) {
+        DHLOGE("Audio ctrl mgr not init.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    AudioEvent audioEvent(CHANGE_PLAY_STATUS, args);
+    int32_t ret = audioCtrlMgr_->SendAudioEvent(audioEvent);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Task Play status change failed.");
+    }
+
+    if (args == AUDIO_EVENT_RESTART) {
+        ret = speaker_->Restart();
+        if (ret != DH_SUCCESS) {
+            DHLOGE("Speaker restart failed.");
+        }
+        return ret;
+    } else if (args == AUDIO_EVENT_PAUSE) {
+        ret = speaker_->Pause();
+        if (ret != DH_SUCCESS) {
+            DHLOGE("Speaker Pause failed.");
+        }
+        return ret;
+    } else {
+        DHLOGE("Play status error.");
+        return ERR_DH_AUDIO_FAILED;
+    }
+}
+
+int32_t DAudioSourceDev::TaskSpkMmapStart(const std::string &args)
+{
+    DHLOGI("Task spk mmap start, content: %s.", args.c_str());
+    if (speaker_ == nullptr) {
+        DHLOGE("Task spk mmap start, speaker is nullptr.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    int32_t ret = speaker_->MmapStart();
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Task spk mmap start fail, error code: %d.", ret);
+    }
+    return ret;
+}
+
+int32_t DAudioSourceDev::TaskSpkMmapStop(const std::string &args)
+{
+    DHLOGI("Task spk mmap stop, content: %s.", args.c_str());
+    if (speaker_ == nullptr) {
+        DHLOGE("Task spk mmap stop, speaker is nullptr.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    int32_t ret = speaker_->MmapStop();
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Task spk mmap stop fail, error code: %d.", ret);
+    }
+    return ret;
+}
+
+int32_t DAudioSourceDev::TaskMicMmapStart(const std::string &args)
+{
+    DHLOGI("Task mic mmap start, content: %s.", args.c_str());
+    if (mic_ == nullptr) {
+        DHLOGE("Task mic mmap start, speaker is nullptr.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    int32_t ret = mic_->MmapStart();
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Task mic mmap start fail, error code: %d.", ret);
+    }
+    return ret;
+}
+
+int32_t DAudioSourceDev::TaskMicMmapStop(const std::string &args)
+{
+    DHLOGI("Task mic mmap stop, content: %s.", args.c_str());
+    if (mic_ == nullptr) {
+        DHLOGE("Task mic mmap stop, speaker is nullptr.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    int32_t ret = mic_->MmapStop();
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Task mic mmap stop fail, error code: %d.", ret);
+    }
+    return ret;
 }
 
 void DAudioSourceDev::OnTaskResult(int32_t resultCode, const std::string &result, const std::string &funcName)
