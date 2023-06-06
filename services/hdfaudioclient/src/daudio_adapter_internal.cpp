@@ -342,7 +342,7 @@ static void ConvertAudioRouteNodeToHAL(const ::AudioRouteNode &node, AudioRouteN
     halNode.portId = node.portId;
     halNode.role = static_cast<AudioPortRole>(node.role);
     halNode.type = static_cast<AudioPortType>(node.type);
-    DHLOGI("Convert audio route node To HAL, portId: %d role: %d type: %d.", halNode.portId, halNode.role,
+    DHLOGD("Convert audio route node To HAL, portId: %d role: %d type: %d.", halNode.portId, halNode.role,
         halNode.type);
 
     switch (node.type) {
@@ -363,17 +363,17 @@ static void ConvertAudioRouteNodeToHAL(const ::AudioRouteNode &node, AudioRouteN
             halNode.ext.mix.moduleId = node.ext.mix.moduleId;
             halNode.ext.mix.streamId = node.ext.mix.streamId;
 
-            DHLOGI("Convert audio route node To HAL, [Mix] moduleId: %d streamId: %d.",
+            DHLOGD("Convert audio route node To HAL, [Mix] moduleId: %d streamId: %d.",
                 halNode.ext.mix.moduleId, halNode.ext.mix.streamId);
             break;
         }
         case AUDIO_PORT_SESSION_TYPE: {
             halNode.ext.session.sessionType = static_cast<AudioSessionType>(node.ext.session.sessionType);
-            DHLOGI("Convert audio route node To HAL, [Session] sessionType: %d.", halNode.ext.session.sessionType);
+            DHLOGD("Convert audio route node To HAL, [Session] sessionType: %d.", halNode.ext.session.sessionType);
             break;
         }
         default :
-            DHLOGI("Unknown node Type");
+            DHLOGD("Unknown node Type");
     }
 }
 static int32_t UpdateAudioRouteInternal(struct AudioAdapter *adapter, const struct ::AudioRoute *route,

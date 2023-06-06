@@ -57,7 +57,7 @@ static void AudioOnQosEvent(int sessionId, int eventId, int tvCount, const QosTv
 
 SoftbusAdapter::SoftbusAdapter()
 {
-    DHLOGI("Softbus adapter constructed.");
+    DHLOGD("Softbus adapter constructed.");
     sessListener_.OnSessionOpened = AudioOnSoftbusSessionOpened;
     sessListener_.OnSessionClosed = AudioOnSoftbusSessionClosed;
     sessListener_.OnBytesReceived = AudioOnBytesReceived;
@@ -68,7 +68,7 @@ SoftbusAdapter::SoftbusAdapter()
 
 SoftbusAdapter::~SoftbusAdapter()
 {
-    DHLOGI("Softbus adapter destructed.");
+    DHLOGD("Softbus adapter destructed.");
 }
 
 int32_t SoftbusAdapter::CreateSoftbusSessionServer(const std::string &pkgName, const std::string &sessionName,
@@ -83,7 +83,7 @@ int32_t SoftbusAdapter::CreateSoftbusSessionServer(const std::string &pkgName, c
             return ret;
         }
     } else {
-        DHLOGI("Session is already created.");
+        DHLOGD("Session is already created.");
         return DH_SUCCESS;
     }
 
@@ -226,7 +226,7 @@ int32_t SoftbusAdapter::OnSoftbusSessionOpened(int32_t sessionId, int32_t result
 
     std::lock_guard<std::mutex> lisLock(listenerMtx_);
     if (mapListenersI_.empty()) {
-        DHLOGI("Start softbus send thread.");
+        DHLOGD("Start softbus send thread.");
         isSessionOpened_.store(true);
         sendDataThread_ = std::thread(&SoftbusAdapter::SendAudioData, this);
         if (pthread_setname_np(sendDataThread_.native_handle(), SENDDATA_THREAD) != DH_SUCCESS) {
@@ -294,12 +294,12 @@ void SoftbusAdapter::OnStreamReceived(int32_t sessionId, const StreamData *data,
 
 void SoftbusAdapter::OnMessageReceived(int sessionId, const void *data, unsigned int dataLen)
 {
-    DHLOGI("On message received, sessionId: %d.", sessionId);
+    DHLOGD("On message received, sessionId: %d.", sessionId);
 }
 
 void SoftbusAdapter::OnQosEvent(int sessionId, int eventId, int tvCount, const QosTv *tvList)
 {
-    DHLOGI("On qos event received, sessionId: %d.", sessionId);
+    DHLOGD("On qos event received, sessionId: %d.", sessionId);
 }
 
 std::shared_ptr<ISoftbusListener> &SoftbusAdapter::GetSoftbusListenerByName(int32_t sessionId)

@@ -36,7 +36,7 @@ constexpr uint32_t MAX_DISTRIBUTED_HAREWARE_ID_LENGTH = 100;
 IMPLEMENT_SINGLE_INSTANCE(DAudioSourceManager);
 DAudioSourceManager::DAudioSourceManager()
 {
-    DHLOGI("Distributed audio source manager constructed.");
+    DHLOGD("Distributed audio source manager constructed.");
 }
 
 DAudioSourceManager::~DAudioSourceManager()
@@ -44,7 +44,7 @@ DAudioSourceManager::~DAudioSourceManager()
     if (devClearThread_.joinable()) {
         devClearThread_.join();
     }
-    DHLOGI("Distributed audio source manager destructed.");
+    DHLOGD("Distributed audio source manager destructed.");
 }
 
 int32_t DAudioSourceManager::Init(const sptr<IDAudioIpcCallback> &callback)
@@ -96,7 +96,7 @@ int32_t DAudioSourceManager::UnInit()
 
 static bool CheckParams(const std::string &devId, const std::string &dhId)
 {
-    DHLOGI("Checking oarams of daudio.");
+    DHLOGD("Checking oarams of daudio.");
     if (devId.empty() || dhId.empty() ||
         devId.size() > MAX_DEVICE_ID_LENGTH || dhId.size() > MAX_DISTRIBUTED_HAREWARE_ID_LENGTH) {
         return false;
@@ -149,7 +149,7 @@ int32_t DAudioSourceManager::DisableDAudio(const std::string &devId, const std::
 int32_t DAudioSourceManager::HandleDAudioNotify(const std::string &devId, const std::string &dhId,
     const int32_t eventType, const std::string &eventContent)
 {
-    DHLOGI("Handle distributed audio notify, devId: %s, dhId: %s, eventType: %d.", GetAnonyString(devId).c_str(),
+    DHLOGD("Handle distributed audio notify, devId: %s, dhId: %s, eventType: %d.", GetAnonyString(devId).c_str(),
         dhId.c_str(), eventType);
     if (eventContent.length() > DAUDIO_MAX_JSON_LEN || eventContent.empty()) {
         return ERR_DH_AUDIO_FAILED;
@@ -157,7 +157,7 @@ int32_t DAudioSourceManager::HandleDAudioNotify(const std::string &devId, const 
 
     json jParam = json::parse(eventContent, nullptr, false);
     if (JsonParamCheck(jParam, { KEY_RANDOM_TASK_CODE })) {
-        DHLOGI("Receive audio notify from sink, random task code: %s",
+        DHLOGD("Receive audio notify from sink, random task code: %s",
             ((std::string)jParam[KEY_RANDOM_TASK_CODE]).c_str());
     }
 
@@ -176,7 +176,7 @@ int32_t DAudioSourceManager::HandleDAudioNotify(const std::string &devId, const 
 int32_t DAudioSourceManager::DAudioNotify(const std::string &devId, const std::string &dhId, const int32_t eventType,
     const std::string &eventContent)
 {
-    DHLOGI("Distributed audio notify, devId: %s, dhId: %s, eventType: %d.", GetAnonyString(devId).c_str(),
+    DHLOGD("Distributed audio notify, devId: %s, dhId: %s, eventType: %d.", GetAnonyString(devId).c_str(),
         dhId.c_str(), eventType);
     {
         std::lock_guard<std::mutex> lck(remoteSvrMutex_);

@@ -86,7 +86,7 @@ int32_t TaskQueue::Produce(std::shared_ptr<TaskImplInterface> &task)
     }
     std::lock_guard<std::mutex> lck(taskQueueMutex_);
     if (taskQueue_.size() >= maxSize_) {
-        DHLOGI("task queue is full, size: %zu", taskQueue_.size());
+        DHLOGD("task queue is full, size: %zu", taskQueue_.size());
         return ERR_DH_AUDIO_SA_TASKQUEUE_FULL;
     }
     taskQueue_.push(task);

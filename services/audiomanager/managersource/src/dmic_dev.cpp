@@ -138,7 +138,7 @@ int32_t DMicDev::CloseDevice(const std::string &devId, const int32_t dhId)
 
 int32_t DMicDev::SetParameters(const std::string &devId, const int32_t dhId, const AudioParamHDF &param)
 {
-    DHLOGI("Set mic parameters {samplerate: %d, channelmask: %d, format: %d, period: %d, "
+    DHLOGD("Set mic parameters {samplerate: %d, channelmask: %d, format: %d, period: %d, "
         "framesize: %d, ext{%s}}.",
         param.sampleRate, param.channelMask, param.bitFormat, param.period, param.frameSize,
         param.ext.c_str());
@@ -157,7 +157,7 @@ int32_t DMicDev::SetParameters(const std::string &devId, const int32_t dhId, con
 
 int32_t DMicDev::NotifyEvent(const std::string &devId, const int32_t dhId, const AudioEvent &event)
 {
-    DHLOGI("Notify mic event, type: %d.", event.type);
+    DHLOGD("Notify mic event, type: %d.", event.type);
     std::shared_ptr<IAudioEventCallback> cbObj = audioEventCallback_.lock();
     if (cbObj == nullptr) {
         DHLOGE("Event callback is null");
@@ -281,7 +281,7 @@ int32_t DMicDev::ReadStreamData(const std::string &devId, const int32_t dhId, st
     if (insertFrameCnt_ >= queSize || queSize == 0) {
         ++insertFrameCnt_;
         isExistedEmpty_.store(true);
-        DHLOGI("Data queue is empty, count :%u.", insertFrameCnt_);
+        DHLOGD("Data queue is empty, count :%u.", insertFrameCnt_);
         data = std::make_shared<AudioData>(param_.comParam.frameSize);
     } else {
         while (insertFrameCnt_ > 0) {
@@ -298,7 +298,7 @@ int32_t DMicDev::ReadStreamData(const std::string &devId, const int32_t dhId, st
 int32_t DMicDev::ReadMmapPosition(const std::string &devId, const int32_t dhId,
     uint64_t &frames, CurrentTimeHDF &time)
 {
-    DHLOGI("Read mmap position. frames: %lu, tvsec: %lu, tvNSec:%lu",
+    DHLOGD("Read mmap position. frames: %lu, tvsec: %lu, tvNSec:%lu",
         writeNum_, writeTvSec_, writeTvNSec_);
     frames = writeNum_;
     time.tvSec = writeTvSec_;
@@ -309,16 +309,16 @@ int32_t DMicDev::ReadMmapPosition(const std::string &devId, const int32_t dhId,
 int32_t DMicDev::RefreshAshmemInfo(const std::string &devId, const int32_t dhId,
     int32_t fd, int32_t ashmemLength, int32_t lengthPerTrans)
 {
-    DHLOGI("RefreshAshmemInfo: fd:%d, ashmemLength: %d, lengthPerTrans: %d", fd, ashmemLength, lengthPerTrans);
+    DHLOGD("RefreshAshmemInfo: fd:%d, ashmemLength: %d, lengthPerTrans: %d", fd, ashmemLength, lengthPerTrans);
     if (param_.captureOpts.capturerFlags == MMAP_MODE) {
-        DHLOGI("DMic dev low-latency mode");
+        DHLOGD("DMic dev low-latency mode");
         if (ashmem_ != nullptr) {
             return DH_SUCCESS;
         }
         ashmem_ = new Ashmem(fd, ashmemLength);
         ashmemLength_ = ashmemLength;
         lengthPerTrans_ = lengthPerTrans;
-        DHLOGI("Create ashmem success. fd:%d, ashmem length: %d, lengthPreTrans: %d",
+        DHLOGD("Create ashmem success. fd:%d, ashmem length: %d, lengthPreTrans: %d",
             fd, ashmemLength_, lengthPerTrans_);
         bool mapRet = ashmem_->MapReadAndWriteAshmem();
         if (!mapRet) {
@@ -350,7 +350,7 @@ void DMicDev::EnqueueThread()
 {
     writeIndex_ = 0;
     writeNum_ = 0;
-    DHLOGI("Enqueue thread start, lengthPerWrite length: %d.", lengthPerTrans_);
+    DHLOGD("Enqueue thread start, lengthPerWrite length: %d.", lengthPerTrans_);
     FillJitterQueue();
     while (ashmem_ != nullptr && isEnqueueRunning_.load()) {
         int64_t timeOffset = UpdateTimeOffset(frameIndex_, LOW_LATENCY_INTERVAL_NS,
@@ -360,7 +360,7 @@ void DMicDev::EnqueueThread()
         {
             std::lock_guard<std::mutex> lock(dataQueueMtx_);
             if (dataQueue_.empty()) {
-                DHLOGI("Data queue is Empty.");
+                DHLOGD("Data queue is Empty.");
                 audioData = std::make_shared<AudioData>(param_.comParam.frameSize);
             } else {
                 audioData = dataQueue_.front();
@@ -395,7 +395,7 @@ void DMicDev::FillJitterQueue()
         }
         usleep(MMAP_WAIT_FRAME_US);
     }
-    DHLOGI("Mic jitter data queue fill end.");
+    DHLOGD("Mic jitter data queue fill end.");
 }
 
 int32_t DMicDev::MmapStop()
@@ -424,7 +424,7 @@ int32_t DMicDev::NotifyHdfAudioEvent(const AudioEvent &event)
 
 int32_t DMicDev::OnStateChange(const AudioEventType type)
 {
-    DHLOGI("On mic device state change, type: %d", type);
+    DHLOGD("On mic device state change, type: %d", type);
     AudioEvent event;
     switch (type) {
         case AudioEventType::DATA_OPENED:
@@ -462,11 +462,11 @@ int32_t DMicDev::OnDecodeTransDataDone(const std::shared_ptr<AudioData> &audioDa
         dataQueSize_ = param_.captureOpts.capturerFlags == MMAP_MODE ? dataQueSize_ : DATA_QUEUE_EXT_SIZE;
     }
     while (dataQueue_.size() > dataQueSize_) {
-        DHLOGI("Data queue overflow. buf current size: %d", dataQueue_.size());
+        DHLOGD("Data queue overflow. buf current size: %d", dataQueue_.size());
         dataQueue_.pop();
     }
     dataQueue_.push(audioData);
-    DHLOGI("Push new mic data, buf len: %d", dataQueue_.size());
+    DHLOGD("Push new mic data, buf len: %d", dataQueue_.size());
     return DH_SUCCESS;
 }
 } // DistributedHardware

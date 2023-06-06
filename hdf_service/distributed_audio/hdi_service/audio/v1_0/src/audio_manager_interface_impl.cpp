@@ -43,12 +43,12 @@ extern "C" IAudioManager *AudioManagerImplGetInstance(void)
 
 AudioManagerInterfaceImpl::AudioManagerInterfaceImpl()
 {
-    DHLOGI("Distributed audio manager constructed.");
+    DHLOGD("Distributed audio manager constructed.");
 }
 
 AudioManagerInterfaceImpl::~AudioManagerInterfaceImpl()
 {
-    DHLOGI("Distributed audio manager destructed.");
+    DHLOGD("Distributed audio manager destructed.");
 }
 
 int32_t AudioManagerInterfaceImpl::GetAllAdapters(std::vector<AudioAdapterDescriptor> &descs)
@@ -107,7 +107,7 @@ int32_t AudioManagerInterfaceImpl::UnloadAdapter(const std::string &adapterName)
 
 int32_t AudioManagerInterfaceImpl::ReleaseAudioManagerObject()
 {
-    DHLOGI("Release distributed audio manager object.");
+    DHLOGD("Release distributed audio manager object.");
     return HDF_SUCCESS;
 }
 
@@ -181,7 +181,7 @@ int32_t AudioManagerInterfaceImpl::RemoveAudioDevice(const std::string &adpName,
     DAudioDevEvent event = { adpName, devId, HDF_AUDIO_DEVICE_REMOVE, 0, 0, 0 };
     ret = NotifyFwk(event);
     if (ret != DH_SUCCESS) {
-        DHLOGI("Notify audio fwk failed, ret = %d.", ret);
+        DHLOGE("Notify audio fwk failed, ret = %d.", ret);
     }
     if (adp->second->IsPortsNoReg()) {
         mapAudioAdapter_.erase(adpName);
@@ -210,7 +210,7 @@ int32_t AudioManagerInterfaceImpl::Notify(const std::string &adpName, const uint
 
 int32_t AudioManagerInterfaceImpl::NotifyFwk(const DAudioDevEvent &event)
 {
-    DHLOGI("Notify audio fwk event(type:%d, adapter:%s, pin:%d).", event.eventType,
+    DHLOGD("Notify audio fwk event(type:%d, adapter:%s, pin:%d).", event.eventType,
         GetAnonyString(event.adapterName).c_str(), event.devId);
     std::stringstream ss;
     ss << "EVENT_TYPE=" << event.eventType << ";NID=" << event.adapterName << ";PIN=" << event.devId << ";VID=" <<

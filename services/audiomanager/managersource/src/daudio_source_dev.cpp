@@ -117,7 +117,7 @@ int32_t DAudioSourceDev::DisableDAudio(const std::string &dhId)
 
 void DAudioSourceDev::NotifyEvent(const AudioEvent &event)
 {
-    DHLOGI("Notify event, eventType: %d.", event.type);
+    DHLOGD("Notify event, eventType: %d.", event.type);
     std::map<AudioEventType, DAudioSourceDevFunc>::iterator iter = memberFuncMap_.find(event.type);
     if (iter == memberFuncMap_.end()) {
         DHLOGE("Invalid eventType.");
@@ -243,7 +243,7 @@ int32_t DAudioSourceDev::CloseCtrlTrans(const AudioEvent &event, bool isSpk)
     }
     if ((!isSpk && (speaker_ == nullptr || !speaker_->IsOpened())) ||
         (isSpk && (mic_ == nullptr || !mic_->IsOpened()))) {
-        DHLOGI("No distributed audio device used, close ctrl trans.");
+        DHLOGD("No distributed audio device used, close ctrl trans.");
         auto task = GenerateTask(this, &DAudioSourceDev::TaskCloseCtrlChannel, event.content, "Close Ctrl Trans",
             &DAudioSourceDev::OnTaskResult);
         return taskQueue_->Produce(task);
@@ -304,7 +304,7 @@ int32_t DAudioSourceDev::HandleNotifyRPC(const AudioEvent &event)
     }
 
     rpcResult_ = (jParam[KEY_RESULT] == DH_SUCCESS) ? true : false;
-    DHLOGI("Notify RPC event: %d, result: %d.", event.type, rpcResult_);
+    DHLOGD("Notify RPC event: %d, result: %d.", event.type, rpcResult_);
     std::map<AudioEventType, uint8_t>::iterator iter = eventNotifyMap_.find(event.type);
     if (iter == eventNotifyMap_.end()) {
         DHLOGE("Invalid eventType.");
@@ -317,7 +317,7 @@ int32_t DAudioSourceDev::HandleNotifyRPC(const AudioEvent &event)
 
 int32_t DAudioSourceDev::HandleVolumeSet(const AudioEvent &event)
 {
-    DHLOGI("Start handle volume set.");
+    DHLOGD("Start handle volume set.");
     if (taskQueue_ == nullptr) {
         DHLOGE("Task queue is null.");
         return ERR_DH_AUDIO_NULLPTR;
@@ -329,7 +329,7 @@ int32_t DAudioSourceDev::HandleVolumeSet(const AudioEvent &event)
 
 int32_t DAudioSourceDev::HandleVolumeChange(const AudioEvent &event)
 {
-    DHLOGI("Start handle volume change.");
+    DHLOGD("Start handle volume change.");
     if (taskQueue_ == nullptr) {
         DHLOGE("Task queue is null.");
         return ERR_DH_AUDIO_NULLPTR;
@@ -341,7 +341,7 @@ int32_t DAudioSourceDev::HandleVolumeChange(const AudioEvent &event)
 
 int32_t DAudioSourceDev::HandleFocusChange(const AudioEvent &event)
 {
-    DHLOGI("Start handle focus change.");
+    DHLOGD("Start handle focus change.");
     if (taskQueue_ == nullptr) {
         DHLOGE("Task queue is null.");
         return ERR_DH_AUDIO_NULLPTR;
@@ -353,7 +353,7 @@ int32_t DAudioSourceDev::HandleFocusChange(const AudioEvent &event)
 
 int32_t DAudioSourceDev::HandleRenderStateChange(const AudioEvent &event)
 {
-    DHLOGI("Start handle render state change.");
+    DHLOGD("Start handle render state change.");
     if (taskQueue_ == nullptr) {
         DHLOGE("Task queue is null.");
         return ERR_DH_AUDIO_NULLPTR;
@@ -365,7 +365,7 @@ int32_t DAudioSourceDev::HandleRenderStateChange(const AudioEvent &event)
 
 int32_t DAudioSourceDev::HandlePlayStatusChange(const AudioEvent &event)
 {
-    DHLOGI("Play status change, content: %s.", event.content.c_str());
+    DHLOGD("Play status change, content: %s.", event.content.c_str());
     if (taskQueue_ == nullptr) {
         DHLOGE("Task queue is null.");
         return ERR_DH_AUDIO_NULLPTR;
@@ -450,10 +450,10 @@ int32_t DAudioSourceDev::WaitForRPC(const AudioEventType type)
         return ERR_DH_AUDIO_SA_RPC_WAIT_TIMEOUT;
     }
     if (!rpcResult_) {
-        DHLOGI("RPC notify Result Failed.");
+        DHLOGE("RPC notify Result Failed.");
         return ERR_DH_AUDIO_FAILED;
     }
-    DHLOGI("Receive sink device notify type: %d.", type);
+    DHLOGD("Receive sink device notify type: %d.", type);
     return DH_SUCCESS;
 }
 
@@ -627,7 +627,7 @@ int32_t DAudioSourceDev::TaskCloseDSpeaker(const std::string &args)
 {
     DHLOGI("Task close speaker, args: %s.", args.c_str());
     if (speaker_ == nullptr) {
-        DHLOGI("Speaker already closed.");
+        DHLOGD("Speaker already closed.");
         NotifyHDF(NOTIFY_CLOSE_SPEAKER_RESULT, HDF_EVENT_RESULT_SUCCESS);
         return DH_SUCCESS;
     }
@@ -788,7 +788,7 @@ int32_t DAudioSourceDev::TaskCloseCtrlChannel(const std::string &args)
 {
     DHLOGI("Task close ctrl channel, args: %s.", args.c_str());
     if (audioCtrlMgr_ == nullptr) {
-        DHLOGI("Audio source ctrl magr already closed.");
+        DHLOGD("Audio source ctrl magr already closed.");
         return DH_SUCCESS;
     }
 
@@ -814,7 +814,7 @@ int32_t DAudioSourceDev::TaskCloseCtrlChannel(const std::string &args)
 
 int32_t DAudioSourceDev::TaskSetVolume(const std::string &args)
 {
-    DHLOGI("Task set volume, args: %s.", args.c_str());
+    DHLOGD("Task set volume, args: %s.", args.c_str());
     if (audioCtrlMgr_ == nullptr) {
         DHLOGE("Audio ctrl mgr not init.");
         return ERR_DH_AUDIO_NULLPTR;
@@ -825,26 +825,25 @@ int32_t DAudioSourceDev::TaskSetVolume(const std::string &args)
 
 int32_t DAudioSourceDev::TaskChangeVolume(const std::string &args)
 {
-    DHLOGI("Task change volume, args: %s.", args.c_str());
+    DHLOGD("Task change volume, args: %s.", args.c_str());
     return NotifyHDF(AudioEventType::VOLUME_CHANGE, args);
 }
 
 int32_t DAudioSourceDev::TaskChangeFocus(const std::string &args)
 {
-    DHLOGI("Task change focus, args: %s.", args.c_str());
+    DHLOGD("Task change focus, args: %s.", args.c_str());
     return NotifyHDF(AudioEventType::AUDIO_FOCUS_CHANGE, args);
 }
 
 int32_t DAudioSourceDev::TaskChangeRenderState(const std::string &args)
 {
-    DHLOGI("Task change render state, args: %s.", args.c_str());
+    DHLOGD("Task change render state, args: %s.", args.c_str());
     return NotifyHDF(AudioEventType::AUDIO_RENDER_STATE_CHANGE, args);
 }
 
-
 int32_t DAudioSourceDev::TaskPlayStatusChange(const std::string &args)
 {
-    DHLOGI("Task play status change, content: %s.", args.c_str());
+    DHLOGD("Task play status change, content: %s.", args.c_str());
     if (audioCtrlMgr_ == nullptr) {
         DHLOGE("Audio ctrl mgr not init.");
         return ERR_DH_AUDIO_NULLPTR;
@@ -934,7 +933,7 @@ void DAudioSourceDev::OnTaskResult(int32_t resultCode, const std::string &result
     (void)resultCode;
     (void)result;
     (void)funcName;
-    DHLOGI("OnTaskResult. resultcode: %d, result: %s, funcName: %s", resultCode, result.c_str(),
+    DHLOGD("OnTaskResult. resultcode: %d, result: %s, funcName: %s", resultCode, result.c_str(),
         funcName.c_str());
 }
 
@@ -947,7 +946,7 @@ int32_t DAudioSourceDev::NotifySinkDev(const AudioEventType type, const json Par
                     { KEY_EVENT_TYPE, type },
                     { KEY_AUDIO_PARAM, Param },
                     { KEY_RANDOM_TASK_CODE, std::to_string(randomTaskCode) } };
-    DHLOGI("Notify sink dev, random task code: %s", std::to_string(randomTaskCode).c_str());
+    DHLOGD("Notify sink dev, random task code: %s", std::to_string(randomTaskCode).c_str());
     DAudioSourceManager::GetInstance().DAudioNotify(devId_, dhId, type, jParam.dump());
     return WaitForRPC(static_cast<AudioEventType>(static_cast<int32_t>(type) + eventOffset));
 }

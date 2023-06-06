@@ -57,7 +57,7 @@ static int32_t InitDescriptorPort(const AudioAdapterDescriptor &desc, ::AudioAda
             break;
         }
         if (strcpy_s(portName, port.portName.length() + STR_TERM_LEN, port.portName.c_str()) != EOK) {
-            DHLOGI("Strcpy_s port name failed.");
+            DHLOGD("Strcpy_s port name failed.");
             free(portName);
             continue;
         }
@@ -103,7 +103,7 @@ static int32_t InitAudioAdapterDescriptor(AudioManagerContext *context,
             return ERR_DH_AUDIO_HDI_NULLPTR;
         }
         if (strcpy_s(adapterName, desc.adapterName.length() + STR_TERM_LEN, desc.adapterName.c_str()) != EOK) {
-            DHLOGI("Strcpy_s adapter name failed.");
+            DHLOGD("Strcpy_s adapter name failed.");
             free(adapterName);
             continue;
         }
@@ -171,7 +171,7 @@ static int32_t LoadAdapterInternal(struct AudioManager *manager, const struct ::
     {
         std::lock_guard<std::mutex> lock(context->mtx_);
         if (context->adapters_.find(adpName) != context->adapters_.end()) {
-            DHLOGI("Adapter already has been load.");
+            DHLOGD("Adapter already has been load.");
             *adapter = &(context->adapters_[adpName]->instance_);
             return DH_SUCCESS;
         }

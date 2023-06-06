@@ -39,7 +39,7 @@ int32_t DaudioHdfOperate::LoadDaudioHDFImpl()
 {
     if (audioServStatus_ == OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START &&
         audioextServStatus_ == OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START) {
-        DHLOGI("Service has already start.");
+        DHLOGD("Service has already start.");
         return DH_SUCCESS;
     }
     servMgr_ = IServiceManager::Get();

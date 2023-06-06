@@ -31,12 +31,12 @@ DAudioSourceDevCtrlMgr::DAudioSourceDevCtrlMgr(const std::string &devId,
     std::shared_ptr<IAudioEventCallback> audioEventCallback)
     : devId_(devId), audioEventCallback_(audioEventCallback)
 {
-    DHLOGI("Control manager constructed.");
+    DHLOGD("Control manager constructed.");
 }
 
 DAudioSourceDevCtrlMgr::~DAudioSourceDevCtrlMgr()
 {
-    DHLOGI("Control manager deconstructed.");
+    DHLOGD("Control manager deconstructed.");
 }
 
 int32_t DAudioSourceDevCtrlMgr::SetUp()
@@ -113,7 +113,7 @@ bool DAudioSourceDevCtrlMgr::IsOpened()
 
 int32_t DAudioSourceDevCtrlMgr::SendAudioEvent(const AudioEvent &event)
 {
-    DHLOGI("Send audio event.");
+    DHLOGD("Send audio event.");
     if (audioCtrlTrans_ == nullptr) {
         DHLOGE("Send audio event, Audio ctrl trans is null");
         return ERR_DH_AUDIO_SA_CTRL_TRANS_NULL;
@@ -123,7 +123,7 @@ int32_t DAudioSourceDevCtrlMgr::SendAudioEvent(const AudioEvent &event)
 
 void DAudioSourceDevCtrlMgr::OnStateChange(int32_t type)
 {
-    DHLOGI("Daudio source control state change, type: %d.", type);
+    DHLOGD("Daudio source control state change, type: %d.", type);
     switch (type) {
         case AudioEventType::CTRL_OPENED:
             isOpened_.store(true);
@@ -148,7 +148,7 @@ void DAudioSourceDevCtrlMgr::OnStateChange(int32_t type)
 
 void DAudioSourceDevCtrlMgr::OnEventReceived(const AudioEvent &event)
 {
-    DHLOGI("Received event");
+    DHLOGD("Received event");
     auto callback = audioEventCallback_.lock();
     if (callback == nullptr) {
         DHLOGE("Callback is nullptr.");

@@ -26,12 +26,12 @@ namespace OHOS {
 namespace DistributedHardware {
 DSpeakerClient::~DSpeakerClient()
 {
-    DHLOGI("Release speaker client.");
+    DHLOGD("Release speaker client.");
 }
 
 int32_t DSpeakerClient::SetUp(const AudioParam &param)
 {
-    DHLOGI("Set up spk client: {sampleRate: %d, bitFormat: %d, channelMask: %d," +
+    DHLOGD("Set up spk client: {sampleRate: %d, bitFormat: %d, channelMask: %d," +
         "frameSize: %d, contentType: %d, renderFlags: %d, streamUsage: %d}.",
         param.comParam.sampleRate, param.comParam.bitFormat, param.comParam.channelMask, param.comParam.frameSize,
         param.renderOpts.contentType, param.renderOpts.renderFlags, param.renderOpts.streamUsage);
@@ -171,7 +171,7 @@ int32_t DSpeakerClient::StopRender()
 
 void DSpeakerClient::PlayThreadRunning()
 {
-    DHLOGI("Start the renderer thread.");
+    DHLOGD("Start the renderer thread.");
     if (pthread_setname_np(pthread_self(), RENDERTHREAD) != DH_SUCCESS) {
         DHLOGE("Render data thread setname failed.");
     }
@@ -251,7 +251,7 @@ int32_t DSpeakerClient::OnDecodeTransDataDone(const std::shared_ptr<AudioData> &
 
 int32_t DSpeakerClient::OnStateChange(const AudioEventType type)
 {
-    DHLOGI("On state change. type: %d", type);
+    DHLOGD("On state change. type: %d", type);
     AudioEvent event;
     switch (type) {
         case AudioEventType::DATA_OPENED: {
@@ -279,7 +279,7 @@ int32_t DSpeakerClient::OnStateChange(const AudioEventType type)
 
 string DSpeakerClient::GetVolumeLevel()
 {
-    DHLOGI("Get the volume level.");
+    DHLOGD("Get the volume level.");
     std::stringstream ss;
     AudioStandard::AudioStreamType streamType = AudioStandard::AudioStreamType::STREAM_DEFAULT;
     auto volumeType = static_cast<AudioStandard::AudioVolumeType>(1);
@@ -294,13 +294,13 @@ string DSpeakerClient::GetVolumeLevel()
        << "MAX_VOLUME_LEVEL=" << maxVolumeLevel << ";"
        << "MIN_VOLUME_LEVEL=" << minVolumeLevel << ";";
     std::string str = ss.str();
-    DHLOGI("Get the volume level result, event: %s.", str.c_str());
+    DHLOGD("Get the volume level result, event: %s.", str.c_str());
     return str;
 }
 
 void DSpeakerClient::OnVolumeKeyEvent(AudioStandard::VolumeEvent volumeEvent)
 {
-    DHLOGI("Volume change event.");
+    DHLOGD("Volume change event.");
     std::shared_ptr<IAudioEventCallback> cbObj = eventCallback_.lock();
     if (cbObj == nullptr) {
         DHLOGE("Event callback is nullptr.");
@@ -313,7 +313,7 @@ void DSpeakerClient::OnVolumeKeyEvent(AudioStandard::VolumeEvent volumeEvent)
        << "IS_UPDATEUI=" << volumeEvent.updateUi << ";"
        << "VOLUME_GROUP_ID=" << volumeEvent.volumeGroupId << ";";
     std::string str = ss.str();
-    DHLOGI("Volume change notification result, event: %s.", str.c_str());
+    DHLOGD("Volume change notification result, event: %s.", str.c_str());
 
     AudioEvent audioEvent(VOLUME_CHANGE, str);
     cbObj->NotifyEvent(audioEvent);
@@ -321,7 +321,7 @@ void DSpeakerClient::OnVolumeKeyEvent(AudioStandard::VolumeEvent volumeEvent)
 
 void DSpeakerClient::OnInterrupt(const AudioStandard::InterruptEvent &interruptEvent)
 {
-    DHLOGI("Audio focus interrupt event.");
+    DHLOGD("Audio focus interrupt event.");
     std::shared_ptr<IAudioEventCallback> cbObj = eventCallback_.lock();
     if (cbObj == nullptr) {
         DHLOGE("Event callback is nullptr.");
@@ -333,7 +333,7 @@ void DSpeakerClient::OnInterrupt(const AudioStandard::InterruptEvent &interruptE
        << "FORCE_TYPE=" << interruptEvent.forceType << ";"
        << "HINT_TYPE=" << interruptEvent.hintType << ";";
     std::string str = ss.str();
-    DHLOGI("Audio focus oninterrupt notification result, event: %s.", str.c_str());
+    DHLOGD("Audio focus oninterrupt notification result, event: %s.", str.c_str());
 
     AudioEvent audioEvent(AUDIO_FOCUS_CHANGE, str);
     cbObj->NotifyEvent(audioEvent);
@@ -342,7 +342,7 @@ void DSpeakerClient::OnInterrupt(const AudioStandard::InterruptEvent &interruptE
 void DSpeakerClient::OnStateChange(const AudioStandard::RendererState state,
     const AudioStandard::StateChangeCmdType __attribute__((unused)) cmdType)
 {
-    DHLOGI("On render state change. state: %d", state);
+    DHLOGD("On render state change. state: %d", state);
     std::shared_ptr<IAudioEventCallback> cbObj = eventCallback_.lock();
     if (cbObj == nullptr) {
         DHLOGE("Event callback is nullptr.");
@@ -352,7 +352,7 @@ void DSpeakerClient::OnStateChange(const AudioStandard::RendererState state,
     ss << "RENDER_STATE_CHANGE_EVENT;"
        << "STATE=" << state << ";";
     std::string str = ss.str();
-    DHLOGI("Audio render state changes notification result, event: %s.", str.c_str());
+    DHLOGD("Audio render state changes notification result, event: %s.", str.c_str());
 
     AudioEvent audioEvent(AUDIO_RENDER_STATE_CHANGE, str);
     cbObj->NotifyEvent(audioEvent);
@@ -360,7 +360,7 @@ void DSpeakerClient::OnStateChange(const AudioStandard::RendererState state,
 
 int32_t DSpeakerClient::SetAudioParameters(const AudioEvent &event)
 {
-    DHLOGI("Set the volume, arg: %s.", event.content.c_str());
+    DHLOGD("Set the volume, arg: %s.", event.content.c_str());
 
     int32_t audioVolumeType;
     int32_t ret = GetAudioParamInt(event.content, AUDIO_VOLUME_TYPE, audioVolumeType);
@@ -369,7 +369,7 @@ int32_t DSpeakerClient::SetAudioParameters(const AudioEvent &event)
         return ret;
     }
     auto volumeType = static_cast<AudioStandard::AudioVolumeType>(audioVolumeType);
-    DHLOGI("Audio volume type, volumeType = %d.", volumeType);
+    DHLOGD("Audio volume type, volumeType = %d.", volumeType);
     if (event.type != VOLUME_SET) {
         DHLOGE("Invalid parameter.");
         return ERR_DH_AUDIO_CLIENT_INVALID_VOLUME_PARAMETER;
@@ -381,7 +381,7 @@ int32_t DSpeakerClient::SetAudioParameters(const AudioEvent &event)
         DHLOGE("Get audio volume level failed.");
         return ret;
     }
-    DHLOGI("volume level = %d.", audioVolumeLevel);
+    DHLOGD("volume level = %d.", audioVolumeLevel);
     ret = AudioStandard::AudioSystemManager::GetInstance()->SetVolume(volumeType, audioVolumeLevel);
     if (ret != DH_SUCCESS) {
         DHLOGE("Voloume set failed.");
@@ -392,7 +392,7 @@ int32_t DSpeakerClient::SetAudioParameters(const AudioEvent &event)
 
 int32_t DSpeakerClient::SetMute(const AudioEvent &event)
 {
-    DHLOGI("Set mute, arg: %s.", event.content.c_str());
+    DHLOGD("Set mute, arg: %s.", event.content.c_str());
     int32_t audioVolumeType;
     int32_t ret = GetAudioParamInt(event.content, AUDIO_VOLUME_TYPE, audioVolumeType);
     if (ret != DH_SUCCESS) {
@@ -408,7 +408,7 @@ int32_t DSpeakerClient::SetMute(const AudioEvent &event)
     }
 
     auto volumeType = static_cast<AudioStandard::AudioVolumeType>(audioVolumeType);
-    DHLOGI("Audio volume type, volumeType = %d.", volumeType);
+    DHLOGD("Audio volume type, volumeType = %d.", volumeType);
     if (event.type != VOLUME_MUTE_SET) {
         DHLOGE("Invalid parameter.");
         return ERR_DH_AUDIO_CLIENT_INVALID_VOLUME_PARAMETER;
@@ -453,7 +453,7 @@ void DSpeakerClient::ReStart()
 
 void DSpeakerClient::PlayStatusChange(const std::string &args)
 {
-    DHLOGI("Play status change, args: %s.", args.c_str());
+    DHLOGD("Play status change, args: %s.", args.c_str());
     if (args == AUDIO_EVENT_RESTART) {
         ReStart();
     } else if (args == AUDIO_EVENT_PAUSE) {

@@ -26,7 +26,7 @@ namespace DistributedHardware {
 AudioTransportStartStatus::AudioTransportStartStatus(std::shared_ptr<AudioTransportContext>& stateContext)
     : stateContext_(stateContext)
 {
-    DHLOGI("AudioTransportStartStatus contruct.");
+    DHLOGD("AudioTransportStartStatus contruct.");
 }
 int32_t AudioTransportStartStatus::Start(std::shared_ptr<IAudioChannel> audioChannel,
     std::shared_ptr<IAudioProcessor> processor)
@@ -108,7 +108,7 @@ int32_t AudioTransportStartStatus::Restart(const AudioParam &localParam, const A
 
 TransportStateType AudioTransportStartStatus::GetStateType()
 {
-    DHLOGI("Get audiotransport status.");
+    DHLOGD("Get audiotransport status.");
     return TRANSPORT_STATE_START;
 }
 } // namespace DistributedHardware

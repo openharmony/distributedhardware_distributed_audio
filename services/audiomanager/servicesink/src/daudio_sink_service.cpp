@@ -38,7 +38,7 @@ REGISTER_SYSTEM_ABILITY_BY_ID(DAudioSinkService, DISTRIBUTED_HARDWARE_AUDIO_SINK
 
 DAudioSinkService::DAudioSinkService(int32_t saId, bool runOnCreate) : SystemAbility(saId, runOnCreate)
 {
-    DHLOGI("Distributed audio sink service constructed.");
+    DHLOGD("Distributed audio sink service constructed.");
 }
 
 void DAudioSinkService::OnStart()
