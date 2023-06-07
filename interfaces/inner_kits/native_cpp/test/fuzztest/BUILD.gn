@@ -19,20 +19,6 @@ group("fuzztest") {
   testonly = true
 
   deps = [
-    "${hdf_ser_aud_ext_path}/test/fuzztest/notifyevent_fuzzer:fuzztest",
-    "${hdf_ser_aud_ext_path}/test/fuzztest/registeraudiodevice_fuzzer:fuzztest",
-    "${hdf_ser_aud_ext_path}/test/fuzztest/unregisteraudiodevice_fuzzer:fuzztest",
-    "${hdf_ser_aud_path}/test/fuzztest/captureframe_fuzzer:fuzztest",
-    "${hdf_ser_aud_path}/test/fuzztest/createcapture_fuzzer:fuzztest",
-    "${hdf_ser_aud_path}/test/fuzztest/createrender_fuzzer:fuzztest",
-    "${hdf_ser_aud_path}/test/fuzztest/destroycapture_fuzzer:fuzztest",
-    "${hdf_ser_aud_path}/test/fuzztest/destroyrender_fuzzer:fuzztest",
-    "${hdf_ser_aud_path}/test/fuzztest/getalladapters_fuzzer:fuzztest",
-    "${hdf_ser_aud_path}/test/fuzztest/getextraparams_fuzzer:fuzztest",
-    "${hdf_ser_aud_path}/test/fuzztest/loadadapter_fuzzer:fuzztest",
-    "${hdf_ser_aud_path}/test/fuzztest/renderframe_fuzzer:fuzztest",
-    "${hdf_ser_aud_path}/test/fuzztest/setextraparams_fuzzer:fuzztest",
-    "${hdf_ser_aud_path}/test/fuzztest/unloadadapter_fuzzer:fuzztest",
     "${services_path}/audiomanager/test/fuzztest/sinkservicedaudionotify_fuzzer:fuzztest",
     "${services_path}/audiomanager/test/fuzztest/sinkserviceinitsink_fuzzer:fuzztest",
     "${services_path}/audiomanager/test/fuzztest/sinkservicereleasesink_fuzzer:fuzztest",

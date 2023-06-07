@@ -4,11 +4,11 @@
     "version": "4.0",
     "license": "Apache License 2.0",
     "segment": {
-        "destPath": "foundation/distributedhardware/distributed_audio/hdf_interfaces/"
+        "destPath":"drivers/interface/distributed_audio"
     },
     "component": {
         "name": "drivers_interface_distributed_audio",
-        "subsystem": "distributedhardware",
+        "subsystem": "hdf",
         "adapted_system_type": [
             "standard"
         ],
@@ -25,8 +25,8 @@
         },
         "build": {
             "sub_component": [
-                "//foundation/distributedhardware/distributed_audio/hdf_interfaces/distributed_audio/audio/v1_0:daudio_idl_target",
-                "//foundation/distributedhardware/distributed_audio/hdf_interfaces/distributed_audio/audioext/v1_0:daudioext_idl_target"
+                "//drivers/interface/distributed_audio/audio/v1_0:daudio_idl_target",
+                "//drivers/interface/distributed_audio/audioext/v1_0:daudioext_idl_target"
             ],
             "test": [
 
@@ -39,24 +39,17 @@
                     }
                 },
                 {
-                    "name": "//foundation/distributedhardware/distributed_audio/hdf_interfaces/distributed_audio/audio/v1_0:libdaudio_stub_1.0",
+                    "name": "//drivers/interface/distributed_audio/audio/v1_0:libdaudio_proxy_1.0",
                     "header": {
                         "header_files": [],
-                        "header_base": "//foundation/distributedhardware/distributed_audio/hdf_interfaces/distributed_audio/audio"
+                        "header_base": "//drivers/interface/distributed_audio/audio"
                     }
                 },
                 {
-                    "name": "//foundation/distributedhardware/distributed_audio/hdf_interfaces/distributed_audio/audioext/v1_0:libdaudioext_proxy_1.0",
+                    "name": "//drivers/interface/distributed_audio/audioext/v1_0:libdaudioext_proxy_1.0",
                     "header": {
                         "header_files": [],
-                        "header_base": "//foundation/distributedhardware/distributed_audio/hdf_interfaces/distributed_audio/audioext"
-                    }
-                },
-                {
-                    "name": "//foundation/distributedhardware/distributed_audio/hdf_interfaces/distributed_audio/audioext/v1_0:libdaudioext_stub_1.0",
-                    "header": {
-                        "header_files": [],
-                        "header_base": "//foundation/distributedhardware/distributed_audio/hdf_interfaces/distributed_audio/audioext"
+                        "header_base": "//drivers/interface/distributed_audio/audioext"
                     }
                 }
             ]

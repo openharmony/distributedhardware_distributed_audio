@@ -23,7 +23,7 @@ hdi("daudio") {
     "IAudioRender.idl",
   ]
   language = "cpp"
-  root = "ohos.hdi://foundation/distributedhardware/distributed_audio/hdf_interfaces/"
-  subsystem_name = "distributedhardware"
+  root = "ohos.hdi://drivers/interface/"
+  subsystem_name = "hdf"
   part_name = "drivers_interface_distributed_audio"
 }

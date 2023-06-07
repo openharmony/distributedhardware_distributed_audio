@@ -11,16 +11,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-import("../../../../../distributedaudio.gni")
+distributedaudio_path = "//foundation/distributedhardware/distributed_audio"
+distributedaudio_ext_path =
+    "//foundation/distributedhardware/distributed_audio_ext"
 
-group("hdi_service_audio_test") {
-  testonly = true
-  deps = [
-    "${hdf_ser_aud_path}/test/unittest/audio_adapter_interface:hdi_service_audio_adapter_test",
-    "${hdf_ser_aud_path}/test/unittest/audio_capture_interface:hdi_service_audio_capture_test",
-    "${hdf_ser_aud_path}/test/unittest/audio_manager_interface:hdi_service_audio_manager_test",
-    "${hdf_ser_aud_path}/test/unittest/audio_render_interface:hdi_service_audio_render_test",
-  ]
+hdf_interfaces_path = "//drivers/interface/distributed_audio"
+hdf_service_path = "//drivers/peripheral/distributed_audio"
+hdf_ser_aud_path = "${hdf_service_path}/hdi_service/audio/v1_0"
+hdf_ser_aud_ext_path = "${hdf_service_path}/hdi_service/audio_ext/v1_0"
+common_path = "${hdf_service_path}/common"
+
+build_flags = [ "-Werror" ]
+
+declare_args() {
+  distributed_audio_hdf_extension = false
 }

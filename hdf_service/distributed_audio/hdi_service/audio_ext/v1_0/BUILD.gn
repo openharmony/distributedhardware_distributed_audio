@@ -13,7 +13,7 @@
 
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-import("../../../../../distributedaudio.gni")
+import("../../../distributedaudio.gni")
 
 ohos_shared_library("libdaudio_manager_daudio_ext_service_1.0") {
   include_dirs = [

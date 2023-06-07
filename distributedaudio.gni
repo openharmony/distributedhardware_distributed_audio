@@ -32,9 +32,8 @@ audio_processor_path = "${services_path}/audioprocessor"
 audio_transport_path = "${services_path}/audiotransport"
 softbusadapter_path = "${services_path}/softbusadapter"
 interfaces_path = "${distributedaudio_path}/interfaces"
-hdf_interfaces_path =
-    "${distributedaudio_path}/hdf_interfaces/distributed_audio"
-hdf_service_path = "${distributedaudio_path}/hdf_service/distributed_audio"
+hdf_interfaces_path = "//drivers/interface/distributed_audio"
+hdf_service_path = "//drivers/peripheral/distributed_audio"
 hdf_ser_aud_path = "${hdf_service_path}/hdi_service/audio/v1_0"
 hdf_ser_aud_ext_path = "${hdf_service_path}/hdi_service/audio_ext/v1_0"
 
