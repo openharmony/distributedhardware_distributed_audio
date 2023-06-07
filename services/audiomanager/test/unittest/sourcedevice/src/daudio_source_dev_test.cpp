@@ -734,7 +734,7 @@ HWTEST_F(DAudioSourceDevTest, TaskSpkMmapStart_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, TaskSpkMmapStop_001, TestSize.Level1)
 {
-    sourceDev_->mic_ = std::make_shared<DSpeakerDev>(DEV_ID, nullptr);
+    sourceDev_->speaker_ = std::make_shared<DSpeakerDev>(DEV_ID, nullptr);
     EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskSpkMmapStop(ARGS));
 }
 
