@@ -34,17 +34,17 @@ DAudioSinkDevCtrlMgr::DAudioSinkDevCtrlMgr(const std::string &devId,
     std::shared_ptr<IAudioEventCallback> audioEventCallback)
     : devId_(devId), audioEventCallback_(audioEventCallback)
 {
-    DHLOGI("Control manager constructed.");
+    DHLOGD("Control manager constructed.");
 }
 
 DAudioSinkDevCtrlMgr::~DAudioSinkDevCtrlMgr()
 {
-    DHLOGI("Control manager deconstructed.");
+    DHLOGD("Control manager deconstructed.");
 }
 
 void DAudioSinkDevCtrlMgr::OnStateChange(int32_t type)
 {
-    DHLOGI("Distributed audio sink device control manager state change, type: %d.", type);
+    DHLOGD("Distributed audio sink device control manager state change, type: %d.", type);
     switch (type) {
         case AudioEventType::CTRL_OPENED:
             isOpened_.store(true);
@@ -92,7 +92,7 @@ int32_t DAudioSinkDevCtrlMgr::Stop()
     DHLOGI("Stop sink device control manager.");
     isOpened_.store(false);
     if (audioCtrlTrans_ == nullptr) {
-        DHLOGI("Ctrl trans already stop.");
+        DHLOGD("Ctrl trans already stop.");
         return DH_SUCCESS;
     }
 
@@ -108,7 +108,7 @@ int32_t DAudioSinkDevCtrlMgr::Release()
 {
     DHLOGI("Release sink device control manager.");
     if (audioCtrlTrans_ == nullptr) {
-        DHLOGI("Ctrl trans already release.");
+        DHLOGD("Ctrl trans already release.");
         return DH_SUCCESS;
     }
     int32_t ret = audioCtrlTrans_->Release();
@@ -127,7 +127,7 @@ bool DAudioSinkDevCtrlMgr::IsOpened()
 
 void DAudioSinkDevCtrlMgr::OnEventReceived(const AudioEvent &event)
 {
-    DHLOGI("Received event type %d.", event.type);
+    DHLOGD("Received event type %d.", event.type);
     auto callback = audioEventCallback_.lock();
     if (callback == nullptr) {
         DHLOGE("Callback is nullptr.");
@@ -138,7 +138,7 @@ void DAudioSinkDevCtrlMgr::OnEventReceived(const AudioEvent &event)
 
 int32_t DAudioSinkDevCtrlMgr::SendAudioEvent(const AudioEvent &event)
 {
-    DHLOGI("Send audio event.");
+    DHLOGD("Send audio event.");
     if (audioCtrlTrans_ == nullptr) {
         return ERR_DH_AUDIO_SA_SINK_CTRL_TRANS_NULL;
     }

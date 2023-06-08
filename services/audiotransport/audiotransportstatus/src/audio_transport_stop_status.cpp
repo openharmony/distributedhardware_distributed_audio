@@ -26,7 +26,7 @@ namespace DistributedHardware {
 AudioTransportStopStatus::AudioTransportStopStatus(std::shared_ptr<AudioTransportContext>& stateContext)
     : stateContext_(stateContext)
 {
-    DHLOGI("AudioTransportStopStatus contruct.");
+    DHLOGD("AudioTransportStopStatus contruct.");
 }
 int32_t AudioTransportStopStatus::Start(std::shared_ptr<IAudioChannel> audioChannel,
     std::shared_ptr<IAudioProcessor> processor)
@@ -64,7 +64,7 @@ int32_t AudioTransportStopStatus::Stop(std::shared_ptr<IAudioChannel> audioChann
 int32_t AudioTransportStopStatus::Pause(std::shared_ptr<IAudioProcessor> processor)
 {
     (void)processor;
-    DHLOGI("Audiotransport status is stop, can not pause.");
+    DHLOGE("Audiotransport status is stop, can not pause.");
     return ERR_DH_AUDIO_TRANS_ILLEGAL_OPERATION;
 }
 

@@ -126,14 +126,14 @@ int32_t DAudioSourceService::ConfigDistributedHardware(const std::string &devId,
 void DAudioSourceService::DAudioNotify(const std::string &devId, const std::string &dhId, const int32_t eventType,
     const std::string &eventContent)
 {
-    DHLOGI("Notify distributed audio device, devId: %s, dhId: %s.", GetAnonyString(devId).c_str(),
+    DHLOGD("Notify distributed audio device, devId: %s, dhId: %s.", GetAnonyString(devId).c_str(),
         dhId.c_str());
     DAudioSourceManager::GetInstance().HandleDAudioNotify(devId, dhId, eventType, eventContent);
 }
 
 int DAudioSourceService::Dump(int32_t fd, const std::vector<std::u16string>& args)
 {
-    DHLOGI("Distributed audio source service dump.");
+    DHLOGD("Distributed audio source service dump.");
     std::string result;
     std::vector<std::string> argsStr;
 

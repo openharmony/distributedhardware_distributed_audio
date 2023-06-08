@@ -34,12 +34,12 @@ IMPLEMENT_SINGLE_INSTANCE(DAudioSinkHandler);
 
 DAudioSinkHandler::DAudioSinkHandler()
 {
-    DHLOGI("DAudio sink handler constructed.");
+    DHLOGD("DAudio sink handler constructed.");
 }
 
 DAudioSinkHandler::~DAudioSinkHandler()
 {
-    DHLOGI("DAudio sink handler destructed.");
+    DHLOGD("DAudio sink handler destructed.");
 }
 
 int32_t DAudioSinkHandler::InitSink(const std::string &params)
@@ -122,7 +122,7 @@ int32_t DAudioSinkHandler::UnsubscribeLocalHardware(const std::string &dhId)
 
 void DAudioSinkHandler::OnRemoteSinkSvrDied(const wptr<IRemoteObject> &remote)
 {
-    DHLOGI("The daudio service of sink device died.");
+    DHLOGD("The daudio service of sink device died.");
     sptr<IRemoteObject> remoteObject = remote.promote();
     if (remoteObject == nullptr) {
         DHLOGE("OnRemoteDied remote promoted failed.");
@@ -138,7 +138,7 @@ void DAudioSinkHandler::OnRemoteSinkSvrDied(const wptr<IRemoteObject> &remote)
 
 void DAudioSinkHandler::FinishStartSA(const std::string &param, const sptr<IRemoteObject> &remoteObject)
 {
-    DHLOGI("Finish start SA.");
+    DHLOGD("Finish start SA.");
     std::lock_guard<std::mutex> lock(sinkProxyMutex_);
     remoteObject->AddDeathRecipient(sinkSvrRecipient_);
     dAudioSinkProxy_ = iface_cast<IDAudioSink>(remoteObject);

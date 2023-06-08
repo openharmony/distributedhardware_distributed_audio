@@ -90,7 +90,7 @@ int32_t AudioDataChannel::CloseSession()
 {
     DHLOGI("Close session, sessionId: %d.", sessionId_);
     if (sessionId_ == 0) {
-        DHLOGI("Session is already close.");
+        DHLOGD("Session is already close.");
         return DH_SUCCESS;
     }
 
@@ -110,13 +110,13 @@ int32_t AudioDataChannel::SendEvent(const AudioEvent &audioEvent)
 
 int32_t AudioDataChannel::SendData(const std::shared_ptr<AudioData> &audioData)
 {
-    DHLOGI("Send data, sessionId: %d.", sessionId_);
+    DHLOGD("Send data, sessionId: %d.", sessionId_);
     return SoftbusAdapter::GetInstance().SendSoftbusStream(sessionId_, audioData);
 }
 
 void AudioDataChannel::OnSessionOpened(int32_t sessionId, int32_t result)
 {
-    DHLOGI("On audio session opened, sessionId: %d, result: %d.", sessionId, result);
+    DHLOGD("On audio session opened, sessionId: %d, result: %d.", sessionId, result);
     if (result != 0) {
         DHLOGE("Session open failed.");
         return;
@@ -137,7 +137,7 @@ void AudioDataChannel::OnSessionClosed(int32_t sessionId)
 {
     DHLOGI("On audio session closed, sessionId: %d.", sessionId);
     if (sessionId_ == 0) {
-        DHLOGI("Session already closed.");
+        DHLOGD("Session already closed.");
         return;
     }
     auto listener = channelListener_.lock();

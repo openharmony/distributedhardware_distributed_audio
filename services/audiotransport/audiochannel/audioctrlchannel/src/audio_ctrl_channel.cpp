@@ -107,7 +107,7 @@ int32_t AudioCtrlChannel::CloseSession()
 {
     DHLOGI("Close session, sessionId: %d.", sessionId_);
     if (sessionId_ == 0) {
-        DHLOGI("Session is already closed.");
+        DHLOGD("Session is already closed.");
         return DH_SUCCESS;
     }
 
@@ -134,7 +134,7 @@ int32_t AudioCtrlChannel::SendData(const std::shared_ptr<AudioData> &data)
 
 int32_t AudioCtrlChannel::SendEvent(const AudioEvent &audioEvent)
 {
-    DHLOGI("Send event, sessionId: %d.", sessionId_);
+    DHLOGD("Send event, sessionId: %d.", sessionId_);
     json jAudioEvent;
     jAudioEvent[KEY_TYPE] = audioEvent.type;
     jAudioEvent[KEY_EVENT_CONTENT] = audioEvent.content;
@@ -150,7 +150,7 @@ int32_t AudioCtrlChannel::SendEvent(const AudioEvent &audioEvent)
 
 int32_t AudioCtrlChannel::SendMsg(string &message)
 {
-    DHLOGI("Start send messages.");
+    DHLOGD("Start send messages.");
     uint8_t *buf = reinterpret_cast<uint8_t *>(calloc((MSG_MAX_SIZE), sizeof(uint8_t)));
     if (buf == nullptr) {
         DHLOGE("Malloc memory failed.");
@@ -190,7 +190,7 @@ void AudioCtrlChannel::OnSessionClosed(int32_t sessionId)
 {
     DHLOGI("On control session closed, sessionId: %d.", sessionId);
     if (sessionId_ == 0) {
-        DHLOGI("Session already closed.");
+        DHLOGD("Session already closed.");
         return;
     }
     auto listener = channelListener_.lock();

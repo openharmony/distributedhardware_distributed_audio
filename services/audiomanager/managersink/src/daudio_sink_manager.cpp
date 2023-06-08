@@ -31,7 +31,7 @@ namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(DAudioSinkManager);
 DAudioSinkManager::DAudioSinkManager()
 {
-    DHLOGI("Distributed audio sink manager constructed.");
+    DHLOGD("Distributed audio sink manager constructed.");
 }
 
 DAudioSinkManager::~DAudioSinkManager()
@@ -39,7 +39,7 @@ DAudioSinkManager::~DAudioSinkManager()
     if (devClearThread_.joinable()) {
         devClearThread_.join();
     }
-    DHLOGI("Distributed audio sink manager deconstructed.");
+    DHLOGD("Distributed audio sink manager deconstructed.");
 }
 
 int32_t DAudioSinkManager::Init()
@@ -90,7 +90,7 @@ void DAudioSinkManager::OnSinkDevReleased(const std::string &devId)
 int32_t DAudioSinkManager::HandleDAudioNotify(const std::string &devId, const std::string &dhId,
     const int32_t eventType, const std::string &eventContent)
 {
-    DHLOGI("Receive audio event from devId: %s, event type: %d.", GetAnonyString(devId).c_str(), eventType);
+    DHLOGD("Receive audio event from devId: %s, event type: %d.", GetAnonyString(devId).c_str(), eventType);
 
     if (eventContent.length() > DAUDIO_MAX_JSON_LEN || eventContent.empty() || !CheckIsNum(dhId)
         || !CheckDevIdIsLegal(devId) || eventType < 0 || eventType > MAX_EVENT_TYPE_NUM) {
@@ -99,7 +99,7 @@ int32_t DAudioSinkManager::HandleDAudioNotify(const std::string &devId, const st
 
     json jParam = json::parse(eventContent, nullptr, false);
     if (JsonParamCheck(jParam, { KEY_RANDOM_TASK_CODE })) {
-        DHLOGI("Receive audio notify from source, random task code: %s",
+        DHLOGD("Receive audio notify from source, random task code: %s",
             ((std::string)jParam[KEY_RANDOM_TASK_CODE]).c_str());
     }
 
@@ -127,7 +127,7 @@ int32_t DAudioSinkManager::CreateAudioDevice(const std::string &devId)
 int32_t DAudioSinkManager::DAudioNotify(const std::string &devId, const std::string &dhId, const int32_t eventType,
     const std::string &eventContent)
 {
-    DHLOGI("Distributed audio notify, devId: %s, dhId: %s, eventType: %d.",
+    DHLOGD("Distributed audio notify, devId: %s, dhId: %s, eventType: %d.",
         GetAnonyString(devId).c_str(), dhId.c_str(), eventType);
 
     {

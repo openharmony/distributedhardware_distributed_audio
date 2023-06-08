@@ -26,7 +26,7 @@ namespace OHOS {
 namespace DistributedHardware {
 void AudioTransportContext::SetTransportStatus(TransportStateType stateType)
 {
-    DHLOGI("Set transport status in state %d", stateType);
+    DHLOGD("Set transport status in state %d", stateType);
     auto stateContext = std::shared_ptr<AudioTransportContext>(shared_from_this());
     currentState_ = AudioTransportStatusFactory::GetInstance().CreateState(stateType, stateContext);
 }
@@ -44,7 +44,7 @@ int32_t AudioTransportContext::GetTransportStatusType()
 int32_t AudioTransportContext::Start()
 {
     if (currentState_ == nullptr) {
-        DHLOGI("CurrentState is nullptr.");
+        DHLOGD("CurrentState is nullptr.");
         return ERR_DH_AUDIO_NULLPTR;
     }
     DHLOGI("Audio transport context start.");
@@ -54,7 +54,7 @@ int32_t AudioTransportContext::Start()
 int32_t AudioTransportContext::Stop()
 {
     if (currentState_ == nullptr) {
-        DHLOGI("CurrentState is nullptr.");
+        DHLOGD("CurrentState is nullptr.");
         return ERR_DH_AUDIO_NULLPTR;
     }
     DHLOGI("Audio transport context stop.");
@@ -64,7 +64,7 @@ int32_t AudioTransportContext::Stop()
 int32_t AudioTransportContext::Pause()
 {
     if (currentState_ == nullptr) {
-        DHLOGI("CurrentState is nullptr.");
+        DHLOGD("CurrentState is nullptr.");
         return ERR_DH_AUDIO_NULLPTR;
     }
     DHLOGI("Audio transport context pause.");
@@ -74,7 +74,7 @@ int32_t AudioTransportContext::Pause()
 int32_t AudioTransportContext::Restart(const AudioParam &localParam, const AudioParam &remoteParam)
 {
     if (currentState_ == nullptr) {
-        DHLOGI("CurrentState is nullptr.");
+        DHLOGD("CurrentState is nullptr.");
         return ERR_DH_AUDIO_NULLPTR;
     }
     DHLOGI("Audio transport context restart.");

@@ -35,7 +35,7 @@ DMicClient::~DMicClient()
 
 int32_t DMicClient::OnStateChange(const AudioEventType type)
 {
-    DHLOGI("On state change type: %d.", type);
+    DHLOGD("On state change type: %d.", type);
     AudioEvent event;
     event.content = "";
     switch (type) {
@@ -159,7 +159,7 @@ int32_t DMicClient::StartCapture()
 
 void DMicClient::CaptureThreadRunning()
 {
-    DHLOGI("Start the capturer thread.");
+    DHLOGD("Start the capturer thread.");
     if (pthread_setname_np(pthread_self(), CAPTURETHREAD) != DH_SUCCESS) {
         DHLOGE("Capture data thread setname failed.");
     }
@@ -178,7 +178,7 @@ void DMicClient::CaptureThreadRunning()
             }
         }
         if (errorFlag) {
-            DHLOGI("Bytes read failed.");
+            DHLOGE("Bytes read failed.");
             break;
         }
 

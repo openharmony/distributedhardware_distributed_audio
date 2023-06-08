@@ -27,7 +27,7 @@ namespace OHOS {
 namespace DistributedHardware {
 DAudioSinkStub::DAudioSinkStub()
 {
-    DHLOGI("Distributed audio sink stub constructed.");
+    DHLOGD("Distributed audio sink stub constructed.");
     memberFuncMap_[static_cast<uint32_t>(IDAudioSinkInterfaceCode::INIT_SINK)] =
         &DAudioSinkStub::InitSinkInner;
     memberFuncMap_[static_cast<uint32_t>(IDAudioSinkInterfaceCode::RELEASE_SINK)] =
@@ -42,12 +42,12 @@ DAudioSinkStub::DAudioSinkStub()
 
 DAudioSinkStub::~DAudioSinkStub()
 {
-    DHLOGI("Distributed audio sink stub deconstructed.");
+    DHLOGD("Distributed audio sink stub deconstructed.");
 }
 
 int32_t DAudioSinkStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    DHLOGI("On remote request, code: %d.", code);
+    DHLOGD("On remote request, code: %d.", code);
     std::u16string desc = DAudioSinkStub::GetDescriptor();
     std::u16string remoteDesc = data.ReadInterfaceToken();
     if (desc != remoteDesc) {

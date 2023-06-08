@@ -48,7 +48,7 @@ void AudioEncoderCallback::OnInputBufferAvailable(uint32_t index)
 
 void AudioEncoderCallback::OnOutputFormatChanged(const Media::Format &format)
 {
-    DHLOGI("On output format changed.");
+    DHLOGD("On output format changed.");
     std::shared_ptr<AudioEncoder> encObj = audioEncoder_.lock();
     if (encObj == nullptr) {
         DHLOGE("Encoder is nullptr.");

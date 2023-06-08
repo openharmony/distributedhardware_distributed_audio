@@ -29,7 +29,7 @@ namespace DistributedHardware {
 AudioEncoderProcessor::~AudioEncoderProcessor()
 {
     if (audioEncoder_ != nullptr) {
-        DHLOGI("Release audio processor.");
+        DHLOGD("Release audio processor.");
         StopAudioProcessor();
         ReleaseAudioProcessor();
     }
@@ -152,7 +152,7 @@ void AudioEncoderProcessor::OnCodecDataDone(const std::shared_ptr<AudioData> &ou
 
 void AudioEncoderProcessor::OnCodecStateNotify(const AudioEvent &event)
 {
-    DHLOGI("Codec state notify.");
+    DHLOGD("Codec state notify.");
     auto cbObj = procCallback_.lock();
     if (cbObj == nullptr) {
         DHLOGE("Processor callback is null.");

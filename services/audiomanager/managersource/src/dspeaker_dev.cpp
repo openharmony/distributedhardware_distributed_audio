@@ -137,7 +137,7 @@ int32_t DSpeakerDev::CloseDevice(const std::string &devId, const int32_t dhId)
 
 int32_t DSpeakerDev::SetParameters(const std::string &devId, const int32_t dhId, const AudioParamHDF &param)
 {
-    DHLOGI("Set speaker parameters {samplerate: %d, channelmask: %d, format: %d, streamusage: %d, period: %d, "
+    DHLOGD("Set speaker parameters {samplerate: %d, channelmask: %d, format: %d, streamusage: %d, period: %d, "
         "framesize: %d, renderFlags: %d, ext{%s}}.",
         param.sampleRate, param.channelMask, param.bitFormat, param.streamUsage, param.period, param.frameSize,
         param.renderFlags, param.ext.c_str());
@@ -157,7 +157,7 @@ int32_t DSpeakerDev::SetParameters(const std::string &devId, const int32_t dhId,
 
 int32_t DSpeakerDev::NotifyEvent(const std::string &devId, int32_t dhId, const AudioEvent &event)
 {
-    DHLOGI("Notify speaker event.");
+    DHLOGD("Notify speaker event.");
     std::shared_ptr<IAudioEventCallback> cbObj = audioEventCallback_.lock();
     if (cbObj == nullptr) {
         DHLOGE("Event callback is null");
@@ -313,7 +313,7 @@ int32_t DSpeakerDev::WriteStreamData(const std::string &devId, const int32_t dhI
 int32_t DSpeakerDev::ReadMmapPosition(const std::string &devId, const int32_t dhId,
     uint64_t &frames, CurrentTimeHDF &time)
 {
-    DHLOGI("Read mmap position. frames: %lu, tvsec: %lu, tvNSec:%lu",
+    DHLOGD("Read mmap position. frames: %lu, tvsec: %lu, tvNSec:%lu",
         readNum_, readTvSec_, readTvNSec_);
     frames = readNum_;
     time.tvSec = readTvSec_;
@@ -323,7 +323,7 @@ int32_t DSpeakerDev::ReadMmapPosition(const std::string &devId, const int32_t dh
 int32_t DSpeakerDev::RefreshAshmemInfo(const std::string &devId, const int32_t dhId,
     int32_t fd, int32_t ashmemLength, int32_t lengthPerTrans)
 {
-    DHLOGI("RefreshAshmemInfo: fd:%d, ashmemLength: %d, lengthPerTrans: %d", fd, ashmemLength, lengthPerTrans);
+    DHLOGD("RefreshAshmemInfo: fd:%d, ashmemLength: %d, lengthPerTrans: %d", fd, ashmemLength, lengthPerTrans);
     if (param_.renderOpts.renderFlags == MMAP_MODE) {
         DHLOGI("DSpeaker dev low-latency mode");
         if (ashmem_ != nullptr) {
@@ -362,7 +362,7 @@ void DSpeakerDev::EnqueueThread()
     readIndex_ = 0;
     readNum_ = 0;
     frameIndex_ = 0;
-    DHLOGI("Enqueue thread start, lengthPerRead length: %d.", lengthPerTrans_);
+    DHLOGD("Enqueue thread start, lengthPerRead length: %d.", lengthPerTrans_);
     while (ashmem_ != nullptr && isEnqueueRunning_.load()) {
         int64_t timeOffset = UpdateTimeOffset(frameIndex_, LOW_LATENCY_INTERVAL_NS,
             startTime_);

@@ -34,7 +34,7 @@ namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(DAudioSourceHandler);
 DAudioSourceHandler::DAudioSourceHandler()
 {
-    DHLOGI("Audio source handler constructed.");
+    DHLOGD("Audio source handler constructed.");
     if (!sourceSvrRecipient_) {
         sourceSvrRecipient_ = new DAudioSourceSvrRecipient();
     }
@@ -46,7 +46,7 @@ DAudioSourceHandler::DAudioSourceHandler()
 
 DAudioSourceHandler::~DAudioSourceHandler()
 {
-    DHLOGI("Audio source handler destructed.");
+    DHLOGD("Audio source handler destructed.");
 }
 
 int32_t DAudioSourceHandler::InitSource(const std::string &params)

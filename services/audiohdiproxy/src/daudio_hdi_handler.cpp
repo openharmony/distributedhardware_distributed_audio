@@ -35,12 +35,12 @@ IMPLEMENT_SINGLE_INSTANCE(DAudioHdiHandler);
 
 DAudioHdiHandler::DAudioHdiHandler()
 {
-    DHLOGI("Distributed audio hdi handler construct.");
+    DHLOGD("Distributed audio hdi handler construct.");
 }
 
 DAudioHdiHandler::~DAudioHdiHandler()
 {
-    DHLOGI("Distributed audio hdi handler deconstructed.");
+    DHLOGD("Distributed audio hdi handler deconstructed.");
 }
 
 int32_t DAudioHdiHandler::InitHdiHandler()
@@ -51,13 +51,13 @@ int32_t DAudioHdiHandler::InitHdiHandler()
     }
 
     DAUDIO_SYNC_TRACE(DAUDIO_LOAD_HDF_DRIVER);
-    DHLOGI("Load hdf driver start.");
+    DHLOGD("Load hdf driver start.");
     int32_t ret = DaudioHdfOperate::GetInstance().LoadDaudioHDFImpl();
     if (ret != DH_SUCCESS) {
         DHLOGE("Load hdf driver failed, ret: %d", ret);
         return ret;
     }
-    DHLOGI("Load hdf driver end.");
+    DHLOGD("Load hdf driver end.");
 
     audioSrvHdf_ = IDAudioManager::Get(HDF_AUDIO_SERVICE_NAME.c_str(), false);
     if (audioSrvHdf_ == nullptr) {
@@ -165,7 +165,7 @@ int32_t DAudioHdiHandler::UnRegisterAudioDevice(const std::string &devId, const 
 int32_t DAudioHdiHandler::NotifyEvent(const std::string &devId, const int32_t dhId,
     const AudioEvent &audioEvent)
 {
-    DHLOGI("Notify event adpname: %s, dhId: %d, event type: %d, event content: %s.",
+    DHLOGD("Notify event adpname: %s, dhId: %d, event type: %d, event content: %s.",
         GetAnonyString(devId).c_str(), dhId, audioEvent.type, audioEvent.content.c_str());
     if (audioSrvHdf_ == nullptr) {
         DHLOGE("Audio hdi proxy not init");

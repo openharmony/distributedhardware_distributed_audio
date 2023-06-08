@@ -204,7 +204,7 @@ int32_t AudioAdapterInterfaceImpl::DestroyCapture(const AudioDeviceDescriptor &d
 
 int32_t AudioAdapterInterfaceImpl::GetPortCapability(const AudioPort &port, AudioPortCapability &capability)
 {
-    DHLOGI("Get audio port capability.");
+    DHLOGD("Get audio port capability.");
     (void)port;
     capability.sampleRateMasks = AUDIO_SAMPLE_RATE_DEFAULT;
     capability.channelCount = AUDIO_CHANNEL_COUNT_DEFAULT;
@@ -214,7 +214,6 @@ int32_t AudioAdapterInterfaceImpl::GetPortCapability(const AudioPort &port, Audi
 
 int32_t AudioAdapterInterfaceImpl::SetPassthroughMode(const AudioPort &port, AudioPortPassthroughMode mode)
 {
-    DHLOGI("Distributed audio not support yet.");
     (void)port;
     (void)mode;
     return HDF_SUCCESS;
@@ -222,7 +221,6 @@ int32_t AudioAdapterInterfaceImpl::SetPassthroughMode(const AudioPort &port, Aud
 
 int32_t AudioAdapterInterfaceImpl::GetPassthroughMode(const AudioPort &port, AudioPortPassthroughMode &mode)
 {
-    DHLOGI("Distributed audio not support yet.");
     (void)port;
     (void)mode;
     return HDF_SUCCESS;
@@ -230,7 +228,6 @@ int32_t AudioAdapterInterfaceImpl::GetPassthroughMode(const AudioPort &port, Aud
 
 int32_t AudioAdapterInterfaceImpl::GetDeviceStatus(AudioDeviceStatus& status)
 {
-    DHLOGI("Distributed audio not support yet.");
     (void) status;
     return HDF_SUCCESS;
 }
@@ -269,7 +266,7 @@ int32_t AudioAdapterInterfaceImpl::SetVoiceVolume(float volume)
 int32_t AudioAdapterInterfaceImpl::SetExtraParams(AudioExtParamKey key, const std::string &condition,
     const std::string &value)
 {
-    DHLOGI("Set audio parameters, key = %d, condition: %s value: %s.", key, condition.c_str(), value.c_str());
+    DHLOGD("Set audio parameters, key = %d, condition: %s value: %s.", key, condition.c_str(), value.c_str());
     int32_t ret = ERR_DH_AUDIO_HDF_FAIL;
     switch (key) {
         case AudioExtParamKey::AUDIO_EXT_PARAM_KEY_VOLUME:
@@ -293,7 +290,7 @@ int32_t AudioAdapterInterfaceImpl::SetExtraParams(AudioExtParamKey key, const st
 int32_t AudioAdapterInterfaceImpl::GetExtraParams(AudioExtParamKey key, const std::string &condition,
     std::string &value)
 {
-    DHLOGI("Get audio parameters, key: %d, condition: %s.", key, condition.c_str());
+    DHLOGD("Get audio parameters, key: %d, condition: %s.", key, condition.c_str());
     int32_t ret = ERR_DH_AUDIO_HDF_FAIL;
     switch (key) {
         case AudioExtParamKey::AUDIO_EXT_PARAM_KEY_VOLUME:
@@ -316,7 +313,7 @@ int32_t AudioAdapterInterfaceImpl::GetExtraParams(AudioExtParamKey key, const st
 
 int32_t AudioAdapterInterfaceImpl::RegExtraParamObserver(const sptr<IAudioCallback> &audioCallback, int8_t cookie)
 {
-    DHLOGI("Register audio param observer.");
+    DHLOGD("Register audio param observer.");
     paramCallback_ = audioCallback;
     (void) cookie;
     return HDF_SUCCESS;
@@ -741,7 +738,7 @@ int32_t AudioAdapterInterfaceImpl::HandleRenderStateChangeEvent(const DAudioEven
 int32_t AudioAdapterInterfaceImpl::HandleSANotifyEvent(const DAudioEvent &event)
 {
     if (event.type == HDF_AUDIO_EVENT_OPEN_SPK_RESULT) {
-        DHLOGI("Notify event: OPEN_SPK_RESULT, event content: %s.", event.content.c_str());
+        DHLOGD("Notify event: OPEN_SPK_RESULT, event content: %s.", event.content.c_str());
         if (event.content == HDF_EVENT_RESULT_SUCCESS) {
             isSpkOpened_ = true;
         }
@@ -749,7 +746,7 @@ int32_t AudioAdapterInterfaceImpl::HandleSANotifyEvent(const DAudioEvent &event)
         spkWaitCond_.notify_all();
         return DH_SUCCESS;
     } else if (event.type == HDF_AUDIO_EVENT_CLOSE_SPK_RESULT) {
-        DHLOGI("Notify event: CLOSE_SPK_RESULT, event content: %s.", event.content.c_str());
+        DHLOGD("Notify event: CLOSE_SPK_RESULT, event content: %s.", event.content.c_str());
         if (event.content == HDF_EVENT_RESULT_SUCCESS) {
             isSpkOpened_ = false;
         }
@@ -757,7 +754,7 @@ int32_t AudioAdapterInterfaceImpl::HandleSANotifyEvent(const DAudioEvent &event)
         spkWaitCond_.notify_all();
         return DH_SUCCESS;
     } else if (event.type == HDF_AUDIO_EVENT_OPEN_MIC_RESULT) {
-        DHLOGI("Notify event: OPEN_MIC_RESULT, event content: %s.", event.content.c_str());
+        DHLOGD("Notify event: OPEN_MIC_RESULT, event content: %s.", event.content.c_str());
         if (event.content == HDF_EVENT_RESULT_SUCCESS) {
             isMicOpened_ = true;
         }
@@ -765,7 +762,7 @@ int32_t AudioAdapterInterfaceImpl::HandleSANotifyEvent(const DAudioEvent &event)
         micWaitCond_.notify_all();
         return DH_SUCCESS;
     } else if (event.type == HDF_AUDIO_EVENT_CLOSE_MIC_RESULT) {
-        DHLOGI("Notify event: CLOSE_MIC_RESULT, event content: %s.", event.content.c_str());
+        DHLOGD("Notify event: CLOSE_MIC_RESULT, event content: %s.", event.content.c_str());
         if (event.content == HDF_EVENT_RESULT_SUCCESS) {
             isMicOpened_ = false;
         }
@@ -830,17 +827,17 @@ int32_t AudioAdapterInterfaceImpl::HandleDeviceClosed(const DAudioEvent &event)
         int32_t ret = paramCallback_->ParamCallback(AUDIO_EXT_PARAM_KEY_STATUS, ss.str(),
             std::to_string(EVENT_DEV_CLOSED), reserved, cookie);
         if (ret != DH_SUCCESS) {
-            DHLOGI("Notify fwk failed.");
+            DHLOGE("Notify fwk failed.");
         }
     }
 
     AudioDeviceDescriptor dec;
     if (isSpkOpened_ == true && event.type == HDF_AUDIO_EVENT_SPK_CLOSED) {
-        DHLOGI("Render device status error, close render.");
+        DHLOGE("Render device status error, close render.");
         dec.pins = static_cast<AudioPortPin>(spkPinInUse_);
         return DestroyRender(dec);
     } else if (isMicOpened_ == true && event.type == HDF_AUDIO_EVENT_MIC_CLOSED) {
-        DHLOGI("Capture device status error, close capture.");
+        DHLOGE("Capture device status error, close capture.");
         dec.pins = static_cast<AudioPortPin>(micPinInUse_);
         return DestroyCapture(dec);
     }

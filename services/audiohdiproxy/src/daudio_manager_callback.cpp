@@ -111,7 +111,7 @@ int32_t DAudioManagerCallback::GetAudioParamHDF(const AudioParameter& param, Aud
 
 int32_t DAudioManagerCallback::SetParameters(const std::string& adpName, int32_t devId, const AudioParameter& param)
 {
-    DHLOGI("Set Parameters.");
+    DHLOGD("Set Parameters.");
     if (callback_ == nullptr) {
         DHLOGE("Register hdi callback is nullptr.");
         return HDF_FAILURE;
@@ -184,12 +184,12 @@ int32_t DAudioManagerCallback::NotifyEvent(const std::string& adpName, int32_t d
 int32_t DAudioManagerCallback::WriteStreamData(const std::string &adpName, int32_t devId,
     const OHOS::HDI::DistributedAudio::Audioext::V1_0::AudioData &data)
 {
-    DHLOGI("Write Stream Data.");
+    DHLOGD("Write Stream Data.");
     if (callback_ == nullptr) {
         DHLOGE("Register hdi callback is nullptr.");
         return HDF_FAILURE;
     }
-    DHLOGI("Audio data param frameSize is %d.", data.param.frameSize);
+    DHLOGD("Audio data param frameSize is %d.", data.param.frameSize);
     if (data.param.frameSize == 0 || data.param.frameSize > DEFAULT_AUDIO_DATA_SIZE) {
         DHLOGE("Audio data param frameSize is 0. or > 4096");
         return HDF_FAILURE;
@@ -232,7 +232,7 @@ int32_t DAudioManagerCallback::ReadStreamData(const std::string &adpName, int32_
 int32_t DAudioManagerCallback::ReadMmapPosition(const std::string &adpName, int32_t devId,
     uint64_t &frames, OHOS::HDI::DistributedAudio::Audioext::V1_0::CurrentTime &time)
 {
-    DHLOGI("Read mmap position");
+    DHLOGD("Read mmap position");
     if (callback_ == nullptr) {
         DHLOGE("Regisiter hdi callback id nullptr.");
         return HDF_FAILURE;
@@ -245,14 +245,14 @@ int32_t DAudioManagerCallback::ReadMmapPosition(const std::string &adpName, int3
     }
     time.tvSec = timeHdf.tvSec;
     time.tvNSec = timeHdf.tvNSec;
-    DHLOGI("Read mmap position success.");
+    DHLOGD("Read mmap position success.");
     return HDF_SUCCESS;
 }
 
 int32_t DAudioManagerCallback::RefreshAshmemInfo(const std::string &adpName, int32_t devId,
     int fd, int32_t ashmemLength, int32_t lengthPerTrans)
 {
-    DHLOGI("Refresh ashmem info.");
+    DHLOGD("Refresh ashmem info.");
     if (callback_ == nullptr) {
         DHLOGE("Regisiter hdi callback id nullptr.");
         return HDF_FAILURE;
@@ -262,7 +262,7 @@ int32_t DAudioManagerCallback::RefreshAshmemInfo(const std::string &adpName, int
         DHLOGE("Refresh ashmem info failed.");
         return HDF_FAILURE;
     }
-    DHLOGI("Refresh ashmem info success.");
+    DHLOGD("Refresh ashmem info success.");
     return HDF_SUCCESS;
 }
 } // DistributedHardware

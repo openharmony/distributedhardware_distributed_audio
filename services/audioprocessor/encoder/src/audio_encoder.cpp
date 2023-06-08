@@ -35,7 +35,7 @@ const std::string AudioEncoder::ENCODE_MIME_AAC = "audio/mp4a-latm";
 AudioEncoder::~AudioEncoder()
 {
     if (audioEncoder_ != nullptr) {
-        DHLOGI("Release audio codec.");
+        DHLOGD("Release audio codec.");
         StopAudioCodec();
         ReleaseAudioCodec();
     }
@@ -44,7 +44,7 @@ AudioEncoder::~AudioEncoder()
 int32_t AudioEncoder::ConfigureAudioCodec(const AudioCommonParam &codecParam,
     const std::shared_ptr<IAudioCodecCallback> &codecCallback)
 {
-    DHLOGI("Configure audio codec.");
+    DHLOGD("Configure audio codec.");
     if (!IsInEncodeRange(codecParam) || codecCallback == nullptr) {
         DHLOGE("Codec param error or callback is null.");
         return ERR_DH_AUDIO_BAD_VALUE;

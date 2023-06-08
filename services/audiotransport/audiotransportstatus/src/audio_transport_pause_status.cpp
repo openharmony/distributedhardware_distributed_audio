@@ -26,7 +26,7 @@ namespace DistributedHardware {
 AudioTransportPauseStatus::AudioTransportPauseStatus(std::shared_ptr<AudioTransportContext>& stateContext)
     : stateContext_(stateContext)
 {
-    DHLOGI("AudioTransportPauseStatus contruct.");
+    DHLOGD("AudioTransportPauseStatus contruct.");
 }
 
 int32_t AudioTransportPauseStatus::Start(std::shared_ptr<IAudioChannel> audioChannel,

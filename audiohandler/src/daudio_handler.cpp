@@ -46,12 +46,12 @@ DAudioHandler::DAudioHandler()
     spkInfos_.channelMinVal = 0;
     micInfos_.channelMaxVal = 0;
     micInfos_.channelMinVal = 0;
-    DHLOGI("Distributed audio handler constructed.");
+    DHLOGD("Distributed audio handler constructed.");
 }
 
 DAudioHandler::~DAudioHandler()
 {
-    DHLOGI("Distributed audio handler deconstructed.");
+    DHLOGD("Distributed audio handler deconstructed.");
 }
 
 int32_t DAudioHandler::Initialize()
@@ -69,7 +69,7 @@ int32_t DAudioHandler::Initialize()
 
 std::vector<DHItem> DAudioHandler::Query()
 {
-    DHLOGI("Query distributed hardware information.");
+    DHLOGD("Query distributed hardware information.");
     auto audioSrv = AudioStandard::AudioSystemManager::GetInstance();
     std::vector<DHItem> dhItemVec;
     if (audioSrv == nullptr) {
@@ -106,7 +106,7 @@ std::vector<DHItem> DAudioHandler::Query()
 
 std::vector<DHItem> DAudioHandler::ablityForDump()
 {
-    DHLOGI("Get audio ablity for dump.");
+    DHLOGD("Get audio ablity for dump.");
     if (ablityForDumpVec_.size() > 0) {
         return ablityForDumpVec_;
     }
@@ -116,7 +116,7 @@ std::vector<DHItem> DAudioHandler::ablityForDump()
 }
 int32_t DAudioHandler::QueryCodecInfo()
 {
-    DHLOGI("Query codec information.");
+    DHLOGD("Query codec information.");
     auto avCodecList = Media::AVCodecListFactory::CreateAVCodecList();
     if (avCodecList == nullptr) {
         DHLOGE("Failed to query the avcodec information.");
@@ -155,7 +155,7 @@ int32_t DAudioHandler::QueryCodecInfo()
 
 int32_t DAudioHandler::QueryAudioInfo()
 {
-    DHLOGI("Start to query codec information.");
+    DHLOGD("Start to query codec information.");
     audioInfos_.sampleRates = OHOS::AudioStandard::AudioCapturer::GetSupportedSamplingRates();
     audioInfos_.formats = OHOS::AudioStandard::AudioCapturer::GetSupportedFormats();
     audioInfos_.channels = OHOS::AudioStandard::AudioCapturer::GetSupportedChannels();
@@ -215,14 +215,14 @@ void DAudioHandler::GetSupportAudioInfo(AudioInfo &audioInfos, CoderInfo &encode
 
 std::map<std::string, std::string> DAudioHandler::QueryExtraInfo()
 {
-    DHLOGI("Query extra information");
+    DHLOGD("Query extra information");
     std::map<std::string, std::string> extraInfo;
     return extraInfo;
 }
 
 bool DAudioHandler::IsSupportPlugin()
 {
-    DHLOGI("Is support plug in");
+    DHLOGD("Is support plug in");
     return false;
 }
 

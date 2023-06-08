@@ -125,7 +125,7 @@ void AudioCtrlTransport::OnSessionOpened()
 
 void AudioCtrlTransport::OnSessionClosed()
 {
-    DHLOGI("On channel session closed.");
+    DHLOGD("On channel session closed.");
     auto callback = ctrlTransCallback_.lock();
     if (callback == nullptr) {
         DHLOGE("Callback is nullptr.");
@@ -141,7 +141,7 @@ void AudioCtrlTransport::OnDataReceived(const std::shared_ptr<AudioData> &data)
 
 void AudioCtrlTransport::OnEventReceived(const AudioEvent &event)
 {
-    DHLOGI("Audio event received.");
+    DHLOGD("Audio event received.");
     auto callback = ctrlTransCallback_.lock();
     if (callback == nullptr) {
         DHLOGE("Callback is null.");
