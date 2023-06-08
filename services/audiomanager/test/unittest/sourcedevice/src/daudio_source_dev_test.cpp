@@ -26,6 +26,10 @@ const std::string ARGS = "args";
 const std::string DH_ID_MIC = "134217728";
 const std::string DH_ID_SPK = "1";
 const std::string DH_ID_UNKNOWN = "0";
+const int32_t taskQueueLength = 20;
+const int32_t ashmemLength = 20
+const size_t capacity = 1;
+const int32_t fd = 1;
 
 void DAudioSourceDevTest::SetUpTestCase(void) {}
 
@@ -169,7 +173,7 @@ HWTEST_F(DAudioSourceDevTest, HandlePlayStatusChange_001, TestSize.Level1)
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->HandlePlayStatusChange(event));
 
     sourceDev_->audioCtrlMgr_ = std::make_shared<DAudioSourceDevCtrlMgr>(DEV_ID, sourceDev_);
-    sourceDev_->taskQueue_ = std::make_shared<TaskQueue>(20);
+    sourceDev_->taskQueue_ = std::make_shared<TaskQueue>(taskQueueLength);
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandlePlayStatusChange(event));
 }
 
@@ -307,7 +311,7 @@ HWTEST_F(DAudioSourceDevTest, HandleNotifyRPC_003, TestSize.Level1)
 HWTEST_F(DAudioSourceDevTest, HandleSpkMmapStart_001, TestSize.Level1)
 {
     AudioEvent event;
-    sourceDev_->taskQueue_ = std::make_shared<TaskQueue>(20);
+    sourceDev_->taskQueue_ = std::make_shared<TaskQueue>(taskQueueLength);
     sourceDev_->speaker_ = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleSpkMmapStart(event));
 }
@@ -321,7 +325,7 @@ HWTEST_F(DAudioSourceDevTest, HandleSpkMmapStart_001, TestSize.Level1)
 HWTEST_F(DAudioSourceDevTest, HandleSpkMmapStop_001, TestSize.Level1)
 {
     AudioEvent event;
-    sourceDev_->taskQueue_ = std::make_shared<TaskQueue>(20);
+    sourceDev_->taskQueue_ = std::make_shared<TaskQueue>(taskQueueLength);
     sourceDev_->speaker_ = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleSpkMmapStop(event));
 }
@@ -335,7 +339,7 @@ HWTEST_F(DAudioSourceDevTest, HandleSpkMmapStop_001, TestSize.Level1)
 HWTEST_F(DAudioSourceDevTest, HandleMicMmapStart_001, TestSize.Level1)
 {
     AudioEvent event;
-    sourceDev_->taskQueue_ = std::make_shared<TaskQueue>(20);
+    sourceDev_->taskQueue_ = std::make_shared<TaskQueue>(taskQueueLength);
     sourceDev_->mic_ = std::make_shared<DMicDev>(DEV_ID, sourceDev_);
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleMicMmapStart(event));
 }
@@ -349,7 +353,7 @@ HWTEST_F(DAudioSourceDevTest, HandleMicMmapStart_001, TestSize.Level1)
 HWTEST_F(DAudioSourceDevTest, HandleMicMmapStop_001, TestSize.Level1)
 {
     AudioEvent event;
-    sourceDev_->taskQueue_ = std::make_shared<TaskQueue>(20);
+    sourceDev_->taskQueue_ = std::make_shared<TaskQueue>(taskQueueLength);
     sourceDev_->mic_ = std::make_shared<DMicDev>(DEV_ID, sourceDev_);
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleMicMmapStop(event));
 }
@@ -721,7 +725,7 @@ HWTEST_F(DAudioSourceDevTest, TaskPlayStatusChange_001, TestSize.Level1)
 HWTEST_F(DAudioSourceDevTest, TaskSpkMmapStart_001, TestSize.Level1)
 {
     sourceDev_->speaker_ = std::make_shared<DSpeakerDev>(DEV_ID, nullptr);
-    sourceDev_->speaker_->ashmem_ = new Ashmem(1, 20);
+    sourceDev_->speaker_->ashmem_ = new Ashmem(fd, ashmemLength);
     EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskSpkMmapStart(ARGS));
     EXPECT_EQ(DH_SUCCESS, sourceDev_->speaker_->MmapStop());
 }
@@ -747,10 +751,9 @@ HWTEST_F(DAudioSourceDevTest, TaskSpkMmapStop_001, TestSize.Level1)
 HWTEST_F(DAudioSourceDevTest, TaskMicMmapStart_001, TestSize.Level1)
 {
     sourceDev_->mic_ = std::make_shared<DMicDev>(DEV_ID, nullptr);
-    sourceDev_->mic_->ashmem_ = new Ashmem(1, 20);
-    const size_t capacity = 1;
+    sourceDev_->mic_->ashmem_ = new Ashmem(fd, ashmemLength);
     std::shared_ptr<AudioData> data = std::make_shared<AudioData>(capacity);
-    for (size_t i = 0; i < 20; i++) {
+    for (size_t i = 0; i < taskQueueLength; i++) {
         sourceDev_->mic_->dataQueue_.push(data);
     }
     EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskMicMmapStart(ARGS));
