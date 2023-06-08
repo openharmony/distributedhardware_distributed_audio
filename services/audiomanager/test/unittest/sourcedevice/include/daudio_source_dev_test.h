@@ -18,6 +18,7 @@
 
 #include <gtest/gtest.h>
 
+#include "audio_data.h"
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
 #define private public

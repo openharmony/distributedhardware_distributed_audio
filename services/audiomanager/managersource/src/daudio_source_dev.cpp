@@ -904,7 +904,7 @@ int32_t DAudioSourceDev::TaskMicMmapStart(const std::string &args)
 {
     DHLOGI("Task mic mmap start, content: %s.", args.c_str());
     if (mic_ == nullptr) {
-        DHLOGE("Task mic mmap start, speaker is nullptr.");
+        DHLOGE("Task mic mmap start, mic is nullptr.");
         return ERR_DH_AUDIO_NULLPTR;
     }
     int32_t ret = mic_->MmapStart();
@@ -918,7 +918,7 @@ int32_t DAudioSourceDev::TaskMicMmapStop(const std::string &args)
 {
     DHLOGI("Task mic mmap stop, content: %s.", args.c_str());
     if (mic_ == nullptr) {
-        DHLOGE("Task mic mmap stop, speaker is nullptr.");
+        DHLOGE("Task mic mmap stop, mic is nullptr.");
         return ERR_DH_AUDIO_NULLPTR;
     }
     int32_t ret = mic_->MmapStop();
