@@ -27,7 +27,7 @@ const std::string DH_ID_MIC = "134217728";
 const std::string DH_ID_SPK = "1";
 const std::string DH_ID_UNKNOWN = "0";
 const int32_t taskQueueLength = 20;
-const int32_t ashmemLength = 20
+const int32_t ashmemLength = 20;
 const size_t capacity = 1;
 const int32_t fd = 1;
 
