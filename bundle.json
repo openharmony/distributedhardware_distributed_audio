@@ -7,7 +7,7 @@
     "license":"Apache License 2.0",
     "publishAs":"code-segment",
     "segment":{
-        "destPath":"foundation/distributedhardware/distributed_audio/"
+        "destPath":"foundation/distributedhardware/distributed_audio"
     },
     "dirs":{},
     "scripts":{},
@@ -29,15 +29,21 @@
         "deps":{
             "components":[
                 "appexecfwk_standard",
-                "eventhandler",
-                "hiviewdfx_hilog_native",
-                "ipc",
-                "safwk",
-                "samgr",
-                "dsoftbus",
+                "audio_framework",
                 "c_utils",
                 "distributed_hardware_fwk",
-                "player_framework"
+                "drivers_interface_audio",
+                "dsoftbus",
+                "eventhandler",
+                "hdf_core",
+                "hisysevent_native",
+                "hitrace_native",
+                "hiviewdfx_hilog_native",
+                "ipc",
+                "multimedia_image_framework",
+                "player_framework",
+                "safwk",
+                "samgr"
             ],
             "third_party":[
                 "json"

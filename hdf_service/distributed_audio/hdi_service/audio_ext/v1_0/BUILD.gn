@@ -27,13 +27,14 @@ ohos_shared_library("libdaudio_manager_daudio_ext_service_1.0") {
   sources = [ "./src/daudio_manager_interface_impl.cpp" ]
 
   public_deps = [
-    "${hdf_interfaces_path}/audioext/v1_0:libdaudioext_stub_1.0",
     "${hdf_ser_aud_path}:libaudio_manager_daudio_primary_service_1.0",
     "${hdf_service_path}/hdi_service/common:libdaudio_hdf_utils",
   ]
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_distributed_audio:libdaudio_stub_1.0",
+    "drivers_interface_distributed_audio:libdaudioext_stub_1.0",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
@@ -59,6 +60,8 @@ ohos_shared_library("libdaudio_ext_driver") {
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_distributed_audio:libdaudio_stub_1.0",
+    "drivers_interface_distributed_audio:libdaudioext_stub_1.0",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",

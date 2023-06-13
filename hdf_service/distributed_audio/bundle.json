@@ -16,10 +16,11 @@
       "ram": "8000KB",
       "deps": {
         "components": [
-          "ipc",
+          "c_utils",
+          "drivers_interface_distributed_audio",
           "hdf_core",
           "hiviewdfx_hilog_native",
-          "c_utils"
+          "ipc"
         ],
         "third_party": [
           "bounds_checking_function"
