@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -417,6 +417,25 @@ HWTEST_F(AudioAdapterInterfaceImpTest, AdapterLoad_001, TestSize.Level1)
  */
 HWTEST_F(AudioAdapterInterfaceImpTest, AdapterUnload_001, TestSize.Level1)
 {
+    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->AdapterUnload());
+
+    std::string adpterName = "adbcef";
+    AudioDeviceDescriptor descSpk;
+    AudioSampleAttributes attrsSpk;
+    sptr<IDAudioCallback> callbackSpk = new MockIDAudioCallback();
+    AdapterTest_->audioRender_ = new AudioRenderInterfaceImpl(adpterName, descSpk, attrsSpk, callbackSpk);
+    EXPECT_EQ(HDF_ERR_DEVICE_BUSY, AdapterTest_->AdapterUnload());
+
+    AudioDeviceDescriptor devDescMic;
+    AudioSampleAttributes attrsMic;
+    sptr<IDAudioCallback> callbackMic = new MockIDAudioCallback();
+    AdapterTest_->audioCapture_ = new AudioCaptureInterfaceImpl(adpterName, devDescMic, attrsMic, callbackMic);
+    EXPECT_EQ(HDF_ERR_DEVICE_BUSY, AdapterTest_->AdapterUnload());
+
+    AdapterTest_->audioRender_ = nullptr;
+    EXPECT_EQ(HDF_ERR_DEVICE_BUSY, AdapterTest_->AdapterUnload());
+
+    AdapterTest_->audioCapture_ = nullptr;
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->AdapterUnload());
 }
 
