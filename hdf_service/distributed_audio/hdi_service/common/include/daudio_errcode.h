@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,7 +30,7 @@ enum DAudioErrorCode {
     ERR_DH_AUDIO_HDF_OPEN_DEVICE_FAIL = -46007,
     ERR_DH_AUDIO_HDF_CLOSE_DEVICE_FAIL = -46008,
     ERR_DH_AUDIO_COMMON_NOT_FOUND_KEY = -46009,
-    ERR_DH_AUDIO_HDF_FAILURE = -46010,
+    ERR_DH_AUDIO_HDF_WAIT_TIMEOUT = -46010,
 };
 } // Distributedaudio
 } // OHOS

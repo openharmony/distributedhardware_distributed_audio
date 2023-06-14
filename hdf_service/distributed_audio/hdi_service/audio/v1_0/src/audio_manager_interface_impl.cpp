@@ -99,7 +99,7 @@ int32_t AudioManagerInterfaceImpl::UnloadAdapter(const std::string &adapterName)
     int32_t ret = adp->second->AdapterUnload();
     if (ret != DH_SUCCESS) {
         DHLOGE("Unload audio adapter failed, adapter return: %d.", ret);
-        return HDF_SUCCESS;
+        return ret;
     }
     DHLOGI("Unload adapter success.");
     return HDF_SUCCESS;
