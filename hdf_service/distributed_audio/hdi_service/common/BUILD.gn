@@ -38,6 +38,6 @@ ohos_shared_library("libdaudio_hdf_utils") {
   ]
 
   install_images = [ chipset_base_dir ]
-  subsystem_name = "hdf"
+  subsystem_name = "distributedhardware"
   part_name = "drivers_peripheral_distributed_audio"
 }
