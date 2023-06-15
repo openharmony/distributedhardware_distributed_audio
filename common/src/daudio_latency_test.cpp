@@ -98,7 +98,7 @@ int64_t DAudioLatencyTest::RecordBeepTime(const uint8_t *base, const int32_t &si
 int32_t DAudioLatencyTest::ComputeLatency()
 {
     DHLOGD("Compute latency time.");
-    int32_t playSize = playBeepTime_.size();
+    int32_t playSize = static_cast<int32_t>(playBeepTime_.size());
     if (playSize == 0 || playBeepTime_.size() != captureBeepTime_.size()) {
         DHLOGE("Record num is not equal <%d, %d>", playSize, captureBeepTime_.size());
         return -1;

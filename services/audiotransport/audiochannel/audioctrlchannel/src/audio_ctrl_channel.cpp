@@ -233,6 +233,7 @@ void AudioCtrlChannel::OnBytesReceived(int32_t sessionId, const void *data, uint
     json jParam = json::parse(message, nullptr, false);
     if (from_audioEventJson(jParam, audioEvent) != DH_SUCCESS) {
         DHLOGE("Get audioEvent from json failed.");
+        free(buf);
         return;
     }
     free(buf);
