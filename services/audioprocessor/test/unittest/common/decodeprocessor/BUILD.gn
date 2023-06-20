@@ -35,6 +35,7 @@ config("module_private_config") {
     "${services_path}/common/audiodata/include",
     "${audio_processor_path}/decodeprocessor/include",
     "${audio_processor_path}/decoder/include",
+    "${audio_processor_path}/directprocessor/include",
     "${audio_processor_path}/interface",
     "${audio_processor_path}/test/unittest/common",
   ]
@@ -68,7 +69,35 @@ ohos_unittest("DecodeProcessTest") {
   ]
 }
 
+ohos_unittest("DirectProcessorTest") {
+  module_out_path = module_output_path
+
+  sources = [ "../directprocessor/audio_direct_processor_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "${audio_transport_path}/decodetransport:distributed_audio_decode_transport",
+    "${services_path}/common:distributed_audio_utils",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "player_framework:media_client",
+  ]
+
+  defines = [
+    "HI_LOG_ENABLE",
+    "DH_LOG_TAG=\"daudio_proc_test\"",
+    "LOG_DOMAIN=0xD004100",
+  ]
+}
+
 group("decode_processor_test") {
   testonly = true
-  deps = [ ":DecodeProcessTest" ]
+  deps = [
+    ":DecodeProcessTest",
+    ":DirectProcessorTest",
+  ]
 }
