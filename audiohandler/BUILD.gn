@@ -32,10 +32,7 @@ ohos_shared_library("distributed_audio_handler") {
 
   sources = [ "src/daudio_handler.cpp" ]
 
-  deps = [
-    "${mediastandard_path}/interfaces/inner_api/native:media_client",
-    "${services_path}/common:distributed_audio_utils",
-  ]
+  deps = [ "${services_path}/common:distributed_audio_utils" ]
 
   external_deps = [
     "audio_framework:audio_capturer",
