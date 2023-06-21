@@ -169,6 +169,10 @@ void AudioDataChannel::OnStreamReceived(int32_t sessionId, const StreamData *dat
         return;
     }
 
+    if (data == nullptr) {
+        DHLOGE("Received stream data is nullptr.");
+        return;
+    }
     DHLOGI("On audio stream received, sessionId: %d dataSize: %zu.", sessionId, data->bufLen);
     auto audioData = std::make_shared<AudioData>(data->bufLen);
     if (memcpy_s(audioData->Data(), audioData->Capacity(), reinterpret_cast<uint8_t *>(data->buf), data->bufLen)
