@@ -32,6 +32,7 @@
 #include "audio_event.h"
 #include "audio_param.h"
 #include "audio_status.h"
+#include "av_sender_engine_transport.h"
 #include "daudio_errorcode.h"
 #include "daudio_log.h"
 #include "iaudio_data_transport.h"
@@ -42,7 +43,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 class DMicClient : public IAudioDataTransCallback,
-    public IMicClient,
+    public IMicClient, public AVSenderTransportCallback,
     public std::enable_shared_from_this<DMicClient> {
 public:
     DMicClient(const std::string &devId, const std::shared_ptr<IAudioEventCallback> &callback)
@@ -50,11 +51,15 @@ public:
     ~DMicClient() override;
     int32_t OnStateChange(const AudioEventType type) override;
     int32_t OnDecodeTransDataDone(const std::shared_ptr<AudioData> &audioData) override;
+    void OnEngineTransEvent(const AVTransEvent &event) override;
+    void OnEngineTransMessage(const std::shared_ptr<AVTransMessage> &message) override;
+    int32_t InitSenderEngine(IAVEngineProvider *providerPtr) override;
     int32_t SetUp(const AudioParam &param) override;
     int32_t Release() override;
     int32_t StartCapture() override;
     int32_t StopCapture() override;
     void SetAttrs(const std::string &devId, const std::shared_ptr<IAudioEventCallback> &callback) override;
+    int32_t SendMessage(uint32_t type, std::string content, std::string dstDevId) override;
 
 private:
     void CaptureThreadRunning();
@@ -74,6 +79,7 @@ private:
     std::weak_ptr<IAudioEventCallback> eventCallback_;
     std::unique_ptr<AudioStandard::AudioCapturer> audioCapturer_ = nullptr;
     std::shared_ptr<IAudioDataTransport> micTrans_ = nullptr;
+    bool engineFlag_ = true;
 };
 } // DistributedHardware
 } // OHOS

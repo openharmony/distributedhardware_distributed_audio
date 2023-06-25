@@ -26,8 +26,8 @@
 #include "dmic_dev.h"
 #include "dspeaker_dev.h"
 #include "iaudio_event_callback.h"
-#include "iaudio_datatrans_callback.h"
 #include "iaudio_data_transport.h"
+#include "iaudio_datatrans_callback.h"
 #include "idaudio_ipc_callback.h"
 #include "idaudio_hdi_callback.h"
 #include "task_queue.h"
@@ -105,6 +105,7 @@ private:
     int32_t CloseCtrlTrans(const AudioEvent &event, bool isSpk);
     AudioEventType getEventTypeFromArgs(const std::string &args);
     void to_json(json &j, const AudioParam &param);
+    int32_t SendAudioEventToRemote(const AudioEvent &event);
 
 private:
     static constexpr uint8_t RPC_WAIT_SECONDS = 2;
@@ -133,6 +134,7 @@ private:
     using DAudioSourceDevFunc = int32_t (DAudioSourceDev::*)(const AudioEvent &audioEvent);
     std::map<AudioEventType, DAudioSourceDevFunc> memberFuncMap_;
     std::map<AudioEventType, uint8_t> eventNotifyMap_;
+    bool engineFlag_ = true;
 };
 } // DistributedHardware
 } // OHOS

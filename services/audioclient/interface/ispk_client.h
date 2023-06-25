@@ -19,6 +19,7 @@
 #include <memory>
 
 #include "audio_param.h"
+#include "i_av_engine_provider.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -35,6 +36,8 @@ public:
     virtual int32_t SetAudioParameters(const AudioEvent &event) = 0;
     virtual void PlayStatusChange(const std::string &args) = 0;
     virtual void SetAttrs(const std::string &devId, const std::shared_ptr<IAudioEventCallback> &callback) = 0;
+    virtual int32_t InitReceiverEngine(IAVEngineProvider *providerPtr) = 0;
+    virtual int32_t SendMessage(uint32_t type, std::string content, std::string dstDevId) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

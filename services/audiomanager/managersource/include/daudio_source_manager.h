@@ -43,6 +43,12 @@ public:
         const std::string &eventContent);
     int32_t OnEnableDAudio(const std::string &devId, const std::string &dhId, const int32_t result);
     int32_t OnDisableDAudio(const std::string &devId, const std::string &dhId, const int32_t result);
+    int32_t LoadAVSenderEngineProvider();
+    int32_t UnloadAVSenderEngineProvider();
+    int32_t LoadAVReceiverEngineProvider();
+    int32_t UnloadAVReceiverEngineProvider();
+    IAVEngineProvider *getSenderProvider();
+    IAVEngineProvider *getReceiverProvider();
 
 private:
     DAudioSourceManager();
@@ -69,6 +75,11 @@ private:
     sptr<IDAudioIpcCallback> ipcCallback_ = nullptr;
     std::shared_ptr<DAudioSourceMgrCallback> daudioMgrCallback_ = nullptr;
     std::thread devClearThread_;
+    IAVEngineProvider *sendProviderPtr_ = nullptr;
+    IAVEngineProvider *rcvProviderPtr_ = nullptr;
+    void *pSHandler_ = nullptr;
+    void *pRHandler_ = nullptr;
+    bool engineFlag_ = true;
 };
 } // DistributedHardware
 } // OHOS

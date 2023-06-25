@@ -28,6 +28,7 @@
 #include "daudio_hisysevent.h"
 #include "daudio_hitrace.h"
 #include "daudio_log.h"
+#include "daudio_source_manager.h"
 #include "daudio_util.h"
 
 #undef DH_LOG_TAG
@@ -98,6 +99,51 @@ int32_t DSpeakerDev::DisableDevice(const int32_t dhId)
     }
     enabledPorts_.erase(dhId);
     return DH_SUCCESS;
+}
+
+int32_t DSpeakerDev::InitSenderEngine(IAVEngineProvider *providerPtr)
+{
+    DHLOGI("InitSenderEngine enter");
+    // new 方式
+    IsParamEnabled(AUDIO_ENGINE_FLAG, engineFlag_);
+    if (engineFlag_ == true) {
+        if (speakerTrans_ == nullptr) {
+            speakerTrans_ = std::make_shared<AVTransSenderTransport>(devId_, shared_from_this());
+        }
+        int32_t ret = speakerTrans_->InitEngine(providerPtr);
+        if (ret != DH_SUCCESS) {
+            DHLOGE("Initialize av sender adapter failed.");
+            return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+        }
+        ret = speakerTrans_->CreateCtrl();
+        if (ret != DH_SUCCESS) {
+            DHLOGE("Create ctrl channel failed.");
+            return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+        }
+    }
+    return DH_SUCCESS;
+}
+
+void DSpeakerDev::OnEngineTransEvent(const AVTransEvent &event)
+{
+    if (event.type == EventType::EVENT_START_SUCCESS) {
+        OnStateChange(DATA_OPENED);
+    } else if ((event.type == EventType::EVENT_STOP_SUCCESS) ||
+        (event.type == EventType::EVENT_CHANNEL_CLOSED) ||
+        (event.type == EventType::EVENT_START_FAIL)) {
+        OnStateChange(DATA_CLOSED);
+    }
+}
+
+void DSpeakerDev::OnEngineTransMessage(const std::shared_ptr<AVTransMessage> &message)
+{
+    DHLOGI("On Engine message");
+    if (message == nullptr) {
+        DHLOGE("The parameter is nullptr");
+        return;
+    }
+    DAudioSourceManager::GetInstance().HandleDAudioNotify(message->dstDevId_, message->dstDevId_,
+        message->type_, message->content_);
 }
 
 int32_t DSpeakerDev::OpenDevice(const std::string &devId, const int32_t dhId)
@@ -196,7 +242,6 @@ int32_t DSpeakerDev::Start()
         DHLOGE("Speaker trans start failed, ret: %d.", ret);
         return ret;
     }
-
     std::unique_lock<std::mutex> lck(channelWaitMutex_);
     auto status = channelWaitCond_.wait_for(lck, std::chrono::seconds(CHANNEL_WAIT_SECONDS),
         [this]() { return isTransReady_.load(); });
@@ -299,7 +344,7 @@ int32_t DSpeakerDev::WriteStreamData(const std::string &devId, const int32_t dhI
 {
     DHLOGD("Write stream data, dhId:%d", dhId);
     if (speakerTrans_ == nullptr) {
-        DHLOGE("Read stream data, speaker trans is null.");
+        DHLOGE("Write stream data, speaker trans is null.");
         return ERR_DH_AUDIO_SA_SPEAKER_TRANS_NULL;
     }
     int32_t ret = speakerTrans_->FeedAudioData(data);
@@ -320,6 +365,7 @@ int32_t DSpeakerDev::ReadMmapPosition(const std::string &devId, const int32_t dh
     time.tvNSec = readTvNSec_;
     return DH_SUCCESS;
 }
+
 int32_t DSpeakerDev::RefreshAshmemInfo(const std::string &devId, const int32_t dhId,
     int32_t fd, int32_t ashmemLength, int32_t lengthPerTrans)
 {
@@ -407,6 +453,21 @@ int32_t DSpeakerDev::MmapStop()
 AudioParam DSpeakerDev::GetAudioParam() const
 {
     return param_;
+}
+
+int32_t DSpeakerDev::SendMessage(uint32_t type, std::string content, std::string dstDevId)
+{
+    DHLOGI("Send message to remote.");
+    if (type != static_cast<uint32_t>(OPEN_SPEAKER)&& type != static_cast<uint32_t>(CLOSE_SPEAKER)) {
+        DHLOGE("Send message to remote. not OPEN_SPK or CLOSE_SPK. type: %u", type);
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    if (speakerTrans_ == nullptr) {
+        DHLOGE("speaker trans is null.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    speakerTrans_->SendMessage(type, content, dstDevId);
+    return DH_SUCCESS;
 }
 
 int32_t DSpeakerDev::NotifyHdfAudioEvent(const AudioEvent &event)

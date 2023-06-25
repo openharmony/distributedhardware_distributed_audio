@@ -54,9 +54,10 @@ ohos_shared_library("distributed_audio_utils") {
   external_deps = [
     "c_utils:utils",
     "dsoftbus:softbus_client",
+    "hilog:libhilog",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
-    "hiviewdfx_hilog_native:libhilog",
+    "init:libbegetutil",
   ]
 
   defines = [

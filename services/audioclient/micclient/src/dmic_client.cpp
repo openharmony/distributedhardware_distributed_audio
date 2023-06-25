@@ -19,6 +19,7 @@
 
 #include "daudio_constants.h"
 #include "daudio_hisysevent.h"
+#include "daudio_sink_manager.h"
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DMicClient"
@@ -31,6 +32,45 @@ DMicClient::~DMicClient()
         DHLOGI("Release mic client.");
         StopCapture();
     }
+}
+
+void DMicClient::OnEngineTransEvent(const AVTransEvent &event)
+{
+    if (event.type == EventType::EVENT_START_SUCCESS) {
+        OnStateChange(DATA_OPENED);
+    } else if ((event.type == EventType::EVENT_STOP_SUCCESS) ||
+        (event.type == EventType::EVENT_CHANNEL_CLOSED) ||
+        (event.type == EventType::EVENT_START_FAIL)) {
+        OnStateChange(DATA_CLOSED);
+    }
+}
+
+void DMicClient::OnEngineTransMessage(const std::shared_ptr<AVTransMessage> &message)
+{
+    DHLOGI("On Engine message");
+    if (message == nullptr) {
+        DHLOGE("The parameter is nullptr");
+        return;
+    }
+    DAudioSinkManager::GetInstance().HandleDAudioNotify(message->dstDevId_, message->dstDevId_,
+        static_cast<int32_t>(message->type_), message->content_);
+}
+
+int32_t DMicClient::InitSenderEngine(IAVEngineProvider *providerPtr)
+{
+    DHLOGI("Init SenderEngine");
+    IsParamEnabled(AUDIO_ENGINE_FLAG, engineFlag_);
+    if (engineFlag_ == true) {
+        if (micTrans_ == nullptr) {
+            micTrans_ = std::make_shared<AVTransSenderTransport>(devId_, shared_from_this());
+        }
+        int32_t ret = micTrans_->InitEngine(providerPtr);
+        if (ret != DH_SUCCESS) {
+            DHLOGE("Initialize av sender adapter failed. micclient");
+            return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+        }
+    }
+    return DH_SUCCESS;
 }
 
 int32_t DMicClient::OnStateChange(const AudioEventType type)
@@ -89,14 +129,36 @@ int32_t DMicClient::SetUp(const AudioParam &param)
         DHLOGE("Audio capturer create failed.");
         return ERR_DH_AUDIO_CLIENT_CREATE_CAPTURER_FAILED;
     }
-
-    micTrans_ = std::make_shared<AudioEncodeTransport>(devId_);
+    // old new 方式归一
+    if (engineFlag_ == false) {
+        micTrans_ = std::make_shared<AudioEncodeTransport>(devId_);
+    }
+    if (micTrans_ == nullptr) {
+        DHLOGE("mic trans in engine should be init by dev.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
     int32_t ret = micTrans_->SetUp(audioParam_, audioParam_, shared_from_this(), CAP_MIC);
     if (ret != DH_SUCCESS) {
         DHLOGE("Mic trans setup failed.");
         return ret;
     }
     clientStatus_ = AudioStatus::STATUS_READY;
+    return DH_SUCCESS;
+}
+
+int32_t DMicClient::SendMessage(uint32_t type, std::string content, std::string dstDevId)
+{
+    DHLOGI("Send message to remote.");
+    if (type != static_cast<uint32_t>(NOTIFY_OPEN_MIC_RESULT) &&
+        type != static_cast<uint32_t>(NOTIFY_CLOSE_MIC_RESULT)) {
+        DHLOGE("event type is not NOTIFY_OPEN_MIC or NOTIFY_CLOSE_MIC. type: %u", type);
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    if (micTrans_ == nullptr) {
+        DHLOGE("mic trans is null.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    micTrans_->SendMessage(type, content, dstDevId);
     return DH_SUCCESS;
 }
 
@@ -145,7 +207,6 @@ int32_t DMicClient::StartCapture()
             "daudio capturer start failed.");
         return ERR_DH_AUDIO_CLIENT_CAPTURER_START_FAILED;
     }
-
     int32_t ret = micTrans_->Start();
     if (ret != DH_SUCCESS) {
         DHLOGE("Mic trans start failed.");
@@ -181,7 +242,6 @@ void DMicClient::CaptureThreadRunning()
             DHLOGE("Bytes read failed.");
             break;
         }
-
         int32_t ret = micTrans_->FeedAudioData(audioData);
         if (ret != DH_SUCCESS) {
             DHLOGE("Failed to send data.");

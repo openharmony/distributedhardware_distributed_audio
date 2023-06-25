@@ -23,9 +23,18 @@
 
 #include "daudio_sink_dev.h"
 #include "idaudio_source.h"
+#include "i_av_engine_provider_callback.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+class EngineProviderListener : public IAVEngineProviderCallback {
+public:
+    EngineProviderListener() {};
+    ~EngineProviderListener() override {};
+
+    int32_t OnProviderEvent(const AVTransEvent &event) override;
+};
+
 class DAudioSinkManager {
 DECLARE_SINGLE_INSTANCE_BASE(DAudioSinkManager);
 public:
@@ -36,22 +45,31 @@ public:
     int32_t DAudioNotify(const std::string &devId, const std::string &dhId, const int32_t eventType,
         const std::string &eventContent);
     void OnSinkDevReleased(const std::string &devId);
-
     void NotifyEvent(const std::string &devId, const int32_t eventType, const std::string &eventContent);
+    void ClearAudioDev(const std::string &devId);
+    int32_t CreateAudioDevice(const std::string &devId);
+private:
+    DAudioSinkManager();
+    ~DAudioSinkManager();
+    int32_t LoadAVSenderEngineProvider();
+    int32_t UnloadAVSenderEngineProvider();
+    int32_t LoadAVReceiverEngineProvider();
+    int32_t UnloadAVReceiverEngineProvider();
 
 private:
     static constexpr const char* DEVCLEAR_THREAD = "sinkClearTh";
-
-    DAudioSinkManager();
-    ~DAudioSinkManager();
-    void ClearAudioDev(const std::string &devId);
-    int32_t CreateAudioDevice(const std::string &devId);
     std::mutex devMapMutex_;
     std::unordered_map<std::string, std::shared_ptr<DAudioSinkDev>> audioDevMap_;
     std::mutex remoteSvrMutex_;
     std::map<std::string, sptr<IDAudioSource>> sourceServiceMap_;
     std::thread devClearThread_;
     std::string localNetworkId_;
+
+    IAVEngineProvider *sendProviderPtr_ = nullptr;
+    IAVEngineProvider *rcvProviderPtr_ = nullptr;
+    void *pSHandler_ = nullptr;
+    void *pRHandler_ = nullptr;
+    bool engineFlag_ = true;
 };
 } // DistributedHardware
 } // OHOS

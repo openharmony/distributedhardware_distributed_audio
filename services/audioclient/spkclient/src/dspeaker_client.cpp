@@ -18,6 +18,7 @@
 #include "daudio_constants.h"
 #include "daudio_hisysevent.h"
 #include "daudio_util.h"
+#include "daudio_sink_manager.h"
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DSpeakerClient"
@@ -27,6 +28,50 @@ namespace DistributedHardware {
 DSpeakerClient::~DSpeakerClient()
 {
     DHLOGD("Release speaker client.");
+}
+
+void DSpeakerClient::OnEngineTransEvent(const AVTransEvent &event)
+{
+    if (event.type == EventType::EVENT_START_SUCCESS) {
+        OnStateChange(DATA_OPENED);
+    } else if ((event.type == EventType::EVENT_STOP_SUCCESS) ||
+        (event.type == EventType::EVENT_CHANNEL_CLOSED) ||
+        (event.type == EventType::EVENT_START_FAIL)) {
+        OnStateChange(DATA_CLOSED);
+    }
+}
+
+void DSpeakerClient::OnEngineTransMessage(const std::shared_ptr<AVTransMessage> &message)
+{
+    if (message == nullptr) {
+        DHLOGE("The parameter is nullptr");
+        return;
+    }
+    DAudioSinkManager::GetInstance().HandleDAudioNotify(message->dstDevId_, message->dstDevId_,
+        static_cast<int32_t>(message->type_), message->content_);
+}
+
+void DSpeakerClient::OnEngineTransDataAvailable(const std::shared_ptr<AudioData> &audioData)
+{
+    DHLOGE("On Engine Data available");
+    OnDecodeTransDataDone(audioData);
+}
+
+int32_t DSpeakerClient::InitReceiverEngine(IAVEngineProvider *providerPtr)
+{
+    DHLOGI("InitReceiverEngine enter.");
+    IsParamEnabled(AUDIO_ENGINE_FLAG, engineFlag_);
+    if (engineFlag_ == true) {
+        if (speakerTrans_ == nullptr) {
+            speakerTrans_ = std::make_shared<AVTransReceiverTransport>(devId_, shared_from_this());
+        }
+        int32_t ret = speakerTrans_->InitEngine(providerPtr);
+        if (ret != DH_SUCCESS) {
+            DHLOGE("Initialize av receiver adapter failed spkclient.");
+            return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+        }
+    }
+    return DH_SUCCESS;
 }
 
 int32_t DSpeakerClient::SetUp(const AudioParam &param)
@@ -57,7 +102,13 @@ int32_t DSpeakerClient::SetUp(const AudioParam &param)
     }
     audioRenderer_ ->SetRendererCallback(shared_from_this());
 
-    speakerTrans_ = std::make_shared<AudioDecodeTransport>(devId_);
+    if (engineFlag_ == false) {
+        speakerTrans_ = std::make_shared<AudioDecodeTransport>(devId_);
+    }
+    if (speakerTrans_ == nullptr) {
+        DHLOGE("Speaker trans should be init by dev.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
     int32_t ret = speakerTrans_->SetUp(audioParam_, audioParam_, shared_from_this(), CAP_SPK);
     if (ret != DH_SUCCESS) {
         DHLOGE("Speaker trans setup failed.");
@@ -68,7 +119,6 @@ int32_t DSpeakerClient::SetUp(const AudioParam &param)
         DHLOGE("Speaker trans start failed.");
         return ret;
     }
-
     auto pid = getpid();
     ret = AudioStandard::AudioSystemManager::GetInstance()->RegisterVolumeKeyEventCallback(pid, shared_from_this());
     if (ret != DH_SUCCESS) {
@@ -429,10 +479,10 @@ void DSpeakerClient::Pause()
     if (renderDataThread_.joinable()) {
         renderDataThread_.join();
     }
+    // wuhaobo todo 这里确认下pause的实现 engine 改如何pause
     if (speakerTrans_ == nullptr || speakerTrans_->Pause() != DH_SUCCESS) {
         DHLOGE("Speaker trans Pause failed.");
     }
-
     if (audioRenderer_ != nullptr) {
         audioRenderer_->Flush();
     }
@@ -443,12 +493,29 @@ void DSpeakerClient::Pause()
 void DSpeakerClient::ReStart()
 {
     DHLOGI("ReStart");
+    // wuhaobo todo 这里确认下restart的实现 engine 改如何restart
     if (speakerTrans_ == nullptr || speakerTrans_->Restart(audioParam_, audioParam_) != DH_SUCCESS) {
         DHLOGE("Speaker trans Restart failed.");
     }
     isRenderReady_.store(true);
     renderDataThread_ = std::thread(&DSpeakerClient::PlayThreadRunning, this);
     clientStatus_ = AudioStatus::STATUS_START;
+}
+
+int32_t DSpeakerClient::SendMessage(uint32_t type, std::string content, std::string dstDevId)
+{
+    DHLOGI("Send message to remote.");
+    if (type != static_cast<uint32_t>(NOTIFY_OPEN_SPEAKER_RESULT) &&
+        type != static_cast<uint32_t>(NOTIFY_CLOSE_SPEAKER_RESULT)) {
+        DHLOGE("event type is not NOTIFY_OPEN_SPK or NOTIFY_CLOSE_SPK. type:%u", type);
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    if (speakerTrans_ == nullptr) {
+        DHLOGE("speaker trans is null.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    speakerTrans_->SendMessage(type, content, dstDevId);
+    return DH_SUCCESS;
 }
 
 void DSpeakerClient::PlayStatusChange(const std::string &args)

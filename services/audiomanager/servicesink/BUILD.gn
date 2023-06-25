@@ -23,14 +23,15 @@ ohos_shared_library("distributed_audio_sink") {
 
   include_dirs += [
     "include",
+    "${audio_client_path}/interface",
     "${audio_client_path}/micclient/include",
     "${audio_client_path}/spkclient/include",
     "${audio_control_path}/controlsink/include",
     "${audio_processor_path}/encodeprocessor/include",
     "${audio_processor_path}/decodeprocessor/include",
     "${audio_processor_path}/interface",
-    "${audio_transport_path}/audiochannel/interface",
     "${audio_transport_path}/audiochannel/audiodatachannel/include",
+    "${audio_transport_path}/audiochannel/interface",
     "${audio_transport_path}/audioctrltransport/include",
     "${audio_transport_path}/audioctrltransport/interface",
     "${audio_transport_path}/audiotransportstatus/include",
@@ -38,17 +39,17 @@ ohos_shared_library("distributed_audio_sink") {
     "${audio_transport_path}/decodetransport/include",
     "${audio_transport_path}/encodetransport/include",
     "${audio_transport_path}/interface",
-    "${common_path}/include",
+    "${audio_transport_path}/receiverengine/include",
+    "${audio_transport_path}/senderengine/include",
     "${common_path}/dfx_utils/include",
-    "${fwk_common_path}/utils/include",
-    "${fwk_utils_path}/include",
+    "${common_path}/include",
     "${innerkits_path}/native_cpp/audio_sink/include",
     "${innerkits_path}/native_cpp/audio_source/include",
-    "${services_path}/common/taskProcessor/include",
-    "${services_path}/common/audioparam",
+    "${services_path}/audiomanager/managersink/include",
     "${services_path}/common/audioeventcallback",
     "${services_path}/common/audiodata/include",
-    "${services_path}/audiomanager/managersink/include",
+    "${services_path}/common/audioparam",
+    "${services_path}/common/taskProcessor/include",
     "${softbusadapter_path}/include",
   ]
 
@@ -60,6 +61,8 @@ ohos_shared_library("distributed_audio_sink") {
   }
 
   sources = [
+    "${audio_client_path}/micclient/src/dmic_client.cpp",
+    "${audio_client_path}/spkclient/src/dspeaker_client.cpp",
     "${audio_control_path}/controlsink/src/daudio_sink_dev_ctrl_manager.cpp",
     "${innerkits_path}/native_cpp/audio_sink/src/daudio_sink_handler.cpp",
     "${innerkits_path}/native_cpp/audio_sink/src/daudio_sink_load_callback.cpp",
@@ -71,11 +74,17 @@ ohos_shared_library("distributed_audio_sink") {
     "src/daudio_sink_stub.cpp",
   ]
 
+  if (distributed_audio_extension) {
+    sources += [
+      "${distributedaudio_ext_path}/services/audioclient/directmicclient/src/direct_dmic_client.cpp",
+      "${distributedaudio_ext_path}/services/audioclient/directspkclient/src/direct_dspeaker_client.cpp",
+    ]
+  }
+
   deps = [
     "${audio_transport_path}/audioctrltransport:distributed_audio_control",
     "${audio_transport_path}/decodetransport:distributed_audio_decode_transport",
     "${audio_transport_path}/encodetransport:distributed_audio_encode_transport",
-    "${services_path}/audioclient:distributed_audio_sink_client",
     "${services_path}/common:distributed_audio_utils",
   ]
 
@@ -84,8 +93,13 @@ ohos_shared_library("distributed_audio_sink") {
     "audio_framework:audio_client",
     "audio_framework:audio_renderer",
     "c_utils:utils",
+    "distributed_hardware_fwk:distributed_av_receiver",
+    "distributed_hardware_fwk:distributed_av_sender",
+    "distributed_hardware_fwk:libdhfwk_sdk",
     "drivers_interface_audio:libaudio_proxy_1.0",
     "dsoftbus:softbus_client",
+    "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libhdi",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "ipc:ipc_core",

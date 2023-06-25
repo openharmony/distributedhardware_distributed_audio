@@ -40,6 +40,8 @@ config("module_private_config") {
     "${audio_transport_path}/audiotransportstatus/interface",
     "${audio_transport_path}/encodetransport/include",
     "${audio_transport_path}/decodetransport/include",
+    "${audio_transport_path}/receiverengine/include",
+    "${audio_transport_path}/senderengine/include",
     "${common_path}/include",
     "${common_path}/dfx_utils/include",
     "${distributedaudio_path}/audiohandler/include",

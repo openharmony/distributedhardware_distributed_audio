@@ -52,6 +52,9 @@ public:
     int32_t Pause() override;
     int32_t Restart(const AudioParam &localParam, const AudioParam &remoteParam) override;
     int32_t FeedAudioData(std::shared_ptr<AudioData> &audioData) override;
+    int32_t CreateCtrl() override;
+    int32_t InitEngine(IAVEngineProvider *providerPtr) override;
+    int32_t SendMessage(uint32_t type, std::string content, std::string dstDevId) override;
 
     void OnSessionOpened() override;
     void OnSessionClosed() override;

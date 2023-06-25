@@ -28,6 +28,7 @@
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
 #include "daudio_log.h"
+#include "parameter.h"
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DAudioUtils"
@@ -308,6 +309,43 @@ bool CheckDevIdIsLegal(const std::string &devId)
             return false;
         }
     }
+    return true;
+}
+
+template <typename T>
+bool GetSysPara(const char *key, T &value)
+{
+    if (key == nullptr) {
+        DHLOGE("GetSysPara: key is nullptr");
+        return false;
+    }
+    char paraValue[20] = {0}; // 20 for system parameter
+    auto res = GetParameter(key, "-1", paraValue, sizeof(paraValue));
+    if (res <= 0) {
+        DHLOGD("GetSysPara fail, key:%{public}s res:%{public}d", key, res);
+        return false;
+    }
+    DHLOGI("GetSysPara: key:%{public}s value:%{public}s", key, paraValue);
+    std::stringstream valueStr;
+    valueStr << paraValue;
+    valueStr >> value;
+    return true;
+}
+
+template bool GetSysPara(const char *key, int32_t &value);
+template bool GetSysPara(const char *key, uint32_t &value);
+template bool GetSysPara(const char *key, int64_t &value);
+template bool GetSysPara(const char *key, std::string &value);
+
+bool IsParamEnabled(std::string key, bool &isEnabled)
+{
+    // todo 当前默认是engine， 如果要默认为老的trans通路，需要把true / false 颠倒
+    int32_t policyFlag = 0;
+    if (GetSysPara(key.c_str(), policyFlag) && policyFlag == 1) {
+        isEnabled = false;
+        return false;
+    }
+    isEnabled = true;
     return true;
 }
 } // namespace DistributedHardware

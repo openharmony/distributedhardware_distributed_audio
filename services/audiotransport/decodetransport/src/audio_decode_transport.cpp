@@ -138,6 +138,27 @@ int32_t AudioDecodeTransport::FeedAudioData(std::shared_ptr<AudioData> &audioDat
     return DH_SUCCESS;
 }
 
+int32_t AudioDecodeTransport::CreateCtrl()
+{
+    DHLOGI("create ctrl not support.");
+    return DH_SUCCESS;
+}
+
+int32_t AudioDecodeTransport::InitEngine(IAVEngineProvider *providerPtr)
+{
+    (void)providerPtr;
+    return DH_SUCCESS;
+}
+
+int32_t AudioDecodeTransport::SendMessage(uint32_t type, std::string content, std::string dstDevId)
+{
+    (void)type;
+    (void)content;
+    (void)dstDevId;
+    DHLOGI("Send message not support.");
+    return DH_SUCCESS;
+}
+
 void AudioDecodeTransport::OnSessionOpened()
 {
     DHLOGI("On channel session opened.");

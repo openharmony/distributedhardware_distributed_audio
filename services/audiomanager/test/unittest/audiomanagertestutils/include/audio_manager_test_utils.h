@@ -73,6 +73,21 @@ public:
     {
         return DH_SUCCESS;
     }
+
+    int32_t InitEngine(IAVEngineProvider *providerPtr) override
+    {
+        return DH_SUCCESS;
+    }
+
+    int32_t SendMessage(uint32_t type, std::string content, std::string dstDevId) override
+    {
+        return 0;
+    }
+
+    int32_t CreateCtrl() override
+    {
+        return 0;
+    }
 };
 } // namespace DistributedHardware
 } // namespace OHOS
