@@ -18,6 +18,7 @@ import("../../../../../distributedaudio.gni")
 group("unittest") {
   testonly = true
   deps = [
+    "${common_path}/test/unittest:daudio_utils_test",
     "${distributedaudio_path}/audiohandler/test/unittest:audio_handler_test",
     "${hdf_service_path}/hdi_service/audio/v1_0/test/unittest:hdi_service_audio_test",
     "${hdf_service_path}/hdi_service/audio_ext/v1_0/test/unittest:hdi_service_audio_ext_test",

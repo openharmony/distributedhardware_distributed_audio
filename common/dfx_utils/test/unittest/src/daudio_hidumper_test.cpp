@@ -56,6 +56,5 @@ HWTEST_F(DAudioHidumperTest, Dump_001, TestSize.Level1)
     args = {"-h", "--ability"};
     EXPECT_EQ(true, hidumper_->Dump(args, result));
 }
-
 } // DistributedHardware
 } // OHOS

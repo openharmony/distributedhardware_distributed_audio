@@ -13,17 +13,15 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DAUDIO_LATENCY_UNIT_TEST_H
-#define OHOS_DAUDIO_LATENCY_UNIT_TEST_H
+#ifndef OHOS_DAUDIO_UTILS_TEST
+#define OHOS_DAUDIO_UTILS_TEST
 
 #include <gtest/gtest.h>
 #include <memory>
 
-#include "daudio_latency_test.h"
-
 namespace OHOS {
 namespace DistributedHardware {
-class DAudioLatencyUnitTest : public testing::Test {
+class DAudioUtilsTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
@@ -32,4 +30,4 @@ public:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DAUDIO_LATENCY_UNIT_TEST_H
+#endif // OHOS_DAUDIO_UTILS_TEST
