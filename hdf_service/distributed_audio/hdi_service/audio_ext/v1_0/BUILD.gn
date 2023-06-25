@@ -37,7 +37,7 @@ ohos_shared_library("libdaudio_manager_daudio_ext_service_1.0") {
     "drivers_interface_distributed_audio:libdaudioext_stub_1.0",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "ipc:ipc_single",
   ]
 
@@ -66,7 +66,7 @@ ohos_shared_library("libdaudio_ext_driver") {
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "ipc:ipc_single",
   ]
 
