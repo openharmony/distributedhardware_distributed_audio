@@ -19,6 +19,7 @@ ohos_shared_library("distributed_audio_handler") {
   include_dirs = [
     "//third_party/json/include",
     "${fwk_common_path}/utils/include",
+    "${fwk_utils_path}/include",
     "${mediastandardfwk_path}/audiomanager/include",
     "${mediastandardfwk_path}/audiocommon/include",
     "${mediastandardfwk_path}/audiocapturer/include",
@@ -40,6 +41,7 @@ ohos_shared_library("distributed_audio_handler") {
     "c_utils:utils",
     "multimedia_image_framework:image_native",
     "player_framework:media_client",
+    "distributed_hardware_fwk:distributedhardwareutils"
   ]
 
   defines = [
