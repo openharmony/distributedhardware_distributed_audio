@@ -96,11 +96,13 @@ std::vector<DHItem> DAudioHandler::Query()
         infoJson["INTERRUPT_GROUP_ID"] = dev->interruptGroupId_;
         infoJson["VOLUME_GROUP_ID"] = dev->volumeGroupId_;
 
-        std::string audioEncoders = HiStreamerQueryTool::GetInstance().QueryHiStreamerPluginInfo(HISTREAM_PLUGIN_TYPE::AUDIO_ENCODER);
+        std::string audioEncoders =
+            HiStreamerQueryTool::GetInstance().QueryHiStreamerPluginInfo(HISTREAM_PLUGIN_TYPE::AUDIO_ENCODER);
         DHLOGI("DScreen QueryAudioEncoderAbility info: %s", audioEncoders.c_str());
         infoJson[KEY_HISTREAMER_AUDIO_ENCODER] = audioEncoders;
 
-        std::string audioDecoders = HiStreamerQueryTool::GetInstance().QueryHiStreamerPluginInfo(HISTREAM_PLUGIN_TYPE::AUDIO_DECODER);
+        std::string audioDecoders =
+            HiStreamerQueryTool::GetInstance().QueryHiStreamerPluginInfo(HISTREAM_PLUGIN_TYPE::AUDIO_DECODER);
         DHLOGI("DScreen QueryAudioDecoderAbility info: %s", audioDecoders.c_str());
         infoJson[KEY_HISTREAMER_AUDIO_DECODER] = audioDecoders;
 
