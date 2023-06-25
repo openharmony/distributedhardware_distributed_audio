@@ -152,5 +152,21 @@ HWTEST_F(DSpeakerClientTest, Release001, TestSize.Level1)
     speakerClient_->Pause();
     EXPECT_EQ(ERR_DH_AUDIO_SA_STATUS_ERR, speakerClient_->Release());
 }
+
+/**
+ * @tc.name: GetVolumeLevel_001
+ * @tc.desc: Verify the GetVolumeLevel function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6G
+ */
+HWTEST_F(DSpeakerClientTest, GetVolumeLevel_001, TestSize.Level1)
+{
+    AudioStandard::InterruptEvent eventType = {static_cast<AudioStandard::InterruptType>(1),
+        static_cast<AudioStandard::InterruptForceType>(0), static_cast<AudioStandard::InterruptHint>(0)};
+    speakerClient_->OnInterrupt(eventType);
+
+    std::string volEvent = speakerClient_->GetVolumeLevel();
+    EXPECT_NE("", volEvent);
+}
 } // DistributedHardware
 } // OHOS
