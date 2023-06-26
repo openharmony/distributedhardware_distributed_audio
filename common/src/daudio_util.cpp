@@ -169,7 +169,12 @@ int32_t GetAudioParamStr(const std::string &params, const std::string &key, std:
 int32_t GetAudioParamBool(const std::string &params, const std::string &key, bool &value)
 {
     std::string val;
-    GetAudioParamStr(params, key, val);
+    int32_t ret = GetAudioParamStr(params, key, val);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Get audio param string fail, error code %d.", ret);
+        return ret;
+    }
+
     value = (val != "0");
     return DH_SUCCESS;
 }
@@ -178,8 +183,13 @@ int32_t GetAudioParamInt(const std::string &params, const std::string &key, int3
 {
     std::string val = "0";
     int32_t ret = GetAudioParamStr(params, key, val);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Get audio param string fail, error code %d.", ret);
+        return ret;
+    }
+
     value = std::stoi(val);
-    return ret;
+    return DH_SUCCESS;
 }
 
 bool JsonParamCheck(const json &jsonObj, const std::initializer_list<std::string> &keys)
