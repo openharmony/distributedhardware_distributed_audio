@@ -68,6 +68,8 @@ ohos_unittest("DaudioSourceDevTest") {
   configs = [ ":module_private_config" ]
 
   deps = [
+    "${audio_transport_path}/decodetransport:distributed_audio_decode_transport",
+    "${audio_transport_path}/encodetransport:distributed_audio_encode_transport",
     "${hdf_interfaces_path}/audioext/v1_0:libdaudioext_proxy_1.0",
     "${services_path}/audiomanager/servicesource:distributed_audio_source",
     "${services_path}/common:distributed_audio_utils",

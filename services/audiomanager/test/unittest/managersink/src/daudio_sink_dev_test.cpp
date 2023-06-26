@@ -50,6 +50,10 @@ HWTEST_F(DAudioSinkDevTest, NotifyOpenCtrlChannel_001, TestSize.Level1)
     sinkDev_->taskQueue_ = std::make_shared<TaskQueue>(capacity);
     AudioEvent event;
     EXPECT_EQ(DH_SUCCESS, sinkDev_->NotifyOpenCtrlChannel(event));
+    event.type = OPEN_CTRL;
+    sinkDev_->NotifyEvent(event);
+
+    event.type = EVENT_UNKNOWN;
     sinkDev_->NotifyEvent(event);
 }
 
@@ -467,6 +471,8 @@ HWTEST_F(DAudioSinkDevTest, NotifyRenderStateChange_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSinkDevTest, NotifyRenderStateChange_002, TestSize.Level1)
 {
+    sinkDev_->SleepAudioDev();
+
     constexpr size_t capacity = 20;
     sinkDev_->taskQueue_ = std::make_shared<TaskQueue>(capacity);
     AudioEvent event;
