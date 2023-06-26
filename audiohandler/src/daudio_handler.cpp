@@ -22,6 +22,7 @@
 #include "nlohmann/json.hpp"
 #include "string_ex.h"
 
+#include "histreamer_query_tool.h"
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
 #include "daudio_log.h"
@@ -69,7 +70,7 @@ int32_t DAudioHandler::Initialize()
 
 std::vector<DHItem> DAudioHandler::Query()
 {
-    DHLOGD("Query distributed hardware information.");
+    DHLOGI("Query distributed hardware information.");
     auto audioSrv = AudioStandard::AudioSystemManager::GetInstance();
     std::vector<DHItem> dhItemVec;
     if (audioSrv == nullptr) {
@@ -94,6 +95,17 @@ std::vector<DHItem> DAudioHandler::Query()
         }
         infoJson["INTERRUPT_GROUP_ID"] = dev->interruptGroupId_;
         infoJson["VOLUME_GROUP_ID"] = dev->volumeGroupId_;
+
+        std::string audioEncoders =
+            HiStreamerQueryTool::GetInstance().QueryHiStreamerPluginInfo(HISTREAM_PLUGIN_TYPE::AUDIO_ENCODER);
+        DHLOGI("DScreen QueryAudioEncoderAbility info: %s", audioEncoders.c_str());
+        infoJson[KEY_HISTREAMER_AUDIO_ENCODER] = audioEncoders;
+
+        std::string audioDecoders =
+            HiStreamerQueryTool::GetInstance().QueryHiStreamerPluginInfo(HISTREAM_PLUGIN_TYPE::AUDIO_DECODER);
+        DHLOGI("DScreen QueryAudioDecoderAbility info: %s", audioDecoders.c_str());
+        infoJson[KEY_HISTREAMER_AUDIO_DECODER] = audioDecoders;
+
         DHItem dhItem;
         dhItem.dhId = std::to_string(dhId);
         dhItem.attrs = infoJson.dump();

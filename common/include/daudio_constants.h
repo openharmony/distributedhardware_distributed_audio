@@ -84,6 +84,9 @@ const std::string NAME = "name";
 const std::string KEY_CODECTYPE = "codecType";
 const std::string KEY_DEVICE_TYPE = "deviceType";
 
+const std::string KEY_HISTREAMER_AUDIO_ENCODER = "histmAudEnc";
+const std::string KEY_HISTREAMER_AUDIO_DECODER = "histmAudDec";
+
 const std::string HDF_EVENT_RESULT_SUCCESS = "DH_SUCCESS";
 const std::string HDF_EVENT_RESULT_FAILED = "DH_FAILED";
 
