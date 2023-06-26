@@ -401,6 +401,7 @@ int32_t DSpeakerDev::MmapStop()
     if (enqueueDataThread_.joinable()) {
         enqueueDataThread_.join();
     }
+    DHLOGI("Spk mmap stop end.");
     return DH_SUCCESS;
 }
 

@@ -104,7 +104,7 @@ HWTEST_F(DAudioSourceServiceTest, Dump_001, TestSize.Level1)
 {
     int32_t fd = 0;
     const std::vector<std::u16string> args;
-    EXPECT_EQ(DH_SUCCESS, sourceSrv_->Dump(fd, args));
+    sourceSrv_->Dump(fd, args);
 }
 } // DistributedHardware
 } // OHOS

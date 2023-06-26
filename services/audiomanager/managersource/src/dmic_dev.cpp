@@ -405,6 +405,7 @@ int32_t DMicDev::MmapStop()
     if (enqueueDataThread_.joinable()) {
         enqueueDataThread_.join();
     }
+    DHLOGI("Mic mmap stop end.");
     return DH_SUCCESS;
 }
 

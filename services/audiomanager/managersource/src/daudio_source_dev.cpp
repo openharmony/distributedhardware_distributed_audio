@@ -244,9 +244,7 @@ int32_t DAudioSourceDev::CloseCtrlTrans(const AudioEvent &event, bool isSpk)
     if ((!isSpk && (speaker_ == nullptr || !speaker_->IsOpened())) ||
         (isSpk && (mic_ == nullptr || !mic_->IsOpened()))) {
         DHLOGD("No distributed audio device used, close ctrl trans.");
-        auto task = GenerateTask(this, &DAudioSourceDev::TaskCloseCtrlChannel, event.content, "Close Ctrl Trans",
-            &DAudioSourceDev::OnTaskResult);
-        return taskQueue_->Produce(task);
+        return HandleCloseCtrlTrans(event);
     }
     return DH_SUCCESS;
 }
@@ -271,7 +269,7 @@ int32_t DAudioSourceDev::HandleCloseCtrlTrans(const AudioEvent &event)
         DHLOGE("Task queue is null.");
         return ERR_DH_AUDIO_NULLPTR;
     }
-    auto task = GenerateTask(this, &DAudioSourceDev::TaskCloseCtrlChannel, "", "Close Ctrl Trans",
+    auto task = GenerateTask(this, &DAudioSourceDev::TaskCloseCtrlChannel, event.content, "Close Ctrl Trans",
         &DAudioSourceDev::OnTaskResult);
     return taskQueue_->Produce(task);
 }
@@ -466,7 +464,7 @@ int32_t DAudioSourceDev::TaskEnableDAudio(const std::string &args)
     json jParam = json::parse(args, nullptr, false);
     if (!JsonParamCheck(jParam, { KEY_DH_ID, KEY_ATTRS }) || !CheckIsNum((std::string)jParam[KEY_DH_ID])) {
         DHLOGE("The keys or values is invalid.");
-        return ERR_DH_AUDIO_NOT_SUPPORT;
+        return ERR_DH_AUDIO_SA_ENABLE_PARAM_INVALID;
     }
     int32_t dhId = std::stoi((std::string)jParam[KEY_DH_ID]);
 
@@ -475,7 +473,6 @@ int32_t DAudioSourceDev::TaskEnableDAudio(const std::string &args)
             return EnableDSpeaker(dhId, jParam[KEY_ATTRS]);
         case AUDIO_DEVICE_TYPE_MIC:
             return EnableDMic(dhId, jParam[KEY_ATTRS]);
-        case AUDIO_DEVICE_TYPE_UNKNOWN:
         default:
             DHLOGE("Unknown audio device.");
             return ERR_DH_AUDIO_NOT_SUPPORT;
@@ -530,7 +527,7 @@ int32_t DAudioSourceDev::TaskDisableDAudio(const std::string &args)
     }
     json jParam = json::parse(args, nullptr, false);
     if (!JsonParamCheck(jParam, { KEY_DH_ID }) || !CheckIsNum((std::string)jParam[KEY_DH_ID])) {
-        return ERR_DH_AUDIO_NOT_SUPPORT;
+        return ERR_DH_AUDIO_SA_DISABLE_PARAM_INVALID;
     }
     int32_t dhId = std::stoi((std::string)jParam[KEY_DH_ID]);
     switch (GetDevTypeByDHId(dhId)) {
@@ -538,7 +535,6 @@ int32_t DAudioSourceDev::TaskDisableDAudio(const std::string &args)
             return DisableDSpeaker(dhId);
         case AUDIO_DEVICE_TYPE_MIC:
             return DisableDMic(dhId);
-        case AUDIO_DEVICE_TYPE_UNKNOWN:
         default:
             DHLOGE("Unknown audio device.");
             return ERR_DH_AUDIO_NOT_SUPPORT;
@@ -893,11 +889,8 @@ int32_t DAudioSourceDev::TaskSpkMmapStop(const std::string &args)
         DHLOGE("Task spk mmap stop, speaker is nullptr.");
         return ERR_DH_AUDIO_NULLPTR;
     }
-    int32_t ret = speaker_->MmapStop();
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Task spk mmap stop fail, error code: %d.", ret);
-    }
-    return ret;
+    speaker_->MmapStop();
+    return DH_SUCCESS;
 }
 
 int32_t DAudioSourceDev::TaskMicMmapStart(const std::string &args)
@@ -921,11 +914,8 @@ int32_t DAudioSourceDev::TaskMicMmapStop(const std::string &args)
         DHLOGE("Task mic mmap stop, mic is nullptr.");
         return ERR_DH_AUDIO_NULLPTR;
     }
-    int32_t ret = mic_->MmapStop();
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Task mic mmap stop fail, error code: %d.", ret);
-    }
-    return ret;
+    mic_->MmapStop();
+    return DH_SUCCESS;
 }
 
 void DAudioSourceDev::OnTaskResult(int32_t resultCode, const std::string &result, const std::string &funcName)
