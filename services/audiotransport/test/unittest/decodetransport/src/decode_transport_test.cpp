@@ -186,6 +186,10 @@ HWTEST_F(DecodeTransportTest, decode_transport_test_004, TestSize.Level1)
     decodeTrans_->OnEventReceived(event);
     decodeTrans_->OnStateNotify(event);
     decodeTrans_->OnAudioDataDone(audioData);
+    decodeTrans_->dataTransCallback_ = std::make_shared<MockAudioTransportCallback>();
+    decodeTrans_->OnSessionOpened();
+    decodeTrans_->OnSessionClosed();
+    decodeTrans_->OnAudioDataDone(audioData);
 
     EXPECT_EQ(DH_SUCCESS, decodeTrans_->FeedAudioData(audioData));
 }
