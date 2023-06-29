@@ -40,9 +40,9 @@ config("module_private_config") {
     "${audio_transport_path}/audiotransportstatus/include",
     "${audio_transport_path}/audiotransportstatus/interface",
     "${audio_transport_path}/decodetransport/include",
+    "${audio_transport_path}/interface",
     "${audio_transport_path}/receiverengine/include",
     "${audio_transport_path}/senderengine/include",
-    "${audio_transport_path}/interface",
     "${common_path}/include",
     "${fwk_common_path}/utils/include",
     "${services_path}/common/audioeventcallback",
@@ -69,7 +69,11 @@ ohos_unittest("SpeakerClientTest") {
     "//third_party/googletest:gtest_main",
   ]
 
-  external_deps = [ "audio_framework:audio_client" ]
+  external_deps = [
+    "audio_framework:audio_client",
+    "distributed_hardware_fwk:distributed_av_receiver",
+    "distributed_hardware_fwk:distributed_av_sender",
+  ]
 }
 
 group("spk_client_test") {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,23 +13,25 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DAUDIO_LATENCY_UNIT_TEST_H
-#define OHOS_DAUDIO_LATENCY_UNIT_TEST_H
+#ifndef AUDIO_TRANSPORT_CONTEXT_TEST_H
+#define AUDIO_TRANSPORT_CONTEXT_TEST_H
 
 #include <gtest/gtest.h>
-#include <memory>
 
-#include "daudio_latency_test.h"
+#define private public
+#include "audio_transport_context.h"
+#undef private
 
 namespace OHOS {
 namespace DistributedHardware {
-class DAudioLatencyUnitTest : public testing::Test {
+class AudioTransportContextTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
+    std::shared_ptr<AudioTransportContext> stateContext_ = nullptr;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DAUDIO_LATENCY_UNIT_TEST_H
+#endif // AUDIO_TRANSPORT_CONTEXT_TEST_H

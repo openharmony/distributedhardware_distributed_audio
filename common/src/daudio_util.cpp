@@ -170,7 +170,12 @@ int32_t GetAudioParamStr(const std::string &params, const std::string &key, std:
 int32_t GetAudioParamBool(const std::string &params, const std::string &key, bool &value)
 {
     std::string val;
-    GetAudioParamStr(params, key, val);
+    int32_t ret = GetAudioParamStr(params, key, val);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Get audio param string fail, error code %d.", ret);
+        return ret;
+    }
+
     value = (val != "0");
     return DH_SUCCESS;
 }
@@ -179,8 +184,13 @@ int32_t GetAudioParamInt(const std::string &params, const std::string &key, int3
 {
     std::string val = "0";
     int32_t ret = GetAudioParamStr(params, key, val);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Get audio param string fail, error code %d.", ret);
+        return ret;
+    }
+
     value = std::stoi(val);
-    return ret;
+    return DH_SUCCESS;
 }
 
 bool JsonParamCheck(const json &jsonObj, const std::initializer_list<std::string> &keys)
@@ -339,14 +349,14 @@ template bool GetSysPara(const char *key, std::string &value);
 
 bool IsParamEnabled(std::string key, bool &isEnabled)
 {
-    // todo 当前默认是engine， 如果要默认为老的trans通路，需要把true / false 颠倒
+    // by default: old trans
     int32_t policyFlag = 0;
     if (GetSysPara(key.c_str(), policyFlag) && policyFlag == 1) {
-        isEnabled = false;
-        return false;
+        isEnabled = true;
+        return true;
     }
-    isEnabled = true;
-    return true;
+    isEnabled = false;
+    return false;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

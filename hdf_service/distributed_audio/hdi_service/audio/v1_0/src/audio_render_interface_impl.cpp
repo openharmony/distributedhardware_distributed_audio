@@ -90,7 +90,7 @@ int32_t AudioRenderInterfaceImpl::FadeInProcess(const uint32_t durationFrame,
 
 int32_t AudioRenderInterfaceImpl::RenderFrame(const std::vector<int8_t> &frame, uint64_t &replyBytes)
 {
-    DHLOGD("Render frame[sampleRate: %d, channelCount: %d, format: %d, frameSize: %d].", devAttrs_.sampleRate,
+    DHLOGD("Render frame[sampleRate: %u, channelCount: %u, format: %d, frameSize: %u].", devAttrs_.sampleRate,
         devAttrs_.channelCount, devAttrs_.format, devAttrs_.frameSize);
     int64_t timeOffset = UpdateTimeOffset(frameIndex_, framePeriodNs_, startTime_);
     DHLOGD("Render frameIndex: %lld, timeOffset: %lld.", frameIndex_, timeOffset);

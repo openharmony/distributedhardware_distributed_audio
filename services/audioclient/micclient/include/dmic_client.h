@@ -79,7 +79,7 @@ private:
     std::weak_ptr<IAudioEventCallback> eventCallback_;
     std::unique_ptr<AudioStandard::AudioCapturer> audioCapturer_ = nullptr;
     std::shared_ptr<IAudioDataTransport> micTrans_ = nullptr;
-    bool engineFlag_ = true;
+    bool engineFlag_ = false;
 };
 } // DistributedHardware
 } // OHOS

@@ -1,33 +1,33 @@
 {
-    "name":"@ohos/distributed_audio",
-    "description":"distributed audio",
-    "version":"4.0",
-    "author":{},
-    "repository":"https://gitee.com/openharmony/distributed_audio",
-    "license":"Apache License 2.0",
-    "publishAs":"code-segment",
-    "segment":{
-        "destPath":"foundation/distributedhardware/distributed_audio"
+    "name": "@ohos/distributed_audio",
+    "description": "distributed audio",
+    "version": "4.0",
+    "author": {},
+    "repository": "https://gitee.com/openharmony/distributed_audio",
+    "license": "Apache License 2.0",
+    "publishAs": "code-segment",
+    "segment": {
+        "destPath": "foundation/distributedhardware/distributed_audio"
     },
-    "dirs":{},
-    "scripts":{},
-    "component":{
-        "name":"distributed_audio",
-        "subsystem":"distributedhardware",
-        "syscap":[
+    "dirs": {},
+    "scripts": {},
+    "component": {
+        "name": "distributed_audio",
+        "subsystem": "distributedhardware",
+        "syscap": [
             "SystemCapability.DistributedHardware.DistributedAudio"
         ],
-        "features":[],
-        "adapted_system_type":[
+        "features": [],
+        "adapted_system_type": [
             "standard"
         ],
-        "rom":"2000KB",
-        "ram":"6MB",
+        "rom": "2000KB",
+        "ram": "6MB",
         "hisysevent_config": [
             "//foundation/distributedhardware/distributed_audio/hisysevent.yaml"
         ],
-        "deps":{
-            "components":[
+        "deps": {
+            "components": [
                 "appexecfwk_standard",
                 "audio_framework",
                 "c_utils",
@@ -38,19 +38,19 @@
                 "hdf_core",
                 "hisysevent_native",
                 "hitrace_native",
-                "hiviewdfx_hilog_native",
+                "hilog",
                 "ipc",
                 "multimedia_image_framework",
                 "player_framework",
                 "safwk",
                 "samgr"
             ],
-            "third_party":[
+            "third_party": [
                 "json"
             ]
         },
-        "build":{
-            "sub_component":[
+        "build": {
+            "sub_component": [
                 "//foundation/distributedhardware/distributed_audio/sa_profile:daudio_sa_profile",
                 "//foundation/distributedhardware/distributed_audio/sa_profile:daudio.cfg",
 
@@ -73,8 +73,7 @@
                 "//foundation/distributedhardware/distributed_audio/services/audiotransport/decodetransport:distributed_audio_decode_transport",
                 "//foundation/distributedhardware/distributed_audio/services/audiotransport/encodetransport:distributed_audio_encode_transport"
             ],
-            "inner_kits":[
-                {
+            "inner_kits": [{
                     "type": "so",
                     "name": "//foundation/distributedhardware/distributed_audio/interfaces/inner_kits/native_cpp/audio_sink:distributed_audio_sink_sdk",
                     "header": {
@@ -126,7 +125,7 @@
                     }
                 }
             ],
-            "test":[
+            "test": [
                 "//foundation/distributedhardware/distributed_audio/interfaces/inner_kits/native_cpp/test/unittest:unittest",
                 "//foundation/distributedhardware/distributed_audio/interfaces/inner_kits/native_cpp/test/fuzztest:fuzztest"
             ]

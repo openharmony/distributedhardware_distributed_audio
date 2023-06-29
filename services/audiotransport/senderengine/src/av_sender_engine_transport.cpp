@@ -103,14 +103,15 @@ int32_t AVTransSenderTransport::Stop()
     }
     return DH_SUCCESS;
 }
-// wuhaobo todo pause 待实现
+
+// wuhaobo todo pause
 int32_t AVTransSenderTransport::Pause()
 {
     DHLOGI("PauseSenderEngine enter.");
     return DH_SUCCESS;
 }
 
-// wuhaobo todo restart 待实现
+// wuhaobo todo restart
 int32_t AVTransSenderTransport::Restart(const AudioParam &localParam, const AudioParam &remoteParam)
 {
     DHLOGI("RestartSenderEngine enter.");
@@ -191,7 +192,7 @@ int32_t AVTransSenderTransport::SetParameter(const AudioParam &audioParam)
     senderAdapter_->SetParameter(AVTransTag::AUDIO_SAMPLE_FORMAT, std::to_string(audioParam.comParam.bitFormat));
     senderAdapter_->SetParameter(AVTransTag::AUDIO_CHANNEL_MASK, std::to_string(audioParam.comParam.channelMask));
     senderAdapter_->SetParameter(AVTransTag::AUDIO_CHANNEL_LAYOUT, std::to_string(audioParam.comParam.channelMask));
-    senderAdapter_->SetParameter(AVTransTag::AUDIO_BIT_RATE, std::to_string(1536000));
+    senderAdapter_->SetParameter(AVTransTag::AUDIO_BIT_RATE, std::to_string(AUDIO_SET_HISTREAMER_BIT_RATE));
     senderAdapter_->SetParameter(AVTransTag::AUDIO_FRAME_SIZE, std::to_string(audioParam.comParam.frameSize));
     senderAdapter_->SetParameter(AVTransTag::AUDIO_CODEC_TYPE, std::to_string(audioParam.comParam.codecType));
     senderAdapter_->SetParameter(AVTransTag::ENGINE_READY, OWNER_NAME_D_SPEAKER);

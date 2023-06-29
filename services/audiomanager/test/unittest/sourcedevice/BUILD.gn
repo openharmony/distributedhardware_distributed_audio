@@ -33,30 +33,30 @@ config("module_private_config") {
     "${audio_control_path}/controlsource/include",
     "${audio_hdi_proxy_path}/include",
     "${audio_processor_path}/interface",
-    "${audio_transport_path}/interface",
     "${audio_transport_path}/audioctrltransport/interface",
     "${audio_transport_path}/audiochannel/interface",
     "${audio_transport_path}/audiotransportstatus/include",
     "${audio_transport_path}/audiotransportstatus/interface",
     "${audio_transport_path}/encodetransport/include",
     "${audio_transport_path}/decodetransport/include",
+    "${audio_transport_path}/interface",
     "${audio_transport_path}/receiverengine/include",
     "${audio_transport_path}/senderengine/include",
     "${common_path}/include",
     "${common_path}/dfx_utils/include",
     "${distributedaudio_path}/audiohandler/include",
-    "${services_path}/hdfaudioclient/include",
     "${hdf_service_path}/hdi_service/common/include",
-    "${interfaces_path}/inner_kits/native_cpp/audio_sink/include",
-    "${interfaces_path}/inner_kits/native_cpp/audio_source/include",
     "${innerkits_path}/native_cpp/audio_source/include",
     "${innerkits_path}/native_cpp/audio_sink/include",
+    "${interfaces_path}/inner_kits/native_cpp/audio_sink/include",
+    "${interfaces_path}/inner_kits/native_cpp/audio_source/include",
+    "${services_path}/audiomanager/managersource/include",
+    "${services_path}/audiomanager/test/unittest/audiomanagertestutils/include",
     "${services_path}/common/audioparam",
     "${services_path}/common/taskProcessor/include",
     "${services_path}/common/audiodata/include",
     "${services_path}/common/audioeventcallback",
-    "${services_path}/audiomanager/managersource/include",
-    "${services_path}/audiomanager/test/unittest/audiomanagertestutils/include",
+    "${services_path}/hdfaudioclient/include",
     "${softbusadapter_path}/include",
   ]
 }
@@ -70,6 +70,8 @@ ohos_unittest("DaudioSourceDevTest") {
   configs = [ ":module_private_config" ]
 
   deps = [
+    "${audio_transport_path}/decodetransport:distributed_audio_decode_transport",
+    "${audio_transport_path}/encodetransport:distributed_audio_encode_transport",
     "${hdf_interfaces_path}/audioext/v1_0:libdaudioext_proxy_1.0",
     "${services_path}/audiomanager/servicesource:distributed_audio_source",
     "${services_path}/common:distributed_audio_utils",
@@ -79,6 +81,8 @@ ohos_unittest("DaudioSourceDevTest") {
 
   external_deps = [
     "c_utils:utils",
+    "distributed_hardware_fwk:distributed_av_receiver",
+    "distributed_hardware_fwk:distributed_av_sender",
     "drivers_interface_audio:libaudio_proxy_1.0",
     "dsoftbus:softbus_client",
     "ipc:ipc_core",
@@ -103,6 +107,8 @@ ohos_unittest("DMicDevTest") {
   ]
 
   external_deps = [
+    "distributed_hardware_fwk:distributed_av_receiver",
+    "distributed_hardware_fwk:distributed_av_sender",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]
@@ -125,6 +131,8 @@ ohos_unittest("DSpeakerDevTest") {
   ]
 
   external_deps = [
+    "distributed_hardware_fwk:distributed_av_receiver",
+    "distributed_hardware_fwk:distributed_av_sender",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]

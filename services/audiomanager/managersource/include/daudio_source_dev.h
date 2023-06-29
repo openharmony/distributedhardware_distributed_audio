@@ -134,7 +134,7 @@ private:
     using DAudioSourceDevFunc = int32_t (DAudioSourceDev::*)(const AudioEvent &audioEvent);
     std::map<AudioEventType, DAudioSourceDevFunc> memberFuncMap_;
     std::map<AudioEventType, uint8_t> eventNotifyMap_;
-    bool engineFlag_ = true;
+    bool engineFlag_ = false;
 };
 } // DistributedHardware
 } // OHOS

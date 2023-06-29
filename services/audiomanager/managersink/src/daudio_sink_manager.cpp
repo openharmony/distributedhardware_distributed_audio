@@ -141,7 +141,7 @@ int32_t DAudioSinkManager::HandleDAudioNotify(const std::string &devId, const st
         return ERR_DH_AUDIO_FAILED;
     }
 
-    // now ctrl channel is also goto here, please sure here not crash. 
+    // now ctrl channel is also goto here, please sure here not crash.
     json jParam = json::parse(eventContent, nullptr, false);
     if (JsonParamCheck(jParam, { KEY_RANDOM_TASK_CODE })) {
         DHLOGD("Receive audio notify from source, random task code: %s",
@@ -170,7 +170,6 @@ int32_t DAudioSinkManager::CreateAudioDevice(const std::string &devId)
         DHLOGE("Awake audio dev failed.");
         return ERR_DH_AUDIO_FAILED;
     }
-    // wuhaobo zhushi 不论old 还是new 都需要调用init
     int32_t ret = dev->InitAVTransEngines(sendProviderPtr_, rcvProviderPtr_);
     if (ret != DH_SUCCESS) {
         DHLOGE("Init av transport sender engine failed.");
@@ -318,7 +317,6 @@ int32_t DAudioSinkManager::UnloadAVSenderEngineProvider()
 int32_t EngineProviderListener::OnProviderEvent(const AVTransEvent &event)
 {
     DHLOGI("On provider event :%d", event.type);
-    // wuhaobo zhushi 这里等source要求打开后才会回调上来；创建设备
     if (event.type == EventType::EVENT_CHANNEL_OPENED) {
         DHLOGI("CreateAudioDevice enter");
         DAudioSinkManager::GetInstance().CreateAudioDevice(event.peerDevId);

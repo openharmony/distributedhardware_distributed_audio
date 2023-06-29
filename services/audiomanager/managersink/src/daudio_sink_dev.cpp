@@ -341,29 +341,31 @@ int32_t DAudioSinkDev::NotifyPlayStatusChange(const AudioEvent &audioEvent)
 int32_t DAudioSinkDev::TaskOpenCtrlChannel(const std::string &args)
 {
     DHLOGI("Open ctrl channel.");
-    if (args.length() > DAUDIO_MAX_JSON_LEN || args.empty()) {
-        return ERR_DH_AUDIO_SA_PARAM_INVALID;
-    }
-    json jParam = json::parse(args, nullptr, false);
-    if (!JsonParamCheck(jParam, { KEY_DH_ID })) {
-        return ERR_DH_AUDIO_FAILED;
-    }
+    if (engineFlag_ == false) {
+        if (args.length() > DAUDIO_MAX_JSON_LEN || args.empty()) {
+            return ERR_DH_AUDIO_SA_PARAM_INVALID;
+        }
+        json jParam = json::parse(args, nullptr, false);
+        if (!JsonParamCheck(jParam, { KEY_DH_ID })) {
+            return ERR_DH_AUDIO_FAILED;
+        }
 
-    if (audioCtrlMgr_ != nullptr && audioCtrlMgr_->IsOpened()) {
-        DHLOGD("Ctrl channel already opened.");
+        if (audioCtrlMgr_ != nullptr && audioCtrlMgr_->IsOpened()) {
+            DHLOGD("Ctrl channel already opened.");
+            NotifySourceDev(NOTIFY_OPEN_CTRL_RESULT, jParam[KEY_DH_ID], DH_SUCCESS);
+            return DH_SUCCESS;
+        }
+
+        audioCtrlMgr_ = std::make_shared<DAudioSinkDevCtrlMgr>(devId_, shared_from_this());
+        int32_t ret = audioCtrlMgr_->SetUp();
+        if (ret != DH_SUCCESS) {
+            DHLOGE("SetUp ctrl mgr failed, ret: %d.", ret);
+            NotifySourceDev(NOTIFY_OPEN_CTRL_RESULT, jParam[KEY_DH_ID], ERR_DH_AUDIO_FAILED);
+            return ret;
+        }
+
         NotifySourceDev(NOTIFY_OPEN_CTRL_RESULT, jParam[KEY_DH_ID], DH_SUCCESS);
-        return DH_SUCCESS;
     }
-
-    audioCtrlMgr_ = std::make_shared<DAudioSinkDevCtrlMgr>(devId_, shared_from_this());
-    int32_t ret = audioCtrlMgr_->SetUp();
-    if (ret != DH_SUCCESS) {
-        DHLOGE("SetUp ctrl mgr failed, ret: %d.", ret);
-        NotifySourceDev(NOTIFY_OPEN_CTRL_RESULT, jParam[KEY_DH_ID], ERR_DH_AUDIO_FAILED);
-        return ret;
-    }
-
-    NotifySourceDev(NOTIFY_OPEN_CTRL_RESULT, jParam[KEY_DH_ID], DH_SUCCESS);
     DHLOGI("Open ctrl channel success, notify open ctrl result.");
     return DH_SUCCESS;
 }
@@ -371,21 +373,23 @@ int32_t DAudioSinkDev::TaskOpenCtrlChannel(const std::string &args)
 int32_t DAudioSinkDev::TaskCloseCtrlChannel(const std::string &args)
 {
     (void)args;
-    DHLOGD("Close ctrl channel.");
-    if (audioCtrlMgr_ == nullptr) {
-        DHLOGD("Ctrl channel already closed.");
-        return DH_SUCCESS;
-    }
+    if (engineFlag_ == false) {
+        DHLOGD("Close ctrl channel.");
+        if (audioCtrlMgr_ == nullptr) {
+            DHLOGD("Ctrl channel already closed.");
+            return DH_SUCCESS;
+        }
 
-    int32_t ret = audioCtrlMgr_->Stop();
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Stop ctrl mgr failed, ret: %d.", ret);
+        int32_t ret = audioCtrlMgr_->Stop();
+        if (ret != DH_SUCCESS) {
+            DHLOGE("Stop ctrl mgr failed, ret: %d.", ret);
+        }
+        ret = audioCtrlMgr_->Release();
+        if (ret != DH_SUCCESS) {
+            DHLOGE("Release ctrl mgr failed, ret: %d.", ret);
+        }
+        audioCtrlMgr_ = nullptr;
     }
-    ret = audioCtrlMgr_->Release();
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Release ctrl mgr failed, ret: %d.", ret);
-    }
-    audioCtrlMgr_ = nullptr;
     DHLOGD("Close ctrl channel success.");
     return DH_SUCCESS;
 }
@@ -596,9 +600,6 @@ int32_t DAudioSinkDev::TaskVolumeChange(const std::string &args)
 {
     DHLOGD("Audio volume changed.");
     AudioEvent event(AudioEventType::VOLUME_CHANGE, args);
-    if (audioCtrlMgr_ == nullptr) {
-        return ERR_DH_AUDIO_SA_SINKCTRLMGR_NOT_INIT;
-    }
     return SendAudioEventToRemote(event);
 }
 
@@ -606,9 +607,6 @@ int32_t DAudioSinkDev::TaskFocusChange(const std::string &args)
 {
     DHLOGD("Audio focus changed.");
     AudioEvent event(AudioEventType::AUDIO_FOCUS_CHANGE, args);
-    if (audioCtrlMgr_ == nullptr) {
-        return ERR_DH_AUDIO_SA_SINKCTRLMGR_NOT_INIT;
-    }
     return SendAudioEventToRemote(event);
 }
 
@@ -616,9 +614,6 @@ int32_t DAudioSinkDev::TaskRenderStateChange(const std::string &args)
 {
     DHLOGD("Audio render state changed.");
     AudioEvent event(AudioEventType::AUDIO_RENDER_STATE_CHANGE, args);
-    if (audioCtrlMgr_ == nullptr) {
-        return ERR_DH_AUDIO_SA_SINKCTRLMGR_NOT_INIT;
-    }
     return SendAudioEventToRemote(event);
 }
 

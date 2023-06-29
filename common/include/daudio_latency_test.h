@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "single_instance.h"
+
 namespace OHOS {
 namespace DistributedHardware {
 class DAudioLatencyTest {
@@ -26,7 +27,6 @@ DECLARE_SINGLE_INSTANCE_BASE(DAudioLatencyTest);
 public:
     int32_t AddPlayTime(const int64_t playBeepTime);
     int32_t AddRecordTime(const int64_t recordBeepTime);
-    int64_t GetNowTimeUs();
     int64_t RecordBeepTime(const uint8_t *base, const int32_t &sizePerFrame, bool &status);
     bool IsFrameHigh(const int16_t *audioData, const int32_t size, int32_t threshhold);
     int32_t ComputeLatency();

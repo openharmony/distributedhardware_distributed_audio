@@ -137,7 +137,7 @@ void DSpeakerDev::OnEngineTransEvent(const AVTransEvent &event)
 
 void DSpeakerDev::OnEngineTransMessage(const std::shared_ptr<AVTransMessage> &message)
 {
-    DHLOGI("On Engine message");
+    DHLOGI("On Engine message, type:%d.", message->type_);
     if (message == nullptr) {
         DHLOGE("The parameter is nullptr");
         return;
@@ -447,6 +447,7 @@ int32_t DSpeakerDev::MmapStop()
     if (enqueueDataThread_.joinable()) {
         enqueueDataThread_.join();
     }
+    DHLOGI("Spk mmap stop end.");
     return DH_SUCCESS;
 }
 

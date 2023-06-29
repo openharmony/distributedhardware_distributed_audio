@@ -39,6 +39,7 @@ constexpr int32_t LOG_MAX_LEN = 4096;
 constexpr int32_t DISTRIBUTED_HARDWARE_AUDIO_SOURCE_SA_ID = 4805;
 constexpr int32_t DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID = 4806;
 constexpr int32_t AUDIO_LOADSA_TIMEOUT_MS = 10000;
+constexpr int32_t AUDIO_SET_HISTREAMER_BIT_RATE = 1536000;
 
 constexpr int32_t AUDIO_DEVICE_TYPE_UNKNOWN = 0;
 constexpr int32_t AUDIO_DEVICE_TYPE_SPEAKER = 1;
@@ -83,6 +84,9 @@ const std::string AVENC_AAC = "avenc_aac";
 const std::string NAME = "name";
 const std::string KEY_CODECTYPE = "codecType";
 const std::string KEY_DEVICE_TYPE = "deviceType";
+
+const std::string KEY_HISTREAMER_AUDIO_ENCODER = "histmAudEnc";
+const std::string KEY_HISTREAMER_AUDIO_DECODER = "histmAudDec";
 
 const std::string HDF_EVENT_RESULT_SUCCESS = "DH_SUCCESS";
 const std::string HDF_EVENT_RESULT_FAILED = "DH_FAILED";

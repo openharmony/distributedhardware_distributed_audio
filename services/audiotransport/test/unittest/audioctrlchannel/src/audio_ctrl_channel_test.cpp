@@ -128,6 +128,7 @@ HWTEST_F(AudioCtrlChannelTest, OnSessionClosed_001, TestSize.Level1)
     ctrlChannel_->OnSessionClosed(sessionId);
     listener = std::make_shared<MockIAudioChannelListener>();
     ctrlChannel_->channelListener_ = listener;
+    ctrlChannel_->OnSessionClosed(sessionId);
     AudioEvent event;
     EXPECT_EQ(ERR_DH_AUDIO_TRANS_ERROR, ctrlChannel_->SendEvent(event));
 }
@@ -140,12 +141,17 @@ HWTEST_F(AudioCtrlChannelTest, OnSessionClosed_001, TestSize.Level1)
  */
 HWTEST_F(AudioCtrlChannelTest, SendMsg_001, TestSize.Level1)
 {
+    int32_t sessionId = 1;
+    int32_t dataLen = 3;
+    uint8_t *data = new uint8_t[dataLen];
+    ctrlChannel_->OnBytesReceived(sessionId, data, dataLen);
     std::shared_ptr<IAudioChannelListener> listener = std::make_shared<MockIAudioChannelListener>();
     ctrlChannel_->channelListener_ = listener;
-
-    int32_t sessionId = 0;
-    uint8_t *data = nullptr;
-    int32_t dataLen = 0;
+    ctrlChannel_->OnBytesReceived(sessionId, data, dataLen);
+    delete [] data;
+    data = nullptr;
+    sessionId = 0;
+    dataLen = 0;
     ctrlChannel_->OnBytesReceived(sessionId, data, dataLen);
     listener = nullptr;
     ctrlChannel_->channelListener_ = listener;
@@ -158,6 +164,19 @@ HWTEST_F(AudioCtrlChannelTest, SendMsg_001, TestSize.Level1)
 
     string message = "sendMsg";
     EXPECT_NE(ERR_DH_AUDIO_CTRL_CHANNEL_SEND_MSG_FAIL, ctrlChannel_->SendMsg(message));
+}
+
+/**
+ * @tc.name: from_audioEventJson_001
+ * @tc.desc: Verify the from_audioEventJson function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5U
+ */
+HWTEST_F(AudioCtrlChannelTest, from_audioEventJson_001, TestSize.Level1)
+{
+    AudioEvent event;
+    json j;
+    EXPECT_NE(DH_SUCCESS, from_audioEventJson(j, event));
 }
 } // namespace DistributedHardware
 } // namespace OHOS

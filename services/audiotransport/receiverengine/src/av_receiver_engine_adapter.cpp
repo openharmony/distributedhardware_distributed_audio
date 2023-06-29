@@ -112,7 +112,7 @@ int32_t AVTransReceiverAdapter::CreateControlChannel(const std::string &peerDevI
     }
     std::vector<std::string> dstDevIds = {peerDevId};
     int32_t ret = receiverEngine_->CreateControlChannel(dstDevIds,
-        ChannelAttribute{TransStrategy::LOW_LATANCY_STRATEGY });
+        ChannelAttribute{TransStrategy::LOW_LATANCY_STRATEGY});
     if (ret != DH_SUCCESS) {
         DHLOGE("Create av transport receiver channel failed, ret: %d", ret);
         return ERR_DH_AV_TRANS_CREATE_CHANNEL_FAILED;

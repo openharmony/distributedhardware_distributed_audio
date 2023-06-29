@@ -104,7 +104,7 @@ int32_t AVTransSenderAdapter::CreateControlChannel(const std::string &peerDevId)
     }
     std::vector<std::string> dstDevIds = {peerDevId};
     int32_t ret = senderEngine_->CreateControlChannel(dstDevIds,
-        ChannelAttribute{TransStrategy::LOW_LATANCY_STRATEGY });
+        ChannelAttribute{TransStrategy::LOW_LATANCY_STRATEGY});
     if (ret != DH_SUCCESS) {
         DHLOGI("Create av transport sender channel failed, ret: %d", ret);
         return ERR_DH_AV_TRANS_CREATE_CHANNEL_FAILED;
@@ -206,7 +206,7 @@ int32_t AVTransSenderAdapter::OnSenderEvent(const AVTransEvent &event)
         case EventType::EVENT_STOP_SUCCESS:
         case EventType::EVENT_ENGINE_ERROR:
         case EventType::EVENT_REMOTE_ERROR:
-            if (adapterCallback_ == nullptr) {
+            if (adapterCallback_ != nullptr) {
                 DHLOGI("callback on engine event.");
                 adapterCallback_->OnEngineEvent(event);
             }

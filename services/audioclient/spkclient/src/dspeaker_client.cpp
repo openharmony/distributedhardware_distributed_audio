@@ -479,7 +479,7 @@ void DSpeakerClient::Pause()
     if (renderDataThread_.joinable()) {
         renderDataThread_.join();
     }
-    // wuhaobo todo 这里确认下pause的实现 engine 改如何pause
+    // wuhaobo todo pause engine
     if (speakerTrans_ == nullptr || speakerTrans_->Pause() != DH_SUCCESS) {
         DHLOGE("Speaker trans Pause failed.");
     }
@@ -493,7 +493,7 @@ void DSpeakerClient::Pause()
 void DSpeakerClient::ReStart()
 {
     DHLOGI("ReStart");
-    // wuhaobo todo 这里确认下restart的实现 engine 改如何restart
+    // wuhaobo todo pause engine
     if (speakerTrans_ == nullptr || speakerTrans_->Restart(audioParam_, audioParam_) != DH_SUCCESS) {
         DHLOGE("Speaker trans Restart failed.");
     }

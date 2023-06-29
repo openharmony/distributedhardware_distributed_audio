@@ -29,9 +29,8 @@ config("decode_transport_pub_config") {
 
 ohos_shared_library("distributed_audio_decode_transport") {
   include_dirs = [
-    # 这里需要确认下是否可以屏蔽
-    # "${mediastandard_path}/interfaces/innerkits/native/media/include",
-    # "${mediastandardfwk_path}/audiocommon/include",
+    "${mediastandard_path}/interfaces/innerkits/native/media/include",
+    "${mediastandardfwk_path}/audiocommon/include",
     "//third_party/json/include",
   ]
 

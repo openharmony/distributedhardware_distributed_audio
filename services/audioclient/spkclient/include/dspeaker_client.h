@@ -103,7 +103,7 @@ private:
     std::unique_ptr<AudioStandard::AudioRenderer> audioRenderer_ = nullptr;
     std::shared_ptr<IAudioDataTransport> speakerTrans_ = nullptr;
     std::weak_ptr<IAudioEventCallback> eventCallback_;
-    bool engineFlag_ = true;
+    bool engineFlag_ = false;
 };
 } // DistributedHardware
 } // OHOS

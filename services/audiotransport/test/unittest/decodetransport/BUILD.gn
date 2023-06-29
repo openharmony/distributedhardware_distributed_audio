@@ -29,19 +29,21 @@ config("module_private_config") {
 
   include_dirs += [
     "include",
-    "${common_path}/include",
-    "${softbusadapter_path}/include",
-    "${services_path}/common/audioparam",
-    "${services_path}/common/audiodata/include",
+    "${audio_processor_path}/decodeprocessor/include",
+    "${audio_processor_path}/interface",
+    "${audio_transport_path}/audiochannel/audiodatachannel/include",
+    "${audio_transport_path}/audiochannel/interface",
     "${audio_transport_path}/audiotransportstatus/include",
     "${audio_transport_path}/audiotransportstatus/interface",
-    "${audio_processor_path}/interface",
-    "${audio_processor_path}/decodeprocessor/include",
-    "${audio_transport_path}/interface",
-    "${audio_transport_path}/audiochannel/interface",
-    "${audio_transport_path}/audiochannel/audiodatachannel/include",
     "${audio_transport_path}/decodetransport/include",
+    "${audio_transport_path}/interface",
+    "${audio_transport_path}/receiverengine/include",
+    "${audio_transport_path}/senderengine/include",
     "${audio_transport_path}/test/unittest/audiotranstestutils/include",
+    "${common_path}/include",
+    "${services_path}/common/audiodata/include",
+    "${services_path}/common/audioparam",
+    "${softbusadapter_path}/include",
   ]
 }
 
@@ -58,7 +60,11 @@ ohos_unittest("DecodeTransportTest") {
     "//third_party/googletest:gtest_main",
   ]
 
-  external_deps = [ "dsoftbus:softbus_client" ]
+  external_deps = [
+    "distributed_hardware_fwk:distributed_av_receiver",
+    "distributed_hardware_fwk:distributed_av_sender",
+    "dsoftbus:softbus_client",
+  ]
 
   defines = [
     "HI_LOG_ENABLE",

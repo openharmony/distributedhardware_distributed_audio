@@ -40,6 +40,7 @@ hdf_ser_aud_ext_path = "${hdf_service_path}/hdi_service/audio_ext/v1_0"
 
 fwk_utils_path = "${distributedhardwarefwk_path}/utils"
 fwk_common_path = "${distributedhardwarefwk_path}/common"
+fwk_services_path = "${distributedhardwarefwk_path}/services"
 innerkits_path = "${distributedaudio_path}/interfaces/inner_kits"
 
 build_flags = [ "-Werror" ]

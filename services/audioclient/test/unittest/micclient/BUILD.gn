@@ -36,6 +36,8 @@ config("module_private_config") {
     "${audio_transport_path}/audiotransportstatus/interface",
     "${audio_transport_path}/encodetransport/include",
     "${audio_transport_path}/interface",
+    "${audio_transport_path}/receiverengine/include",
+    "${audio_transport_path}/senderengine/include",
     "${common_path}/include",
     "${fwk_common_path}/utils/include",
     "${services_path}/common/audioeventcallback",
@@ -61,7 +63,11 @@ ohos_unittest("MicClientTest") {
     "//third_party/googletest:gtest_main",
   ]
 
-  external_deps = [ "audio_framework:audio_capturer" ]
+  external_deps = [
+    "audio_framework:audio_capturer",
+    "distributed_hardware_fwk:distributed_av_receiver",
+    "distributed_hardware_fwk:distributed_av_sender",
+  ]
 }
 
 group("mic_client_test") {

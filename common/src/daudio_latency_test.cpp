@@ -14,10 +14,13 @@
  */
 
 #include "daudio_latency_test.h"
-#include "daudio_log.h"
 
 #include <ctime>
 #include <string>
+
+#include "daudio_errorcode.h"
+#include "daudio_log.h"
+#include "daudio_util.h"
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DAudioLatencyTest"
@@ -38,36 +41,30 @@ DAudioLatencyTest::~DAudioLatencyTest()
 int32_t DAudioLatencyTest::AddPlayTime(const int64_t playBeepTime)
 {
     if (GetNowTimeUs() - lastPlayTime_ <= TWO_BEEP_TIME_INTERVAL) {
-        DHLOGE("Catch play high frame, but not in 900ms.");
-        return -1;
+        DHLOGE("Catch play high frame, but not in %d ms.", TWO_BEEP_TIME_INTERVAL);
+        return ERR_DH_AUDIO_FAILED;
     }
     DHLOGI("Catch play high frame, playTime: %lld.", playBeepTime);
     playBeepTime_.push_back(playBeepTime);
     lastPlayTime_ = GetNowTimeUs();
-    return 0;
+    return DH_SUCCESS;
 }
 
 int32_t DAudioLatencyTest::AddRecordTime(const int64_t recordBeepTime)
 {
     if (captureBeepTime_.size() >= playBeepTime_.size()) {
-        DHLOGE("Catch record high frame, but capturesize >= playsize.");
-        return -1;
+        DHLOGE("Catch record high frame size error, capturesize %zu, playsize %zu.",
+            captureBeepTime_.size(), playBeepTime_.size());
+        return ERR_DH_AUDIO_BAD_VALUE;
     }
     if (GetNowTimeUs() - lastRecordTime_ <= TWO_BEEP_TIME_INTERVAL) {
-        DHLOGE("Catch record high frame, but not in 900ms.");
-        return -1;
+        DHLOGE("Catch record high frame, but not in %d ms.", TWO_BEEP_TIME_INTERVAL);
+        return ERR_DH_AUDIO_FAILED;
     }
     DHLOGI("Catch record high frame, recordTime: %lld.", recordBeepTime);
     captureBeepTime_.push_back(recordBeepTime);
     lastRecordTime_ = GetNowTimeUs();
-    return 0;
-}
-
-int64_t DAudioLatencyTest::GetNowTimeUs()
-{
-    std::chrono::microseconds nowUs =
-        std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch());
-    return nowUs.count();
+    return DH_SUCCESS;
 }
 
 bool DAudioLatencyTest::IsFrameHigh(const int16_t *audioData, const int32_t size, int32_t threshhold)
@@ -85,11 +82,12 @@ bool DAudioLatencyTest::IsFrameHigh(const int16_t *audioData, const int32_t size
 int64_t DAudioLatencyTest::RecordBeepTime(const uint8_t *base, const int32_t &sizePerFrame, bool &status)
 {
     int32_t threshhold = BEEP_THRESHHOLD;
-    if (IsFrameHigh((int16_t *)base, sizePerFrame / sizeof(int16_t), threshhold) == true &&
-        status == true) {
+    bool isHigh = IsFrameHigh(reinterpret_cast<int16_t *>(const_cast<uint8_t *>(base)),
+        sizePerFrame / sizeof(int16_t), threshhold);
+    if (isHigh && status) {
         status = false;
         return GetNowTimeUs();
-    } else if (IsFrameHigh((int16_t *)base, sizePerFrame / sizeof(int16_t), threshhold) == false) {
+    } else if (!isHigh) {
         status = true;
     }
     return 0;

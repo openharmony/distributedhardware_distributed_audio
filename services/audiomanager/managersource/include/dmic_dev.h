@@ -125,7 +125,7 @@ private:
     std::thread enqueueDataThread_;
     std::mutex writeAshmemMutex_;
     std::condition_variable dataQueueCond_;
-    bool engineFlag_ = true;
+    bool engineFlag_ = false;
 };
 } // DistributedHardware
 } // OHOS
