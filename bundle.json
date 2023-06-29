@@ -135,6 +135,14 @@
                             "audioparam/audio_param.h"
                         ]
                     }
+                },
+                {
+                    "type": "so",
+                    "name": "//foundation/distributedhardware/distributed_audio/services/hdfaudioclient:daudio_client",
+                    "header": {
+                        "header_base": "//foundation/distributedhardware/distributed_audio/services/hdfaudioclient",
+                        "header_files": []
+                    }
                 }
             ],
             "test": [
