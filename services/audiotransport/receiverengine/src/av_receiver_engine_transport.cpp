@@ -119,14 +119,14 @@ int32_t AVTransReceiverTransport::Release()
     return DH_SUCCESS;
 }
 
-// wuhaobo todo pause
+// todo pause
 int32_t AVTransReceiverTransport::Pause()
 {
     DHLOGI("Pause ReceiverEngine enter.");
     return DH_SUCCESS;
 }
 
-// wuhaobo todo restart
+// todo restart
 int32_t AVTransReceiverTransport::Restart(const AudioParam &localParam, const AudioParam &remoteParam)
 {
     DHLOGI("ReStart ReceiverEngine enter.");

@@ -104,14 +104,14 @@ int32_t AVTransSenderTransport::Stop()
     return DH_SUCCESS;
 }
 
-// wuhaobo todo pause
+// todo pause
 int32_t AVTransSenderTransport::Pause()
 {
     DHLOGI("PauseSenderEngine enter.");
     return DH_SUCCESS;
 }
 
-// wuhaobo todo restart
+// todo restart
 int32_t AVTransSenderTransport::Restart(const AudioParam &localParam, const AudioParam &remoteParam)
 {
     DHLOGI("RestartSenderEngine enter.");

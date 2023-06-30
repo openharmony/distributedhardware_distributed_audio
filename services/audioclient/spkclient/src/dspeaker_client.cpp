@@ -74,7 +74,7 @@ int32_t DSpeakerClient::InitReceiverEngine(IAVEngineProvider *providerPtr)
     return DH_SUCCESS;
 }
 
-int32_t DSpeakerClient::SetUp(const AudioParam &param)
+int32_t DSpeakerClient::CreateAudioRenderer(const AudioParam &param)
 {
     DHLOGD("Set up spk client: {sampleRate: %d, bitFormat: %d, channelMask: %d," +
         "frameSize: %d, contentType: %d, renderFlags: %d, streamUsage: %d}.",
@@ -101,7 +101,16 @@ int32_t DSpeakerClient::SetUp(const AudioParam &param)
         return ERR_DH_AUDIO_CLIENT_CREATE_RENDER_FAILED;
     }
     audioRenderer_ ->SetRendererCallback(shared_from_this());
+    return DH_SUCCESS;
+}
 
+int32_t DSpeakerClient::SetUp(const AudioParam &param)
+{
+    int32_t ret = CreateAudioRenderer(param);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Set up failed, Create Audio renderer failed.");
+        return ret;
+    }
     if (engineFlag_ == false) {
         speakerTrans_ = std::make_shared<AudioDecodeTransport>(devId_);
     }
@@ -109,7 +118,7 @@ int32_t DSpeakerClient::SetUp(const AudioParam &param)
         DHLOGE("Speaker trans should be init by dev.");
         return ERR_DH_AUDIO_NULLPTR;
     }
-    int32_t ret = speakerTrans_->SetUp(audioParam_, audioParam_, shared_from_this(), CAP_SPK);
+    ret = speakerTrans_->SetUp(audioParam_, audioParam_, shared_from_this(), CAP_SPK);
     if (ret != DH_SUCCESS) {
         DHLOGE("Speaker trans setup failed.");
         return ret;
@@ -479,7 +488,7 @@ void DSpeakerClient::Pause()
     if (renderDataThread_.joinable()) {
         renderDataThread_.join();
     }
-    // wuhaobo todo pause engine
+    // todo pause engine
     if (speakerTrans_ == nullptr || speakerTrans_->Pause() != DH_SUCCESS) {
         DHLOGE("Speaker trans Pause failed.");
     }
@@ -493,7 +502,7 @@ void DSpeakerClient::Pause()
 void DSpeakerClient::ReStart()
 {
     DHLOGI("ReStart");
-    // wuhaobo todo pause engine
+    // todo pause engine
     if (speakerTrans_ == nullptr || speakerTrans_->Restart(audioParam_, audioParam_) != DH_SUCCESS) {
         DHLOGE("Speaker trans Restart failed.");
     }

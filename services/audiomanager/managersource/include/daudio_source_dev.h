@@ -106,6 +106,10 @@ private:
     AudioEventType getEventTypeFromArgs(const std::string &args);
     void to_json(json &j, const AudioParam &param);
     int32_t SendAudioEventToRemote(const AudioEvent &event);
+    int32_t CloseSpkOld(const std::string &args);
+    int32_t CloseSpkNew(const std::string &args);
+    int32_t CloseMicOld(const std::string &args);
+    int32_t CloseMicNew(const std::string &args);
 
 private:
     static constexpr uint8_t RPC_WAIT_SECONDS = 2;
