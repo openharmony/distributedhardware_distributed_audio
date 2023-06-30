@@ -19,6 +19,7 @@
 #include "audio_data.h"
 #include "audio_param.h"
 #include "iaudio_datatrans_callback.h"
+#include "i_av_engine_provider.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -34,6 +35,9 @@ public:
     virtual int32_t Pause() = 0;
     virtual int32_t Restart(const AudioParam &localParam, const AudioParam &remoteParam) = 0;
     virtual int32_t FeedAudioData(std::shared_ptr<AudioData> &audioData) = 0;
+    virtual int32_t CreateCtrl() = 0;
+    virtual int32_t InitEngine(IAVEngineProvider *providerPtr) = 0;
+    virtual int32_t SendMessage(uint32_t type, std::string content, std::string dstDevId) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

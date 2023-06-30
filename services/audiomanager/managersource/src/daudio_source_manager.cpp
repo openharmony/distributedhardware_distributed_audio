@@ -15,6 +15,7 @@
 
 #include "daudio_source_manager.h"
 
+#include <dlfcn.h>
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 
@@ -30,10 +31,21 @@ namespace OHOS {
 namespace DistributedHardware {
 namespace {
 constexpr uint32_t MAX_DEVICE_ID_LENGTH = 200;
-constexpr uint32_t MAX_DISTRIBUTED_HAREWARE_ID_LENGTH = 100;
+constexpr uint32_t MAX_DISTRIBUTED_HARDWARE_ID_LENGTH = 100;
 }
-
 IMPLEMENT_SINGLE_INSTANCE(DAudioSourceManager);
+using AVTransProviderClass = IAVEngineProvider *(*)(const std::string &);
+
+const std::string SENDER_SO_NAME = "libdistributed_av_sender.z.so";
+const std::string GET_SENDER_PROVIDER_FUNC = "GetAVSenderEngineProvider";
+const std::string RECEIVER_SO_NAME = "libdistributed_av_receiver.z.so";
+const std::string GET_RECEIVER_PROVIDER_FUNC = "GetAVReceiverEngineProvider";
+#ifdef __LP64__
+const std::string LIB_LOAD_PATH = "/system/lib64/";
+#else
+const std::string LIB_LOAD_PATH = "/system/lib/";
+#endif
+
 DAudioSourceManager::DAudioSourceManager()
 {
     DHLOGD("Distributed audio source manager constructed.");
@@ -65,12 +77,29 @@ int32_t DAudioSourceManager::Init(const sptr<IDAudioIpcCallback> &callback)
 
     ipcCallback_ = callback;
     daudioMgrCallback_ = std::make_shared<DAudioSourceMgrCallback>();
+    IsParamEnabled(AUDIO_ENGINE_FLAG, engineFlag_);
+    if (engineFlag_ == true) {
+        int32_t ret = LoadAVSenderEngineProvider();
+        if (ret != DH_SUCCESS) {
+            DHLOGE("load av transport sender engine provider failed");
+            return ERR_DH_AUDIO_FAILED;
+        }
+        ret = LoadAVReceiverEngineProvider();
+        if (ret != DH_SUCCESS) {
+            DHLOGE("load av transport receiver engine provider failed.");
+            return ERR_DH_AUDIO_FAILED;
+        }
+    }
     return DH_SUCCESS;
 }
 
 int32_t DAudioSourceManager::UnInit()
 {
     DHLOGI("Uninit audio source manager.");
+    if (engineFlag_ == true) {
+        UnloadAVReceiverEngineProvider();
+        UnloadAVSenderEngineProvider();
+    }
     {
         std::lock_guard<std::mutex> lock(devMapMtx_);
         for (auto iter = audioDevMap_.begin(); iter != audioDevMap_.end(); iter++) {
@@ -96,9 +125,9 @@ int32_t DAudioSourceManager::UnInit()
 
 static bool CheckParams(const std::string &devId, const std::string &dhId)
 {
-    DHLOGD("Checking oarams of daudio.");
+    DHLOGD("Checking params of daudio.");
     if (devId.empty() || dhId.empty() ||
-        devId.size() > MAX_DEVICE_ID_LENGTH || dhId.size() > MAX_DISTRIBUTED_HAREWARE_ID_LENGTH) {
+        devId.size() > MAX_DEVICE_ID_LENGTH || dhId.size() > MAX_DISTRIBUTED_HARDWARE_ID_LENGTH) {
         return false;
     }
     return true;
@@ -149,12 +178,13 @@ int32_t DAudioSourceManager::DisableDAudio(const std::string &devId, const std::
 int32_t DAudioSourceManager::HandleDAudioNotify(const std::string &devId, const std::string &dhId,
     const int32_t eventType, const std::string &eventContent)
 {
-    DHLOGD("Handle distributed audio notify, devId: %s, dhId: %s, eventType: %d.", GetAnonyString(devId).c_str(),
-        dhId.c_str(), eventType);
+    DHLOGD("Receive audio event from devId: %s, event type: %d. event content: %s.",
+        GetAnonyString(devId).c_str(), eventType, eventContent.c_str());
     if (eventContent.length() > DAUDIO_MAX_JSON_LEN || eventContent.empty()) {
         return ERR_DH_AUDIO_FAILED;
     }
 
+    // now ctrl channel is also goto here, please sure here not crash.
     json jParam = json::parse(eventContent, nullptr, false);
     if (JsonParamCheck(jParam, { KEY_RANDOM_TASK_CODE })) {
         DHLOGD("Receive audio notify from sink, random task code: %s",
@@ -303,6 +333,91 @@ void DAudioSourceManager::ClearAudioDev(const std::string &devId)
         audioDevMap_[devId].dev->SleepAudioDev();
         audioDevMap_.erase(devId);
     }
+}
+
+int32_t DAudioSourceManager::LoadAVSenderEngineProvider()
+{
+    DHLOGI("LoadAVSenderEngineProvider enter");
+    char path[PATH_MAX + 1] = {0x00};
+    if ((LIB_LOAD_PATH.length() + SENDER_SO_NAME.length()) > PATH_MAX ||
+        realpath((LIB_LOAD_PATH + SENDER_SO_NAME).c_str(), path) == nullptr) {
+        DHLOGE("File open failed");
+        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+    }
+    pSHandler_ = dlopen(path, RTLD_LAZY | RTLD_NODELETE);
+    if (pSHandler_ == nullptr) {
+        DHLOGE("%s handler load failed, failed reason : %s", path, dlerror());
+        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+    }
+    AVTransProviderClass getEngineFactoryFunc = (AVTransProviderClass)dlsym(pSHandler_,
+        GET_SENDER_PROVIDER_FUNC.c_str());
+    if (getEngineFactoryFunc == nullptr) {
+        DHLOGE("av transport engine factory function handler is null, failed reason : %s", dlerror());
+        dlclose(pSHandler_);
+        pSHandler_ = nullptr;
+        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+    }
+    sendProviderPtr_ = getEngineFactoryFunc(OWNER_NAME_D_SPEAKER);
+    DHLOGI("LoadAVSenderEngineProvider exit");
+    return DH_SUCCESS;
+}
+
+int32_t DAudioSourceManager::UnloadAVSenderEngineProvider()
+{
+    DHLOGI("UnloadAVSenderEngineProvider enter");
+    if (pSHandler_ != nullptr) {
+        dlclose(pSHandler_);
+        pSHandler_ = nullptr;
+    }
+    sendProviderPtr_ = nullptr;
+    return DH_SUCCESS;
+}
+
+int32_t DAudioSourceManager::LoadAVReceiverEngineProvider()
+{
+    DHLOGI("LoadAVReceiverEngineProvider enter");
+    char path[PATH_MAX + 1] = {0x00};
+    if ((LIB_LOAD_PATH.length() + RECEIVER_SO_NAME.length()) > PATH_MAX ||
+        realpath((LIB_LOAD_PATH + RECEIVER_SO_NAME).c_str(), path) == nullptr) {
+        DHLOGE("File canonicalization failed");
+        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+    }
+    pRHandler_ = dlopen(path, RTLD_LAZY | RTLD_NODELETE);
+    if (pRHandler_ == nullptr) {
+        DHLOGE("%s handler load failed, failed reason : %s", path, dlerror());
+        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+    }
+    AVTransProviderClass getEngineFactoryFunc = (AVTransProviderClass)dlsym(pRHandler_,
+        GET_RECEIVER_PROVIDER_FUNC.c_str());
+    if (getEngineFactoryFunc == nullptr) {
+        DHLOGE("av transport engine factory function handler is null, failed reason : %s", dlerror());
+        dlclose(pRHandler_);
+        pRHandler_ = nullptr;
+        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+    }
+    rcvProviderPtr_ = getEngineFactoryFunc(OWNER_NAME_D_MIC);
+    DHLOGE("LoadAVReceiverEngineProvider success");
+    return DH_SUCCESS;
+}
+
+int32_t DAudioSourceManager::UnloadAVReceiverEngineProvider()
+{
+    DHLOGI("UnloadAVReceiverEngineProvider");
+    if (pRHandler_ != nullptr) {
+        dlclose(pRHandler_);
+        pRHandler_ = nullptr;
+    }
+    return DH_SUCCESS;
+}
+
+IAVEngineProvider *DAudioSourceManager::getSenderProvider()
+{
+    return sendProviderPtr_;
+}
+
+IAVEngineProvider *DAudioSourceManager::getReceiverProvider()
+{
+    return rcvProviderPtr_;
 }
 } // DistributedHardware
 } // OHOS

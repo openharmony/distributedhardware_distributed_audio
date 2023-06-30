@@ -23,10 +23,11 @@
 
 #include "audio_param.h"
 #include "audio_status.h"
+#include "av_receiver_engine_transport.h"
 #include "ashmem.h"
 #include "daudio_hdi_handler.h"
-#include "iaudio_datatrans_callback.h"
 #include "iaudio_data_transport.h"
+#include "iaudio_datatrans_callback.h"
 #include "iaudio_event_callback.h"
 #include "idaudio_hdi_callback.h"
 
@@ -36,11 +37,17 @@ namespace OHOS {
 namespace DistributedHardware {
 class DMicDev : public IDAudioHdiCallback,
     public IAudioDataTransCallback,
+    public AVReceiverTransportCallback,
     public std::enable_shared_from_this<DMicDev> {
 public:
     DMicDev(const std::string &devId, std::shared_ptr<IAudioEventCallback> callback)
         : devId_(devId), audioEventCallback_(callback) {};
     ~DMicDev() override = default;
+
+    void OnEngineTransEvent(const AVTransEvent &event) override;
+    void OnEngineTransMessage(const std::shared_ptr<AVTransMessage> &message) override;
+    void OnEngineTransDataAvailable(const std::shared_ptr<AudioData> &audioData) override;
+    int32_t InitReceiverEngine(IAVEngineProvider *providerPtr);
 
     int32_t EnableDMic(const int32_t dhId, const std::string &capability);
     int32_t DisableDMic(const int32_t dhId);
@@ -63,6 +70,7 @@ public:
     int32_t Stop();
     int32_t Release();
     bool IsOpened();
+    int32_t SendMessage(uint32_t type, std::string content, std::string dstDevId);
 
     AudioParam GetAudioParam() const;
     int32_t NotifyHdfAudioEvent(const AudioEvent &event);
@@ -96,7 +104,6 @@ private:
     std::queue<std::shared_ptr<AudioData>> dataQueue_;
     std::set<int32_t> enabledPorts_;
     AudioStatus curStatus_ = AudioStatus::STATUS_IDLE;
-
     // Mic capture parameters
     AudioParamHDF paramHDF_;
     AudioParam param_;
@@ -118,6 +125,7 @@ private:
     std::thread enqueueDataThread_;
     std::mutex writeAshmemMutex_;
     std::condition_variable dataQueueCond_;
+    bool engineFlag_ = false;
 };
 } // DistributedHardware
 } // OHOS

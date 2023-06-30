@@ -26,6 +26,7 @@
 #include "daudio_hisysevent.h"
 #include "daudio_hitrace.h"
 #include "daudio_log.h"
+#include "daudio_source_manager.h"
 #include "daudio_util.h"
 
 #undef DH_LOG_TAG
@@ -34,6 +35,56 @@
 namespace OHOS {
 namespace DistributedHardware {
 static constexpr size_t DATA_QUEUE_EXT_SIZE = 20;
+void DMicDev::OnEngineTransEvent(const AVTransEvent &event)
+{
+    if (event.type == EventType::EVENT_START_SUCCESS) {
+        OnStateChange(DATA_OPENED);
+    } else if ((event.type == EventType::EVENT_STOP_SUCCESS) ||
+        (event.type == EventType::EVENT_CHANNEL_CLOSED) ||
+        (event.type == EventType::EVENT_START_FAIL)) {
+        OnStateChange(DATA_CLOSED);
+    }
+}
+
+void DMicDev::OnEngineTransMessage(const std::shared_ptr<AVTransMessage> &message)
+{
+    DHLOGI("On Engine message");
+    if (message == nullptr) {
+        DHLOGE("The parameter is nullptr");
+        return;
+    }
+    DAudioSourceManager::GetInstance().HandleDAudioNotify(message->dstDevId_, message->dstDevId_,
+        message->type_, message->content_);
+}
+
+void DMicDev::OnEngineTransDataAvailable(const std::shared_ptr<AudioData> &audioData)
+{
+    DHLOGE("On Engine Data available");
+    OnDecodeTransDataDone(audioData);
+}
+
+int32_t DMicDev::InitReceiverEngine(IAVEngineProvider *providerPtr)
+{
+    DHLOGI("InitReceiverEngine enter.");
+    // new 方式
+    IsParamEnabled(AUDIO_ENGINE_FLAG, engineFlag_);
+    if (engineFlag_ == true) {
+        if (micTrans_ == nullptr) {
+            micTrans_ = std::make_shared<AVTransReceiverTransport>(devId_, shared_from_this());
+        }
+        int32_t ret = micTrans_->InitEngine(providerPtr);
+        if (ret != DH_SUCCESS) {
+            DHLOGE("Initialize av receiver adapter failed. micdev");
+            return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+        }
+        ret = micTrans_->CreateCtrl();
+        if (ret != DH_SUCCESS) {
+            DHLOGE("Create ctrl channel failed. micdev");
+            return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+        }
+    }
+    return DH_SUCCESS;
+}
 
 int32_t DMicDev::EnableDMic(const int32_t dhId, const std::string &capability)
 {
@@ -183,8 +234,13 @@ int32_t DMicDev::NotifyEvent(const std::string &devId, const int32_t dhId, const
 int32_t DMicDev::SetUp()
 {
     DHLOGI("Set up mic device.");
-    if (micTrans_ == nullptr) {
+    if (engineFlag_ == false) {
         micTrans_ = std::make_shared<AudioDecodeTransport>(devId_);
+    } else {
+        if (micTrans_ == nullptr) {
+            DHLOGE("mic trans should be init by dev.");
+            return ERR_DH_AUDIO_NULLPTR;
+        }
     }
     int32_t ret = micTrans_->SetUp(param_, param_, shared_from_this(), CAP_MIC);
     if (ret != DH_SUCCESS) {
@@ -206,7 +262,6 @@ int32_t DMicDev::Start()
         DHLOGE("Mic trans start failed, ret: %d.", ret);
         return ret;
     }
-
     std::unique_lock<std::mutex> lck(channelWaitMutex_);
     auto status = channelWaitCond_.wait_for(lck, std::chrono::seconds(CHANNEL_WAIT_SECONDS),
         [this]() { return isTransReady_.load(); });
@@ -446,6 +501,21 @@ int32_t DMicDev::OnStateChange(const AudioEventType type)
         return ERR_DH_AUDIO_SA_MICCALLBACK_NULL;
     }
     cbObj->NotifyEvent(event);
+    return DH_SUCCESS;
+}
+
+int32_t DMicDev::SendMessage(uint32_t type, std::string content, std::string dstDevId)
+{
+    DHLOGI("Send message to remote.");
+    if (type != static_cast<uint32_t>(OPEN_MIC) && type != static_cast<uint32_t>(CLOSE_MIC)) {
+        DHLOGE("Send message to remote. not OPEN_MIC or CLOSE_MIC. type: %u", type);
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    if (micTrans_ == nullptr) {
+        DHLOGE("mic trans is null.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    micTrans_->SendMessage(type, content, dstDevId);
     return DH_SUCCESS;
 }
 

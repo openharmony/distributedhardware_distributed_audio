@@ -18,18 +18,17 @@ import("../../../distributedaudio.gni")
 config("decode_transport_pub_config") {
   include_dirs = [
     "include",
+    "../audiochannel/audiodatachannel/include",
+    "../audiochannel/interface",
     "../audiotransportstatus/include",
     "../audiotransportstatus/interface",
     "../interface",
-    "../audiochannel/interface",
-    "../audiochannel/audiodatachannel/include",
     "../../audioprocessor/interface",
   ]
 }
 
 ohos_shared_library("distributed_audio_decode_transport") {
   include_dirs = [
-    "${fwk_common_path}/utils/include",
     "${mediastandard_path}/interfaces/innerkits/native/media/include",
     "${mediastandardfwk_path}/audiocommon/include",
     "//third_party/json/include",
@@ -37,19 +36,20 @@ ohos_shared_library("distributed_audio_decode_transport") {
 
   include_dirs += [
     "include",
-    "${common_path}/include",
-    "${common_path}/dfx_utils/include",
-    "${audio_processor_path}/decoder/include",
     "${audio_processor_path}/decodeprocessor/include",
+    "${audio_processor_path}/decoder/include",
     "${audio_processor_path}/directprocessor/include",
     "${audio_processor_path}/interface",
-    "${audio_transport_path}/audiochannel/interface",
     "${audio_transport_path}/audiochannel/audiodatachannel/include",
-    "${audio_transport_path}/interface",
+    "${audio_transport_path}/audiochannel/interface",
     "${audio_transport_path}/audiotransportstatus/include",
     "${audio_transport_path}/audiotransportstatus/interface",
-    "${services_path}/common/audioparam",
+    "${audio_transport_path}/interface",
+    "${audio_transport_path}/receiverengine/include",
+    "${common_path}/include",
+    "${common_path}/dfx_utils/include",
     "${services_path}/common/audiodata/include",
+    "${services_path}/common/audioparam",
     "${softbusadapter_path}/include",
   ]
 
@@ -60,6 +60,8 @@ ohos_shared_library("distributed_audio_decode_transport") {
     "${audio_processor_path}/decoder/src/audio_decoder.cpp",
     "${audio_processor_path}/decoder/src/audio_decoder_callback.cpp",
     "${audio_processor_path}/directprocessor/src/audio_direct_processor.cpp",
+    "${audio_transport_path}/receiverengine/src/av_receiver_engine_adapter.cpp",
+    "${audio_transport_path}/receiverengine/src/av_receiver_engine_transport.cpp",
     "${services_path}/common/audiodata/src/audio_data.cpp",
     "src/audio_decode_transport.cpp",
   ]
@@ -72,6 +74,7 @@ ohos_shared_library("distributed_audio_decode_transport") {
 
   external_deps = [
     "c_utils:utils",
+    "distributed_hardware_fwk:distributed_av_receiver",
     "dsoftbus:softbus_client",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",

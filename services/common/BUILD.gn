@@ -57,6 +57,7 @@ ohos_shared_library("distributed_audio_utils") {
     "hilog:libhilog",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
+    "init:libbegetutil",
   ]
 
   defines = [

@@ -39,6 +39,7 @@ constexpr int32_t LOG_MAX_LEN = 4096;
 constexpr int32_t DISTRIBUTED_HARDWARE_AUDIO_SOURCE_SA_ID = 4805;
 constexpr int32_t DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID = 4806;
 constexpr int32_t AUDIO_LOADSA_TIMEOUT_MS = 10000;
+constexpr int32_t AUDIO_SET_HISTREAMER_BIT_RATE = 1536000;
 
 constexpr int32_t AUDIO_DEVICE_TYPE_UNKNOWN = 0;
 constexpr int32_t AUDIO_DEVICE_TYPE_SPEAKER = 1;
@@ -96,6 +97,8 @@ const std::string VOLUME_LEVEL = "VOLUME_LEVEL";
 
 const std::string AUDIO_EVENT_RESTART = "restart";
 const std::string AUDIO_EVENT_PAUSE = "pause";
+
+const std::string AUDIO_ENGINE_FLAG = "persist.distributedhardware.distributedaudio.engine.enable";
 
 constexpr const char *KEY_TYPE = "type";
 constexpr const char *KEY_EVENT_CONTENT = "content";

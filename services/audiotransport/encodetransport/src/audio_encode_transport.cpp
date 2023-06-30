@@ -146,6 +146,27 @@ int32_t AudioEncodeTransport::FeedAudioData(std::shared_ptr<AudioData> &audioDat
     }
     return DH_SUCCESS;
 }
+int32_t AudioEncodeTransport::CreateCtrl()
+{
+    DHLOGI("create ctrl not support.");
+    return DH_SUCCESS;
+}
+
+int32_t AudioEncodeTransport::InitEngine(IAVEngineProvider *providerPtr)
+{
+    (void)providerPtr;
+    DHLOGI("Init engine not support.");
+    return DH_SUCCESS;
+}
+
+int32_t AudioEncodeTransport::SendMessage(uint32_t type, std::string content, std::string dstDevId)
+{
+    (void)type;
+    (void)content;
+    (void)dstDevId;
+    DHLOGI("Send message not support.");
+    return DH_SUCCESS;
+}
 
 int32_t AudioEncodeTransport::InitAudioEncodeTrans(const AudioParam &localParam,
     const AudioParam &remoteParam, const PortCapType capType)

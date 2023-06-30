@@ -65,6 +65,7 @@ DAudioSourceDev::DAudioSourceDev(const std::string &devId, const std::shared_ptr
     eventNotifyMap_[NOTIFY_CLOSE_MIC_RESULT] = EVENT_NOTIFY_CLOSE_MIC;
     eventNotifyMap_[NOTIFY_OPEN_CTRL_RESULT] = EVENT_NOTIFY_OPEN_CTRL;
     eventNotifyMap_[NOTIFY_CLOSE_CTRL_RESULT] = EVENT_NOTIFY_CLOSE_CTRL;
+    IsParamEnabled(AUDIO_ENGINE_FLAG, engineFlag_);
 }
 
 int32_t DAudioSourceDev::AwakeAudioDev()
@@ -138,7 +139,6 @@ int32_t DAudioSourceDev::HandleOpenDSpeaker(const AudioEvent &event)
     if (ret != DH_SUCCESS) {
         return ret;
     }
-
     auto task = GenerateTask(this, &DAudioSourceDev::TaskOpenDSpeaker, event.content, "Open Spk Device",
         &DAudioSourceDev::OnTaskResult);
     return taskQueue_->Produce(task);
@@ -186,7 +186,6 @@ int32_t DAudioSourceDev::HandleOpenDMic(const AudioEvent &event)
     if (ret != DH_SUCCESS) {
         return ret;
     }
-
     auto task = GenerateTask(this, &DAudioSourceDev::TaskOpenDMic, event.content, "Open Mic Device",
         &DAudioSourceDev::OnTaskResult);
     return taskQueue_->Produce(task);
@@ -199,7 +198,6 @@ int32_t DAudioSourceDev::HandleCloseDMic(const AudioEvent &event)
         DHLOGE("Task queue is null.");
         return ERR_DH_AUDIO_NULLPTR;
     }
-
     auto task = GenerateTask(this, &DAudioSourceDev::TaskCloseDMic, event.content, "Close Mic Device",
         &DAudioSourceDev::OnTaskResult);
     taskQueue_->Produce(task);
@@ -225,26 +223,30 @@ int32_t DAudioSourceDev::HandleDMicClosed(const AudioEvent &event)
 
 int32_t DAudioSourceDev::OpenCtrlTrans(const AudioEvent &event)
 {
-    if (audioCtrlMgr_ == nullptr) {
-        audioCtrlMgr_ = std::make_shared<DAudioSourceDevCtrlMgr>(devId_, shared_from_this());
-    }
-    if (!audioCtrlMgr_->IsOpened() && (HandleOpenCtrlTrans(event) != DH_SUCCESS)) {
-        DHLOGE("Open ctrl failed.");
-        return ERR_DH_AUDIO_SA_OPEN_CTRL_FAILED;
+    if (engineFlag_ == false) {
+        if (audioCtrlMgr_ == nullptr) {
+            audioCtrlMgr_ = std::make_shared<DAudioSourceDevCtrlMgr>(devId_, shared_from_this());
+        }
+        if (!audioCtrlMgr_->IsOpened() && (HandleOpenCtrlTrans(event) != DH_SUCCESS)) {
+            DHLOGE("Open ctrl failed.");
+            return ERR_DH_AUDIO_SA_OPEN_CTRL_FAILED;
+        }
     }
     return DH_SUCCESS;
 }
 
 int32_t DAudioSourceDev::CloseCtrlTrans(const AudioEvent &event, bool isSpk)
 {
-    if (audioCtrlMgr_ == nullptr) {
-        DHLOGD("Ctrl already closed.");
-        return DH_SUCCESS;
-    }
-    if ((!isSpk && (speaker_ == nullptr || !speaker_->IsOpened())) ||
-        (isSpk && (mic_ == nullptr || !mic_->IsOpened()))) {
-        DHLOGD("No distributed audio device used, close ctrl trans.");
-        return HandleCloseCtrlTrans(event);
+    if (engineFlag_ == false) {
+        if (audioCtrlMgr_ == nullptr) {
+            DHLOGD("Ctrl already closed.");
+            return DH_SUCCESS;
+        }
+        if ((!isSpk && (speaker_ == nullptr || !speaker_->IsOpened())) ||
+            (isSpk && (mic_ == nullptr || !mic_->IsOpened()))) {
+            DHLOGD("No distributed audio device used, close ctrl trans.");
+            return HandleCloseCtrlTrans(event);
+        }
     }
     return DH_SUCCESS;
 }
@@ -596,6 +598,14 @@ int32_t DAudioSourceDev::TaskOpenDSpeaker(const std::string &args)
         return ERR_DH_AUDIO_FAILED;
     }
 
+    if (engineFlag_ == true) {
+        int32_t ret = speaker_->InitSenderEngine(DAudioSourceManager::GetInstance().getSenderProvider());
+        if (ret != DH_SUCCESS) {
+            DHLOGE("Speaker init sender Engine, error code %d.", ret);
+            return ret;
+        }
+    }
+
     json jAudioParam;
     to_json(jAudioParam, speaker_->GetAudioParam());
     int32_t ret = NotifySinkDev(OPEN_SPEAKER, jAudioParam, jParam[KEY_DH_ID]);
@@ -603,6 +613,7 @@ int32_t DAudioSourceDev::TaskOpenDSpeaker(const std::string &args)
         DHLOGE("Notify sink open speaker failed, error code %d.", ret);
         return ret;
     }
+
     ret = speaker_->SetUp();
     if (ret != DH_SUCCESS) {
         DHLOGE("Speaker setup failed, error code %d.", ret);
@@ -630,7 +641,6 @@ int32_t DAudioSourceDev::TaskCloseDSpeaker(const std::string &args)
     if (args.length() > DAUDIO_MAX_JSON_LEN || args.empty()) {
         return ERR_DH_AUDIO_SA_PARAM_INVALID;
     }
-
     bool closeStatus = true;
     int32_t ret = speaker_->Stop();
     if (ret != DH_SUCCESS) {
@@ -665,6 +675,13 @@ int32_t DAudioSourceDev::TaskOpenDMic(const std::string &args)
         DHLOGE("Mic device not init");
         return ERR_DH_AUDIO_SA_MIC_DEVICE_NOT_INIT;
     }
+    if (engineFlag_ == true) {
+        int32_t ret = mic_->InitReceiverEngine(DAudioSourceManager::GetInstance().getReceiverProvider());
+        if (ret != DH_SUCCESS) {
+            DHLOGE("Init receiver engine failed.");
+            return ret;
+        }
+    }
     if (args.length() > DAUDIO_MAX_JSON_LEN || args.empty()) {
         return ERR_DH_AUDIO_SA_PARAM_INVALID;
     }
@@ -679,7 +696,6 @@ int32_t DAudioSourceDev::TaskOpenDMic(const std::string &args)
     if (!JsonParamCheck(jParam, { KEY_DH_ID })) {
         return ERR_DH_AUDIO_FAILED;
     }
-
     to_json(jAudioParam, mic_->GetAudioParam());
     ret = NotifySinkDev(OPEN_MIC, jAudioParam, jParam[KEY_DH_ID]);
     if (ret != DH_SUCCESS) {
@@ -695,7 +711,6 @@ int32_t DAudioSourceDev::TaskOpenDMic(const std::string &args)
         mic_->Release();
         return ret;
     }
-
     NotifyHDF(NOTIFY_OPEN_MIC_RESULT, HDF_EVENT_RESULT_SUCCESS);
     return DH_SUCCESS;
 }
@@ -711,7 +726,6 @@ int32_t DAudioSourceDev::TaskCloseDMic(const std::string &args)
     if (args.length() > DAUDIO_MAX_JSON_LEN || args.empty()) {
         return ERR_DH_AUDIO_SA_PARAM_INVALID;
     }
-
     bool closeStatus = true;
     int32_t ret = mic_->Stop();
     if (ret != DH_SUCCESS) {
@@ -742,38 +756,40 @@ int32_t DAudioSourceDev::TaskCloseDMic(const std::string &args)
 int32_t DAudioSourceDev::TaskOpenCtrlChannel(const std::string &args)
 {
     DHLOGI("Task open ctrl channel, args: %s.", args.c_str());
-    if (audioCtrlMgr_ == nullptr) {
-        DHLOGE("Audio source ctrl mgr not init.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
-    if (args.length() > DAUDIO_MAX_JSON_LEN || args.empty()) {
-        DHLOGE("Task open ctrl channel, args length is invalid.");
-        return ERR_DH_AUDIO_SA_PARAM_INVALID;
-    }
+    if (engineFlag_ == false) {
+        if (audioCtrlMgr_ == nullptr) {
+            DHLOGE("Audio source ctrl mgr not init.");
+            return ERR_DH_AUDIO_NULLPTR;
+        }
+        if (args.length() > DAUDIO_MAX_JSON_LEN || args.empty()) {
+            DHLOGE("Task open ctrl channel, args length is invalid.");
+            return ERR_DH_AUDIO_SA_PARAM_INVALID;
+        }
 
-    json jAudioParam;
-    json jParam = json::parse(args, nullptr, false);
-    if (!JsonParamCheck(jParam, { KEY_DH_ID })) {
-        DHLOGE("Task open ctrl channel, json param check error.");
-        return ERR_DH_AUDIO_FAILED;
-    }
-    int32_t ret = NotifySinkDev(OPEN_CTRL, jAudioParam, jParam[KEY_DH_ID]);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Notify sink open ctrl failed.");
-        return ret;
-    }
+        json jAudioParam;
+        json jParam = json::parse(args, nullptr, false);
+        if (!JsonParamCheck(jParam, { KEY_DH_ID })) {
+            DHLOGE("Task open ctrl channel, json param check error.");
+            return ERR_DH_AUDIO_FAILED;
+        }
+        int32_t ret = NotifySinkDev(OPEN_CTRL, jAudioParam, jParam[KEY_DH_ID]);
+        if (ret != DH_SUCCESS) {
+            DHLOGE("Notify sink open ctrl failed.");
+            return ret;
+        }
 
-    ret = audioCtrlMgr_->SetUp();
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Set up audio ctrl failed.");
-        return ret;
-    }
-    ret = audioCtrlMgr_->Start();
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Start audio ctrl failed.");
-        audioCtrlMgr_->Release();
-        audioCtrlMgr_ = nullptr;
-        return ret;
+        ret = audioCtrlMgr_->SetUp();
+        if (ret != DH_SUCCESS) {
+            DHLOGE("Set up audio ctrl failed.");
+            return ret;
+        }
+        ret = audioCtrlMgr_->Start();
+        if (ret != DH_SUCCESS) {
+            DHLOGE("Start audio ctrl failed.");
+            audioCtrlMgr_->Release();
+            audioCtrlMgr_ = nullptr;
+            return ret;
+        }
     }
 
     DHLOGI("Task open ctrl channel success.");
@@ -783,25 +799,27 @@ int32_t DAudioSourceDev::TaskOpenCtrlChannel(const std::string &args)
 int32_t DAudioSourceDev::TaskCloseCtrlChannel(const std::string &args)
 {
     DHLOGI("Task close ctrl channel, args: %s.", args.c_str());
-    if (audioCtrlMgr_ == nullptr) {
-        DHLOGD("Audio source ctrl magr already closed.");
-        return DH_SUCCESS;
-    }
+    if (engineFlag_ == false) {
+        if (audioCtrlMgr_ == nullptr) {
+            DHLOGD("Audio source ctrl magr already closed.");
+            return DH_SUCCESS;
+        }
 
-    bool closeStatus = true;
-    int32_t ret = audioCtrlMgr_->Stop();
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Stop audio ctrl failed.");
-        closeStatus = false;
-    }
-    ret = audioCtrlMgr_->Release();
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Release audio ctrl failed.");
-        closeStatus = false;
-    }
-    audioCtrlMgr_ = nullptr;
-    if (!closeStatus) {
-        return ERR_DH_AUDIO_FAILED;
+        bool closeStatus = true;
+        int32_t ret = audioCtrlMgr_->Stop();
+        if (ret != DH_SUCCESS) {
+            DHLOGE("Stop audio ctrl failed.");
+            closeStatus = false;
+        }
+        ret = audioCtrlMgr_->Release();
+        if (ret != DH_SUCCESS) {
+            DHLOGE("Release audio ctrl failed.");
+            closeStatus = false;
+        }
+        audioCtrlMgr_ = nullptr;
+        if (!closeStatus) {
+            return ERR_DH_AUDIO_FAILED;
+        }
     }
 
     DHLOGI("Close audio ctrl channel success.");
@@ -811,12 +829,8 @@ int32_t DAudioSourceDev::TaskCloseCtrlChannel(const std::string &args)
 int32_t DAudioSourceDev::TaskSetVolume(const std::string &args)
 {
     DHLOGD("Task set volume, args: %s.", args.c_str());
-    if (audioCtrlMgr_ == nullptr) {
-        DHLOGE("Audio ctrl mgr not init.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
     AudioEvent event(getEventTypeFromArgs(args), args);
-    return audioCtrlMgr_->SendAudioEvent(event);
+    return SendAudioEventToRemote(event);
 }
 
 int32_t DAudioSourceDev::TaskChangeVolume(const std::string &args)
@@ -840,12 +854,8 @@ int32_t DAudioSourceDev::TaskChangeRenderState(const std::string &args)
 int32_t DAudioSourceDev::TaskPlayStatusChange(const std::string &args)
 {
     DHLOGD("Task play status change, content: %s.", args.c_str());
-    if (audioCtrlMgr_ == nullptr) {
-        DHLOGE("Audio ctrl mgr not init.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
     AudioEvent audioEvent(CHANGE_PLAY_STATUS, args);
-    int32_t ret = audioCtrlMgr_->SendAudioEvent(audioEvent);
+    int32_t ret = SendAudioEventToRemote(audioEvent);
     if (ret != DH_SUCCESS) {
         DHLOGE("Task Play status change failed.");
     }
@@ -866,6 +876,34 @@ int32_t DAudioSourceDev::TaskPlayStatusChange(const std::string &args)
         DHLOGE("Play status error.");
         return ERR_DH_AUDIO_FAILED;
     }
+}
+
+int32_t DAudioSourceDev::SendAudioEventToRemote(const AudioEvent &event)
+{
+    if (engineFlag_ == false) {
+        if (audioCtrlMgr_ == nullptr) {
+            DHLOGE("Audio ctrl mgr not init.");
+            return ERR_DH_AUDIO_NULLPTR;
+        }
+        int32_t ret = audioCtrlMgr_->SendAudioEvent(event);
+        if (ret != DH_SUCCESS) {
+            DHLOGE("Task send audio event to remote failed.");
+            return ERR_DH_AUDIO_NULLPTR;
+        }
+    } else {
+        // because: type: CHANGE_PLAY_STATUS / VOLUME_MUTE_SET / VOLUME_SET, so speaker
+        if (speaker_ == nullptr) {
+            DHLOGE("Audio ctrl mgr not init.");
+            return ERR_DH_AUDIO_NULLPTR;
+        }
+        int32_t ret = speaker_->SendMessage(static_cast<uint32_t>(event.type),
+            event.content, devId_);
+        if (ret != DH_SUCCESS) {
+            DHLOGE("Task send message to remote failed.");
+            return ERR_DH_AUDIO_NULLPTR;
+        }
+    }
+    return DH_SUCCESS;
 }
 
 int32_t DAudioSourceDev::TaskSpkMmapStart(const std::string &args)
@@ -937,7 +975,21 @@ int32_t DAudioSourceDev::NotifySinkDev(const AudioEventType type, const json Par
                     { KEY_AUDIO_PARAM, Param },
                     { KEY_RANDOM_TASK_CODE, std::to_string(randomTaskCode) } };
     DHLOGD("Notify sink dev, random task code: %s", std::to_string(randomTaskCode).c_str());
-    DAudioSourceManager::GetInstance().DAudioNotify(devId_, dhId, type, jParam.dump());
+    if (engineFlag_ == false) {
+        DAudioSourceManager::GetInstance().DAudioNotify(devId_, dhId, type, jParam.dump());
+    } else {
+        DHLOGD("Notify sink dev, new engine, random task code:%s", std::to_string(randomTaskCode).c_str());
+        if (speaker_ == nullptr || mic_ == nullptr) {
+            DHLOGE("speaker or mic dev is null.");
+            return ERR_DH_AUDIO_NULLPTR;
+        }
+        if (type == OPEN_CTRL || type == CLOSE_CTRL) {
+            DHLOGE("In new engine mode, ctrl is not allowed.");
+            return ERR_DH_AUDIO_NULLPTR;
+        }
+        speaker_->SendMessage(static_cast<uint32_t>(type), jParam.dump(), devId_);
+        mic_->SendMessage(static_cast<uint32_t>(type), jParam.dump(), devId_);
+    }
     return WaitForRPC(static_cast<AudioEventType>(static_cast<int32_t>(type) + eventOffset));
 }
 

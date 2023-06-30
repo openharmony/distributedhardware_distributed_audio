@@ -21,14 +21,16 @@
 #include <initializer_list>
 
 #include "nlohmann/json.hpp"
-
 #include "daudio_sink_dev_ctrl_manager.h"
 #include "dmic_client.h"
 #include "dspeaker_client.h"
-#include "task_queue.h"
+#include "iaudio_event_callback.h"
 #include "imic_client.h"
 #include "ispk_client.h"
-#include "iaudio_event_callback.h"
+#include "i_av_engine_provider.h"
+#include "i_av_receiver_engine_callback.h"
+#include "task_queue.h"
+
 #ifdef DAUDIO_SUPPORT_DIRECT
 #include "direct_dmic_client.h"
 #include "direct_dspeaker_client.h"
@@ -45,8 +47,8 @@ public:
 
     int32_t AwakeAudioDev();
     void SleepAudioDev();
-
     void NotifyEvent(const AudioEvent &audioEvent) override;
+    int32_t InitAVTransEngines(IAVEngineProvider *senderPtr, IAVEngineProvider *receiverPtr);
 
 private:
     int32_t TaskOpenCtrlChannel(const std::string &args);
@@ -85,6 +87,8 @@ private:
     int32_t NotifyPlayStatusChange(const AudioEvent &audioEvent);
     void NotifySourceDev(const AudioEventType type, const std::string dhId, const int32_t result);
     int32_t from_json(const json &j, AudioParam &audioParam);
+    int32_t HandleEngineMessage(uint32_t type, std::string content, std::string devId);
+    int32_t SendAudioEventToRemote(const AudioEvent &event);
 
 private:
     std::mutex taskQueueMutex_;
@@ -100,6 +104,7 @@ private:
 
     using DAudioSinkDevFunc = int32_t (DAudioSinkDev::*)(const AudioEvent &audioEvent);
     std::map<AudioEventType, DAudioSinkDevFunc> memberFuncMap_;
+    bool engineFlag_ = false;
 };
 } // DistributedHardware
 } // OHOS

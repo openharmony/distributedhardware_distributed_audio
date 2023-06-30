@@ -15,6 +15,7 @@
 
 #include "daudio_sink_manager.h"
 
+#include <dlfcn.h>
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 
@@ -29,6 +30,17 @@
 namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(DAudioSinkManager);
+using AVTransProviderClass = IAVEngineProvider *(*)(const std::string &);
+
+const std::string SENDER_SO_NAME = "libdistributed_av_sender.z.so";
+const std::string GET_SENDER_PROVIDER_FUNC = "GetAVSenderEngineProvider";
+const std::string RECEIVER_SO_NAME = "libdistributed_av_receiver.z.so";
+const std::string GET_RECEIVER_PROVIDER_FUNC = "GetAVReceiverEngineProvider";
+#ifdef __LP64__
+const std::string LIB_LOAD_PATH = "/system/lib64/";
+#else
+const std::string LIB_LOAD_PATH = "/system/lib/";
+#endif
 DAudioSinkManager::DAudioSinkManager()
 {
     DHLOGD("Distributed audio sink manager constructed.");
@@ -50,12 +62,43 @@ int32_t DAudioSinkManager::Init()
         DHLOGE("Get local network id failed, ret: %d.", ret);
         return ret;
     }
+    // new 方式
+    IsParamEnabled(AUDIO_ENGINE_FLAG, engineFlag_);
+    if (engineFlag_ == true) {
+        ret = LoadAVReceiverEngineProvider();
+        if (ret != DH_SUCCESS || rcvProviderPtr_ == nullptr) {
+            DHLOGE("Load av transport receiver engine provider failed.");
+            return ERR_DH_AUDIO_FAILED;
+        }
+        ret = rcvProviderPtr_->RegisterProviderCallback(std::make_shared<EngineProviderListener>());
+        if (ret != DH_SUCCESS) {
+            DHLOGE("Register av transport receiver Provider Callback failed.");
+            return ERR_DH_AUDIO_FAILED;
+        }
+        DHLOGI("LoadAVReceiverEngineProvider success.");
+
+        ret = LoadAVSenderEngineProvider();
+        if (ret != DH_SUCCESS || sendProviderPtr_ == nullptr) {
+            DHLOGI("Load av transport sender engine provider failed.");
+            return ERR_DH_AUDIO_FAILED;
+        }
+        ret = sendProviderPtr_->RegisterProviderCallback(std::make_shared<EngineProviderListener>());
+        if (ret != DH_SUCCESS) {
+            DHLOGE("Register av transport sender Provider Callback failed.");
+            return ERR_DH_AUDIO_FAILED;
+        }
+        DHLOGE("LoadAVSenderEngineProvider success.");
+    }
     return DH_SUCCESS;
 }
 
 int32_t DAudioSinkManager::UnInit()
 {
     DHLOGI("UnInit audio sink manager.");
+    if (engineFlag_ == true) {
+        UnloadAVSenderEngineProvider();
+        UnloadAVReceiverEngineProvider();
+    }
     {
         std::lock_guard<std::mutex> remoteSvrLock(remoteSvrMutex_);
         sourceServiceMap_.clear();
@@ -90,13 +133,15 @@ void DAudioSinkManager::OnSinkDevReleased(const std::string &devId)
 int32_t DAudioSinkManager::HandleDAudioNotify(const std::string &devId, const std::string &dhId,
     const int32_t eventType, const std::string &eventContent)
 {
-    DHLOGD("Receive audio event from devId: %s, event type: %d.", GetAnonyString(devId).c_str(), eventType);
+    DHLOGD("Receive audio event from devId: %s, event type: %d. event content: %s.",
+        GetAnonyString(devId).c_str(), eventType, eventContent.c_str());
 
-    if (eventContent.length() > DAUDIO_MAX_JSON_LEN || eventContent.empty() || !CheckIsNum(dhId)
+    if (eventContent.length() > DAUDIO_MAX_JSON_LEN || eventContent.empty()
         || !CheckDevIdIsLegal(devId) || eventType < 0 || eventType > MAX_EVENT_TYPE_NUM) {
         return ERR_DH_AUDIO_FAILED;
     }
 
+    // now ctrl channel is also goto here, please sure here not crash.
     json jParam = json::parse(eventContent, nullptr, false);
     if (JsonParamCheck(jParam, { KEY_RANDOM_TASK_CODE })) {
         DHLOGD("Receive audio notify from source, random task code: %s",
@@ -115,9 +160,19 @@ int32_t DAudioSinkManager::HandleDAudioNotify(const std::string &devId, const st
 int32_t DAudioSinkManager::CreateAudioDevice(const std::string &devId)
 {
     DHLOGI("Create audio sink dev.");
+    std::lock_guard<std::mutex> lock(devMapMutex_);
+    if (audioDevMap_.find(devId) != audioDevMap_.end()) {
+        DHLOGI("Audio sink dev in map. devId: %s.", GetAnonyString(devId).c_str());
+        return DH_SUCCESS;
+    }
     auto dev = std::make_shared<DAudioSinkDev>(devId);
     if (dev->AwakeAudioDev() != DH_SUCCESS) {
         DHLOGE("Awake audio dev failed.");
+        return ERR_DH_AUDIO_FAILED;
+    }
+    int32_t ret = dev->InitAVTransEngines(sendProviderPtr_, rcvProviderPtr_);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Init av transport sender engine failed.");
         return ERR_DH_AUDIO_FAILED;
     }
     audioDevMap_.emplace(devId, dev);
@@ -184,6 +239,96 @@ void DAudioSinkManager::ClearAudioDev(const std::string &devId)
     }
     dev->second->SleepAudioDev();
     audioDevMap_.erase(devId);
+}
+
+int32_t DAudioSinkManager::LoadAVReceiverEngineProvider()
+{
+    DHLOGI("LoadAVReceiverEngineProvider enter");
+    char path[PATH_MAX + 1] = {0x00};
+    if ((LIB_LOAD_PATH.length() + RECEIVER_SO_NAME.length()) > PATH_MAX ||
+        realpath((LIB_LOAD_PATH + RECEIVER_SO_NAME).c_str(), path) == nullptr) {
+        DHLOGE("File open failed");
+        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+    }
+    pRHandler_ = dlopen(path, RTLD_LAZY | RTLD_NODELETE);
+    if (pRHandler_ == nullptr) {
+        DHLOGE("%s handler load failed, failed reason : %s", path, dlerror());
+        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+    }
+    AVTransProviderClass getEngineFactoryFunc = (AVTransProviderClass)dlsym(pRHandler_,
+        GET_RECEIVER_PROVIDER_FUNC.c_str());
+    if (getEngineFactoryFunc == nullptr) {
+        DHLOGE("av transport engine factory function handler is null, failed reason : %s", dlerror());
+        dlclose(pRHandler_);
+        pRHandler_ = nullptr;
+        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+    }
+    rcvProviderPtr_ = getEngineFactoryFunc(OWNER_NAME_D_SPEAKER);
+    DHLOGE("LoadAVReceiverEngineProvider success");
+    return DH_SUCCESS;
+}
+
+int32_t DAudioSinkManager::UnloadAVReceiverEngineProvider()
+{
+    DHLOGI("UnloadAVReceiverEngineProvider");
+    if (pRHandler_ != nullptr) {
+        dlclose(pRHandler_);
+        pRHandler_ = nullptr;
+    }
+    return DH_SUCCESS;
+}
+
+int32_t DAudioSinkManager::LoadAVSenderEngineProvider()
+{
+    DHLOGI("LoadAVSenderEngineProvider enter");
+    char path[PATH_MAX + 1] = {0x00};
+    if ((LIB_LOAD_PATH.length() + SENDER_SO_NAME.length()) > PATH_MAX ||
+        realpath((LIB_LOAD_PATH + SENDER_SO_NAME).c_str(), path) == nullptr) {
+        DHLOGE("File open failed");
+        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+    }
+    pSHandler_ = dlopen(path, RTLD_LAZY | RTLD_NODELETE);
+    if (pSHandler_ == nullptr) {
+        DHLOGE("%s handler load failed, failed reason : %s", path, dlerror());
+        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+    }
+    AVTransProviderClass getEngineFactoryFunc = (AVTransProviderClass)dlsym(pSHandler_,
+        GET_SENDER_PROVIDER_FUNC.c_str());
+    if (getEngineFactoryFunc == nullptr) {
+        DHLOGE("av transport engine factory function handler is null, failed reason : %s", dlerror());
+        dlclose(pSHandler_);
+        pSHandler_ = nullptr;
+        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+    }
+    sendProviderPtr_ = getEngineFactoryFunc(OWNER_NAME_D_MIC);
+    return DH_SUCCESS;
+}
+
+int32_t DAudioSinkManager::UnloadAVSenderEngineProvider()
+{
+    DHLOGI("UnloadAVSenderEngineProvider enter");
+    if (pSHandler_ != nullptr) {
+        dlclose(pSHandler_);
+        pSHandler_ = nullptr;
+    }
+    return DH_SUCCESS;
+}
+
+int32_t EngineProviderListener::OnProviderEvent(const AVTransEvent &event)
+{
+    DHLOGI("On provider event :%d", event.type);
+    if (event.type == EventType::EVENT_CHANNEL_OPENED) {
+        DHLOGI("CreateAudioDevice enter");
+        DAudioSinkManager::GetInstance().CreateAudioDevice(event.peerDevId);
+        DHLOGI("CreateAudioDevice end");
+    } else if (event.type == EventType::EVENT_CHANNEL_CLOSED) {
+        DHLOGI("CreateAudioDevice enter");
+        DAudioSinkManager::GetInstance().ClearAudioDev(event.peerDevId);
+        DHLOGI("CreateAudioDevice end");
+    } else {
+        DHLOGE("Invaild event type.");
+    }
+    return DH_SUCCESS;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

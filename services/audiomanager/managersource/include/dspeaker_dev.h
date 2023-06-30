@@ -23,11 +23,12 @@
 
 #include "audio_param.h"
 #include "ashmem.h"
-#include "idaudio_hdi_callback.h"
+#include "av_sender_engine_transport.h"
 #include "daudio_hdi_handler.h"
-#include "iaudio_data_transport.h"
 #include "iaudio_event_callback.h"
+#include "iaudio_data_transport.h"
 #include "iaudio_datatrans_callback.h"
+#include "idaudio_hdi_callback.h"
 
 using json = nlohmann::json;
 
@@ -35,11 +36,15 @@ namespace OHOS {
 namespace DistributedHardware {
 class DSpeakerDev : public IDAudioHdiCallback,
     public IAudioDataTransCallback,
+    public AVSenderTransportCallback,
     public std::enable_shared_from_this<DSpeakerDev> {
 public:
     DSpeakerDev(const std::string &devId, std::shared_ptr<IAudioEventCallback> callback)
         : devId_(devId), audioEventCallback_(callback) {};
     ~DSpeakerDev() override = default;
+    void OnEngineTransEvent(const AVTransEvent &event) override;
+    void OnEngineTransMessage(const std::shared_ptr<AVTransMessage> &message) override;
+    int32_t InitSenderEngine(IAVEngineProvider *providerPtr);
 
     int32_t EnableDSpeaker(const int32_t dhId, const std::string& capability);
     int32_t DisableDSpeaker(const int32_t dhId);
@@ -67,6 +72,7 @@ public:
     bool IsOpened();
     int32_t Pause();
     int32_t Restart();
+    int32_t SendMessage(uint32_t type, std::string content, std::string dstDevId);
 
     AudioParam GetAudioParam() const;
     int32_t NotifyHdfAudioEvent(const AudioEvent &event);
@@ -105,6 +111,7 @@ private:
     int64_t readTvSec_ = 0;
     int64_t readTvNSec_ = 0;
     std::thread enqueueDataThread_;
+    bool engineFlag_ = false;
 };
 } // DistributedHardware
 } // OHOS

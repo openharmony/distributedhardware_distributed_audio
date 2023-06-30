@@ -34,6 +34,7 @@
 #include "audio_status.h"
 #include "audio_decode_transport.h"
 #include "audio_event.h"
+#include "av_receiver_engine_transport.h"
 #include "daudio_errorcode.h"
 #include "daudio_log.h"
 #include "iaudio_data_transport.h"
@@ -44,7 +45,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 class DSpeakerClient : public IAudioDataTransCallback,
-    public ISpkClient,
+    public ISpkClient, public AVReceiverTransportCallback,
     public AudioStandard::VolumeKeyEventCallback,
     public AudioStandard::AudioRendererCallback,
     public std::enable_shared_from_this<DSpeakerClient> {
@@ -59,6 +60,7 @@ public:
     int32_t OnDecodeTransDataDone(const std::shared_ptr<AudioData> &audioData) override;
     void OnVolumeKeyEvent(AudioStandard::VolumeEvent volumeEvent) override;
     void OnInterrupt(const AudioStandard::InterruptEvent &interruptEvent) override;
+    int32_t InitReceiverEngine(IAVEngineProvider *providerPtr) override;
     int32_t SetUp(const AudioParam &param) override;
     int32_t Release() override;
     int32_t StartRender() override;
@@ -67,6 +69,11 @@ public:
     int32_t SetAudioParameters(const AudioEvent &event) override;
     void PlayStatusChange(const std::string &args) override;
     void SetAttrs(const std::string &devId, const std::shared_ptr<IAudioEventCallback> &callback) override;
+    int32_t SendMessage(uint32_t type, std::string content, std::string dstDevId) override;
+
+    void OnEngineTransEvent(const AVTransEvent &event) override;
+    void OnEngineTransMessage(const std::shared_ptr<AVTransMessage> &message) override;
+    void OnEngineTransDataAvailable(const std::shared_ptr<AudioData> &audioData) override;
 
 private:
     std::string GetVolumeLevel();
@@ -96,6 +103,7 @@ private:
     std::unique_ptr<AudioStandard::AudioRenderer> audioRenderer_ = nullptr;
     std::shared_ptr<IAudioDataTransport> speakerTrans_ = nullptr;
     std::weak_ptr<IAudioEventCallback> eventCallback_;
+    bool engineFlag_ = false;
 };
 } // DistributedHardware
 } // OHOS

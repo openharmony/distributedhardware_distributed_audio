@@ -61,7 +61,6 @@
 
                 "//foundation/distributedhardware/distributed_audio/services/common:distributed_audio_utils",
                 "//foundation/distributedhardware/distributed_audio/services/hdfaudioclient:daudio_client",
-                "//foundation/distributedhardware/distributed_audio/services/audioclient:distributed_audio_sink_client",
 
                 "//foundation/distributedhardware/distributed_audio/services/audiomanager/servicesource:distributed_audio_source",
                 "//foundation/distributedhardware/distributed_audio/services/audiomanager/servicesink:distributed_audio_sink",
@@ -91,17 +90,6 @@
                         "header_base": "//foundation/distributedhardware/distributed_audio/interfaces/inner_kits/native_cpp/audio_source/include",
                         "header_files": [
                             "idaudio_source.h"
-                        ]
-                    }
-                },
-                {
-                    "type": "so",
-                    "name": "//foundation/distributedhardware/distributed_audio/services/audioclient:distributed_audio_sink_client",
-                    "header": {
-                        "header_base": "//foundation/distributedhardware/distributed_audio/services/audioclient",
-                        "header_files": [
-                            "interface/imic_client.h",
-                            "interface/ispk_client.h"
                         ]
                     }
                 },
