@@ -160,20 +160,24 @@ int32_t DAudioSinkManager::HandleDAudioNotify(const std::string &devId, const st
 int32_t DAudioSinkManager::CreateAudioDevice(const std::string &devId)
 {
     DHLOGI("Create audio sink dev.");
-    std::lock_guard<std::mutex> lock(devMapMutex_);
-    if (audioDevMap_.find(devId) != audioDevMap_.end()) {
-        DHLOGI("Audio sink dev in map. devId: %s.", GetAnonyString(devId).c_str());
-        return DH_SUCCESS;
+    if (engineFlag_ == true) {
+        std::lock_guard<std::mutex> lock(devMapMutex_);
+        if (audioDevMap_.find(devId) != audioDevMap_.end()) {
+            DHLOGI("Audio sink dev in map. devId: %s.", GetAnonyString(devId).c_str());
+            return DH_SUCCESS;
+        }
     }
     auto dev = std::make_shared<DAudioSinkDev>(devId);
     if (dev->AwakeAudioDev() != DH_SUCCESS) {
         DHLOGE("Awake audio dev failed.");
         return ERR_DH_AUDIO_FAILED;
     }
-    int32_t ret = dev->InitAVTransEngines(sendProviderPtr_, rcvProviderPtr_);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Init av transport sender engine failed.");
-        return ERR_DH_AUDIO_FAILED;
+    if (engineFlag_ == true) {
+        int32_t ret = dev->InitAVTransEngines(sendProviderPtr_, rcvProviderPtr_);
+        if (ret != DH_SUCCESS) {
+            DHLOGE("Init av transport sender engine failed.");
+            return ERR_DH_AUDIO_FAILED;
+        }
     }
     audioDevMap_.emplace(devId, dev);
     return DH_SUCCESS;
