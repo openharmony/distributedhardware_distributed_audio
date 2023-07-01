@@ -39,10 +39,8 @@ AudioRenderInterfaceImpl::AudioRenderInterfaceImpl(const std::string &adpName, c
     devAttrs_(attrs), audioExtCallback_(callback)
 {
     devAttrs_.frameSize = CalculateFrameSize(attrs.sampleRate, attrs.channelCount, attrs.format, timeInterval_, false);
-    const int32_t sizePerSec = static_cast<int32_t>(attrs.sampleRate * attrs.channelCount) *attrs.format;
-    framePeriodNs_ = (static_cast<int64_t>(devAttrs_.frameSize) * AUDIO_NS_PER_SECOND) /sizePerSec;
-    DHLOGD("Distributed audio render constructed, period(%d), frameSize(%d), framePeriodNs_(%d).",
-        attrs.period, devAttrs_.frameSize, framePeriodNs_);
+    DHLOGD("Distributed audio render constructed, period(%d), frameSize(%d).",
+        attrs.period, devAttrs_.frameSize);
 }
 
 AudioRenderInterfaceImpl::~AudioRenderInterfaceImpl()
@@ -92,8 +90,7 @@ int32_t AudioRenderInterfaceImpl::RenderFrame(const std::vector<int8_t> &frame, 
 {
     DHLOGD("Render frame[sampleRate: %u, channelCount: %u, format: %d, frameSize: %u].", devAttrs_.sampleRate,
         devAttrs_.channelCount, devAttrs_.format, devAttrs_.frameSize);
-    int64_t timeOffset = UpdateTimeOffset(frameIndex_, framePeriodNs_, startTime_);
-    DHLOGD("Render frameIndex: %lld, timeOffset: %lld.", frameIndex_, timeOffset);
+    DHLOGD("Render frameIndex: %lld.", frameIndex_);
 
     std::lock_guard<std::mutex> renderLck(renderMtx_);
     if (renderStatus_ != RENDER_STATUS_START) {
@@ -115,7 +112,6 @@ int32_t AudioRenderInterfaceImpl::RenderFrame(const std::vector<int8_t> &frame, 
     }
 
     ++frameIndex_;
-    AbsoluteSleep(startTime_ + frameIndex_ * framePeriodNs_ - timeOffset);
     DHLOGD("Render audio frame success.");
     return HDF_SUCCESS;
 }
@@ -194,7 +190,6 @@ int32_t AudioRenderInterfaceImpl::Start()
     renderStatus_ = RENDER_STATUS_START;
     currentFrame_ = CUR_FRAME_INIT_VALUE;
     frameIndex_ = 0;
-    startTime_ = 0;
     return HDF_SUCCESS;
 }
 
