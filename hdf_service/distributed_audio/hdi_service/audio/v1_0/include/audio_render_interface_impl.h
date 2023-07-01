@@ -116,9 +116,6 @@ private:
     bool firstOpenFlag_ = true;
 
     int64_t frameIndex_ = 0;
-    int64_t framePeriodNs_ = 0;
-    int64_t startTime_ = 0;
-
     std::mutex volMtx_;
     uint32_t vol_ = 0;
     uint32_t volMax_ = 0;
