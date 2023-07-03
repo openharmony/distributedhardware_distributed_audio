@@ -50,8 +50,7 @@ int32_t AVTransReceiverTransport::SetUp(const AudioParam &localParam, const Audi
     (void)remoteParam;
     (void)callback;
     (void)capType;
-    param_ = localParam;
-    return DH_SUCCESS;
+    return SetParameter(localParam);
 }
 
 int32_t AVTransReceiverTransport::CreateCtrl()
@@ -76,12 +75,7 @@ int32_t AVTransReceiverTransport::Start()
         DHLOGE("av transport receiver adapter is null");
         return ERR_DH_AUDIO_TRANS_NULL_VALUE;
     }
-    int32_t ret = SetParameter(param_);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Set parameter failed");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
-    }
-    ret = receiverAdapter_->Start();
+    int32_t ret = receiverAdapter_->Start();
     if (ret != DH_SUCCESS) {
         DHLOGE("start av receiver engine failed");
         return ERR_DH_AUDIO_TRANS_NULL_VALUE;
@@ -198,6 +192,10 @@ void AVTransReceiverTransport::OnEngineDataAvailable(const std::shared_ptr<AVTra
 int32_t AVTransReceiverTransport::SetParameter(const AudioParam &audioParam)
 {
     DHLOGI("SetParameter.");
+    if (receiverAdapter_ == nullptr) {
+        DHLOGE("SetParameter error. adapter is null.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
     receiverAdapter_->SetParameter(AVTransTag::AUDIO_SAMPLE_RATE, std::to_string(audioParam.comParam.sampleRate));
     receiverAdapter_->SetParameter(AVTransTag::AUDIO_SAMPLE_FORMAT, std::to_string(AudioSampleFormat::SAMPLE_F32LE));
     receiverAdapter_->SetParameter(AVTransTag::AUDIO_CHANNEL_MASK, std::to_string(audioParam.comParam.channelMask));

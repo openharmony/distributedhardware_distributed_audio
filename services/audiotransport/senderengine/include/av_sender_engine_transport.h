@@ -71,7 +71,6 @@ private:
     std::shared_ptr<AVTransSenderAdapter> senderAdapter_;
     std::shared_ptr<AVSenderTransportCallback> transCallback_;
     std::string devId_;
-    AudioParam param_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
