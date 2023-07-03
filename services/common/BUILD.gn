@@ -55,8 +55,8 @@ ohos_shared_library("distributed_audio_utils") {
     "c_utils:utils",
     "dsoftbus:softbus_client",
     "hilog:libhilog",
-    "hisysevent_native:libhisysevent",
-    "hitrace_native:hitrace_meter",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
     "init:libbegetutil",
   ]
 
