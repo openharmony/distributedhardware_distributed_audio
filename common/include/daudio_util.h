@@ -50,7 +50,7 @@ bool CheckDevIdIsLegal(const std::string &devId);
 
 template <typename T>
 bool GetSysPara(const char *key, T &value);
-bool IsParamEnabled(std::string key, bool &isEnabled);
+bool IsParamEnabled(const std::string &key, bool &isEnabled);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DAUDIO_UTIL_H

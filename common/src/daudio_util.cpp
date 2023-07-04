@@ -347,7 +347,7 @@ template bool GetSysPara(const char *key, uint32_t &value);
 template bool GetSysPara(const char *key, int64_t &value);
 template bool GetSysPara(const char *key, std::string &value);
 
-bool IsParamEnabled(std::string key, bool &isEnabled)
+bool IsParamEnabled(const std::string &key, bool &isEnabled)
 {
     // by default: old trans
     int32_t policyFlag = 0;
