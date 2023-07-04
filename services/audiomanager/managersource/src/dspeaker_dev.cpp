@@ -459,7 +459,9 @@ AudioParam DSpeakerDev::GetAudioParam() const
 int32_t DSpeakerDev::SendMessage(uint32_t type, std::string content, std::string dstDevId)
 {
     DHLOGI("Send message to remote.");
-    if (type != static_cast<uint32_t>(OPEN_SPEAKER)&& type != static_cast<uint32_t>(CLOSE_SPEAKER)) {
+    if (type != static_cast<uint32_t>(OPEN_SPEAKER) && type != static_cast<uint32_t>(CLOSE_SPEAKER) &&
+        type != static_cast<uint32_t>(CHANGE_PLAY_STATUS) && type != static_cast<uint32_t>(VOLUME_SET) &&
+        type != static_cast<uint32_t>(VOLUME_MUTE_SET)) {
         DHLOGE("Send message to remote. not OPEN_SPK or CLOSE_SPK. type: %u", type);
         return ERR_DH_AUDIO_NULLPTR;
     }
