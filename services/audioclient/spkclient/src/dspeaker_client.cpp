@@ -266,7 +266,7 @@ void DSpeakerClient::PlayThreadRunning()
 
 void DSpeakerClient::FillJitterQueue()
 {
-    while (true) {
+    while (isRenderReady_.load()) {
         {
             std::lock_guard<std::mutex> lock(dataQueueMtx_);
             if (dataQueue_.size() >= DATA_QUEUE_SIZE) {
