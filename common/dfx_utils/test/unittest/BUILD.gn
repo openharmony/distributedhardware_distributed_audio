@@ -85,8 +85,8 @@ ohos_unittest("DAudioDfxTest") {
     "c_utils:utils",
     "drivers_interface_audio:libaudio_proxy_1.0",
     "dsoftbus:softbus_client",
-    "hisysevent_native:libhisysevent",
-    "hitrace_native:hitrace_meter",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]

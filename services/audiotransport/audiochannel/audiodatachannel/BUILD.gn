@@ -41,7 +41,7 @@ ohos_shared_library("distributed_audio_data_channel") {
   external_deps = [
     "c_utils:utils",
     "dsoftbus:softbus_client",
-    "hitrace_native:hitrace_meter",
+    "hitrace:hitrace_meter",
   ]
 
   defines = [
