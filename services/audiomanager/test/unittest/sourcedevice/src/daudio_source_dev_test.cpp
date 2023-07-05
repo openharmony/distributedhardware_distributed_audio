@@ -956,7 +956,7 @@ HWTEST_F(DAudioSourceDevTest, TaskChangeRenderState_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, TaskPlayStatusChange_001, TestSize.Level1)
 {
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->TaskPlayStatusChange(AUDIO_EVENT_PAUSE));
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->TaskPlayStatusChange(AUDIO_EVENT_PAUSE));
 
     sourceDev_->audioCtrlMgr_ = std::make_shared<DAudioSourceDevCtrlMgr>(DEV_ID, sourceDev_);
     sourceDev_->speaker_ = std::make_shared<DSpeakerDev>(DEV_ID, nullptr);
@@ -1087,6 +1087,8 @@ HWTEST_F(DAudioSourceDevTest, NotifyHDF_003, TestSize.Level1)
 HWTEST_F(DAudioSourceDevTest, NotifySinkDev_001, TestSize.Level1)
 {
     json jAudioParam;
+    EXPECT_EQ(ERR_DH_AUDIO_SA_RPC_WAIT_TIMEOUT, sourceDev_->NotifySinkDev(CLOSE_MIC, jAudioParam, DH_ID_SPK));
+    sourceDev_->engineFlag_ = true;
     EXPECT_EQ(ERR_DH_AUDIO_SA_RPC_WAIT_TIMEOUT, sourceDev_->NotifySinkDev(CLOSE_MIC, jAudioParam, DH_ID_SPK));
 }
 } // namespace DistributedHardware

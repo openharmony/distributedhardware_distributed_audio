@@ -935,6 +935,7 @@ int32_t DAudioSourceDev::TaskPlayStatusChange(const std::string &args)
     int32_t ret = SendAudioEventToRemote(audioEvent);
     if (ret != DH_SUCCESS) {
         DHLOGE("Task Play status change failed.");
+        return ERR_DH_AUDIO_FAILED;
     }
 
     if (args == AUDIO_EVENT_RESTART) {
@@ -1066,10 +1067,10 @@ int32_t DAudioSourceDev::NotifySinkDev(const AudioEventType type, const json Par
         }
         speaker_->SendMessage(static_cast<uint32_t>(type), jParam.dump(), devId_);
         mic_->SendMessage(static_cast<uint32_t>(type), jParam.dump(), devId_);
-    }
-    if (type == CLOSE_SPEAKER || type == CLOSE_MIC) {
-        // Close spk || Close mic  do not need to wait RPC
-        return DH_SUCCESS;
+        if (type == CLOSE_SPEAKER || type == CLOSE_MIC) {
+            // Close spk || Close mic  do not need to wait RPC
+            return DH_SUCCESS;
+        }
     }
     return WaitForRPC(static_cast<AudioEventType>(static_cast<int32_t>(type) + eventOffset));
 }
