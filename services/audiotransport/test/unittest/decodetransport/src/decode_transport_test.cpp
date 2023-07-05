@@ -202,7 +202,14 @@ HWTEST_F(DecodeTransportTest, decode_transport_test_004, TestSize.Level1)
  */
 HWTEST_F(DecodeTransportTest, decode_transport_test_005, TestSize.Level1)
 {
+    IAVEngineProvider *providerPtr = nullptr;
+    uint32_t type = 0;
+    std::string content = "content";
+    std::string dstDevId = "dstDevId";
     EXPECT_EQ(ERR_DH_AUDIO_TRANS_ERROR, decodeTrans_->RegisterChannelListener(ROLE_TEST));
+    EXPECT_EQ(DH_SUCCESS, decodeTrans_->CreateCtrl());
+    EXPECT_EQ(DH_SUCCESS, decodeTrans_->InitEngine(providerPtr));
+    EXPECT_EQ(DH_SUCCESS, decodeTrans_->SendMessage(type, content, dstDevId));
 }
 } // namespace DistributedHardware
 } // namespace OHOS
