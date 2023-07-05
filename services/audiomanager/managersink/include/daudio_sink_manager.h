@@ -65,6 +65,7 @@ private:
     std::thread devClearThread_;
     std::string localNetworkId_;
 
+    std::shared_ptr<EngineProviderListener> providerListener_;
     IAVEngineProvider *sendProviderPtr_ = nullptr;
     IAVEngineProvider *rcvProviderPtr_ = nullptr;
     void *pSHandler_ = nullptr;

@@ -56,6 +56,7 @@ int32_t AVTransReceiverAdapter::Release()
     }
     initialized_ = false;
     receiverEngine_ = nullptr;
+    chnCreateSuccess_ = false;
     return DH_SUCCESS;
 }
 

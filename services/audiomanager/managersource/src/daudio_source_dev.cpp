@@ -453,6 +453,8 @@ int32_t DAudioSourceDev::WaitForRPC(const AudioEventType type)
         DHLOGE("RPC notify Result Failed.");
         return ERR_DH_AUDIO_FAILED;
     }
+    rpcNotify_ = 0;
+    rpcResult_ = false;
     DHLOGD("Receive sink device notify type: %d.", type);
     return DH_SUCCESS;
 }

@@ -70,7 +70,8 @@ int32_t DAudioSinkManager::Init()
             DHLOGE("Load av transport receiver engine provider failed.");
             return ERR_DH_AUDIO_FAILED;
         }
-        ret = rcvProviderPtr_->RegisterProviderCallback(std::make_shared<EngineProviderListener>());
+        providerListener_ = std::make_shared<EngineProviderListener>();
+        ret = rcvProviderPtr_->RegisterProviderCallback(providerListener_);
         if (ret != DH_SUCCESS) {
             DHLOGE("Register av transport receiver Provider Callback failed.");
             return ERR_DH_AUDIO_FAILED;
@@ -82,7 +83,7 @@ int32_t DAudioSinkManager::Init()
             DHLOGI("Load av transport sender engine provider failed.");
             return ERR_DH_AUDIO_FAILED;
         }
-        ret = sendProviderPtr_->RegisterProviderCallback(std::make_shared<EngineProviderListener>());
+        ret = sendProviderPtr_->RegisterProviderCallback(providerListener_);
         if (ret != DH_SUCCESS) {
             DHLOGE("Register av transport sender Provider Callback failed.");
             return ERR_DH_AUDIO_FAILED;
@@ -322,13 +323,13 @@ int32_t EngineProviderListener::OnProviderEvent(const AVTransEvent &event)
 {
     DHLOGI("On provider event :%d", event.type);
     if (event.type == EventType::EVENT_CHANNEL_OPENED) {
-        DHLOGI("CreateAudioDevice enter");
+        DHLOGI("Received control channel opened event, create audio device for peerDevId=%s",
+            GetAnonyString(event.peerDevId).c_str());
         DAudioSinkManager::GetInstance().CreateAudioDevice(event.peerDevId);
-        DHLOGI("CreateAudioDevice end");
     } else if (event.type == EventType::EVENT_CHANNEL_CLOSED) {
-        DHLOGI("CreateAudioDevice enter");
+        DHLOGI("Received control channel closed event, clear audio device for peerDevId=%s",
+            GetAnonyString(event.peerDevId).c_str());
         DAudioSinkManager::GetInstance().ClearAudioDev(event.peerDevId);
-        DHLOGI("CreateAudioDevice end");
     } else {
         DHLOGE("Invaild event type.");
     }
