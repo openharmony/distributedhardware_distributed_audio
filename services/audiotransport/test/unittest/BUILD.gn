@@ -24,7 +24,7 @@ group("daudio_transport_test") {
     "${audio_transport_path}/test/unittest/audiotransportstatus:transport_status_test",
     "${audio_transport_path}/test/unittest/decodetransport:decode_transport_test",
     "${audio_transport_path}/test/unittest/encodetransport:encode_transport_test",
-	"${audio_transport_path}/test/unittest/encodetransport:encode_transport_test",
     "${audio_transport_path}/test/unittest/receiverengine:av_receiver_engine_adapter_test",
+    "${audio_transport_path}/test/unittest/senderengine:av_sender_engine_adapter_test",
   ]
 }
