@@ -40,7 +40,6 @@ ohos_shared_library("distributed_audio_handler") {
     "audio_framework:audio_client",
     "c_utils:utils",
     "distributed_hardware_fwk:distributedhardwareutils",
-    "multimedia_image_framework:image_native",
     "player_framework:media_client",
   ]
 

@@ -22,9 +22,7 @@
                 "hilog",
                 "ipc"
             ],
-            "third_party": [
-                "bounds_checking_function"
-            ]
+            "third_party": []
         },
         "build": {
             "sub_component": [

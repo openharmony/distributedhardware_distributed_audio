@@ -28,19 +28,17 @@
         ],
         "deps": {
             "components": [
-                "appexecfwk_standard",
                 "audio_framework",
                 "c_utils",
                 "distributed_hardware_fwk",
                 "drivers_interface_audio",
                 "dsoftbus",
-                "eventhandler",
                 "hdf_core",
                 "hisysevent",
                 "hitrace",
                 "hilog",
+                "init",
                 "ipc",
-                "multimedia_image_framework",
                 "player_framework",
                 "safwk",
                 "samgr"

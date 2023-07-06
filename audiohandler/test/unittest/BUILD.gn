@@ -50,10 +50,7 @@ ohos_unittest("AudioHandlerTest") {
     "//third_party/googletest:gtest_main",
   ]
 
-  external_deps = [
-    "c_utils:utils",
-    "multimedia_image_framework:image_native",
-  ]
+  external_deps = [ "c_utils:utils" ]
 }
 
 group("audio_handler_test") {
