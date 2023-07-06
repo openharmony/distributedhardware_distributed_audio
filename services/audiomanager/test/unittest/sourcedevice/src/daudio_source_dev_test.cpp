@@ -228,27 +228,31 @@ HWTEST_F(DAudioSourceDevTest, WaitForRPC_001, TestSize.Level1)
 HWTEST_F(DAudioSourceDevTest, WaitForRPC_002, TestSize.Level1)
 {
     sourceDev_->rpcResult_ = true;
-
     AudioEventType type = NOTIFY_OPEN_SPEAKER_RESULT;
     sourceDev_->rpcNotify_ = sourceDev_->EVENT_NOTIFY_OPEN_SPK;
     EXPECT_EQ(DH_SUCCESS, sourceDev_->WaitForRPC(type));
 
+    sourceDev_->rpcResult_ = true;
     type = NOTIFY_CLOSE_SPEAKER_RESULT;
     sourceDev_->rpcNotify_ = sourceDev_->EVENT_NOTIFY_CLOSE_SPK;
     EXPECT_EQ(DH_SUCCESS, sourceDev_->WaitForRPC(type));
 
+    sourceDev_->rpcResult_ = true;
     type = NOTIFY_OPEN_MIC_RESULT;
     sourceDev_->rpcNotify_ = sourceDev_->EVENT_NOTIFY_OPEN_MIC;
     EXPECT_EQ(DH_SUCCESS, sourceDev_->WaitForRPC(type));
 
+    sourceDev_->rpcResult_ = true;
     type = NOTIFY_CLOSE_MIC_RESULT;
     sourceDev_->rpcNotify_ = sourceDev_->EVENT_NOTIFY_CLOSE_MIC;
     EXPECT_EQ(DH_SUCCESS, sourceDev_->WaitForRPC(type));
 
+    sourceDev_->rpcResult_ = true;
     type = NOTIFY_OPEN_CTRL_RESULT;
     sourceDev_->rpcNotify_ = sourceDev_->EVENT_NOTIFY_OPEN_CTRL;
     EXPECT_EQ(DH_SUCCESS, sourceDev_->WaitForRPC(type));
 
+    sourceDev_->rpcResult_ = true;
     type = NOTIFY_CLOSE_CTRL_RESULT;
     sourceDev_->rpcNotify_ = sourceDev_->EVENT_NOTIFY_CLOSE_CTRL;
     EXPECT_EQ(DH_SUCCESS, sourceDev_->WaitForRPC(type));
@@ -1089,7 +1093,7 @@ HWTEST_F(DAudioSourceDevTest, NotifySinkDev_001, TestSize.Level1)
     json jAudioParam;
     EXPECT_EQ(ERR_DH_AUDIO_SA_RPC_WAIT_TIMEOUT, sourceDev_->NotifySinkDev(CLOSE_MIC, jAudioParam, DH_ID_SPK));
     sourceDev_->engineFlag_ = true;
-    EXPECT_EQ(ERR_DH_AUDIO_SA_RPC_WAIT_TIMEOUT, sourceDev_->NotifySinkDev(CLOSE_MIC, jAudioParam, DH_ID_SPK));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->NotifySinkDev(CLOSE_MIC, jAudioParam, DH_ID_SPK));
 }
 } // namespace DistributedHardware
 } // namespace OHOS
