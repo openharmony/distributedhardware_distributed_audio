@@ -14,8 +14,7 @@
 import("//build/test.gni")
 import("../../../../../distributedaudio.gni")
 
-module_out_path =
-    "distributed_audio/services/audiotransport/sender_engine_test"
+module_out_path = "distributed_audio/services/audiotransport/sender_engine_test"
 
 config("module_private_config") {
   visibility = [ ":*" ]
@@ -31,8 +30,8 @@ config("module_private_config") {
     "${audio_transport_path}/receiverengine/include",
     "${audio_transport_path}/senderengine/include",
     "${audio_transport_path}/test/unittest/receiverengine/engineutils/include",
-    "${common_path}/dfx_utils/include",
     "${common_path}/include",
+    "${common_path}/dfx_utils/include",
     "${services_path}/common/audiodata/include",
     "${services_path}/common/audioparam",
     "${softbusadapter_path}/include",
