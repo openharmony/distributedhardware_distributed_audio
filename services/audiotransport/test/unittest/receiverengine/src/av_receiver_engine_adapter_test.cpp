@@ -24,16 +24,16 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace DistributedHardware {
-void AVTransReceiverAdapterTest::SetUpTestCase(void) {}
+void AVReceiverEngineAdapterTest::SetUpTestCase(void) {}
 
-void AVTransReceiverAdapterTest::TearDownTestCase(void) {}
+void AVReceiverEngineAdapterTest::TearDownTestCase(void) {}
 
-void AVTransReceiverAdapterTest::SetUp(void)
+void AVReceiverEngineAdapterTest::SetUp(void)
 {
     receiverAdapter_ = std::make_shared<AVTransReceiverAdapter>();
 }
 
-void AVTransReceiverAdapterTest::TearDown(void)
+void AVReceiverEngineAdapterTest::TearDown(void)
 {
     receiverAdapter_ = nullptr;
 }
@@ -44,7 +44,7 @@ void AVTransReceiverAdapterTest::TearDown(void)
  * @tc.type: FUNC
  * @tc.require: AR000HTAPM
  */
-HWTEST_F(AVTransReceiverAdapterTest, Initialize_001, TestSize.Level1)
+HWTEST_F(AVReceiverEngineAdapterTest, Initialize_001, TestSize.Level1)
 {
     IAVEngineProvider *providerPtr = nullptr;
     std::string peerDevId = "peerDevId";
@@ -59,7 +59,7 @@ HWTEST_F(AVTransReceiverAdapterTest, Initialize_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000HTAPM
  */
-HWTEST_F(AVTransReceiverAdapterTest, Initialize_002, TestSize.Level1)
+HWTEST_F(AVReceiverEngineAdapterTest, Initialize_002, TestSize.Level1)
 {
     std::string peerDevId = "peerDevId";
     receiverAdapter_->receiverEngine_ = std::make_shared<MockIAVReceiverEngine>();
@@ -74,7 +74,7 @@ HWTEST_F(AVTransReceiverAdapterTest, Initialize_002, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000HTAPM
  */
-HWTEST_F(AVTransReceiverAdapterTest, Start_001, TestSize.Level1)
+HWTEST_F(AVReceiverEngineAdapterTest, Start_001, TestSize.Level1)
 {
     EXPECT_EQ(ERR_DH_AV_TRANS_NULL_VALUE, receiverAdapter_->Start());
     EXPECT_EQ(ERR_DH_AV_TRANS_NULL_VALUE, receiverAdapter_->Stop());
@@ -86,7 +86,7 @@ HWTEST_F(AVTransReceiverAdapterTest, Start_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000HTAPM
  */
-HWTEST_F(AVTransReceiverAdapterTest, SetParameter_001, TestSize.Level1)
+HWTEST_F(AVReceiverEngineAdapterTest, SetParameter_001, TestSize.Level1)
 {
     std::string param = "param";
     EXPECT_EQ(ERR_DH_AV_TRANS_NULL_VALUE, receiverAdapter_->SetParameter(AVTransTag::AUDIO_SAMPLE_RATE, param));
@@ -98,7 +98,7 @@ HWTEST_F(AVTransReceiverAdapterTest, SetParameter_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000HTAPM
  */
-HWTEST_F(AVTransReceiverAdapterTest, SetParameter_002, TestSize.Level1)
+HWTEST_F(AVReceiverEngineAdapterTest, SetParameter_002, TestSize.Level1)
 {
     std::string param = "param";
     receiverAdapter_->receiverEngine_ = std::make_shared<MockIAVReceiverEngine>();
@@ -111,7 +111,7 @@ HWTEST_F(AVTransReceiverAdapterTest, SetParameter_002, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000HTAPM
  */
-HWTEST_F(AVTransReceiverAdapterTest, CreateControlChannel_001, TestSize.Level1)
+HWTEST_F(AVReceiverEngineAdapterTest, CreateControlChannel_001, TestSize.Level1)
 {
     std::string peerDevId = "peerDevId";
     EXPECT_EQ(ERR_DH_AV_TRANS_NULL_VALUE, receiverAdapter_->CreateControlChannel(peerDevId));
@@ -125,7 +125,7 @@ HWTEST_F(AVTransReceiverAdapterTest, CreateControlChannel_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000HTAPM
  */
-HWTEST_F(AVTransReceiverAdapterTest, CreateControlChannel_002, TestSize.Level1)
+HWTEST_F(AVReceiverEngineAdapterTest, CreateControlChannel_002, TestSize.Level1)
 {
     std::string peerDevId = "peerDevId";
     EXPECT_EQ(ERR_DH_AV_TRANS_NULL_VALUE, receiverAdapter_->CreateControlChannel(peerDevId));
@@ -139,7 +139,7 @@ HWTEST_F(AVTransReceiverAdapterTest, CreateControlChannel_002, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000HTAPM
  */
-HWTEST_F(AVTransReceiverAdapterTest, SendMessageToRemote_001, TestSize.Level1)
+HWTEST_F(AVReceiverEngineAdapterTest, SendMessageToRemote_001, TestSize.Level1)
 {
     uint32_t type = 0;
     std::string content = "content";
@@ -156,7 +156,7 @@ HWTEST_F(AVTransReceiverAdapterTest, SendMessageToRemote_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000HTAPM
  */
-HWTEST_F(AVTransReceiverAdapterTest, RegisterAdapterCallback_001, TestSize.Level1)
+HWTEST_F(AVReceiverEngineAdapterTest, RegisterAdapterCallback_001, TestSize.Level1)
 {
     std::shared_ptr<AVReceiverAdapterCallback> callback = nullptr;
     EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE, receiverAdapter_->RegisterAdapterCallback(callback));
@@ -170,7 +170,7 @@ HWTEST_F(AVTransReceiverAdapterTest, RegisterAdapterCallback_001, TestSize.Level
  * @tc.type: FUNC
  * @tc.require: AR000HTAPM
  */
-HWTEST_F(AVTransReceiverAdapterTest, OnReceiverEvent_001, TestSize.Level1)
+HWTEST_F(AVReceiverEngineAdapterTest, OnReceiverEvent_001, TestSize.Level1)
 {
     AVTransEvent event;
     EXPECT_EQ(DH_SUCCESS, receiverAdapter_->OnReceiverEvent(event));

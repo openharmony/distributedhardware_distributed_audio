@@ -28,11 +28,11 @@ config("module_private_config") {
 
   include_dirs += [
     "include",
-    "${common_path}/include",
-    "${common_path}/dfx_utils/include",
     "${audio_transport_path}/receiverengine/include",
-    "${audio_transport_path}/test/unittest/receiverengine/engineutils/include",
     "${audio_transport_path}/senderengine/include",
+    "${audio_transport_path}/test/unittest/receiverengine/engineutils/include",
+    "${common_path}/dfx_utils/include",
+    "${common_path}/include",
     "${services_path}/common/audiodata/include",
     "${services_path}/common/audioparam",
     "${softbusadapter_path}/include",

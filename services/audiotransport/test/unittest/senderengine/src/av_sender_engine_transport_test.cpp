@@ -24,18 +24,18 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace DistributedHardware {
-void AVTransSenderTransportTest::SetUpTestCase(void) {}
+void AVSenderEngineTransportTest::SetUpTestCase(void) {}
 
-void AVTransSenderTransportTest::TearDownTestCase(void) {}
+void AVSenderEngineTransportTest::TearDownTestCase(void) {}
 
-void AVTransSenderTransportTest::SetUp(void)
+void AVSenderEngineTransportTest::SetUp(void)
 {
     std::string devId = "devId";
     auto callback = std::make_shared<MockAVSenderTransportCallback>();
     senderTrans_ = std::make_shared<AVTransSenderTransport>(devId, callback);
 }
 
-void AVTransSenderTransportTest::TearDown(void)
+void AVSenderEngineTransportTest::TearDown(void)
 {
     senderTrans_ = nullptr;
 }
@@ -46,7 +46,7 @@ void AVTransSenderTransportTest::TearDown(void)
  * @tc.type: FUNC
  * @tc.require: AR000HTAPM
  */
-HWTEST_F(AVTransSenderTransportTest, SetUp_001, TestSize.Level1)
+HWTEST_F(AVSenderEngineTransportTest, SetUp_001, TestSize.Level1)
 {
     AudioParam localParam;
     AudioParam remoteParam;
@@ -62,7 +62,7 @@ HWTEST_F(AVTransSenderTransportTest, SetUp_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000HTAPM
  */
-HWTEST_F(AVTransSenderTransportTest, InitEngine_001, TestSize.Level1)
+HWTEST_F(AVSenderEngineTransportTest, InitEngine_001, TestSize.Level1)
 {
     IAVEngineProvider *providerPtr = nullptr;
     EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE, senderTrans_->InitEngine(providerPtr));
@@ -75,7 +75,7 @@ HWTEST_F(AVTransSenderTransportTest, InitEngine_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000HTAPM
  */
-HWTEST_F(AVTransSenderTransportTest, CreateCtrl_001, TestSize.Level1)
+HWTEST_F(AVSenderEngineTransportTest, CreateCtrl_001, TestSize.Level1)
 {
     EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE, senderTrans_->CreateCtrl());
     senderTrans_->senderAdapter_ = std::make_shared<AVTransSenderAdapter>();
@@ -89,7 +89,7 @@ HWTEST_F(AVTransSenderTransportTest, CreateCtrl_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000HTAPM
  */
-HWTEST_F(AVTransSenderTransportTest, Start_001, TestSize.Level1)
+HWTEST_F(AVSenderEngineTransportTest, Start_001, TestSize.Level1)
 {
     EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE, senderTrans_->Start());
     EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE, senderTrans_->Stop());
@@ -106,7 +106,7 @@ HWTEST_F(AVTransSenderTransportTest, Start_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000HTAPM
  */
-HWTEST_F(AVTransSenderTransportTest, Pause_001, TestSize.Level1)
+HWTEST_F(AVSenderEngineTransportTest, Pause_001, TestSize.Level1)
 {
     AudioParam localParam;
     AudioParam remoteParam;
@@ -120,7 +120,7 @@ HWTEST_F(AVTransSenderTransportTest, Pause_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000HTAPM
  */
-HWTEST_F(AVTransSenderTransportTest, SendMessage_001, TestSize.Level1)
+HWTEST_F(AVSenderEngineTransportTest, SendMessage_001, TestSize.Level1)
 {
     uint32_t type = 0;
     std::string content = "content";
@@ -137,7 +137,7 @@ HWTEST_F(AVTransSenderTransportTest, SendMessage_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000HTAPM
  */
-HWTEST_F(AVTransSenderTransportTest, FeedAudioData_001, TestSize.Level1)
+HWTEST_F(AVSenderEngineTransportTest, FeedAudioData_001, TestSize.Level1)
 {
     size_t bufLen = 4096;
     std::shared_ptr<AudioData> audioData = std::make_shared<AudioData>(bufLen);
@@ -153,7 +153,7 @@ HWTEST_F(AVTransSenderTransportTest, FeedAudioData_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000HTAPM
  */
-HWTEST_F(AVTransSenderTransportTest, SetParameter_001, TestSize.Level1)
+HWTEST_F(AVSenderEngineTransportTest, SetParameter_001, TestSize.Level1)
 {
     AVTransEvent event;
     std::shared_ptr<AVTransMessage> message = nullptr;

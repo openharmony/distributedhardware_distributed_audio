@@ -24,7 +24,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-class AVTransSenderTransportTest : public testing::Test {
+class AVSenderEngineTransportTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
