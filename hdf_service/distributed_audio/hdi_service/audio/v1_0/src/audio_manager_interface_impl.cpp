@@ -111,14 +111,14 @@ int32_t AudioManagerInterfaceImpl::ReleaseAudioManagerObject()
     return HDF_SUCCESS;
 }
 
-int32_t AudioManagerInterfaceImpl::AddAudioDevice(const std::string &adpName, const uint32_t devNo,
+int32_t AudioManagerInterfaceImpl::AddAudioDevice(const std::string &adpName, const uint32_t dhNo,
     const std::string &caps, const sptr<IDAudioCallback> &callback)
 {
-    DHLOGI("Add audio device name: %s, device: %d.", GetAnonyString(adpName).c_str(), devNo);
+    DHLOGI("Add audio device name: %s, device: %d.", GetAnonyString(adpName).c_str(), dhNo);
     std::lock_guard<std::mutex> adpLck(adapterMapMtx_);
     auto adp = mapAudioAdapter_.find(adpName);
     if (adp == mapAudioAdapter_.end()) {
-        int32_t ret = CreateAdapter(adpName, devNo, callback);
+        int32_t ret = CreateAdapter(adpName, dhNo, callback);
         if (ret != DH_SUCCESS) {
             DHLOGE("Create audio adapter failed.");
             return ERR_DH_AUDIO_HDF_FAIL;
@@ -129,7 +129,7 @@ int32_t AudioManagerInterfaceImpl::AddAudioDevice(const std::string &adpName, co
         DHLOGE("Audio device has not been created  or is null ptr.");
         return ERR_DH_AUDIO_HDF_INVALID_OPERATION;
     }
-    switch (GetDevTypeByDHId(devNo)) {
+    switch (GetDevTypeByDHId(dhNo)) {
         case AUDIO_DEVICE_TYPE_SPEAKER:
             adp->second->SetSpeakerCallback(callback);
             break;
@@ -141,18 +141,18 @@ int32_t AudioManagerInterfaceImpl::AddAudioDevice(const std::string &adpName, co
             DHLOGE("DhId is illegal, devType is unknow.");
             return ERR_DH_AUDIO_HDF_FAIL;
     }
-    int32_t ret = adp->second->AddAudioDevice(devNo, caps);
+    int32_t ret = adp->second->AddAudioDevice(dhNo, caps);
     if (ret != DH_SUCCESS) {
         DHLOGE("Add audio device failed, adapter return: %d.", ret);
         return ERR_DH_AUDIO_HDF_FAIL;
     }
 
     DAudioDevEvent event = { adpName,
-                             devNo,
+                             dhNo,
                              HDF_AUDIO_DEVICE_ADD,
                              0,
-                             adp->second->GetVolumeGroup(devNo),
-                             adp->second->GetInterruptGroup(devNo) };
+                             adp->second->GetVolumeGroup(dhNo),
+                             adp->second->GetInterruptGroup(dhNo) };
     ret = NotifyFwk(event);
     if (ret != DH_SUCCESS) {
         DHLOGE("Notify audio fwk failed, ret = %d.", ret);
@@ -162,9 +162,9 @@ int32_t AudioManagerInterfaceImpl::AddAudioDevice(const std::string &adpName, co
     return DH_SUCCESS;
 }
 
-int32_t AudioManagerInterfaceImpl::RemoveAudioDevice(const std::string &adpName, const uint32_t devNo)
+int32_t AudioManagerInterfaceImpl::RemoveAudioDevice(const std::string &adpName, const uint32_t dhNo)
 {
-    DHLOGI("Remove audio device name: %s, device: %d.", GetAnonyString(adpName).c_str(), devNo);
+    DHLOGI("Remove audio device name: %s, device: %d.", GetAnonyString(adpName).c_str(), dhNo);
     std::lock_guard<std::mutex> adpLck(adapterMapMtx_);
     auto adp = mapAudioAdapter_.find(adpName);
     if (adp == mapAudioAdapter_.end() || adp->second == nullptr) {
@@ -172,13 +172,13 @@ int32_t AudioManagerInterfaceImpl::RemoveAudioDevice(const std::string &adpName,
         return ERR_DH_AUDIO_HDF_INVALID_OPERATION;
     }
 
-    int32_t ret = adp->second->RemoveAudioDevice(devNo);
+    int32_t ret = adp->second->RemoveAudioDevice(dhNo);
     if (ret != DH_SUCCESS) {
         DHLOGE("Remove audio device failed, adapter return: %d.", ret);
         return ret;
     }
 
-    DAudioDevEvent event = { adpName, devNo, HDF_AUDIO_DEVICE_REMOVE, 0, 0, 0 };
+    DAudioDevEvent event = { adpName, dhNo, HDF_AUDIO_DEVICE_REMOVE, 0, 0, 0 };
     ret = NotifyFwk(event);
     if (ret != DH_SUCCESS) {
         DHLOGE("Notify audio fwk failed, ret = %d.", ret);
@@ -211,9 +211,9 @@ int32_t AudioManagerInterfaceImpl::Notify(const std::string &adpName, const uint
 int32_t AudioManagerInterfaceImpl::NotifyFwk(const DAudioDevEvent &event)
 {
     DHLOGD("Notify audio fwk event(type:%d, adapter:%s, pin:%d).", event.eventType,
-        GetAnonyString(event.adapterName).c_str(), event.devNo);
+        GetAnonyString(event.adapterName).c_str(), event.dhNo);
     std::stringstream ss;
-    ss << "EVENT_TYPE=" << event.eventType << ";NID=" << event.adapterName << ";PIN=" << event.devNo << ";VID=" <<
+    ss << "EVENT_TYPE=" << event.eventType << ";NID=" << event.adapterName << ";PIN=" << event.dhNo << ";VID=" <<
         event.volGroupId << ";IID=" << event.iptGroupId;
     std::string eventInfo = ss.str();
     int ret = HdfDeviceObjectSetServInfo(deviceObject_, eventInfo.c_str());

@@ -36,7 +36,7 @@ using OHOS::HDI::DistributedAudio::Audioext::V1_0::IDAudioCallback;
 
 typedef struct {
     std::string adapterName;
-    uint32_t devNo;
+    uint32_t dhNo;
     uint32_t eventType;
     uint32_t deviceType;
     uint32_t volGroupId;
@@ -62,9 +62,9 @@ public:
     int32_t UnloadAdapter(const std::string &adapterName) override;
     int32_t ReleaseAudioManagerObject() override;
 
-    int32_t AddAudioDevice(const std::string &adpName, const uint32_t devNo, const std::string &caps,
+    int32_t AddAudioDevice(const std::string &adpName, const uint32_t dhNo, const std::string &caps,
         const sptr<IDAudioCallback> &callback);
-    int32_t RemoveAudioDevice(const std::string &adpName, const uint32_t devNo);
+    int32_t RemoveAudioDevice(const std::string &adpName, const uint32_t dhNo);
     int32_t Notify(const std::string &adpName, const uint32_t devId, const DAudioEvent &event);
     void SetDeviceObject(struct HdfDeviceObject *deviceObject);
 
