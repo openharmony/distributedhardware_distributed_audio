@@ -506,6 +506,7 @@ AudioAdapterContext::AudioAdapterContext()
     instance_.SetVoiceVolume = nullptr;
     instance_.GetMicMute = nullptr;
     instance_.SetMicMute = nullptr;
+    instance_.GetDeviceStatus = nullptr;
 }
 
 AudioAdapterContext::~AudioAdapterContext()
