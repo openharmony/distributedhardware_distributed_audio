@@ -24,7 +24,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-void AudioDataInit64FuzzTest(const uint8_t* data, size_t size)
+void AudioDataSetInit64FuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size < (sizeof(int64_t)))) {
         return;
@@ -43,7 +43,7 @@ void AudioDataInit64FuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DistributedHardware::AudioDataInit64FuzzTest(data, size);
+    OHOS::DistributedHardware::AudioDataSetInit64FuzzTest(data, size);
     return 0;
 }
 
