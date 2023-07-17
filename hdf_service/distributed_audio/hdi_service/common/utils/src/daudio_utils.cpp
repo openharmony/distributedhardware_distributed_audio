@@ -108,7 +108,8 @@ int32_t GetDevTypeByDHId(int32_t dhId)
 uint32_t CalculateFrameSize(uint32_t sampleRate, uint32_t channelCount,
     int32_t format, uint32_t timeInterval, bool isMMAP)
 {
-    return isMMAP ? (sampleRate * channelCount * format * timeInterval) / AUDIO_MS_PER_SECOND : DEFAULT_AUDIO_DATA_SIZE;
+    return isMMAP ? (sampleRate * channelCount * static_cast<uint32_t>(format) * timeInterval) /
+                     AUDIO_MS_PER_SECOND : DEFAULT_AUDIO_DATA_SIZE;
 }
 
 int32_t CalculateSampleNum(uint32_t sampleRate, uint32_t timems)
