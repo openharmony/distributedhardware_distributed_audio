@@ -49,7 +49,7 @@ int32_t DaudioHdfOperate::LoadDaudioHDFImpl()
         return ERR_DH_AUDIO_NULLPTR;
     }
 
-    ::OHOS::sptr<IServStatListener> listener =
+    ::OHOS::sptr<IServStatListener> listener(
         new DAudioHdfServStatListener(DAudioHdfServStatListener::StatusCallback([&](const ServiceStatus& status) {
             DHLOGI("Load audio service status callback, serviceName: %s, status: %d",
                 status.serviceName.c_str(), status.status);
@@ -61,7 +61,7 @@ int32_t DaudioHdfOperate::LoadDaudioHDFImpl()
                 audioextServStatus_ = status.status;
                 hdfOperateCon_.notify_one();
             }
-        }));
+    })));
     if (servMgr_->RegisterServiceStatusListener(listener, DEVICE_CLASS_AUDIO) != HDF_SUCCESS) {
         DHLOGE("Failed to register the service status listener.");
         return ERR_DH_AUDIO_NULLPTR;
