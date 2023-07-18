@@ -52,7 +52,7 @@ int32_t DAudioSinkHandler::InitSink(const std::string &params)
             DHLOGE("Failed to get system ability mgr.");
             return ERR_DH_AUDIO_NULLPTR;
         }
-        sptr<DAudioSinkLoadCallback> loadCallback = new DAudioSinkLoadCallback(params);
+        sptr<DAudioSinkLoadCallback> loadCallback(new DAudioSinkLoadCallback(params));
         int32_t ret = samgr->LoadSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID, loadCallback);
         if (ret != ERR_OK) {
             DHLOGE("Failed to Load systemAbility ret code: %d.", ret);
