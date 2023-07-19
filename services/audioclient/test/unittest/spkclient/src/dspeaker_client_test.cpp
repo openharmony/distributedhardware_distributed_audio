@@ -13,9 +13,11 @@
  * limitations under the License.
  */
 
+#include "dspeaker_client_test.h"
+
 #include <thread>
 #include <chrono>
-#include "dspeaker_client_test.h"
+
 #include "av_trans_types.h"
 
 using namespace testing::ext;
