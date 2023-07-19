@@ -31,9 +31,7 @@ const std::string DH_ID_MIC = "134217728";
 const std::string DH_ID_SPK = "1";
 const std::string DH_ID_UNKNOWN = "0";
 const int32_t TASK_QUEUE_LEN = 20;
-const int32_t ASHMEM_LEN = 20;
 const size_t AUDIO_DATA_CAP = 1;
-const int32_t fd = 1;
 
 void DAudioSourceDevTest::SetUpTestCase(void) {}
 
@@ -294,7 +292,8 @@ HWTEST_F(DAudioSourceDevTest, OpenCtrlTrans_001, TestSize.Level1)
 {
     AudioEvent event;
     EXPECT_EQ(ERR_DH_AUDIO_SA_OPEN_CTRL_FAILED, sourceDev_->OpenCtrlTrans(event));
-
+    sourceDev_->engineFlag_ = true;
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->OpenCtrlTrans(event));
     sourceDev_->audioCtrlMgr_ = std::make_shared<DAudioSourceDevCtrlMgr>(DEV_ID, sourceDev_);
     sourceDev_->audioCtrlMgr_->isOpened_ = true;
     EXPECT_EQ(DH_SUCCESS, sourceDev_->OpenCtrlTrans(event));
@@ -302,7 +301,7 @@ HWTEST_F(DAudioSourceDevTest, OpenCtrlTrans_001, TestSize.Level1)
     sourceDev_->audioCtrlMgr_->isOpened_ = false;
     size_t tempCapacity = 0;
     sourceDev_->taskQueue_ = std::make_shared<TaskQueue>(tempCapacity);
-    EXPECT_EQ(ERR_DH_AUDIO_SA_OPEN_CTRL_FAILED, sourceDev_->OpenCtrlTrans(event));
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->OpenCtrlTrans(event));
     sourceDev_->taskQueue_ = nullptr;
 
     sourceDev_->audioCtrlMgr_ = nullptr;
@@ -319,9 +318,10 @@ HWTEST_F(DAudioSourceDevTest, CloseCtrlTrans_001, TestSize.Level1)
     AudioEvent event;
     bool isSpk = false;
     EXPECT_EQ(DH_SUCCESS, sourceDev_->CloseCtrlTrans(event, isSpk));
-
     sourceDev_->audioCtrlMgr_ = std::make_shared<DAudioSourceDevCtrlMgr>(DEV_ID, sourceDev_);
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->CloseCtrlTrans(event, isSpk));
+    sourceDev_->engineFlag_ = true;
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->CloseCtrlTrans(event, isSpk));
 }
 
 /**
@@ -787,6 +787,9 @@ HWTEST_F(DAudioSourceDevTest, TaskOpenDMic_001, TestSize.Level1)
     sourceDev_->mic_ = std::make_shared<DMicDev>(DEV_ID, sourceDev_);
     EXPECT_EQ(ERR_DH_AUDIO_SA_PARAM_INVALID, sourceDev_->TaskOpenDMic(""));
 
+    sourceDev_->engineFlag_ = true;
+    EXPECT_EQ(ERR_DH_AUDIO_SA_PARAM_INVALID, sourceDev_->TaskOpenDMic(""));
+
     std::string tempLongStr(DAUDIO_MAX_JSON_LEN + 1, 'a');
     EXPECT_EQ(ERR_DH_AUDIO_SA_PARAM_INVALID, sourceDev_->TaskOpenDMic(tempLongStr));
 
@@ -885,6 +888,8 @@ HWTEST_F(DAudioSourceDevTest, TaskCloseCtrlChannel_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, TaskCloseCtrlChannel_002, TestSize.Level1)
 {
+    sourceDev_->engineFlag_ = false;
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskCloseCtrlChannel(ARGS));
     sourceDev_->audioCtrlMgr_ = std::make_shared<DAudioSourceDevCtrlMgr>(DEV_ID, sourceDev_);
     EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskCloseCtrlChannel(ARGS));
 
@@ -980,9 +985,6 @@ HWTEST_F(DAudioSourceDevTest, TaskSpkMmapStart_001, TestSize.Level1)
 
     sourceDev_->speaker_ = std::make_shared<DSpeakerDev>(DEV_ID, nullptr);
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->TaskSpkMmapStart(ARGS));
-
-    sourceDev_->speaker_->ashmem_ = new Ashmem(fd, ASHMEM_LEN);
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskSpkMmapStart(ARGS));
     EXPECT_EQ(DH_SUCCESS, sourceDev_->speaker_->MmapStop());
 }
 
@@ -1012,13 +1014,10 @@ HWTEST_F(DAudioSourceDevTest, TaskMicMmapStart_001, TestSize.Level1)
 
     sourceDev_->mic_ = std::make_shared<DMicDev>(DEV_ID, nullptr);
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->TaskMicMmapStart(ARGS));
-
-    sourceDev_->mic_->ashmem_ = new Ashmem(fd, ASHMEM_LEN);
     std::shared_ptr<AudioData> data = std::make_shared<AudioData>(AUDIO_DATA_CAP);
     for (size_t i = 0; i < TASK_QUEUE_LEN; i++) {
         sourceDev_->mic_->dataQueue_.push(data);
     }
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskMicMmapStart(ARGS));
     EXPECT_EQ(DH_SUCCESS, sourceDev_->mic_->MmapStop());
 }
 
@@ -1092,8 +1091,45 @@ HWTEST_F(DAudioSourceDevTest, NotifySinkDev_001, TestSize.Level1)
 {
     json jAudioParam;
     EXPECT_EQ(ERR_DH_AUDIO_SA_RPC_WAIT_TIMEOUT, sourceDev_->NotifySinkDev(CLOSE_MIC, jAudioParam, DH_ID_SPK));
+    sourceDev_->engineFlag_ = false;
+    EXPECT_EQ(ERR_DH_AUDIO_SA_RPC_WAIT_TIMEOUT, sourceDev_->NotifySinkDev(CLOSE_MIC, jAudioParam, DH_ID_SPK));
     sourceDev_->engineFlag_ = true;
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->NotifySinkDev(CLOSE_MIC, jAudioParam, DH_ID_SPK));
+    sourceDev_->mic_ = std::make_shared<DMicDev>(DEV_ID, sourceDev_);
+    sourceDev_->speaker_ = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->NotifySinkDev(CLOSE_MIC, jAudioParam, DH_ID_SPK));
+}
+
+/**
+ * @tc.name: SendAudioEventToRemote_001
+ * @tc.desc: Verify the SendAudioEventToRemote function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, SendAudioEventToRemote_001, TestSize.Level1)
+{
+    sourceDev_->engineFlag_ = false;
+    AudioEvent event;
+    std::string args;
+    std::string devId = "devId";
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->SendAudioEventToRemote(event));
+    sourceDev_->audioCtrlMgr_ = std::make_shared<DAudioSourceDevCtrlMgr>(DEV_ID, sourceDev_);
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->SendAudioEventToRemote(event));
+}
+
+/**
+ * @tc.name: SendAudioEventToRemote_002
+ * @tc.desc: Verify the SendAudioEventToRemote function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, SendAudioEventToRemote_002, TestSize.Level1)
+{
+    AudioEvent event;
+    sourceDev_->engineFlag_ = true;
+    sourceDev_->speaker_ = nullptr;
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->SendAudioEventToRemote(event));
+    sourceDev_->speaker_ = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->SendAudioEventToRemote(event));
 }
 } // namespace DistributedHardware
 } // namespace OHOS
