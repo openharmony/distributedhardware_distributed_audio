@@ -46,6 +46,21 @@ void DMicClientTest::TearDown()
 }
 
 /**
+ * @tc.name: InitSenderEngine_001
+ * @tc.desc: Verify the InitSenderEngine function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6G
+ */
+HWTEST_F(DMicClientTest, InitSenderEngine_001, TestSize.Level1)
+{
+    IAVEngineProvider *providerPtr = nullptr;
+    micClient_->engineFlag_ = true;
+    auto message = std::make_shared<AVTransMessage>();
+    micClient_->OnEngineTransMessage(message);
+    EXPECT_EQ(DH_SUCCESS, micClient_->InitSenderEngine(providerPtr));
+}
+
+/**
  * @tc.name: OnStateChange_001
  * @tc.desc: Verify the OnStateChange function.
  * @tc.type: FUNC
@@ -80,6 +95,7 @@ HWTEST_F(DMicClientTest, SetUp_001, TestSize.Level1)
     micClient_->SetAttrs(devId, clientCallback);
     AudioParam audioParam;
     EXPECT_NE(DH_SUCCESS, micClient_->SetUp(audioParam));
+    EXPECT_EQ(ERR_DH_AUDIO_TRANS_ERROR, micClient_->SetUp(audioParam_));
 }
 
 /**
@@ -111,6 +127,8 @@ HWTEST_F(DMicClientTest, StartCapture001, TestSize.Level1)
     micClient_->clientStatus_ = AudioStatus::STATUS_READY;
     EXPECT_NE(nullptr, micClient_->audioCapturer_);
     EXPECT_EQ(DH_SUCCESS, micClient_->StartCapture());
+    micClient_->micTrans_ = nullptr;
+    EXPECT_EQ(ERR_DH_AUDIO_SA_STATUS_ERR, micClient_->StartCapture());
     EXPECT_NE(DH_SUCCESS, micClient_->StopCapture());
 }
 
@@ -138,8 +156,11 @@ HWTEST_F(DMicClientTest, StopCapture001, TestSize.Level1)
 HWTEST_F(DMicClientTest, StopCapture002, TestSize.Level1)
 {
     micClient_->clientStatus_ = STATUS_START;
+    EXPECT_EQ(ERR_DH_AUDIO_SA_STATUS_ERR, micClient_->StopCapture());
     micClient_->isCaptureReady_.store(true);
     EXPECT_EQ(ERR_DH_AUDIO_CLIENT_CAPTURER_OR_MICTRANS_INSTANCE, micClient_->StopCapture());
+    micClient_->SetUp(audioParam_);
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, micClient_->StopCapture());
 }
 
 /**
@@ -172,6 +193,22 @@ HWTEST_F(DMicClientTest, Release001, TestSize.Level1)
     micClient_->audioCapturer_ = AudioStandard::AudioCapturer::Create(capturerOptions);
     EXPECT_NE(nullptr, micClient_->audioCapturer_);
     EXPECT_EQ(DH_SUCCESS, micClient_->Release());
+}
+
+/**
+ * @tc.name: SendMessage_001
+ * @tc.desc: Verify the SendMessage function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6G
+ */
+HWTEST_F(DMicClientTest, SendMessage_001, TestSize.Level1)
+{
+    std::string content = "content";
+    std::string dstDevId = "dstDevId";
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, micClient_->SendMessage(EVENT_UNKNOWN, content, dstDevId));
+    EXPECT_EQ(DH_SUCCESS, micClient_->SendMessage(NOTIFY_OPEN_MIC_RESULT, content, dstDevId));
+    micClient_->micTrans_ = nullptr;
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, micClient_->SendMessage(NOTIFY_OPEN_MIC_RESULT, content, dstDevId));
 }
 } // DistributedHardware
 } // OHOS

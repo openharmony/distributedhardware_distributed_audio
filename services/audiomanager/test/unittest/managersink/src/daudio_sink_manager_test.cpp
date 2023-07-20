@@ -39,6 +39,7 @@ void DAudioSinkManagerTest::TearDown() {}
 HWTEST_F(DAudioSinkManagerTest, Init_001, TestSize.Level1)
 {
     EXPECT_NE(DH_SUCCESS, daudioSinkManager.Init());
+    daudioSinkManager.engineFlag_ = true;
     EXPECT_EQ(DH_SUCCESS, daudioSinkManager.UnInit());
 }
 
@@ -51,6 +52,11 @@ HWTEST_F(DAudioSinkManagerTest, Init_001, TestSize.Level1)
 HWTEST_F(DAudioSinkManagerTest, CreateAudioDevice_001, TestSize.Level1)
 {
     std::string devId = "devId";
+    EXPECT_EQ(DH_SUCCESS, daudioSinkManager.CreateAudioDevice(devId));
+    daudioSinkManager.engineFlag_ = true;
+    EXPECT_EQ(DH_SUCCESS, daudioSinkManager.CreateAudioDevice(devId));
+    auto dev = std::make_shared<DAudioSinkDev>(devId);
+    daudioSinkManager.audioDevMap_.emplace(devId, dev);
     EXPECT_EQ(DH_SUCCESS, daudioSinkManager.CreateAudioDevice(devId));
     daudioSinkManager.ClearAudioDev(devId);
     daudioSinkManager.OnSinkDevReleased(devId);
@@ -70,6 +76,20 @@ HWTEST_F(DAudioSinkManagerTest, DAudioNotify_001, TestSize.Level1)
     const std::string eventContent = "eventContent";
     EXPECT_EQ(ERR_DH_AUDIO_SA_GET_REMOTE_SINK_FAILED,
         daudioSinkManager.DAudioNotify(devId, dhId, eventType, eventContent));
+}
+
+/**
+ * @tc.name: LoadAVSenderEngineProvider_001
+ * @tc.desc: Verify the LoadAVSenderEngineProvider function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkManagerTest, LoadAVSenderEngineProvider_001, TestSize.Level1)
+{
+    EXPECT_EQ(DH_SUCCESS, daudioSinkManager.LoadAVSenderEngineProvider());
+    EXPECT_EQ(DH_SUCCESS, daudioSinkManager.UnloadAVSenderEngineProvider());
+    EXPECT_EQ(DH_SUCCESS, daudioSinkManager.LoadAVReceiverEngineProvider());
+    EXPECT_EQ(DH_SUCCESS, daudioSinkManager.UnloadAVReceiverEngineProvider());
 }
 } // DistributedHardware
 } // OHOS
