@@ -43,6 +43,25 @@ void DSpeakerDevTest::TearDown(void)
 }
 
 /**
+ * @tc.name: InitSenderEngine_001
+ * @tc.desc: Verify InitSenderEngine function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DSpeakerDevTest, InitSenderEngine_001, TestSize.Level1)
+{
+    IAVEngineProvider *providerPtr = nullptr;
+    spk_->engineFlag_ = true;
+    AVTransEvent event = { EventType::EVENT_START_SUCCESS, "", "" };
+    spk_->OnEngineTransEvent(event);
+    std::shared_ptr<AVTransMessage> message = nullptr;
+    spk_->OnEngineTransMessage(message);
+    EXPECT_EQ(DH_SUCCESS, spk_->InitSenderEngine(providerPtr));
+    spk_->speakerTrans_ = std::make_shared<MockIAudioDataTransport>();
+    EXPECT_EQ(DH_SUCCESS, spk_->InitSenderEngine(providerPtr));
+}
+
+/**
  * @tc.name: EnableDSpeaker_001
  * @tc.desc: Verify EnableDSpeaker and EnableDevice function.
  * @tc.type: FUNC
@@ -372,6 +391,22 @@ HWTEST_F(DSpeakerDevTest, OnStateChange_001, TestSize.Level1)
 
     eventCb_ = nullptr;
     EXPECT_EQ(ERR_DH_AUDIO_SA_EVENT_CALLBACK_NULL, spk_->OnStateChange(event));
+}
+
+/**
+ * @tc.name: SendMessage_001
+ * @tc.desc: Verify SendMessage function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DSpeakerDevTest, SendMessage_001, TestSize.Level1)
+{
+    std::string content = "content";
+    std::string dstDevId = "dstDevId";
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, spk_->SendMessage(MIC_OPENED, content, dstDevId));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, spk_->SendMessage(OPEN_SPEAKER, content, dstDevId));
+    spk_->speakerTrans_ = std::make_shared<MockIAudioDataTransport>();
+    EXPECT_EQ(DH_SUCCESS, spk_->SendMessage(OPEN_SPEAKER, content, dstDevId));
 }
 } // namespace DistributedHardware
 } // namespace OHOS

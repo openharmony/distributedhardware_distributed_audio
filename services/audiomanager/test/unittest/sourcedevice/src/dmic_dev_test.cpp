@@ -43,6 +43,28 @@ void DMicDevTest::TearDown(void)
 }
 
 /**
+ * @tc.name: InitReceiverEngine_001
+ * @tc.desc: Verify InitReceiverEngine function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, InitReceiverEngine_001, TestSize.Level1)
+{
+    IAVEngineProvider *providerPtr = nullptr;
+    mic_->engineFlag_ = true;
+    AVTransEvent event = { EventType::EVENT_START_SUCCESS, "", "" };
+    mic_->OnEngineTransEvent(event);
+    std::shared_ptr<AVTransMessage> message = nullptr;
+    mic_->OnEngineTransMessage(message);
+    size_t size = 4096;
+    auto audioData = std::make_shared<AudioData>(size);
+    mic_->OnEngineTransDataAvailable(audioData);
+    EXPECT_EQ(DH_SUCCESS, mic_->InitReceiverEngine(providerPtr));
+    mic_->micTrans_ = std::make_shared<MockIAudioDataTransport>();
+    EXPECT_EQ(DH_SUCCESS, mic_->InitReceiverEngine(providerPtr));
+}
+
+/**
  * @tc.name: EnableDMic_001
  * @tc.desc: Verify EnableDMic and EnableDevice function.
  * @tc.type: FUNC
@@ -331,6 +353,22 @@ HWTEST_F(DMicDevTest, OnDecodeTransDataDone_001, TestSize.Level1)
     for (size_t i = 1; i <= mic_->DATA_QUEUE_MAX_SIZE + 1; i++) {
         EXPECT_EQ(DH_SUCCESS, mic_->OnDecodeTransDataDone(data));
     }
+}
+
+/**
+ * @tc.name: SendMessage_001
+ * @tc.desc: Verify SendMessage function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, SendMessage_001, TestSize.Level1)
+{
+    std::string content = "content";
+    std::string dstDevId = "dstDevId";
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->SendMessage(MIC_OPENED, content, dstDevId));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->SendMessage(OPEN_MIC, content, dstDevId));
+    mic_->micTrans_ = std::make_shared<MockIAudioDataTransport>();
+    EXPECT_EQ(DH_SUCCESS, mic_->SendMessage(OPEN_MIC, content, dstDevId));
 }
 } // namespace DistributedHardware
 } // namespace OHOS

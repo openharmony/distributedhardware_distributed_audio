@@ -56,6 +56,7 @@ HWTEST_F(DAudioSourceMgrTest, Init_001, TestSize.Level1)
 
     std::string localDevId;
     EXPECT_NE(DH_SUCCESS, GetLocalDeviceNetworkId(localDevId));
+    sourceMgr.engineFlag_ = true;
     EXPECT_EQ(DH_SUCCESS, sourceMgr.UnInit());
 }
 
@@ -329,6 +330,20 @@ HWTEST_F(DAudioSourceMgrTest, DeleteAudioDevice_001, TestSize.Level1)
     EXPECT_EQ(DH_SUCCESS, sourceMgr.DisableDAudio(DEV_ID, DH_ID + "1", reqId1));
 
     EXPECT_EQ(DH_SUCCESS, sourceMgr.UnInit());
+}
+
+/**
+ * @tc.name: LoadAVReceiverEngineProvider_001
+ * @tc.desc: Verify the LoadAVReceiverEngineProvider function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceMgrTest, LoadAVReceiverEngineProvider_001, TestSize.Level1)
+{
+    EXPECT_EQ(DH_SUCCESS, sourceMgr.LoadAVReceiverEngineProvider());
+    EXPECT_EQ(DH_SUCCESS, sourceMgr.UnloadAVReceiverEngineProvider());
+    EXPECT_EQ(DH_SUCCESS, sourceMgr.LoadAVSenderEngineProvider());
+    EXPECT_EQ(DH_SUCCESS, sourceMgr.UnloadAVSenderEngineProvider());
 }
 } // namespace DistributedHardware
 } // namespace OHOS
