@@ -66,9 +66,8 @@ void DMicDev::OnEngineTransDataAvailable(const std::shared_ptr<AudioData> &audio
 int32_t DMicDev::InitReceiverEngine(IAVEngineProvider *providerPtr)
 {
     DHLOGI("InitReceiverEngine enter.");
-    // new 方式
     IsParamEnabled(AUDIO_ENGINE_FLAG, engineFlag_);
-    if (engineFlag_ == true) {
+    if (engineFlag_) {
         if (micTrans_ == nullptr) {
             micTrans_ = std::make_shared<AVTransReceiverTransport>(devId_, shared_from_this());
         }
@@ -234,14 +233,13 @@ int32_t DMicDev::NotifyEvent(const std::string &devId, const int32_t dhId, const
 int32_t DMicDev::SetUp()
 {
     DHLOGI("Set up mic device.");
-    if (engineFlag_ == false) {
+    if (!engineFlag_) {
         micTrans_ = std::make_shared<AudioDecodeTransport>(devId_);
-    } else {
-        if (micTrans_ == nullptr) {
-            DHLOGE("mic trans should be init by dev.");
-            return ERR_DH_AUDIO_NULLPTR;
-        }
+    } else if (micTrans_ == nullptr) {
+        DHLOGE("mic trans should be init by dev.");
+        return ERR_DH_AUDIO_NULLPTR;
     }
+
     int32_t ret = micTrans_->SetUp(param_, param_, shared_from_this(), CAP_MIC);
     if (ret != DH_SUCCESS) {
         DHLOGE("Mic trans set up failed. ret: %d.", ret);

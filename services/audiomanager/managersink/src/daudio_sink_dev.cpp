@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -81,13 +81,13 @@ void DAudioSinkDev::SleepAudioDev()
 int32_t DAudioSinkDev::InitAVTransEngines(IAVEngineProvider *senderPtr, IAVEngineProvider *receiverPtr)
 {
     DHLOGI("Init InitAVTransEngines");
-    if (engineFlag_ == true) {
-        // new 模式下只支持普通通路;后期音频框架支持后，全部支持
+    if (engineFlag_) {
+        // only supports normal audio channel mode
         micClient_ = std::make_shared<DMicClient>(devId_, shared_from_this());
         micClient_->InitSenderEngine(senderPtr);
     }
 
-    if (engineFlag_ == true) {
+    if (engineFlag_) {
         speakerClient_ = std::make_shared<DSpeakerClient>(devId_, shared_from_this());
         speakerClient_->InitReceiverEngine(receiverPtr);
     }
@@ -341,7 +341,7 @@ int32_t DAudioSinkDev::NotifyPlayStatusChange(const AudioEvent &audioEvent)
 int32_t DAudioSinkDev::TaskOpenCtrlChannel(const std::string &args)
 {
     DHLOGI("Open ctrl channel.");
-    if (engineFlag_ == false) {
+    if (!engineFlag_) {
         if (args.length() > DAUDIO_MAX_JSON_LEN || args.empty()) {
             return ERR_DH_AUDIO_SA_PARAM_INVALID;
         }
@@ -373,7 +373,7 @@ int32_t DAudioSinkDev::TaskOpenCtrlChannel(const std::string &args)
 int32_t DAudioSinkDev::TaskCloseCtrlChannel(const std::string &args)
 {
     (void)args;
-    if (engineFlag_ == false) {
+    if (!engineFlag_) {
         DHLOGD("Close ctrl channel.");
         if (audioCtrlMgr_ == nullptr) {
             DHLOGD("Ctrl channel already closed.");
@@ -411,12 +411,12 @@ int32_t DAudioSinkDev::TaskOpenDSpeaker(const std::string &args)
         DHLOGE("Get audio param from json failed, error code %d.", ret);
         return ret;
     }
-    // new mode 下 spkclient应该在初始化就做
-    if (engineFlag_ == true && speakerClient_ == nullptr) {
+
+    if (engineFlag_ && speakerClient_ == nullptr) {
         DHLOGE("speaker client should be init by dev.");
         return ERR_DH_AUDIO_NULLPTR;
     }
-    if (engineFlag_ == false && speakerClient_ == nullptr) {
+    if (!engineFlag_ && speakerClient_ == nullptr) {
 #ifdef DAUDIO_SUPPORT_DIRECT
         if (audioParam.renderOpts.renderFlags == MMAP_MODE) {
             DHLOGI("Try to mmap mode.");
@@ -449,7 +449,7 @@ int32_t DAudioSinkDev::TaskCloseDSpeaker(const std::string &args)
     DHLOGI("Close speaker device.");
     if (speakerClient_ == nullptr) {
         DHLOGE("Speaker client is null or already closed.");
-        if (engineFlag_ == false) {
+        if (!engineFlag_) {
             NotifySourceDev(NOTIFY_CLOSE_SPEAKER_RESULT, spkDhId_, DH_SUCCESS);
         }
         return DH_SUCCESS;
@@ -467,7 +467,7 @@ int32_t DAudioSinkDev::TaskCloseDSpeaker(const std::string &args)
         closeStatus = false;
     }
     speakerClient_ = nullptr;
-    if (engineFlag_ == false) {
+    if (!engineFlag_) {
         closeStatus ? NotifySourceDev(NOTIFY_CLOSE_SPEAKER_RESULT, spkDhId_, DH_SUCCESS) :
             NotifySourceDev(NOTIFY_CLOSE_SPEAKER_RESULT, spkDhId_, ERR_DH_AUDIO_FAILED);
     }
@@ -492,11 +492,11 @@ int32_t DAudioSinkDev::TaskOpenDMic(const std::string &args)
         DHLOGE("Get audio param from json failed, error code %d.", ret);
         return ret;
     }
-    if (engineFlag_ == true && micClient_ == nullptr) {
+    if (engineFlag_ && micClient_ == nullptr) {
         DHLOGE("Mic client should be init by dev.");
         return ERR_DH_AUDIO_NULLPTR;
     }
-    if (engineFlag_ == false && micClient_ == nullptr) {
+    if (!engineFlag_ && micClient_ == nullptr) {
 #ifdef DAUDIO_SUPPORT_DIRECT
         if (audioParam.captureOpts.capturerFlags == MMAP_MODE) {
             DHLOGI("Try to mmap mode.");
@@ -533,7 +533,7 @@ int32_t DAudioSinkDev::TaskCloseDMic(const std::string &args)
     DHLOGI("Close mic device.");
     if (micClient_ == nullptr) {
         DHLOGE("Mic client is null or already closed.");
-        if (engineFlag_ == false) {
+        if (!engineFlag_) {
             NotifySourceDev(NOTIFY_CLOSE_MIC_RESULT, micDhId_, DH_SUCCESS);
         }
         return DH_SUCCESS;
@@ -551,7 +551,7 @@ int32_t DAudioSinkDev::TaskCloseDMic(const std::string &args)
         closeStatus = false;
     }
     micClient_ = nullptr;
-    if (engineFlag_ == false) {
+    if (!engineFlag_) {
         closeStatus ? NotifySourceDev(NOTIFY_CLOSE_MIC_RESULT, micDhId_, DH_SUCCESS) :
             NotifySourceDev(NOTIFY_CLOSE_MIC_RESULT, micDhId_, ERR_DH_AUDIO_FAILED);
     }
@@ -639,7 +639,7 @@ int32_t DAudioSinkDev::TaskPlayStatusChange(const std::string &args)
 
 int32_t DAudioSinkDev::SendAudioEventToRemote(const AudioEvent &event)
 {
-    if (engineFlag_ == false) {
+    if (!engineFlag_) {
         if (audioCtrlMgr_ == nullptr) {
             DHLOGE("Audio ctrl mgr not init.");
             return ERR_DH_AUDIO_NULLPTR;
@@ -684,7 +684,7 @@ void DAudioSinkDev::NotifySourceDev(const AudioEventType type, const std::string
     jEvent[KEY_EVENT_TYPE] = type;
     jEvent[KEY_RANDOM_TASK_CODE] = std::to_string(randomTaskCode);
 
-    if (engineFlag_ == false) {
+    if (!engineFlag_) {
         DHLOGD("notify source dev, random task code: %s", std::to_string(randomTaskCode).c_str());
         DAudioSinkManager::GetInstance().DAudioNotify(devId_, dhId, type, jEvent.dump());
     } else {

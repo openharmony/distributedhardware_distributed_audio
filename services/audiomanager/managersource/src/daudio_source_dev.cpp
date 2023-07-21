@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -223,7 +223,7 @@ int32_t DAudioSourceDev::HandleDMicClosed(const AudioEvent &event)
 
 int32_t DAudioSourceDev::OpenCtrlTrans(const AudioEvent &event)
 {
-    if (engineFlag_ == false) {
+    if (!engineFlag_) {
         if (audioCtrlMgr_ == nullptr) {
             audioCtrlMgr_ = std::make_shared<DAudioSourceDevCtrlMgr>(devId_, shared_from_this());
         }
@@ -237,7 +237,7 @@ int32_t DAudioSourceDev::OpenCtrlTrans(const AudioEvent &event)
 
 int32_t DAudioSourceDev::CloseCtrlTrans(const AudioEvent &event, bool isSpk)
 {
-    if (engineFlag_ == false) {
+    if (!engineFlag_) {
         if (audioCtrlMgr_ == nullptr) {
             DHLOGD("Ctrl already closed.");
             return DH_SUCCESS;
@@ -600,7 +600,7 @@ int32_t DAudioSourceDev::TaskOpenDSpeaker(const std::string &args)
         return ERR_DH_AUDIO_FAILED;
     }
 
-    if (engineFlag_ == true) {
+    if (engineFlag_) {
         int32_t ret = speaker_->InitSenderEngine(DAudioSourceManager::GetInstance().getSenderProvider());
         if (ret != DH_SUCCESS) {
             DHLOGE("Speaker init sender Engine, error code %d.", ret);
@@ -699,7 +699,7 @@ int32_t DAudioSourceDev::TaskCloseDSpeaker(const std::string &args)
         DHLOGD("args length error.");
         return ERR_DH_AUDIO_SA_PARAM_INVALID;
     }
-    int32_t ret = engineFlag_ == false ? CloseSpkOld(args) : CloseSpkNew(args);
+    int32_t ret = !engineFlag_ ? CloseSpkOld(args) : CloseSpkNew(args);
     if (ret != DH_SUCCESS) {
         DHLOGE("Close spk in old mode failed.");
         return ret;
@@ -715,7 +715,7 @@ int32_t DAudioSourceDev::TaskOpenDMic(const std::string &args)
         DHLOGE("Mic device not init");
         return ERR_DH_AUDIO_SA_MIC_DEVICE_NOT_INIT;
     }
-    if (engineFlag_ == true) {
+    if (engineFlag_) {
         int32_t ret = mic_->InitReceiverEngine(DAudioSourceManager::GetInstance().getReceiverProvider());
         if (ret != DH_SUCCESS) {
             DHLOGE("Init receiver engine failed.");
@@ -823,7 +823,7 @@ int32_t DAudioSourceDev::TaskCloseDMic(const std::string &args)
     if (args.length() > DAUDIO_MAX_JSON_LEN || args.empty()) {
         return ERR_DH_AUDIO_SA_PARAM_INVALID;
     }
-    int32_t ret = engineFlag_ == false ? CloseMicOld(args): CloseMicNew(args);
+    int32_t ret = !engineFlag_ ? CloseMicOld(args): CloseMicNew(args);
     if (ret != DH_SUCCESS) {
         DHLOGE("Task close mic error.");
         return ret;
@@ -835,7 +835,7 @@ int32_t DAudioSourceDev::TaskCloseDMic(const std::string &args)
 int32_t DAudioSourceDev::TaskOpenCtrlChannel(const std::string &args)
 {
     DHLOGI("Task open ctrl channel, args: %s.", args.c_str());
-    if (engineFlag_ == false) {
+    if (!engineFlag_) {
         if (audioCtrlMgr_ == nullptr) {
             DHLOGE("Audio source ctrl mgr not init.");
             return ERR_DH_AUDIO_NULLPTR;
@@ -878,7 +878,7 @@ int32_t DAudioSourceDev::TaskOpenCtrlChannel(const std::string &args)
 int32_t DAudioSourceDev::TaskCloseCtrlChannel(const std::string &args)
 {
     DHLOGI("Task close ctrl channel, args: %s.", args.c_str());
-    if (engineFlag_ == false) {
+    if (!engineFlag_) {
         if (audioCtrlMgr_ == nullptr) {
             DHLOGD("Audio source ctrl magr already closed.");
             return DH_SUCCESS;
@@ -960,7 +960,7 @@ int32_t DAudioSourceDev::TaskPlayStatusChange(const std::string &args)
 
 int32_t DAudioSourceDev::SendAudioEventToRemote(const AudioEvent &event)
 {
-    if (engineFlag_ == false) {
+    if (!engineFlag_) {
         if (audioCtrlMgr_ == nullptr) {
             DHLOGE("Audio ctrl mgr not init.");
             return ERR_DH_AUDIO_NULLPTR;
@@ -1055,7 +1055,7 @@ int32_t DAudioSourceDev::NotifySinkDev(const AudioEventType type, const json Par
                     { KEY_AUDIO_PARAM, Param },
                     { KEY_RANDOM_TASK_CODE, std::to_string(randomTaskCode) } };
     DHLOGD("Notify sink dev, random task code: %s", std::to_string(randomTaskCode).c_str());
-    if (engineFlag_ == false) {
+    if (!engineFlag_) {
         DAudioSourceManager::GetInstance().DAudioNotify(devId_, dhId, type, jParam.dump());
     } else {
         DHLOGD("Notify sink dev, new engine, random task code:%s", std::to_string(randomTaskCode).c_str());

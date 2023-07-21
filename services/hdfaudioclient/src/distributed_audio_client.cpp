@@ -288,7 +288,7 @@ extern "C" {
 
 struct AudioManager *GetAudioManagerFuncs(void)
 {
-    if (OHOS::DistributedHardware::AudioManagerInit() == true) {
+    if (OHOS::DistributedHardware::AudioManagerInit()) {
         return &OHOS::DistributedHardware::g_AudioManagerContext.instance_;
     } else {
         return nullptr;

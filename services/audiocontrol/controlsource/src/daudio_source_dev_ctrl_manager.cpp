@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -69,7 +69,7 @@ int32_t DAudioSourceDevCtrlMgr::Start()
 
     std::unique_lock<std::mutex> lck(channelWaitMutex_);
     auto status = channelWaitCond_.wait_for(lck, std::chrono::seconds(CHANNEL_WAIT_SECONDS),
-        [this]() { return isOpened_.load() == true; });
+        [this]() { return isOpened_.load(); });
     if (!status) {
         DHLOGE("Wait channel open timeout(%ds).", CHANNEL_WAIT_SECONDS);
         return ERR_DH_AUDIO_SA_CTRL_CHANNEL_WAIT_TIMEOUT;

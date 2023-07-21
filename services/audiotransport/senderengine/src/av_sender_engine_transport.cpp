@@ -98,14 +98,12 @@ int32_t AVTransSenderTransport::Stop()
     return DH_SUCCESS;
 }
 
-// todo pause
 int32_t AVTransSenderTransport::Pause()
 {
     DHLOGI("PauseSenderEngine enter.");
     return DH_SUCCESS;
 }
 
-// todo restart
 int32_t AVTransSenderTransport::Restart(const AudioParam &localParam, const AudioParam &remoteParam)
 {
     DHLOGI("RestartSenderEngine enter.");
