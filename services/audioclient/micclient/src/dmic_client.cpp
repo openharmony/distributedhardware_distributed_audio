@@ -60,7 +60,7 @@ int32_t DMicClient::InitSenderEngine(IAVEngineProvider *providerPtr)
 {
     DHLOGI("Init SenderEngine");
     IsParamEnabled(AUDIO_ENGINE_FLAG, engineFlag_);
-    if (engineFlag_ == true) {
+    if (engineFlag_) {
         if (micTrans_ == nullptr) {
             micTrans_ = std::make_shared<AVTransSenderTransport>(devId_, shared_from_this());
         }
@@ -129,8 +129,9 @@ int32_t DMicClient::SetUp(const AudioParam &param)
         DHLOGE("Audio capturer create failed.");
         return ERR_DH_AUDIO_CLIENT_CREATE_CAPTURER_FAILED;
     }
-    // old new 方式归一
-    if (engineFlag_ == false) {
+
+    // Use a unified process regardless of whether it relies on transport components or not
+    if (!engineFlag_) {
         micTrans_ = std::make_shared<AudioEncodeTransport>(devId_);
     }
     if (micTrans_ == nullptr) {

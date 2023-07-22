@@ -62,9 +62,9 @@ int32_t DAudioSinkManager::Init()
         DHLOGE("Get local network id failed, ret: %d.", ret);
         return ret;
     }
-    // new 方式
+
     IsParamEnabled(AUDIO_ENGINE_FLAG, engineFlag_);
-    if (engineFlag_ == true) {
+    if (engineFlag_) {
         ret = LoadAVReceiverEngineProvider();
         if (ret != DH_SUCCESS || rcvProviderPtr_ == nullptr) {
             DHLOGE("Load av transport receiver engine provider failed.");
@@ -88,7 +88,7 @@ int32_t DAudioSinkManager::Init()
             DHLOGE("Register av transport sender Provider Callback failed.");
             return ERR_DH_AUDIO_FAILED;
         }
-        DHLOGE("LoadAVSenderEngineProvider success.");
+        DHLOGI("LoadAVSenderEngineProvider success.");
     }
     return DH_SUCCESS;
 }
@@ -96,7 +96,7 @@ int32_t DAudioSinkManager::Init()
 int32_t DAudioSinkManager::UnInit()
 {
     DHLOGI("UnInit audio sink manager.");
-    if (engineFlag_ == true) {
+    if (engineFlag_) {
         UnloadAVSenderEngineProvider();
         UnloadAVReceiverEngineProvider();
     }
@@ -161,7 +161,7 @@ int32_t DAudioSinkManager::HandleDAudioNotify(const std::string &devId, const st
 int32_t DAudioSinkManager::CreateAudioDevice(const std::string &devId)
 {
     DHLOGI("Create audio sink dev.");
-    if (engineFlag_ == true) {
+    if (engineFlag_) {
         std::lock_guard<std::mutex> lock(devMapMutex_);
         if (audioDevMap_.find(devId) != audioDevMap_.end()) {
             DHLOGI("Audio sink dev in map. devId: %s.", GetAnonyString(devId).c_str());
@@ -173,7 +173,7 @@ int32_t DAudioSinkManager::CreateAudioDevice(const std::string &devId)
         DHLOGE("Awake audio dev failed.");
         return ERR_DH_AUDIO_FAILED;
     }
-    if (engineFlag_ == true) {
+    if (engineFlag_) {
         int32_t ret = dev->InitAVTransEngines(sendProviderPtr_, rcvProviderPtr_);
         if (ret != DH_SUCCESS) {
             DHLOGE("Init av transport sender engine failed.");
@@ -269,7 +269,7 @@ int32_t DAudioSinkManager::LoadAVReceiverEngineProvider()
         return ERR_DH_AUDIO_TRANS_NULL_VALUE;
     }
     rcvProviderPtr_ = getEngineFactoryFunc(OWNER_NAME_D_SPEAKER);
-    DHLOGE("LoadAVReceiverEngineProvider success");
+    DHLOGE("LoadAVReceiverEngineProvider success.");
     return DH_SUCCESS;
 }
 

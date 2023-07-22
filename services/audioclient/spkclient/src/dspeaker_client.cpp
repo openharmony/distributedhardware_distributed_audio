@@ -61,7 +61,7 @@ int32_t DSpeakerClient::InitReceiverEngine(IAVEngineProvider *providerPtr)
 {
     DHLOGI("InitReceiverEngine enter.");
     IsParamEnabled(AUDIO_ENGINE_FLAG, engineFlag_);
-    if (engineFlag_ == true) {
+    if (engineFlag_) {
         if (speakerTrans_ == nullptr) {
             speakerTrans_ = std::make_shared<AVTransReceiverTransport>(devId_, shared_from_this());
         }
@@ -111,7 +111,7 @@ int32_t DSpeakerClient::SetUp(const AudioParam &param)
         DHLOGE("Set up failed, Create Audio renderer failed.");
         return ret;
     }
-    if (engineFlag_ == false) {
+    if (!engineFlag_) {
         speakerTrans_ = std::make_shared<AudioDecodeTransport>(devId_);
     }
     if (speakerTrans_ == nullptr) {
@@ -488,7 +488,7 @@ void DSpeakerClient::Pause()
     if (renderDataThread_.joinable()) {
         renderDataThread_.join();
     }
-    // todo pause engine
+
     if (speakerTrans_ == nullptr || speakerTrans_->Pause() != DH_SUCCESS) {
         DHLOGE("Speaker trans Pause failed.");
     }
@@ -502,7 +502,6 @@ void DSpeakerClient::Pause()
 void DSpeakerClient::ReStart()
 {
     DHLOGI("ReStart");
-    // todo pause engine
     if (speakerTrans_ == nullptr || speakerTrans_->Restart(audioParam_, audioParam_) != DH_SUCCESS) {
         DHLOGE("Speaker trans Restart failed.");
     }

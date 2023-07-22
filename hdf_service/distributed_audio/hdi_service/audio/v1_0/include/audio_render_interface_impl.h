@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -105,21 +105,20 @@ private:
     AudioDeviceDescriptor devDesc_;
     AudioSampleAttributes devAttrs_;
 
-    uint32_t timeInterval_ = 5;
-    float renderSpeed_ = 0;
-    uint32_t currentFrame_ = 0;
     std::mutex renderMtx_;
+    std::mutex volMtx_;
+    bool firstOpenFlag_ = true;
+    uint32_t timeInterval_ = 5;
+    uint32_t currentFrame_ = 0;
+    uint32_t vol_ = 0;
+    uint32_t volMax_ = 0;
+    uint32_t volMin_ = 0;
+    int64_t frameIndex_ = 0;
+    float renderSpeed_ = 0;
     AudioChannelMode channelMode_ = AUDIO_CHANNEL_NORMAL;
     AudioRenderStatus renderStatus_ = RENDER_STATUS_CLOSE;
     sptr<IDAudioCallback> audioExtCallback_ = nullptr;
     sptr<IAudioCallback> renderCallback_ = nullptr;
-    bool firstOpenFlag_ = true;
-
-    int64_t frameIndex_ = 0;
-    std::mutex volMtx_;
-    uint32_t vol_ = 0;
-    uint32_t volMax_ = 0;
-    uint32_t volMin_ = 0;
 };
 } // V1_0
 } // Audio

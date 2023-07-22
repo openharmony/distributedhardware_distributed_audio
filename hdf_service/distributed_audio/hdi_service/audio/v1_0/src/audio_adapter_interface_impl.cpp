@@ -837,11 +837,11 @@ int32_t AudioAdapterInterfaceImpl::HandleDeviceClosed(const DAudioEvent &event)
     }
 
     AudioDeviceDescriptor dec;
-    if (isSpkOpened_ == true && event.type == HDF_AUDIO_EVENT_SPK_CLOSED) {
+    if (isSpkOpened_ && event.type == HDF_AUDIO_EVENT_SPK_CLOSED) {
         DHLOGE("Render device status error, close render.");
         dec.pins = static_cast<AudioPortPin>(spkPinInUse_);
         return DestroyRender(dec);
-    } else if (isMicOpened_ == true && event.type == HDF_AUDIO_EVENT_MIC_CLOSED) {
+    } else if (isMicOpened_ && event.type == HDF_AUDIO_EVENT_MIC_CLOSED) {
         DHLOGE("Capture device status error, close capture.");
         dec.pins = static_cast<AudioPortPin>(micPinInUse_);
         return DestroyCapture(dec);

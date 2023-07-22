@@ -78,7 +78,7 @@ int32_t DAudioSourceManager::Init(const sptr<IDAudioIpcCallback> &callback)
     ipcCallback_ = callback;
     daudioMgrCallback_ = std::make_shared<DAudioSourceMgrCallback>();
     IsParamEnabled(AUDIO_ENGINE_FLAG, engineFlag_);
-    if (engineFlag_ == true) {
+    if (engineFlag_) {
         int32_t ret = LoadAVSenderEngineProvider();
         if (ret != DH_SUCCESS) {
             DHLOGE("load av transport sender engine provider failed");
@@ -96,7 +96,7 @@ int32_t DAudioSourceManager::Init(const sptr<IDAudioIpcCallback> &callback)
 int32_t DAudioSourceManager::UnInit()
 {
     DHLOGI("Uninit audio source manager.");
-    if (engineFlag_ == true) {
+    if (engineFlag_) {
         UnloadAVReceiverEngineProvider();
         UnloadAVSenderEngineProvider();
     }

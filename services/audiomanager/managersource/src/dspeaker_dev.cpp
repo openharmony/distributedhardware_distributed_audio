@@ -104,9 +104,8 @@ int32_t DSpeakerDev::DisableDevice(const int32_t dhId)
 int32_t DSpeakerDev::InitSenderEngine(IAVEngineProvider *providerPtr)
 {
     DHLOGI("InitSenderEngine enter");
-    // new 方式
     IsParamEnabled(AUDIO_ENGINE_FLAG, engineFlag_);
-    if (engineFlag_ == true) {
+    if (engineFlag_) {
         if (speakerTrans_ == nullptr) {
             speakerTrans_ = std::make_shared<AVTransSenderTransport>(devId_, shared_from_this());
         }
