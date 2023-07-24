@@ -100,14 +100,24 @@ int32_t AVTransSenderTransport::Stop()
 
 int32_t AVTransSenderTransport::Pause()
 {
-    DHLOGI("PauseSenderEngine enter.");
-    return DH_SUCCESS;
+    DHLOGI("AVTransSenderTransport Pause enter.");
+    if (senderAdapter_ == nullptr) {
+        DHLOGE("Pause error. sender adapter is null.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    return senderAdapter_->SetParameter(AVTransTag::ENGINE_PAUSE, "");
 }
 
 int32_t AVTransSenderTransport::Restart(const AudioParam &localParam, const AudioParam &remoteParam)
 {
-    DHLOGI("RestartSenderEngine enter.");
-    return DH_SUCCESS;
+    (void)localParam;
+    (void)remoteParam;
+    DHLOGI("AVTransSenderTransport Restart enter.");
+    if (senderAdapter_ == nullptr) {
+        DHLOGE("Pause error. sender adapter is null.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    return senderAdapter_->SetParameter(AVTransTag::ENGINE_RESUME, "");
 }
 
 int32_t AVTransSenderTransport::Release()
