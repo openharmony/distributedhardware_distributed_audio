@@ -115,14 +115,24 @@ int32_t AVTransReceiverTransport::Release()
 
 int32_t AVTransReceiverTransport::Pause()
 {
-    DHLOGI("Pause ReceiverEngine enter.");
-    return DH_SUCCESS;
+    DHLOGI("AVTransReceiverTransport Pause enter.");
+    if (receiverAdapter_ == nullptr) {
+        DHLOGE("Pause error. receiver adapter is null.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    return receiverAdapter_->SetParameter(AVTransTag::ENGINE_PAUSE, "");
 }
 
 int32_t AVTransReceiverTransport::Restart(const AudioParam &localParam, const AudioParam &remoteParam)
 {
-    DHLOGI("ReStart ReceiverEngine enter.");
-    return DH_SUCCESS;
+    (void)localParam;
+    (void)remoteParam;
+    DHLOGI("AVTransReceiverTransport Restart enter.");
+    if (receiverAdapter_ == nullptr) {
+        DHLOGE("Restart error. receiver adapter is null.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    return receiverAdapter_->SetParameter(AVTransTag::ENGINE_RESUME, "");
 }
 
 int32_t AVTransReceiverTransport::FeedAudioData(std::shared_ptr<AudioData> &audioData)
