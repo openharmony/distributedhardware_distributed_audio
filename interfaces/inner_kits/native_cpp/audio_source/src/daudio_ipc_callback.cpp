@@ -35,6 +35,7 @@ int32_t DAudioIpcCallback::OnNotifyRegResult(const std::string &devId, const std
         reqId.length() > DAUDIO_MAX_DEVICE_ID_LEN) {
         return ERR_DH_AUDIO_SA_DEVID_ILLEGAL;
     }
+    std::lock_guard<std::mutex> registerLck(registerMapMtx_);
     auto iter = registerCallbackMap_.find(reqId);
     if (iter != registerCallbackMap_.end()) {
         iter->second->OnRegisterResult(devId, dhId, status, resultData);
@@ -55,6 +56,7 @@ int32_t DAudioIpcCallback::OnNotifyUnregResult(const std::string &devId, const s
         reqId.length() > DAUDIO_MAX_DEVICE_ID_LEN) {
         return ERR_DH_AUDIO_SA_DEVID_ILLEGAL;
     }
+    std::lock_guard<std::mutex> registerLck(unregisterMapMtx_);
     auto iter = unregisterCallbackMap_.find(reqId);
     if (iter != unregisterCallbackMap_.end()) {
         iter->second->OnUnregisterResult(devId, dhId, status, resultData);
@@ -68,12 +70,14 @@ void DAudioIpcCallback::PushRegisterCallback(const std::string &reqId,
     const std::shared_ptr<RegisterCallback> &callback)
 {
     DHLOGD("Push register callback, reqId: %s", reqId.c_str());
+    std::lock_guard<std::mutex> registerLck(registerMapMtx_);
     registerCallbackMap_.emplace(reqId, callback);
 }
 
 void DAudioIpcCallback::PopRegisterCallback(const std::string &reqId)
 {
     DHLOGD("Pop register callback, reqId: %s", reqId.c_str());
+    std::lock_guard<std::mutex> registerLck(registerMapMtx_);
     registerCallbackMap_.erase(reqId);
 }
 
@@ -81,12 +85,14 @@ void DAudioIpcCallback::PushUnregisterCallback(const std::string &reqId,
     const std::shared_ptr<UnregisterCallback> &callback)
 {
     DHLOGD("Push unregister callback, reqId: %s", reqId.c_str());
+    std::lock_guard<std::mutex> registerLck(unregisterMapMtx_);
     unregisterCallbackMap_.emplace(reqId, callback);
 }
 
 void DAudioIpcCallback::PopUnregisterCallback(const std::string &reqId)
 {
     DHLOGD("Pop unregister callback, reqId: %s", reqId.c_str());
+    std::lock_guard<std::mutex> registerLck(unregisterMapMtx_);
     unregisterCallbackMap_.erase(reqId);
 }
 } // DistributedHardware
