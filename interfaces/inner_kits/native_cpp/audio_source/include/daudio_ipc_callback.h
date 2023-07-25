@@ -17,6 +17,7 @@
 #define OHOS_DAUDIO_IPC_CALLBACK_H
 
 #include <map>
+#include <mutex>
 
 #include "daudio_ipc_callback_stub.h"
 #include "idistributed_hardware_source.h"
@@ -39,7 +40,9 @@ public:
     void PopUnregisterCallback(const std::string &reqId);
 
 private:
+    std::mutex registerMapMtx_;
     std::map<std::string, std::shared_ptr<RegisterCallback>> registerCallbackMap_;
+    std::mutex unregisterMapMtx_;
     std::map<std::string, std::shared_ptr<UnregisterCallback>> unregisterCallbackMap_;
 };
 } // DistributedHardware
