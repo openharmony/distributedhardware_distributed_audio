@@ -78,18 +78,22 @@ void DAudioSinkDev::SleepAudioDev()
     taskQueue_ = nullptr;
 }
 
-int32_t DAudioSinkDev::InitAVTransEngines(IAVEngineProvider *senderPtr, IAVEngineProvider *receiverPtr)
+int32_t DAudioSinkDev::InitAVTransEngines(const ChannelState channelState, IAVEngineProvider *providerPtr)
 {
     DHLOGI("Init InitAVTransEngines");
-    if (engineFlag_) {
+    if (channelState == ChannelState::UNKNOWN || providerPtr == nullptr) {
+        DHLOGE("The channel type is invalid.");
+        return ERR_DH_AUDIO_FAILED;
+    }
+    if (engineFlag_ && channelState == ChannelState::MIC_CONTROL_OPENED) {
         // only supports normal audio channel mode
         micClient_ = std::make_shared<DMicClient>(devId_, shared_from_this());
-        micClient_->InitSenderEngine(senderPtr);
+        micClient_->InitSenderEngine(providerPtr);
     }
 
-    if (engineFlag_) {
+    if (engineFlag_ && channelState == ChannelState::SPK_CONTROL_OPENED) {
         speakerClient_ = std::make_shared<DSpeakerClient>(devId_, shared_from_this());
-        speakerClient_->InitReceiverEngine(receiverPtr);
+        speakerClient_->InitReceiverEngine(providerPtr);
     }
     return DH_SUCCESS;
 }
@@ -440,6 +444,7 @@ int32_t DAudioSinkDev::TaskOpenDSpeaker(const std::string &args)
 
     NotifySourceDev(NOTIFY_OPEN_SPEAKER_RESULT, spkDhId_, ret);
     DHLOGI("Open speaker device task end, notify source ret %d.", ret);
+    isSpkInUse_.store(true);
     return ret;
 }
 
@@ -470,6 +475,10 @@ int32_t DAudioSinkDev::TaskCloseDSpeaker(const std::string &args)
     if (!engineFlag_) {
         closeStatus ? NotifySourceDev(NOTIFY_CLOSE_SPEAKER_RESULT, spkDhId_, DH_SUCCESS) :
             NotifySourceDev(NOTIFY_CLOSE_SPEAKER_RESULT, spkDhId_, ERR_DH_AUDIO_FAILED);
+    }
+    isSpkInUse_.store(false);
+    if (engineFlag_) {
+        JudgeDeviceStatus();
     }
     DHLOGI("Close speaker device task excute success.");
     return DH_SUCCESS;
@@ -524,6 +533,7 @@ int32_t DAudioSinkDev::TaskOpenDMic(const std::string &args)
     } while (false);
     NotifySourceDev(NOTIFY_OPEN_MIC_RESULT, micDhId_, ret);
     DHLOGI("Open mic device task end, notify source ret %d.", ret);
+    isMicInUse_.store(true);
     return ret;
 }
 
@@ -554,6 +564,10 @@ int32_t DAudioSinkDev::TaskCloseDMic(const std::string &args)
     if (!engineFlag_) {
         closeStatus ? NotifySourceDev(NOTIFY_CLOSE_MIC_RESULT, micDhId_, DH_SUCCESS) :
             NotifySourceDev(NOTIFY_CLOSE_MIC_RESULT, micDhId_, ERR_DH_AUDIO_FAILED);
+    }
+    isMicInUse_.store(false);
+    if (engineFlag_) {
+        JudgeDeviceStatus();
     }
     DHLOGI("Close mic device task excute success.");
     return DH_SUCCESS;
@@ -666,6 +680,17 @@ int32_t DAudioSinkDev::SendAudioEventToRemote(const AudioEvent &event)
     return DH_SUCCESS;
 }
 
+void DAudioSinkDev::JudgeDeviceStatus()
+{
+    DHLOGI("Checking device's status.");
+    if (isSpkInUse_.load() || isMicInUse_.load()) {
+        DHLOGI("Device contain periperials in using, speaker status: %d, mic status: %d.",
+            isSpkInUse_.load(), isMicInUse_.load());
+        return;
+    }
+    DAudioSinkManager::GetInstance().OnSinkDevReleased(devId_);
+}
+
 void DAudioSinkDev::OnTaskResult(int32_t resultCode, const std::string &result, const std::string &funcName)
 {
     (void)resultCode;
@@ -689,16 +714,16 @@ void DAudioSinkDev::NotifySourceDev(const AudioEventType type, const std::string
         DAudioSinkManager::GetInstance().DAudioNotify(devId_, dhId, type, jEvent.dump());
     } else {
         DHLOGD("Notify source dev, new engine, random task code:%s", std::to_string(randomTaskCode).c_str());
-        if (speakerClient_ == nullptr || micClient_ == nullptr) {
-            DHLOGE("speaker client or mic client is null.");
-            return;
-        }
         if (type == NOTIFY_OPEN_CTRL_RESULT || type == NOTIFY_CLOSE_CTRL_RESULT) {
             DHLOGE("In new engine mode, ctrl is not allowed.");
             return;
         }
-        speakerClient_->SendMessage(static_cast<uint32_t>(type), jEvent.dump(), devId_);
-        micClient_->SendMessage(static_cast<uint32_t>(type), jEvent.dump(), devId_);
+        if (speakerClient_ != nullptr) {
+            speakerClient_->SendMessage(static_cast<uint32_t>(type), jEvent.dump(), devId_);
+        }
+        if (micClient_ != nullptr) {
+            micClient_->SendMessage(static_cast<uint32_t>(type), jEvent.dump(), devId_);
+        }
     }
 }
 

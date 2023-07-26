@@ -16,6 +16,7 @@
 #ifndef OHOS_DAUDIO_SINK_DEV_H
 #define OHOS_DAUDIO_SINK_DEV_H
 
+#include <atomic>
 #include <condition_variable>
 #include <mutex>
 #include <initializer_list>
@@ -40,6 +41,12 @@ using json = nlohmann::json;
 
 namespace OHOS {
 namespace DistributedHardware {
+enum class ChannelState {
+    SPK_CONTROL_OPENED,
+    MIC_CONTROL_OPENED,
+    UNKNOWN,
+};
+
 class DAudioSinkDev : public IAudioEventCallback, public std::enable_shared_from_this<DAudioSinkDev> {
 public:
     explicit DAudioSinkDev(const std::string &networkId);
@@ -48,7 +55,7 @@ public:
     int32_t AwakeAudioDev();
     void SleepAudioDev();
     void NotifyEvent(const AudioEvent &audioEvent) override;
-    int32_t InitAVTransEngines(IAVEngineProvider *senderPtr, IAVEngineProvider *receiverPtr);
+    int32_t InitAVTransEngines(const ChannelState channelState, IAVEngineProvider *providerPtr);
 
 private:
     int32_t TaskOpenCtrlChannel(const std::string &args);
@@ -89,6 +96,7 @@ private:
     int32_t from_json(const json &j, AudioParam &audioParam);
     int32_t HandleEngineMessage(uint32_t type, std::string content, std::string devId);
     int32_t SendAudioEventToRemote(const AudioEvent &event);
+    void JudgeDeviceStatus();
 
 private:
     std::mutex taskQueueMutex_;
@@ -105,6 +113,8 @@ private:
     using DAudioSinkDevFunc = int32_t (DAudioSinkDev::*)(const AudioEvent &audioEvent);
     std::map<AudioEventType, DAudioSinkDevFunc> memberFuncMap_;
     bool engineFlag_ = false;
+    std::atomic<bool> isSpkInUse_ = false;
+    std::atomic<bool> isMicInUse_ = false;
 };
 } // DistributedHardware
 } // OHOS
