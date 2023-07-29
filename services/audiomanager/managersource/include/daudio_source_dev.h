@@ -132,6 +132,7 @@ private:
 
     std::mutex rpcWaitMutex_;
     std::condition_variable rpcWaitCond_;
+    std::atomic<bool> isRpcOpen_ = false;
     bool rpcResult_ = false;
     uint8_t rpcNotify_ = 0;
 
