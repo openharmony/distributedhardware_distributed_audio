@@ -29,6 +29,11 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+static const std::string PARAM_CLOSE_SPEAKER = "{\"audioParam\":null,\"dhId\":\"" +
+    std::to_string(PIN_OUT_SPEAKER) + "\",\"eventType\":12}";
+static const std::string PARAM_CLOSE_MIC = "{\"audioParam\":null,\"dhId\":\"" +
+    std::to_string(PIN_IN_MIC) + "\",\"eventType\":22}";
+
 IMPLEMENT_SINGLE_INSTANCE(DAudioSinkManager);
 using AVTransProviderClass = IAVEngineProvider *(*)(const std::string &);
 
@@ -161,26 +166,40 @@ int32_t DAudioSinkManager::HandleDAudioNotify(const std::string &devId, const st
 int32_t DAudioSinkManager::CreateAudioDevice(const std::string &devId)
 {
     DHLOGI("Create audio sink dev.");
-    if (engineFlag_) {
+    std::shared_ptr<DAudioSinkDev> dev = nullptr;
+    {
         std::lock_guard<std::mutex> lock(devMapMutex_);
         if (audioDevMap_.find(devId) != audioDevMap_.end()) {
             DHLOGI("Audio sink dev in map. devId: %s.", GetAnonyString(devId).c_str());
-            return DH_SUCCESS;
+            dev = audioDevMap_[devId];
+        } else {
+            dev = std::make_shared<DAudioSinkDev>(devId);
+            if (dev->AwakeAudioDev() != DH_SUCCESS) {
+                DHLOGE("Awake audio dev failed.");
+                return ERR_DH_AUDIO_FAILED;
+            }
+            audioDevMap_.emplace(devId, dev);
         }
     }
-    auto dev = std::make_shared<DAudioSinkDev>(devId);
-    if (dev->AwakeAudioDev() != DH_SUCCESS) {
-        DHLOGE("Awake audio dev failed.");
-        return ERR_DH_AUDIO_FAILED;
-    }
+
     if (engineFlag_) {
-        int32_t ret = dev->InitAVTransEngines(sendProviderPtr_, rcvProviderPtr_);
+        int32_t ret = ERR_DH_AUDIO_FAILED;
+        if (channelState_ == ChannelState::SPK_CONTROL_OPENED) {
+            ret = dev->InitAVTransEngines(ChannelState::SPK_CONTROL_OPENED, rcvProviderPtr_);
+        }
+        if (channelState_ == ChannelState::MIC_CONTROL_OPENED) {
+            ret = dev->InitAVTransEngines(ChannelState::MIC_CONTROL_OPENED, sendProviderPtr_);
+        }
         if (ret != DH_SUCCESS) {
             DHLOGE("Init av transport sender engine failed.");
+            dev->SleepAudioDev();
+            {
+                std::lock_guard<std::mutex> lock(devMapMutex_);
+                audioDevMap_.erase(devId);
+            }
             return ERR_DH_AUDIO_FAILED;
         }
     }
-    audioDevMap_.emplace(devId, dev);
     return DH_SUCCESS;
 }
 
@@ -319,17 +338,36 @@ int32_t DAudioSinkManager::UnloadAVSenderEngineProvider()
     return DH_SUCCESS;
 }
 
+void DAudioSinkManager::SetChannelState(const std::string &content)
+{
+    DHLOGI("The channel state belong to %s.", content.c_str());
+    if (content.find(OWNER_NAME_D_SPEAKER) != content.npos) {
+        channelState_ = ChannelState::SPK_CONTROL_OPENED;
+    } else if (content.find(OWNER_NAME_D_MIC) != content.npos) {
+        channelState_ = ChannelState::MIC_CONTROL_OPENED;
+    }
+}
+
 int32_t EngineProviderListener::OnProviderEvent(const AVTransEvent &event)
 {
     DHLOGI("On provider event :%d", event.type);
     if (event.type == EventType::EVENT_CHANNEL_OPENED) {
-        DHLOGI("Received control channel opened event, create audio device for peerDevId=%s",
-            GetAnonyString(event.peerDevId).c_str());
+        DHLOGI("Received control channel opened event, create audio device for peerDevId=%s, content=%s.",
+            GetAnonyString(event.peerDevId).c_str(), event.content.c_str());
+        DAudioSinkManager::GetInstance().SetChannelState(event.content);
         DAudioSinkManager::GetInstance().CreateAudioDevice(event.peerDevId);
     } else if (event.type == EventType::EVENT_CHANNEL_CLOSED) {
         DHLOGI("Received control channel closed event, clear audio device for peerDevId=%s",
             GetAnonyString(event.peerDevId).c_str());
-        DAudioSinkManager::GetInstance().ClearAudioDev(event.peerDevId);
+        if (event.content.find(OWNER_NAME_D_SPEAKER) != event.content.npos) {
+            DHLOGD("Notify audio event, event type: %d, event content: %s.", CLOSE_SPEAKER,
+                PARAM_CLOSE_SPEAKER.c_str());
+            DAudioSinkManager::GetInstance().NotifyEvent(event.peerDevId, CLOSE_SPEAKER, PARAM_CLOSE_SPEAKER);
+        }
+        if (event.content.find(OWNER_NAME_D_MIC) != event.content.npos) {
+            DHLOGD("Notify audio event, event type: %d, event content: %s.", CLOSE_MIC, PARAM_CLOSE_MIC.c_str());
+            DAudioSinkManager::GetInstance().NotifyEvent(event.peerDevId, CLOSE_MIC, PARAM_CLOSE_MIC);
+        }
     } else {
         DHLOGE("Invaild event type.");
     }

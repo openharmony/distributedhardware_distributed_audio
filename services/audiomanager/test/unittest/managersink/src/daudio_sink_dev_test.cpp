@@ -48,8 +48,14 @@ HWTEST_F(DAudioSinkDevTest, InitAVTransEngines_001, TestSize.Level1)
 {
     IAVEngineProvider *senderPtr = nullptr;
     IAVEngineProvider *receiverPtr = nullptr;
+    ChannelState type = ChannelState::UNKNOWN;
     sinkDev_->engineFlag_ = true;
-    EXPECT_EQ(DH_SUCCESS, sinkDev_->InitAVTransEngines(senderPtr, receiverPtr));
+
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sinkDev_->InitAVTransEngines(type, receiverPtr));
+    type = ChannelState::MIC_CONTROL_OPENED;
+    EXPECT_EQ(DH_SUCCESS, sinkDev_->InitAVTransEngines(type, senderPtr));
+    type = ChannelState::SPK_CONTROL_OPENED;
+    EXPECT_EQ(DH_SUCCESS, sinkDev_->InitAVTransEngines(type, receiverPtr));
 }
 
 /**

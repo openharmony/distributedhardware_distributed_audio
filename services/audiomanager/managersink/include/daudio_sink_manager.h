@@ -48,6 +48,8 @@ public:
     void NotifyEvent(const std::string &devId, const int32_t eventType, const std::string &eventContent);
     void ClearAudioDev(const std::string &devId);
     int32_t CreateAudioDevice(const std::string &devId);
+    void SetChannelState(const std::string &content);
+
 private:
     DAudioSinkManager();
     ~DAudioSinkManager();
@@ -64,6 +66,7 @@ private:
     std::map<std::string, sptr<IDAudioSource>> sourceServiceMap_;
     std::thread devClearThread_;
     std::string localNetworkId_;
+    ChannelState channelState_ = ChannelState::UNKNOWN;
 
     std::shared_ptr<EngineProviderListener> providerListener_;
     IAVEngineProvider *sendProviderPtr_ = nullptr;
