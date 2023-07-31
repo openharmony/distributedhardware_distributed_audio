@@ -89,6 +89,7 @@ void DAudioSourceDev::SleepAudioDev()
 int32_t DAudioSourceDev::EnableDAudio(const std::string &dhId, const std::string &attrs)
 {
     DHLOGI("Enable audio device, dhId: %s.", dhId.c_str());
+    isRpcOpen_.store(true);
     if (taskQueue_ == nullptr) {
         DHLOGE("Task queue is null.");
         return ERR_DH_AUDIO_NULLPTR;
@@ -104,9 +105,31 @@ int32_t DAudioSourceDev::EnableDAudio(const std::string &dhId, const std::string
 int32_t DAudioSourceDev::DisableDAudio(const std::string &dhId)
 {
     DHLOGI("Disable audio device, dhId: %s.", dhId.c_str());
+    isRpcOpen_.store(false);
     if (taskQueue_ == nullptr) {
         DHLOGE("Task queue is null.");
         return ERR_DH_AUDIO_NULLPTR;
+    }
+
+    if (!CheckIsNum(dhId)) {
+        DHLOGE("Disable audio device dhId param error.");
+        return ERR_DH_AUDIO_SA_DISABLE_PARAM_INVALID;
+    }
+    json jParamClose = { { KEY_DH_ID, dhId } };
+    AudioEvent event(AudioEventType::EVENT_UNKNOWN, jParamClose.dump());
+    int32_t dhIdNum = std::stoi(dhId);
+    switch (GetDevTypeByDHId(dhIdNum)) {
+        case AUDIO_DEVICE_TYPE_SPEAKER:
+            event.type = CLOSE_SPEAKER;
+            HandleCloseDSpeaker(event);
+            break;
+        case AUDIO_DEVICE_TYPE_MIC:
+            event.type = CLOSE_MIC;
+            HandleCloseDMic(event);
+            break;
+        default:
+            DHLOGE("Unknown audio device.");
+            return ERR_DH_AUDIO_NOT_SUPPORT;
     }
 
     json jParam = { { KEY_DEV_ID, devId_ }, { KEY_DH_ID, dhId } };
@@ -1047,6 +1070,11 @@ void DAudioSourceDev::OnTaskResult(int32_t resultCode, const std::string &result
 
 int32_t DAudioSourceDev::NotifySinkDev(const AudioEventType type, const json Param, const std::string dhId)
 {
+    if (!isRpcOpen_.load()) {
+        DHLOGE("Network connection failure, rpc is not open!");
+        return ERR_DH_AUDIO_FAILED;
+    }
+
     std::random_device rd;
     const uint32_t randomTaskCode = rd();
     constexpr uint32_t eventOffset = 4;
