@@ -783,16 +783,18 @@ int32_t AudioAdapterInterfaceImpl::WaitForSANotify(const AudioDeviceEvent &event
     if (event == EVENT_OPEN_SPK || event == EVENT_CLOSE_SPK) {
         spkNotifyFlag_ = false;
         std::unique_lock<std::mutex> lck(spkWaitMutex_);
-        auto status =
-            spkWaitCond_.wait_for(lck, std::chrono::seconds(WAIT_SECONDS), [this]() { return spkNotifyFlag_; });
+        auto status = spkWaitCond_.wait_for(lck, std::chrono::seconds(WAIT_SECONDS), [this, event]() {
+            return spkNotifyFlag_ ||
+                (event == EVENT_OPEN_SPK && isSpkOpened_) || (event == EVENT_CLOSE_SPK && !isSpkOpened_);
+        });
         if (!status) {
             DHLOGE("Wait spk event: %d timeout(%d)s.", event, WAIT_SECONDS);
             return ERR_DH_AUDIO_HDF_WAIT_TIMEOUT;
         }
-        if (event == EVENT_OPEN_SPK && isSpkOpened_ != true) {
+        if (event == EVENT_OPEN_SPK && !isSpkOpened_) {
             DHLOGE("Wait open render device failed.");
             return ERR_DH_AUDIO_HDF_OPEN_DEVICE_FAIL;
-        } else if (event == EVENT_CLOSE_SPK && isSpkOpened_ != false) {
+        } else if (event == EVENT_CLOSE_SPK && isSpkOpened_) {
             DHLOGE("Wait close render device failed.");
             return ERR_DH_AUDIO_HDF_CLOSE_DEVICE_FAIL;
         }
@@ -802,16 +804,18 @@ int32_t AudioAdapterInterfaceImpl::WaitForSANotify(const AudioDeviceEvent &event
     if (event == EVENT_OPEN_MIC || event == EVENT_CLOSE_MIC) {
         micNotifyFlag_ = false;
         std::unique_lock<std::mutex> lck(micWaitMutex_);
-        auto status =
-            micWaitCond_.wait_for(lck, std::chrono::seconds(WAIT_SECONDS), [this]() { return micNotifyFlag_; });
+        auto status = micWaitCond_.wait_for(lck, std::chrono::seconds(WAIT_SECONDS), [this, event]() {
+            return micNotifyFlag_ ||
+                (event == EVENT_OPEN_MIC && isMicOpened_) || (event == EVENT_CLOSE_MIC && !isMicOpened_);
+        });
         if (!status) {
             DHLOGE("Wait mic event: %d timeout(%d)s.", event, WAIT_SECONDS);
             return ERR_DH_AUDIO_HDF_WAIT_TIMEOUT;
         }
-        if (event == EVENT_OPEN_MIC && isMicOpened_ != true) {
+        if (event == EVENT_OPEN_MIC && !isMicOpened_) {
             DHLOGE("Wait open capture device failed.");
             return ERR_DH_AUDIO_HDF_OPEN_DEVICE_FAIL;
-        } else if (event == EVENT_CLOSE_MIC && isMicOpened_ != false) {
+        } else if (event == EVENT_CLOSE_MIC && isMicOpened_) {
             DHLOGE("Wait close capture device failed.");
             return ERR_DH_AUDIO_HDF_CLOSE_DEVICE_FAIL;
         }
