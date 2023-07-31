@@ -26,7 +26,7 @@ namespace OHOS {
 namespace DistributedHardware {
 void DecoderOnInputAvailabelFuzzTest(const uint8_t* data, size_t size)
 {
-    if (data == nullptr) {
+    if ((data == nullptr) || (size < sizeof(uint32_t))) {
         return;
     }
 
