@@ -46,16 +46,16 @@ void DAudioSinkDevTest::TearDown()
  */
 HWTEST_F(DAudioSinkDevTest, InitAVTransEngines_001, TestSize.Level1)
 {
-    IAVEngineProvider *senderPtr = nullptr;
-    IAVEngineProvider *receiverPtr = nullptr;
+    std::shared_ptr<IAVEngineProvider> senderPtr = std::make_shared<IAVEngineProvider>();
+    std::shared_ptr<IAVEngineProvider> receiverPtr = std::make_shared<IAVEngineProvider>();
     ChannelState type = ChannelState::UNKNOWN;
     sinkDev_->engineFlag_ = true;
 
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sinkDev_->InitAVTransEngines(type, receiverPtr));
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sinkDev_->InitAVTransEngines(type, receiverPtr.get()));
     type = ChannelState::MIC_CONTROL_OPENED;
-    EXPECT_EQ(DH_SUCCESS, sinkDev_->InitAVTransEngines(type, senderPtr));
+    EXPECT_EQ(DH_SUCCESS, sinkDev_->InitAVTransEngines(type, senderPtr.get()));
     type = ChannelState::SPK_CONTROL_OPENED;
-    EXPECT_EQ(DH_SUCCESS, sinkDev_->InitAVTransEngines(type, receiverPtr));
+    EXPECT_EQ(DH_SUCCESS, sinkDev_->InitAVTransEngines(type, receiverPtr.get()));
 }
 
 /**

@@ -101,7 +101,7 @@ HWTEST_F(AVReceiverEngineTransportTest, Start_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: Start_001
+ * @tc.name: Pause_001
  * @tc.desc: Verify the Pause function.
  * @tc.type: FUNC
  * @tc.require: AR000HTAPM
@@ -112,6 +112,25 @@ HWTEST_F(AVReceiverEngineTransportTest, Pause_001, TestSize.Level1)
     AudioParam remoteParam;
     size_t bufLen = 4096;
     std::shared_ptr<AudioData> audioData = std::make_shared<AudioData>(bufLen);
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, receiverTrans_->Restart(localParam, remoteParam));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, receiverTrans_->Pause());
+    EXPECT_EQ(DH_SUCCESS, receiverTrans_->FeedAudioData(audioData));
+}
+
+/**
+ * @tc.name: Pause_002
+ * @tc.desc: Verify the Pause function.
+ * @tc.type: FUNC
+ * @tc.require: AR000HTAPM
+ */
+HWTEST_F(AVReceiverEngineTransportTest, Pause_002, TestSize.Level1)
+{
+    AudioParam localParam;
+    AudioParam remoteParam;
+    size_t bufLen = 4096;
+    std::shared_ptr<AudioData> audioData = std::make_shared<AudioData>(bufLen);
+    receiverTrans_->receiverAdapter_ = std::make_shared<AVTransReceiverAdapter>();
+    receiverTrans_->receiverAdapter_->receiverEngine_ = std::make_shared<MockIAVReceiverEngine>();
     EXPECT_EQ(DH_SUCCESS, receiverTrans_->Restart(localParam, remoteParam));
     EXPECT_EQ(DH_SUCCESS, receiverTrans_->Pause());
     EXPECT_EQ(DH_SUCCESS, receiverTrans_->FeedAudioData(audioData));
