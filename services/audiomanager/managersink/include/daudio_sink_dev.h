@@ -25,6 +25,7 @@
 #include "daudio_sink_dev_ctrl_manager.h"
 #include "dmic_client.h"
 #include "dspeaker_client.h"
+#include "event_handler.h"
 #include "iaudio_event_callback.h"
 #include "imic_client.h"
 #include "ispk_client.h"
@@ -62,6 +63,7 @@ private:
     int32_t TaskCloseCtrlChannel(const std::string &args);
     int32_t TaskOpenDSpeaker(const std::string &args);
     int32_t TaskCloseDSpeaker(const std::string &args);
+    int32_t TaskStartRender();
     int32_t TaskOpenDMic(const std::string &args);
     int32_t TaskCloseDMic(const std::string &args);
     int32_t TaskSetParameter(const std::string &args);
@@ -114,6 +116,40 @@ private:
     std::map<AudioEventType, DAudioSinkDevFunc> memberFuncMap_;
     std::atomic<bool> isSpkInUse_ = false;
     std::atomic<bool> isMicInUse_ = false;
+
+    class SinkEventHandler : public AppExecFwk::EventHandler {
+    public:
+        SinkEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner, const std::shared_ptr<DAudioSinkDev> &dev);
+        ~SinkEventHandler() override;
+        void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
+
+    private:
+        void NotifyOpenCtrlChannel(const AppExecFwk::InnerEvent::Pointer &event);
+        void NotifyCloseCtrlChannel(const AppExecFwk::InnerEvent::Pointer &event);
+        void NotifyCtrlOpened(const AppExecFwk::InnerEvent::Pointer &event);
+        void NotifyCtrlClosed(const AppExecFwk::InnerEvent::Pointer &event);
+        void NotifyOpenSpeaker(const AppExecFwk::InnerEvent::Pointer &event);
+        void NotifyCloseSpeaker(const AppExecFwk::InnerEvent::Pointer &event);
+        void NotifySpeakerOpened(const AppExecFwk::InnerEvent::Pointer &event);
+        void NotifySpeakerClosed(const AppExecFwk::InnerEvent::Pointer &event);
+        void NotifyOpenMic(const AppExecFwk::InnerEvent::Pointer &event);
+        void NotifyCloseMic(const AppExecFwk::InnerEvent::Pointer &event);
+        void NotifyMicOpened(const AppExecFwk::InnerEvent::Pointer &event);
+        void NotifyMicClosed(const AppExecFwk::InnerEvent::Pointer &event);
+        void NotifySetVolume(const AppExecFwk::InnerEvent::Pointer &event);
+        void NotifyVolumeChange(const AppExecFwk::InnerEvent::Pointer &event);
+        void NotifySetParam(const AppExecFwk::InnerEvent::Pointer &event);
+        void NotifySetMute(const AppExecFwk::InnerEvent::Pointer &event);
+        void NotifyFocusChange(const AppExecFwk::InnerEvent::Pointer &event);
+        void NotifyRenderStateChange(const AppExecFwk::InnerEvent::Pointer &event);
+        void NotifyPlayStatusChange(const AppExecFwk::InnerEvent::Pointer &event);
+
+    private:
+        using SinkEventFunc = void (SinkEventHandler::*)(const AppExecFwk::InnerEvent::Pointer &event);
+        std::map<uint32_t, SinkEventFunc> mapEventFuncs_;
+        std::shared_ptr<DAudioSinkDev> sinkDev_;
+    };
+    std::shared_ptr<SinkEventHandler> handler_;
 };
 } // DistributedHardware
 } // OHOS
