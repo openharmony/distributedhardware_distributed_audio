@@ -153,10 +153,12 @@ int32_t DAudioSinkManager::HandleDAudioNotify(const std::string &devId, const st
         DHLOGD("Receive audio notify from source, random task code: %s",
             ((std::string)jParam[KEY_RANDOM_TASK_CODE]).c_str());
     }
-
-    std::lock_guard<std::mutex> lock(devMapMutex_);
-    auto iter = audioDevMap_.find(devId);
-    if (iter == audioDevMap_.end() && CreateAudioDevice(devId) != DH_SUCCESS) {
+    bool isDevExisted = false;
+    {
+        std::lock_guard<std::mutex> lock(devMapMutex_);
+        isDevExisted = audioDevMap_.find(devId) != audioDevMap_.end();
+    }
+    if (!isDevExisted && CreateAudioDevice(devId) != DH_SUCCESS) {
         return ERR_DH_AUDIO_FAILED;
     }
     NotifyEvent(devId, eventType, eventContent);
