@@ -79,7 +79,6 @@ private:
     IAVEngineProvider *rcvProviderPtr_ = nullptr;
     void *pSHandler_ = nullptr;
     void *pRHandler_ = nullptr;
-    bool engineFlag_ = false;
 };
 } // DistributedHardware
 } // OHOS

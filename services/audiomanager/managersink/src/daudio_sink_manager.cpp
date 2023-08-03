@@ -68,43 +68,38 @@ int32_t DAudioSinkManager::Init()
         return ret;
     }
 
-    IsParamEnabled(AUDIO_ENGINE_FLAG, engineFlag_);
-    if (engineFlag_) {
-        ret = LoadAVReceiverEngineProvider();
-        if (ret != DH_SUCCESS || rcvProviderPtr_ == nullptr) {
-            DHLOGE("Load av transport receiver engine provider failed.");
-            return ERR_DH_AUDIO_FAILED;
-        }
-        providerListener_ = std::make_shared<EngineProviderListener>();
-        ret = rcvProviderPtr_->RegisterProviderCallback(providerListener_);
-        if (ret != DH_SUCCESS) {
-            DHLOGE("Register av transport receiver Provider Callback failed.");
-            return ERR_DH_AUDIO_FAILED;
-        }
-        DHLOGI("LoadAVReceiverEngineProvider success.");
-
-        ret = LoadAVSenderEngineProvider();
-        if (ret != DH_SUCCESS || sendProviderPtr_ == nullptr) {
-            DHLOGI("Load av transport sender engine provider failed.");
-            return ERR_DH_AUDIO_FAILED;
-        }
-        ret = sendProviderPtr_->RegisterProviderCallback(providerListener_);
-        if (ret != DH_SUCCESS) {
-            DHLOGE("Register av transport sender Provider Callback failed.");
-            return ERR_DH_AUDIO_FAILED;
-        }
-        DHLOGI("LoadAVSenderEngineProvider success.");
+    ret = LoadAVReceiverEngineProvider();
+    if (ret != DH_SUCCESS || rcvProviderPtr_ == nullptr) {
+        DHLOGE("Load av transport receiver engine provider failed.");
+        return ERR_DH_AUDIO_FAILED;
     }
+    providerListener_ = std::make_shared<EngineProviderListener>();
+    ret = rcvProviderPtr_->RegisterProviderCallback(providerListener_);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Register av transport receiver Provider Callback failed.");
+        return ERR_DH_AUDIO_FAILED;
+    }
+    DHLOGI("LoadAVReceiverEngineProvider success.");
+
+    ret = LoadAVSenderEngineProvider();
+    if (ret != DH_SUCCESS || sendProviderPtr_ == nullptr) {
+        DHLOGI("Load av transport sender engine provider failed.");
+        return ERR_DH_AUDIO_FAILED;
+    }
+    ret = sendProviderPtr_->RegisterProviderCallback(providerListener_);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Register av transport sender Provider Callback failed.");
+        return ERR_DH_AUDIO_FAILED;
+    }
+    DHLOGI("LoadAVSenderEngineProvider success.");
     return DH_SUCCESS;
 }
 
 int32_t DAudioSinkManager::UnInit()
 {
     DHLOGI("UnInit audio sink manager.");
-    if (engineFlag_) {
-        UnloadAVSenderEngineProvider();
-        UnloadAVReceiverEngineProvider();
-    }
+    UnloadAVSenderEngineProvider();
+    UnloadAVReceiverEngineProvider();
     {
         std::lock_guard<std::mutex> remoteSvrLock(remoteSvrMutex_);
         sourceServiceMap_.clear();
@@ -184,23 +179,21 @@ int32_t DAudioSinkManager::CreateAudioDevice(const std::string &devId)
         }
     }
 
-    if (engineFlag_) {
-        int32_t ret = ERR_DH_AUDIO_FAILED;
-        if (channelState_ == ChannelState::SPK_CONTROL_OPENED) {
-            ret = dev->InitAVTransEngines(ChannelState::SPK_CONTROL_OPENED, rcvProviderPtr_);
+    int32_t ret = ERR_DH_AUDIO_FAILED;
+    if (channelState_ == ChannelState::SPK_CONTROL_OPENED) {
+        ret = dev->InitAVTransEngines(ChannelState::SPK_CONTROL_OPENED, rcvProviderPtr_);
+    }
+    if (channelState_ == ChannelState::MIC_CONTROL_OPENED) {
+        ret = dev->InitAVTransEngines(ChannelState::MIC_CONTROL_OPENED, sendProviderPtr_);
+    }
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Init av transport sender engine failed.");
+        dev->SleepAudioDev();
+        {
+            std::lock_guard<std::mutex> lock(devMapMutex_);
+            audioDevMap_.erase(devId);
         }
-        if (channelState_ == ChannelState::MIC_CONTROL_OPENED) {
-            ret = dev->InitAVTransEngines(ChannelState::MIC_CONTROL_OPENED, sendProviderPtr_);
-        }
-        if (ret != DH_SUCCESS) {
-            DHLOGE("Init av transport sender engine failed.");
-            dev->SleepAudioDev();
-            {
-                std::lock_guard<std::mutex> lock(devMapMutex_);
-                audioDevMap_.erase(devId);
-            }
-            return ERR_DH_AUDIO_FAILED;
-        }
+        return ERR_DH_AUDIO_FAILED;
     }
     return DH_SUCCESS;
 }

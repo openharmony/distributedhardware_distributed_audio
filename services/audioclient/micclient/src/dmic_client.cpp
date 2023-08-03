@@ -59,16 +59,13 @@ void DMicClient::OnEngineTransMessage(const std::shared_ptr<AVTransMessage> &mes
 int32_t DMicClient::InitSenderEngine(IAVEngineProvider *providerPtr)
 {
     DHLOGI("Init SenderEngine");
-    IsParamEnabled(AUDIO_ENGINE_FLAG, engineFlag_);
-    if (engineFlag_) {
-        if (micTrans_ == nullptr) {
-            micTrans_ = std::make_shared<AVTransSenderTransport>(devId_, shared_from_this());
-        }
-        int32_t ret = micTrans_->InitEngine(providerPtr);
-        if (ret != DH_SUCCESS) {
-            DHLOGE("Initialize av sender adapter failed. micclient");
-            return ERR_DH_AUDIO_TRANS_NULL_VALUE;
-        }
+    if (micTrans_ == nullptr) {
+        micTrans_ = std::make_shared<AVTransSenderTransport>(devId_, shared_from_this());
+    }
+    int32_t ret = micTrans_->InitEngine(providerPtr);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Mic client initialize av sender adapter failed.");
+        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
     }
     return DH_SUCCESS;
 }
@@ -81,8 +78,10 @@ int32_t DMicClient::OnStateChange(const AudioEventType type)
     switch (type) {
         case AudioEventType::DATA_OPENED: {
             isBlocking_.store(true);
-            isCaptureReady_.store(true);
-            captureDataThread_ = std::thread(&DMicClient::CaptureThreadRunning, this);
+            if (audioParam_.captureOpts.capturerFlags != MMAP_MODE) {
+                isCaptureReady_.store(true);
+                captureDataThread_ = std::thread(&DMicClient::CaptureThreadRunning, this);
+            }
             event.type = AudioEventType::MIC_OPENED;
             break;
         }
@@ -120,7 +119,7 @@ int32_t DMicClient::SetUp(const AudioParam &param)
         },
         {
             static_cast<AudioStandard::SourceType>(audioParam_.captureOpts.sourceType),
-            0,
+            audioParam_.captureOpts.capturerFlags == MMAP_MODE ? AudioStandard::STREAM_FLAG_FAST : 0,
         }
     };
     std::lock_guard<std::mutex> lck(devMtx_);
@@ -129,11 +128,14 @@ int32_t DMicClient::SetUp(const AudioParam &param)
         DHLOGE("Audio capturer create failed.");
         return ERR_DH_AUDIO_CLIENT_CREATE_CAPTURER_FAILED;
     }
-
-    // Use a unified process regardless of whether it relies on transport components or not
-    if (!engineFlag_) {
-        micTrans_ = std::make_shared<AudioEncodeTransport>(devId_);
+    if (audioParam_.captureOpts.capturerFlags == MMAP_MODE) {
+        int32_t ret = audioCapturer_->SetCapturerReadCallback(shared_from_this());
+        if (ret != DH_SUCCESS) {
+            DHLOGE("Client save read callback failed.");
+            return ERR_DH_AUDIO_CLIENT_CREATE_CAPTURER_FAILED;
+        }
     }
+
     if (micTrans_ == nullptr) {
         DHLOGE("mic trans in engine should be init by dev.");
         return ERR_DH_AUDIO_NULLPTR;
@@ -256,6 +258,33 @@ int32_t DMicClient::OnDecodeTransDataDone(const std::shared_ptr<AudioData> &audi
     return DH_SUCCESS;
 }
 
+void DMicClient::OnReadData(size_t length)
+{
+    AudioStandard::BufferDesc bufDesc;
+    if (audioCapturer_ == nullptr) {
+        DHLOGE("audioCapturer is nullptr.");
+        return;
+    }
+    int32_t ret = audioCapturer_->GetBufferDesc(bufDesc);
+    if (ret != 0 || bufDesc.buffer == nullptr || bufDesc.bufLength == 0) {
+        DHLOGE("Get buffer desc failed. On read data.");
+        return;
+    }
+    std::shared_ptr<AudioData> audioData = std::make_shared<AudioData>(audioParam_.comParam.frameSize);
+    if (audioData->Capacity() != bufDesc.bufLength) {
+        DHLOGE("Audio data length is not equal to buflength. datalength: %d, bufLength: %d",
+            audioData->Capacity(), bufDesc.bufLength);
+    }
+    if (memcpy_s(audioData->Data(), audioData->Capacity(), bufDesc.buffer, bufDesc.bufLength) != EOK) {
+        DHLOGE("Copy audio data failed.");
+    }
+    audioCapturer_->Enqueue(bufDesc);
+    ret = micTrans_->FeedAudioData(audioData);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Failed to send data.");
+    }
+}
+
 int32_t DMicClient::StopCapture()
 {
     DHLOGI("Stop capturer.");
@@ -274,9 +303,11 @@ int32_t DMicClient::StopCapture()
     }
 
     isBlocking_.store(false);
-    isCaptureReady_.store(false);
-    if (captureDataThread_.joinable()) {
-        captureDataThread_.join();
+    if (audioParam_.captureOpts.capturerFlags != MMAP_MODE) {
+        isCaptureReady_.store(false);
+        if (captureDataThread_.joinable()) {
+            captureDataThread_.join();
+        }
     }
 
     bool status = true;

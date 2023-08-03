@@ -66,21 +66,18 @@ void DMicDev::OnEngineTransDataAvailable(const std::shared_ptr<AudioData> &audio
 int32_t DMicDev::InitReceiverEngine(IAVEngineProvider *providerPtr)
 {
     DHLOGI("InitReceiverEngine enter.");
-    IsParamEnabled(AUDIO_ENGINE_FLAG, engineFlag_);
-    if (engineFlag_) {
-        if (micTrans_ == nullptr) {
-            micTrans_ = std::make_shared<AVTransReceiverTransport>(devId_, shared_from_this());
-        }
-        int32_t ret = micTrans_->InitEngine(providerPtr);
-        if (ret != DH_SUCCESS) {
-            DHLOGE("Initialize av receiver adapter failed. micdev");
-            return ERR_DH_AUDIO_TRANS_NULL_VALUE;
-        }
-        ret = micTrans_->CreateCtrl();
-        if (ret != DH_SUCCESS) {
-            DHLOGE("Create ctrl channel failed. micdev");
-            return ERR_DH_AUDIO_TRANS_NULL_VALUE;
-        }
+    if (micTrans_ == nullptr) {
+        micTrans_ = std::make_shared<AVTransReceiverTransport>(devId_, shared_from_this());
+    }
+    int32_t ret = micTrans_->InitEngine(providerPtr);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Mic dev initialize av receiver adapter failed.");
+        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+    }
+    ret = micTrans_->CreateCtrl();
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Create ctrl channel failed. micdev");
+        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
     }
     return DH_SUCCESS;
 }
@@ -233,9 +230,7 @@ int32_t DMicDev::NotifyEvent(const std::string &devId, const int32_t dhId, const
 int32_t DMicDev::SetUp()
 {
     DHLOGI("Set up mic device.");
-    if (!engineFlag_) {
-        micTrans_ = std::make_shared<AudioDecodeTransport>(devId_);
-    } else if (micTrans_ == nullptr) {
+    if (micTrans_ == nullptr) {
         DHLOGE("mic trans should be init by dev.");
         return ERR_DH_AUDIO_NULLPTR;
     }

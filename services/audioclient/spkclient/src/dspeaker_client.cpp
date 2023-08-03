@@ -60,16 +60,13 @@ void DSpeakerClient::OnEngineTransDataAvailable(const std::shared_ptr<AudioData>
 int32_t DSpeakerClient::InitReceiverEngine(IAVEngineProvider *providerPtr)
 {
     DHLOGI("InitReceiverEngine enter.");
-    IsParamEnabled(AUDIO_ENGINE_FLAG, engineFlag_);
-    if (engineFlag_) {
-        if (speakerTrans_ == nullptr) {
-            speakerTrans_ = std::make_shared<AVTransReceiverTransport>(devId_, shared_from_this());
-        }
-        int32_t ret = speakerTrans_->InitEngine(providerPtr);
-        if (ret != DH_SUCCESS) {
-            DHLOGE("Initialize av receiver adapter failed spkclient.");
-            return ERR_DH_AUDIO_TRANS_NULL_VALUE;
-        }
+    if (speakerTrans_ == nullptr) {
+        speakerTrans_ = std::make_shared<AVTransReceiverTransport>(devId_, shared_from_this());
+    }
+    int32_t ret = speakerTrans_->InitEngine(providerPtr);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Spk client initialize av receiver adapter failed.");
+        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
     }
     return DH_SUCCESS;
 }
@@ -91,7 +88,7 @@ int32_t DSpeakerClient::CreateAudioRenderer(const AudioParam &param)
         {
             static_cast<AudioStandard::ContentType>(audioParam_.renderOpts.contentType),
             static_cast<AudioStandard::StreamUsage>(audioParam_.renderOpts.streamUsage),
-            0,
+            audioParam_.renderOpts.renderFlags == MMAP_MODE ? AudioStandard::STREAM_FLAG_FAST : 0,
         }
     };
     std::lock_guard<std::mutex> lck(devMtx_);
@@ -101,7 +98,48 @@ int32_t DSpeakerClient::CreateAudioRenderer(const AudioParam &param)
         return ERR_DH_AUDIO_CLIENT_CREATE_RENDER_FAILED;
     }
     audioRenderer_ ->SetRendererCallback(shared_from_this());
+    if (audioParam_.renderOpts.renderFlags == MMAP_MODE) {
+        int32_t ret = audioRenderer_->SetRendererWriteCallback(shared_from_this());
+        if (ret != DH_SUCCESS) {
+            DHLOGE("Client save write callback failed.");
+            return ERR_DH_AUDIO_CLIENT_CREATE_RENDER_FAILED;
+        }
+    }
     return DH_SUCCESS;
+}
+
+void DSpeakerClient::OnWriteData(size_t length)
+{
+    AudioStandard::BufferDesc bufDesc;
+    if (audioRenderer_ == nullptr) {
+        DHLOGE("AudioRenderer is nullptr.");
+        return;
+    }
+    int32_t ret = audioRenderer_->GetBufferDesc(bufDesc);
+    if (ret != DH_SUCCESS || bufDesc.buffer == nullptr || bufDesc.bufLength == 0) {
+        DHLOGE("Get buffer desc failed.");
+        return;
+    }
+    std::shared_ptr<AudioData> audioData = nullptr;
+    {
+        std::unique_lock<std::mutex> spkLck(dataQueueMtx_);
+        dataQueueCond_.wait_for(spkLck, std::chrono::milliseconds(REQUEST_DATA_WAIT),
+            [this]() { return !dataQueue_.empty(); });
+        if (dataQueue_.empty()) {
+            return;
+        }
+        audioData = dataQueue_.front();
+        dataQueue_.pop();
+        DHLOGD("Pop spk data, dataQueue size: %d.", dataQueue_.size());
+    }
+    if (audioData->Capacity() != bufDesc.bufLength) {
+        DHLOGE("Audio data length is not equal to buflength. datalength: %d, bufLength: %d",
+            audioData->Capacity(), bufDesc.bufLength);
+    }
+    if (memcpy_s(bufDesc.buffer, bufDesc.bufLength, audioData->Data(), audioData->Capacity()) != EOK) {
+        DHLOGE("Copy audio data failed.");
+    }
+    audioRenderer_->Enqueue(bufDesc);
 }
 
 int32_t DSpeakerClient::SetUp(const AudioParam &param)
@@ -110,9 +148,6 @@ int32_t DSpeakerClient::SetUp(const AudioParam &param)
     if (ret != DH_SUCCESS) {
         DHLOGE("Set up failed, Create Audio renderer failed.");
         return ret;
-    }
-    if (!engineFlag_) {
-        speakerTrans_ = std::make_shared<AudioDecodeTransport>(devId_);
     }
     if (speakerTrans_ == nullptr) {
         DHLOGE("Speaker trans should be init by dev.");
@@ -189,8 +224,10 @@ int32_t DSpeakerClient::StartRender()
             "daudio renderer start failed.");
         return ERR_DH_AUDIO_CLIENT_RENDER_STARTUP_FAILURE;
     }
-    isRenderReady_.store(true);
-    renderDataThread_ = std::thread(&DSpeakerClient::PlayThreadRunning, this);
+    if (audioParam_.renderOpts.renderFlags != MMAP_MODE) {
+        isRenderReady_.store(true);
+        renderDataThread_ = std::thread(&DSpeakerClient::PlayThreadRunning, this);
+    }
     clientStatus_ = AudioStatus::STATUS_START;
     return DH_SUCCESS;
 }
@@ -213,9 +250,11 @@ int32_t DSpeakerClient::StopRender()
     }
 
     FlushJitterQueue();
-    isRenderReady_.store(false);
-    if (renderDataThread_.joinable()) {
-        renderDataThread_.join();
+    if (audioParam_.renderOpts.renderFlags != MMAP_MODE) {
+        isRenderReady_.store(false);
+        if (renderDataThread_.joinable()) {
+            renderDataThread_.join();
+        }
     }
 
     if (!audioRenderer_->Stop()) {
@@ -484,9 +523,11 @@ void DSpeakerClient::Pause()
 {
     DHLOGI("Pause and flush");
     FlushJitterQueue();
-    isRenderReady_.store(false);
-    if (renderDataThread_.joinable()) {
-        renderDataThread_.join();
+    if (audioParam_.renderOpts.renderFlags != MMAP_MODE) {
+        isRenderReady_.store(false);
+        if (renderDataThread_.joinable()) {
+            renderDataThread_.join();
+        }
     }
 
     if (speakerTrans_ == nullptr || speakerTrans_->Pause() != DH_SUCCESS) {
@@ -505,8 +546,10 @@ void DSpeakerClient::ReStart()
     if (speakerTrans_ == nullptr || speakerTrans_->Restart(audioParam_, audioParam_) != DH_SUCCESS) {
         DHLOGE("Speaker trans Restart failed.");
     }
-    isRenderReady_.store(true);
-    renderDataThread_ = std::thread(&DSpeakerClient::PlayThreadRunning, this);
+    if (audioParam_.renderOpts.renderFlags != MMAP_MODE) {
+        isRenderReady_.store(true);
+        renderDataThread_ = std::thread(&DSpeakerClient::PlayThreadRunning, this);
+    }
     clientStatus_ = AudioStatus::STATUS_START;
 }
 

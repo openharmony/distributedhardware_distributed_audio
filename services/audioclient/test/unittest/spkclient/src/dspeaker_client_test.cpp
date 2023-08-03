@@ -58,7 +58,6 @@ void DSpeakerClientTest::TearDown()
 HWTEST_F(DSpeakerClientTest, InitReceiverEngine_001, TestSize.Level1)
 {
     IAVEngineProvider *providerPtr = nullptr;
-    speakerClient_->engineFlag_ = true;
 
     AVTransEvent event1 = { EventType::EVENT_START_SUCCESS, "", ""};
     speakerClient_->OnEngineTransEvent(event1);
@@ -102,7 +101,6 @@ HWTEST_F(DSpeakerClientTest, SetUp_001, TestSize.Level1)
     AudioParam audioParam;
     EXPECT_NE(DH_SUCCESS, speakerClient_->SetUp(audioParam));
     EXPECT_EQ(ERR_DH_AUDIO_TRANS_ERROR, speakerClient_->SetUp(audioParam_));
-    speakerClient_->engineFlag_ = true;
     speakerClient_->speakerTrans_ = nullptr;
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, speakerClient_->SetUp(audioParam));
     EXPECT_EQ(ERR_DH_AUDIO_SA_STATUS_ERR, speakerClient_->Release());

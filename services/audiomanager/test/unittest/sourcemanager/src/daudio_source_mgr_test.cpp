@@ -57,7 +57,6 @@ HWTEST_F(DAudioSourceMgrTest, Init_001, TestSize.Level1)
 
     std::string localDevId;
     EXPECT_NE(DH_SUCCESS, GetLocalDeviceNetworkId(localDevId));
-    sourceMgr.engineFlag_ = true;
     EXPECT_EQ(DH_SUCCESS, sourceMgr.UnInit());
 }
 

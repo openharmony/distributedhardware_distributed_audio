@@ -51,7 +51,6 @@ void DMicDevTest::TearDown(void)
 HWTEST_F(DMicDevTest, InitReceiverEngine_001, TestSize.Level1)
 {
     IAVEngineProvider *providerPtr = nullptr;
-    mic_->engineFlag_ = true;
     AVTransEvent event = { EventType::EVENT_START_SUCCESS, "", "" };
     mic_->OnEngineTransEvent(event);
     std::shared_ptr<AVTransMessage> message = nullptr;
@@ -172,14 +171,11 @@ HWTEST_F(DMicDevTest, NotifyEvent_001, TestSize.Level1)
  */
 HWTEST_F(DMicDevTest, SetUp_001, TestSize.Level1)
 {
-    mic_->engineFlag_ = true;
     mic_->micTrans_ = nullptr;
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->SetUp());
 
     mic_->micTrans_ = std::make_shared<MockIAudioDataTransport>();
     EXPECT_EQ(DH_SUCCESS, mic_->SetUp());
-    mic_->engineFlag_ = false;
-    EXPECT_EQ(ERR_DH_AUDIO_TRANS_ERROR, mic_->SetUp());
 }
 
 /**
@@ -215,7 +211,6 @@ HWTEST_F(DMicDevTest, Start_002, TestSize.Level1)
     EXPECT_EQ(ERR_DH_AUDIO_TRANS_ERROR, mic_->SetUp());
     EXPECT_NE(DH_SUCCESS, mic_->Start());
 
-    mic_->engineFlag_ = true;
     mic_->micTrans_ = std::make_shared<MockIAudioDataTransport>();
     EXPECT_EQ(DH_SUCCESS, mic_->SetUp());
     EXPECT_EQ(ERR_DH_AUDIO_SA_MIC_CHANNEL_WAIT_TIMEOUT, mic_->Start());
