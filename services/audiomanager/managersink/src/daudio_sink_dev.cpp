@@ -648,8 +648,8 @@ void DAudioSinkDev::SinkEventHandler::NotifySetVolume(const AppExecFwk::InnerEve
         DHLOGE("The audio event is nullptr.");
         return;
     }
-    if (sinkDev_.lock()->TaskCloseDMic(audioEvent->content) != DH_SUCCESS) {
-        DHLOGE("Close mic failed.");
+    if (sinkDev_.lock()->TaskSetVolume(audioEvent->content) != DH_SUCCESS) {
+        DHLOGE("Set volume falied.");
         return;
     }
 }
