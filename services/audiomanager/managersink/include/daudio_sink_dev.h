@@ -112,7 +112,6 @@ private:
 
     using DAudioSinkDevFunc = int32_t (DAudioSinkDev::*)(const AudioEvent &audioEvent);
     std::map<AudioEventType, DAudioSinkDevFunc> memberFuncMap_;
-    bool engineFlag_ = false;
     std::atomic<bool> isSpkInUse_ = false;
     std::atomic<bool> isMicInUse_ = false;
 };

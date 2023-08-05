@@ -77,18 +77,15 @@ int32_t DAudioSourceManager::Init(const sptr<IDAudioIpcCallback> &callback)
 
     ipcCallback_ = callback;
     daudioMgrCallback_ = std::make_shared<DAudioSourceMgrCallback>();
-    IsParamEnabled(AUDIO_ENGINE_FLAG, engineFlag_);
-    if (engineFlag_) {
-        int32_t ret = LoadAVSenderEngineProvider();
-        if (ret != DH_SUCCESS) {
-            DHLOGE("load av transport sender engine provider failed");
-            return ERR_DH_AUDIO_FAILED;
-        }
-        ret = LoadAVReceiverEngineProvider();
-        if (ret != DH_SUCCESS) {
-            DHLOGE("load av transport receiver engine provider failed.");
-            return ERR_DH_AUDIO_FAILED;
-        }
+    int32_t ret = LoadAVSenderEngineProvider();
+    if (ret != DH_SUCCESS) {
+        DHLOGE("load av transport sender engine provider failed");
+        return ERR_DH_AUDIO_FAILED;
+    }
+    ret = LoadAVReceiverEngineProvider();
+    if (ret != DH_SUCCESS) {
+        DHLOGE("load av transport receiver engine provider failed.");
+        return ERR_DH_AUDIO_FAILED;
     }
     return DH_SUCCESS;
 }
@@ -96,10 +93,8 @@ int32_t DAudioSourceManager::Init(const sptr<IDAudioIpcCallback> &callback)
 int32_t DAudioSourceManager::UnInit()
 {
     DHLOGI("Uninit audio source manager.");
-    if (engineFlag_) {
-        UnloadAVReceiverEngineProvider();
-        UnloadAVSenderEngineProvider();
-    }
+    UnloadAVReceiverEngineProvider();
+    UnloadAVSenderEngineProvider();
     {
         std::lock_guard<std::mutex> lock(devMapMtx_);
         for (auto iter = audioDevMap_.begin(); iter != audioDevMap_.end(); iter++) {

@@ -104,21 +104,18 @@ int32_t DSpeakerDev::DisableDevice(const int32_t dhId)
 int32_t DSpeakerDev::InitSenderEngine(IAVEngineProvider *providerPtr)
 {
     DHLOGI("InitSenderEngine enter");
-    IsParamEnabled(AUDIO_ENGINE_FLAG, engineFlag_);
-    if (engineFlag_) {
-        if (speakerTrans_ == nullptr) {
-            speakerTrans_ = std::make_shared<AVTransSenderTransport>(devId_, shared_from_this());
-        }
-        int32_t ret = speakerTrans_->InitEngine(providerPtr);
-        if (ret != DH_SUCCESS) {
-            DHLOGE("Initialize av sender adapter failed.");
-            return ERR_DH_AUDIO_TRANS_NULL_VALUE;
-        }
-        ret = speakerTrans_->CreateCtrl();
-        if (ret != DH_SUCCESS) {
-            DHLOGE("Create ctrl channel failed.");
-            return ERR_DH_AUDIO_TRANS_NULL_VALUE;
-        }
+    if (speakerTrans_ == nullptr) {
+        speakerTrans_ = std::make_shared<AVTransSenderTransport>(devId_, shared_from_this());
+    }
+    int32_t ret = speakerTrans_->InitEngine(providerPtr);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Speaker dev initialize av sender adapter failed.");
+        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+    }
+    ret = speakerTrans_->CreateCtrl();
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Create ctrl channel failed.");
+        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
     }
     return DH_SUCCESS;
 }

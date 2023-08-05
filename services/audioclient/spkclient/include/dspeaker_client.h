@@ -21,6 +21,7 @@
 #include <cstdint>
 #include <memory>
 #include <mutex>
+#include <securec.h>
 #include <sstream>
 #include <string>
 #include <thread>
@@ -48,6 +49,7 @@ class DSpeakerClient : public IAudioDataTransCallback,
     public ISpkClient, public AVReceiverTransportCallback,
     public AudioStandard::VolumeKeyEventCallback,
     public AudioStandard::AudioRendererCallback,
+    public AudioStandard::AudioRendererWriteCallback,
     public std::enable_shared_from_this<DSpeakerClient> {
 public:
     DSpeakerClient(const std::string &devId, const std::shared_ptr<IAudioEventCallback> &callback)
@@ -75,6 +77,7 @@ public:
     void OnEngineTransMessage(const std::shared_ptr<AVTransMessage> &message) override;
     void OnEngineTransDataAvailable(const std::shared_ptr<AudioData> &audioData) override;
 
+    void OnWriteData(size_t length) override;
 private:
     std::string GetVolumeLevel();
     void PlayThreadRunning();
@@ -104,7 +107,6 @@ private:
     std::unique_ptr<AudioStandard::AudioRenderer> audioRenderer_ = nullptr;
     std::shared_ptr<IAudioDataTransport> speakerTrans_ = nullptr;
     std::weak_ptr<IAudioEventCallback> eventCallback_;
-    bool engineFlag_ = false;
 };
 } // DistributedHardware
 } // OHOS

@@ -51,7 +51,6 @@ void DSpeakerDevTest::TearDown(void)
 HWTEST_F(DSpeakerDevTest, InitSenderEngine_001, TestSize.Level1)
 {
     IAVEngineProvider *providerPtr = nullptr;
-    spk_->engineFlag_ = true;
     AVTransEvent event = { EventType::EVENT_START_SUCCESS, "", "" };
     spk_->OnEngineTransEvent(event);
     std::shared_ptr<AVTransMessage> message = nullptr;

@@ -43,6 +43,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 class DMicClient : public IAudioDataTransCallback,
+    public AudioStandard::AudioCapturerReadCallback,
     public IMicClient, public AVSenderTransportCallback,
     public std::enable_shared_from_this<DMicClient> {
 public:
@@ -61,6 +62,7 @@ public:
     void SetAttrs(const std::string &devId, const std::shared_ptr<IAudioEventCallback> &callback) override;
     int32_t SendMessage(uint32_t type, std::string content, std::string dstDevId) override;
 
+    void OnReadData(size_t length) override;
 private:
     void CaptureThreadRunning();
 
@@ -79,7 +81,6 @@ private:
     std::weak_ptr<IAudioEventCallback> eventCallback_;
     std::unique_ptr<AudioStandard::AudioCapturer> audioCapturer_ = nullptr;
     std::shared_ptr<IAudioDataTransport> micTrans_ = nullptr;
-    bool engineFlag_ = false;
 };
 } // DistributedHardware
 } // OHOS

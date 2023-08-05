@@ -54,7 +54,6 @@ void DMicClientTest::TearDown()
 HWTEST_F(DMicClientTest, InitSenderEngine_001, TestSize.Level1)
 {
     IAVEngineProvider *providerPtr = nullptr;
-    micClient_->engineFlag_ = true;
     auto message = std::make_shared<AVTransMessage>();
     micClient_->OnEngineTransMessage(message);
     EXPECT_EQ(DH_SUCCESS, micClient_->InitSenderEngine(providerPtr));
