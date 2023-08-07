@@ -833,7 +833,6 @@ int32_t DAudioSourceDev::TaskCloseDMic(const std::string &args)
 int32_t DAudioSourceDev::TaskOpenCtrlChannel(const std::string &args)
 {
     DHLOGI("Task open ctrl channel, args: %s.", args.c_str());
-    // todo 该函数可以删除
     DHLOGI("Task open ctrl channel success.");
     return DH_SUCCESS;
 }
@@ -841,7 +840,6 @@ int32_t DAudioSourceDev::TaskOpenCtrlChannel(const std::string &args)
 int32_t DAudioSourceDev::TaskCloseCtrlChannel(const std::string &args)
 {
     DHLOGI("Task close ctrl channel, args: %s.", args.c_str());
-    // todo 该函数可以删除
     DHLOGI("Close audio ctrl channel success.");
     return DH_SUCCESS;
 }
