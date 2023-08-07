@@ -33,6 +33,7 @@
                 "distributed_hardware_fwk",
                 "drivers_interface_audio",
                 "dsoftbus",
+                "eventhandler",
                 "hdf_core",
                 "hisysevent",
                 "hitrace",
