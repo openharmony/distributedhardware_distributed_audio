@@ -20,18 +20,18 @@
 #include <initializer_list>
 #include "nlohmann/json.hpp"
 
+#include "event_handler.h"
+
 #include "audio_event.h"
 #include "daudio_source_dev_ctrl_manager.h"
 #include "daudio_source_mgr_callback.h"
 #include "dmic_dev.h"
 #include "dspeaker_dev.h"
-#include "event_handler.h"
 #include "iaudio_event_callback.h"
 #include "iaudio_data_transport.h"
 #include "iaudio_datatrans_callback.h"
 #include "idaudio_ipc_callback.h"
 #include "idaudio_hdi_callback.h"
-#include "task_queue.h"
 
 using json = nlohmann::json;
 
@@ -124,12 +124,9 @@ private:
 
     std::string devId_;
     std::shared_ptr<DAudioSourceMgrCallback> mgrCallback_;
-    std::shared_ptr<TaskQueue> taskQueue_;
     std::shared_ptr<DSpeakerDev> speaker_;
     std::shared_ptr<DMicDev> mic_;
-
     std::shared_ptr<DAudioSourceDevCtrlMgr> audioCtrlMgr_;
-    std::mutex taskQueueMutex_;
 
     std::mutex rpcWaitMutex_;
     std::condition_variable rpcWaitCond_;
@@ -139,7 +136,8 @@ private:
 
     class SourceEventHandler : public AppExecFwk::EventHandler {
     public:
-        SourceEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner, const std::shared_ptr<DAudioSourceDev> &dev);
+        SourceEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
+            const std::shared_ptr<DAudioSourceDev> &dev);
         ~SourceEventHandler() override;
         void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
 
@@ -161,6 +159,7 @@ private:
         void SpkMmapStopCallback(const AppExecFwk::InnerEvent::Pointer &event);
         void MicMmapStartCallback(const AppExecFwk::InnerEvent::Pointer &event);
         void MicMmapStopCallback(const AppExecFwk::InnerEvent::Pointer &event);
+        int32_t GetEventParam(const AppExecFwk::InnerEvent::Pointer &event, std::string &eventParam);
 
     private:
         using SourceEventFunc = void (SourceEventHandler::*)(const AppExecFwk::InnerEvent::Pointer &event);

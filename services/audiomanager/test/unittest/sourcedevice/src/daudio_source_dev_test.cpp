@@ -153,14 +153,12 @@ HWTEST_F(DAudioSourceDevTest, CreatTasks_002, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, CreatTasks_003, TestSize.Level1)
 {
-    size_t tempCapacity = 0;
-    sourceDev_->taskQueue_ = std::make_shared<TaskQueue>(tempCapacity);
+    sourceDev_->AwakeAudioDev();
     AudioEvent event = AudioEvent(OPEN_SPEAKER, "");
     EXPECT_EQ(ERR_DH_AUDIO_SA_OPEN_CTRL_FAILED, sourceDev_->HandleOpenDSpeaker(event));
 
     event.type = OPEN_MIC;
     EXPECT_EQ(ERR_DH_AUDIO_SA_OPEN_CTRL_FAILED, sourceDev_->HandleOpenDMic(event));
-    sourceDev_->taskQueue_ = nullptr;
 }
 
 /**
@@ -191,9 +189,8 @@ HWTEST_F(DAudioSourceDevTest, HandlePlayStatusChange_001, TestSize.Level1)
     AudioEvent event = AudioEvent(CHANGE_PLAY_STATUS, "");
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->HandlePlayStatusChange(event));
 
-    sourceDev_->taskQueue_ = std::make_shared<TaskQueue>(TASK_QUEUE_LEN);
+    sourceDev_->AwakeAudioDev();
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandlePlayStatusChange(event));
-    sourceDev_->taskQueue_ = nullptr;
 }
 
 /**
@@ -297,11 +294,8 @@ HWTEST_F(DAudioSourceDevTest, OpenCtrlTrans_001, TestSize.Level1)
     EXPECT_EQ(DH_SUCCESS, sourceDev_->OpenCtrlTrans(event));
 
     sourceDev_->audioCtrlMgr_->isOpened_ = false;
-    size_t tempCapacity = 0;
-    sourceDev_->taskQueue_ = std::make_shared<TaskQueue>(tempCapacity);
+    sourceDev_->AwakeAudioDev();
     EXPECT_EQ(DH_SUCCESS, sourceDev_->OpenCtrlTrans(event));
-    sourceDev_->taskQueue_ = nullptr;
-
     sourceDev_->audioCtrlMgr_ = nullptr;
 }
 
@@ -330,7 +324,7 @@ HWTEST_F(DAudioSourceDevTest, CloseCtrlTrans_001, TestSize.Level1)
 HWTEST_F(DAudioSourceDevTest, CloseCtrlTrans_002, TestSize.Level1)
 {
     AudioEvent event;
-    sourceDev_->taskQueue_ = std::make_shared<TaskQueue>(TASK_QUEUE_LEN);
+    sourceDev_->AwakeAudioDev();
 
     bool isSpk = false;
     sourceDev_->mic_ = nullptr;
@@ -349,8 +343,6 @@ HWTEST_F(DAudioSourceDevTest, CloseCtrlTrans_002, TestSize.Level1)
 
     sourceDev_->mic_->isOpened_ = true;
     EXPECT_EQ(DH_SUCCESS, sourceDev_->CloseCtrlTrans(event, isSpk));
-
-    sourceDev_->taskQueue_ = nullptr;
 }
 
 /**
@@ -364,14 +356,8 @@ HWTEST_F(DAudioSourceDevTest, HandleOpenCtrlTrans_001, TestSize.Level1)
     AudioEvent event;
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->HandleOpenCtrlTrans(event));
 
-    sourceDev_->taskQueue_ = std::make_shared<TaskQueue>(TASK_QUEUE_LEN);
+    sourceDev_->AwakeAudioDev();
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleOpenCtrlTrans(event));
-    sourceDev_->taskQueue_ = nullptr;
-
-    size_t tempCapacity = 0;
-    sourceDev_->taskQueue_ = std::make_shared<TaskQueue>(tempCapacity);
-    EXPECT_EQ(ERR_DH_AUDIO_SA_TASKQUEUE_FULL, sourceDev_->HandleOpenCtrlTrans(event));
-    sourceDev_->taskQueue_ = nullptr;
 }
 
 /**
@@ -385,14 +371,8 @@ HWTEST_F(DAudioSourceDevTest, HandleCloseCtrlTrans_001, TestSize.Level1)
     AudioEvent event;
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->HandleCloseCtrlTrans(event));
 
-    sourceDev_->taskQueue_ = std::make_shared<TaskQueue>(TASK_QUEUE_LEN);
+    sourceDev_->AwakeAudioDev();
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleCloseCtrlTrans(event));
-    sourceDev_->taskQueue_ = nullptr;
-
-    size_t tempCapacity = 0;
-    sourceDev_->taskQueue_ = std::make_shared<TaskQueue>(tempCapacity);
-    EXPECT_EQ(ERR_DH_AUDIO_SA_TASKQUEUE_FULL, sourceDev_->HandleCloseCtrlTrans(event));
-    sourceDev_->taskQueue_ = nullptr;
 }
 
 /**
@@ -475,9 +455,8 @@ HWTEST_F(DAudioSourceDevTest, HandleSpkMmapStart_001, TestSize.Level1)
     AudioEvent event;
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->HandleSpkMmapStart(event));
 
-    sourceDev_->taskQueue_ = std::make_shared<TaskQueue>(TASK_QUEUE_LEN);
+    sourceDev_->AwakeAudioDev();
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleSpkMmapStart(event));
-    sourceDev_->taskQueue_ = nullptr;
 }
 
 /**
@@ -491,9 +470,8 @@ HWTEST_F(DAudioSourceDevTest, HandleSpkMmapStop_001, TestSize.Level1)
     AudioEvent event;
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->HandleSpkMmapStop(event));
 
-    sourceDev_->taskQueue_ = std::make_shared<TaskQueue>(TASK_QUEUE_LEN);
+    sourceDev_->AwakeAudioDev();
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleSpkMmapStop(event));
-    sourceDev_->taskQueue_ = nullptr;
 }
 
 /**
@@ -507,9 +485,8 @@ HWTEST_F(DAudioSourceDevTest, HandleMicMmapStart_001, TestSize.Level1)
     AudioEvent event;
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->HandleMicMmapStart(event));
 
-    sourceDev_->taskQueue_ = std::make_shared<TaskQueue>(TASK_QUEUE_LEN);
+    sourceDev_->AwakeAudioDev();
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleMicMmapStart(event));
-    sourceDev_->taskQueue_ = nullptr;
 }
 
 /**
@@ -523,9 +500,8 @@ HWTEST_F(DAudioSourceDevTest, HandleMicMmapStop_001, TestSize.Level1)
     AudioEvent event;
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->HandleMicMmapStop(event));
 
-    sourceDev_->taskQueue_ = std::make_shared<TaskQueue>(TASK_QUEUE_LEN);
+    sourceDev_->AwakeAudioDev();
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleMicMmapStop(event));
-    sourceDev_->taskQueue_ = nullptr;
 }
 
 /**
