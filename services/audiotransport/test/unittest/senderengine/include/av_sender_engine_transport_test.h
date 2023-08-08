@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DAUDIO_AV_SENDER_ENGINE_transport_TEST_H
-#define OHOS_DAUDIO_AV_SENDER_ENGINE_transport_TEST_H
+#ifndef OHOS_DAUDIO_AV_SENDER_ENGINE_TRANSPORT_TEST_H
+#define OHOS_DAUDIO_AV_SENDER_ENGINE_TRANSPORT_TEST_H
 
 #include <gtest/gtest.h>
 
