@@ -29,7 +29,7 @@ void AudioDataSetInit64FuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < (sizeof(int64_t)))) {
         return;
     }
-    
+
     size_t capacity = 4096;
     int64_t value = *(reinterpret_cast<const int64_t*>(data));
     std::string name(reinterpret_cast<const char*>(data), size);
