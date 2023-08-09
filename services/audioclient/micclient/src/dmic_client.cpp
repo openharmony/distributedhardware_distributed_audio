@@ -266,7 +266,7 @@ void DMicClient::OnReadData(size_t length)
         return;
     }
     int32_t ret = audioCapturer_->GetBufferDesc(bufDesc);
-    if (ret != 0 || bufDesc.buffer == nullptr || bufDesc.bufLength == 0) {
+    if (ret != DH_SUCCESS || bufDesc.buffer == nullptr || bufDesc.bufLength == 0) {
         DHLOGE("Get buffer desc failed. On read data.");
         return;
     }
@@ -279,8 +279,11 @@ void DMicClient::OnReadData(size_t length)
         DHLOGE("Copy audio data failed.");
     }
     audioCapturer_->Enqueue(bufDesc);
-    ret = micTrans_->FeedAudioData(audioData);
-    if (ret != DH_SUCCESS) {
+    if (micTrans_ == nullptr) {
+        DHLOGE("Mic trans is nullptr.");
+        return;
+    }
+    if (micTrans_->FeedAudioData(audioData) != DH_SUCCESS) {
         DHLOGE("Failed to send data.");
     }
 }

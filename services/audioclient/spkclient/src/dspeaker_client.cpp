@@ -98,12 +98,13 @@ int32_t DSpeakerClient::CreateAudioRenderer(const AudioParam &param)
         return ERR_DH_AUDIO_CLIENT_CREATE_RENDER_FAILED;
     }
     audioRenderer_ ->SetRendererCallback(shared_from_this());
-    if (audioParam_.renderOpts.renderFlags == MMAP_MODE) {
-        int32_t ret = audioRenderer_->SetRendererWriteCallback(shared_from_this());
-        if (ret != DH_SUCCESS) {
-            DHLOGE("Client save write callback failed.");
-            return ERR_DH_AUDIO_CLIENT_CREATE_RENDER_FAILED;
-        }
+    if (audioParam_.renderOpts.renderFlags != MMAP_MODE) {
+        return DH_SUCCESS;
+    }
+    int32_t ret = audioRenderer_->SetRendererWriteCallback(shared_from_this());
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Client save write callback failed.");
+        return ERR_DH_AUDIO_CLIENT_CREATE_RENDER_FAILED;
     }
     return DH_SUCCESS;
 }
