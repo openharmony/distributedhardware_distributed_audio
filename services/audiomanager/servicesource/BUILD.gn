@@ -97,6 +97,7 @@ ohos_shared_library("distributed_audio_source") {
     "distributed_hardware_fwk:distributed_av_sender",
     "drivers_interface_audio:libaudio_proxy_1.0",
     "dsoftbus:softbus_client",
+    "eventhandler:libeventhandler",
     "hdf_core:libhdi",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",

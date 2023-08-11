@@ -20,6 +20,8 @@
 #include <initializer_list>
 #include "nlohmann/json.hpp"
 
+#include "event_handler.h"
+
 #include "audio_event.h"
 #include "daudio_source_dev_ctrl_manager.h"
 #include "daudio_source_mgr_callback.h"
@@ -30,7 +32,6 @@
 #include "iaudio_datatrans_callback.h"
 #include "idaudio_ipc_callback.h"
 #include "idaudio_hdi_callback.h"
-#include "task_queue.h"
 
 using json = nlohmann::json;
 
@@ -123,12 +124,9 @@ private:
 
     std::string devId_;
     std::shared_ptr<DAudioSourceMgrCallback> mgrCallback_;
-    std::shared_ptr<TaskQueue> taskQueue_;
     std::shared_ptr<DSpeakerDev> speaker_;
     std::shared_ptr<DMicDev> mic_;
-
     std::shared_ptr<DAudioSourceDevCtrlMgr> audioCtrlMgr_;
-    std::mutex taskQueueMutex_;
 
     std::mutex rpcWaitMutex_;
     std::condition_variable rpcWaitCond_;
@@ -136,9 +134,43 @@ private:
     bool rpcResult_ = false;
     uint8_t rpcNotify_ = 0;
 
+    class SourceEventHandler : public AppExecFwk::EventHandler {
+    public:
+        SourceEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
+            const std::shared_ptr<DAudioSourceDev> &dev);
+        ~SourceEventHandler() override;
+        void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
+
+    private:
+        void EnableDAudioCallback(const AppExecFwk::InnerEvent::Pointer &event);
+        void DisableDAudioCallback(const AppExecFwk::InnerEvent::Pointer &event);
+        void OpenDSpeakerCallback(const AppExecFwk::InnerEvent::Pointer &event);
+        void CloseDSpeakerCallback(const AppExecFwk::InnerEvent::Pointer &event);
+        void OpenDMicCallback(const AppExecFwk::InnerEvent::Pointer &event);
+        void CloseDMicCallback(const AppExecFwk::InnerEvent::Pointer &event);
+        void OpenCtrlCallback(const AppExecFwk::InnerEvent::Pointer &event);
+        void CloseCtrlCallback(const AppExecFwk::InnerEvent::Pointer &event);
+        void SetVolumeCallback(const AppExecFwk::InnerEvent::Pointer &event);
+        void ChangeVolumeCallback(const AppExecFwk::InnerEvent::Pointer &event);
+        void ChangeFocusCallback(const AppExecFwk::InnerEvent::Pointer &event);
+        void ChangeRenderStateCallback(const AppExecFwk::InnerEvent::Pointer &event);
+        void PlayStatusChangeCallback(const AppExecFwk::InnerEvent::Pointer &event);
+        void SpkMmapStartCallback(const AppExecFwk::InnerEvent::Pointer &event);
+        void SpkMmapStopCallback(const AppExecFwk::InnerEvent::Pointer &event);
+        void MicMmapStartCallback(const AppExecFwk::InnerEvent::Pointer &event);
+        void MicMmapStopCallback(const AppExecFwk::InnerEvent::Pointer &event);
+        int32_t GetEventParam(const AppExecFwk::InnerEvent::Pointer &event, std::string &eventParam);
+
+    private:
+        using SourceEventFunc = void (SourceEventHandler::*)(const AppExecFwk::InnerEvent::Pointer &event);
+        std::map<uint32_t, SourceEventFunc> mapEventFuncs_;
+        std::weak_ptr<DAudioSourceDev> sourceDev_;
+    };
+
     using DAudioSourceDevFunc = int32_t (DAudioSourceDev::*)(const AudioEvent &audioEvent);
     std::map<AudioEventType, DAudioSourceDevFunc> memberFuncMap_;
     std::map<AudioEventType, uint8_t> eventNotifyMap_;
+    std::shared_ptr<SourceEventHandler> handler_;
 };
 } // DistributedHardware
 } // OHOS

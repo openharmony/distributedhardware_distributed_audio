@@ -87,8 +87,11 @@ void DAudioSinkDev::NotifyEvent(const AudioEvent &audioEvent)
     DHLOGD("Notify event, eventType: %d.", (int32_t)audioEvent.type);
     auto eventParam = std::make_shared<AudioEvent>(audioEvent);
     auto msgEvent = AppExecFwk::InnerEvent::Get(static_cast<uint32_t>(audioEvent.type), eventParam, 0);
-    if (handler_ != nullptr) {
-        handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE);
+    if (handler_ == nullptr) {
+        DHLOGE("The event handler is null.");
+        return;
+    }
+    if (handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
         DHLOGD("Send event success.");
     }
 }
@@ -441,16 +444,17 @@ void DAudioSinkDev::SinkEventHandler::ProcessEvent(const AppExecFwk::InnerEvent:
 void DAudioSinkDev::SinkEventHandler::NotifyOpenCtrlChannel(const AppExecFwk::InnerEvent::Pointer &event)
 {
     DHLOGI("Notify open ctrl channel.");
-    if (event == nullptr || sinkDev_.expired()) {
-        DHLOGE("The input event or sink dev is null.");
+    std::string eventParam;
+    if (GetEventParam(event, eventParam) != DH_SUCCESS) {
+        DHLOGE("Failed to get event parameters.");
         return;
     }
-    std::shared_ptr<AudioEvent> audioEvent = event->GetSharedObject<AudioEvent>();
-    if (audioEvent == nullptr) {
-        DHLOGE("The audio event is nullptr.");
+    auto sinkDevObj = sinkDev_.lock();
+    if (sinkDevObj == nullptr) {
+        DHLOGE("Sink dev is invalid.");
         return;
     }
-    if (sinkDev_.lock()->TaskOpenCtrlChannel(audioEvent->content) != DH_SUCCESS) {
+    if (sinkDevObj->TaskOpenCtrlChannel(eventParam) != DH_SUCCESS) {
         DHLOGE("Open ctrl channel failed.");
         return;
     }
@@ -459,16 +463,17 @@ void DAudioSinkDev::SinkEventHandler::NotifyOpenCtrlChannel(const AppExecFwk::In
 void DAudioSinkDev::SinkEventHandler::NotifyCloseCtrlChannel(const AppExecFwk::InnerEvent::Pointer &event)
 {
     DHLOGI("Notify close ctrl channel.");
-    if (event == nullptr || sinkDev_.expired()) {
-        DHLOGE("The input event or sink dev is null.");
+    std::string eventParam;
+    if (GetEventParam(event, eventParam) != DH_SUCCESS) {
+        DHLOGE("Failed to get event parameters.");
         return;
     }
-    std::shared_ptr<AudioEvent> audioEvent = event->GetSharedObject<AudioEvent>();
-    if (audioEvent == nullptr) {
-        DHLOGE("The audio event is nullptr.");
+    auto sinkDevObj = sinkDev_.lock();
+    if (sinkDevObj == nullptr) {
+        DHLOGE("Sink dev is invalid.");
         return;
     }
-    if (sinkDev_.lock()->TaskCloseCtrlChannel(audioEvent->content) != DH_SUCCESS) {
+    if (sinkDevObj->TaskCloseCtrlChannel(eventParam) != DH_SUCCESS) {
         DHLOGE("Close ctrl channel falied.");
         return;
     }
@@ -483,42 +488,44 @@ void DAudioSinkDev::SinkEventHandler::NotifyCtrlOpened(const AppExecFwk::InnerEv
 void DAudioSinkDev::SinkEventHandler::NotifyCtrlClosed(const AppExecFwk::InnerEvent::Pointer &event)
 {
     DHLOGI("Notify ctrl closed.");
-    if (event == nullptr || sinkDev_.expired()) {
-        DHLOGE("The input event or sink dev is null.");
+    std::string eventParam;
+    if (GetEventParam(event, eventParam) != DH_SUCCESS) {
+        DHLOGE("Failed to get event parameters.");
         return;
     }
-    std::shared_ptr<AudioEvent> audioEvent = event->GetSharedObject<AudioEvent>();
-    if (audioEvent == nullptr) {
-        DHLOGE("The audio event is nullptr.");
+    auto sinkDevObj = sinkDev_.lock();
+    if (sinkDevObj == nullptr) {
+        DHLOGE("Sink dev is invalid.");
         return;
     }
-    if (sinkDev_.lock()->TaskCloseCtrlChannel(audioEvent->content) != DH_SUCCESS) {
+    if (sinkDevObj->TaskCloseCtrlChannel(eventParam) != DH_SUCCESS) {
         DHLOGE("Close ctrl channel failed.");
         return;
     }
-    if (sinkDev_.lock()->TaskCloseDSpeaker(audioEvent->content) != DH_SUCCESS) {
+    if (sinkDevObj->TaskCloseDSpeaker(eventParam) != DH_SUCCESS) {
         DHLOGE("Close speaker failed.");
         return;
     }
-    if (sinkDev_.lock()->TaskCloseDMic(audioEvent->content) != DH_SUCCESS) {
+    if (sinkDevObj->TaskCloseDMic(eventParam) != DH_SUCCESS) {
         DHLOGE("Close mic failed.");
         return;
     }
-    sinkDev_.lock()->JudgeDeviceStatus();
+    sinkDevObj->JudgeDeviceStatus();
 }
 
 void DAudioSinkDev::SinkEventHandler::NotifyOpenSpeaker(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (event == nullptr || sinkDev_.expired()) {
-        DHLOGE("The input event or sink dev is null.");
+    std::string eventParam;
+    if (GetEventParam(event, eventParam) != DH_SUCCESS) {
+        DHLOGE("Failed to get event parameters.");
         return;
     }
-    std::shared_ptr<AudioEvent> audioEvent = event->GetSharedObject<AudioEvent>();
-    if (audioEvent == nullptr) {
-        DHLOGE("The audio event is nullptr.");
+    auto sinkDevObj = sinkDev_.lock();
+    if (sinkDevObj == nullptr) {
+        DHLOGE("Sink dev is invalid.");
         return;
     }
-    if (sinkDev_.lock()->TaskOpenDSpeaker(audioEvent->content) != DH_SUCCESS) {
+    if (sinkDevObj->TaskOpenDSpeaker(eventParam) != DH_SUCCESS) {
         DHLOGE("Open speaker failed.");
         return;
     }
@@ -526,16 +533,17 @@ void DAudioSinkDev::SinkEventHandler::NotifyOpenSpeaker(const AppExecFwk::InnerE
 
 void DAudioSinkDev::SinkEventHandler::NotifyCloseSpeaker(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (event == nullptr || sinkDev_.expired()) {
-        DHLOGE("The input event or sink dev is null.");
+    std::string eventParam;
+    if (GetEventParam(event, eventParam) != DH_SUCCESS) {
+        DHLOGE("Failed to get event parameters.");
         return;
     }
-    std::shared_ptr<AudioEvent> audioEvent = event->GetSharedObject<AudioEvent>();
-    if (audioEvent == nullptr) {
-        DHLOGE("The audio event is nullptr.");
+    auto sinkDevObj = sinkDev_.lock();
+    if (sinkDevObj == nullptr) {
+        DHLOGE("Sink dev is invalid.");
         return;
     }
-    if (sinkDev_.lock()->TaskOpenDSpeaker(audioEvent->content) != DH_SUCCESS) {
+    if (sinkDevObj->TaskOpenDSpeaker(eventParam) != DH_SUCCESS) {
         DHLOGE("Open speaker failed.");
         return;
     }
@@ -544,20 +552,21 @@ void DAudioSinkDev::SinkEventHandler::NotifyCloseSpeaker(const AppExecFwk::Inner
 void DAudioSinkDev::SinkEventHandler::NotifySpeakerOpened(const AppExecFwk::InnerEvent::Pointer &event)
 {
     DHLOGD("Starting render.");
-    if (event == nullptr || sinkDev_.expired()) {
-        DHLOGE("The input event or sink dev is null.");
+    std::string eventParam;
+    if (GetEventParam(event, eventParam) != DH_SUCCESS) {
+        DHLOGE("Failed to get event parameters.");
         return;
     }
-    std::shared_ptr<AudioEvent> audioEvent = event->GetSharedObject<AudioEvent>();
-    if (audioEvent == nullptr) {
-        DHLOGE("The audio event is nullptr.");
+    auto sinkDevObj = sinkDev_.lock();
+    if (sinkDevObj == nullptr) {
+        DHLOGE("Sink dev is invalid.");
         return;
     }
-    if (sinkDev_.lock()->TaskStartRender() != DH_SUCCESS) {
+    if (sinkDevObj->TaskStartRender() != DH_SUCCESS) {
         DHLOGE("Speaker client start failed.");
         return;
     }
-    if (sinkDev_.lock()->TaskVolumeChange(audioEvent->content) != DH_SUCCESS) {
+    if (sinkDevObj->TaskVolumeChange(eventParam) != DH_SUCCESS) {
         DHLOGE("Notify pimary volume to source device failed.");
         return;
     }
@@ -565,16 +574,17 @@ void DAudioSinkDev::SinkEventHandler::NotifySpeakerOpened(const AppExecFwk::Inne
 
 void DAudioSinkDev::SinkEventHandler::NotifySpeakerClosed(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (event == nullptr || sinkDev_.expired()) {
-        DHLOGE("The input event or sink dev is null.");
+    std::string eventParam;
+    if (GetEventParam(event, eventParam) != DH_SUCCESS) {
+        DHLOGE("Failed to get event parameters.");
         return;
     }
-    std::shared_ptr<AudioEvent> audioEvent = event->GetSharedObject<AudioEvent>();
-    if (audioEvent == nullptr) {
-        DHLOGE("The audio event is nullptr.");
+    auto sinkDevObj = sinkDev_.lock();
+    if (sinkDevObj == nullptr) {
+        DHLOGE("Sink dev is invalid.");
         return;
     }
-    if (sinkDev_.lock()->TaskCloseDSpeaker(audioEvent->content) != DH_SUCCESS) {
+    if (sinkDevObj->TaskCloseDSpeaker(eventParam) != DH_SUCCESS) {
         DHLOGE("Close speaker failed.");
         return;
     }
@@ -582,16 +592,17 @@ void DAudioSinkDev::SinkEventHandler::NotifySpeakerClosed(const AppExecFwk::Inne
 
 void DAudioSinkDev::SinkEventHandler::NotifyOpenMic(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (event == nullptr || sinkDev_.expired()) {
-        DHLOGE("The input event or sink dev is null.");
+    std::string eventParam;
+    if (GetEventParam(event, eventParam) != DH_SUCCESS) {
+        DHLOGE("Failed to get event parameters.");
         return;
     }
-    std::shared_ptr<AudioEvent> audioEvent = event->GetSharedObject<AudioEvent>();
-    if (audioEvent == nullptr) {
-        DHLOGE("The audio event is nullptr.");
+    auto sinkDevObj = sinkDev_.lock();
+    if (sinkDevObj == nullptr) {
+        DHLOGE("Sink dev is invalid.");
         return;
     }
-    if (sinkDev_.lock()->TaskOpenDMic(audioEvent->content) != DH_SUCCESS) {
+    if (sinkDevObj->TaskOpenDMic(eventParam) != DH_SUCCESS) {
         DHLOGE("Open mic failed.");
         return;
     }
@@ -599,16 +610,17 @@ void DAudioSinkDev::SinkEventHandler::NotifyOpenMic(const AppExecFwk::InnerEvent
 
 void DAudioSinkDev::SinkEventHandler::NotifyCloseMic(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (event == nullptr || sinkDev_.expired()) {
-        DHLOGE("The input event or sink dev is null.");
+    std::string eventParam;
+    if (GetEventParam(event, eventParam) != DH_SUCCESS) {
+        DHLOGE("Failed to get event parameters.");
         return;
     }
-    std::shared_ptr<AudioEvent> audioEvent = event->GetSharedObject<AudioEvent>();
-    if (audioEvent == nullptr) {
-        DHLOGE("The audio event is nullptr.");
+    auto sinkDevObj = sinkDev_.lock();
+    if (sinkDevObj == nullptr) {
+        DHLOGE("Sink dev is invalid.");
         return;
     }
-    if (sinkDev_.lock()->TaskCloseDMic(audioEvent->content) != DH_SUCCESS) {
+    if (sinkDevObj->TaskCloseDMic(eventParam) != DH_SUCCESS) {
         DHLOGE("Close mic failed.");
         return;
     }
@@ -622,16 +634,17 @@ void DAudioSinkDev::SinkEventHandler::NotifyMicOpened(const AppExecFwk::InnerEve
 
 void DAudioSinkDev::SinkEventHandler::NotifyMicClosed(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (event == nullptr || sinkDev_.expired()) {
-        DHLOGE("The input event or sink dev is null.");
+    std::string eventParam;
+    if (GetEventParam(event, eventParam) != DH_SUCCESS) {
+        DHLOGE("Failed to get event parameters.");
         return;
     }
-    std::shared_ptr<AudioEvent> audioEvent = event->GetSharedObject<AudioEvent>();
-    if (audioEvent == nullptr) {
-        DHLOGE("The audio event is nullptr.");
+    auto sinkDevObj = sinkDev_.lock();
+    if (sinkDevObj == nullptr) {
+        DHLOGE("Sink dev is invalid.");
         return;
     }
-    if (sinkDev_.lock()->TaskCloseDMic(audioEvent->content) != DH_SUCCESS) {
+    if (sinkDevObj->TaskCloseDMic(eventParam) != DH_SUCCESS) {
         DHLOGE("Close mic failed.");
         return;
     }
@@ -639,33 +652,35 @@ void DAudioSinkDev::SinkEventHandler::NotifyMicClosed(const AppExecFwk::InnerEve
 
 void DAudioSinkDev::SinkEventHandler::NotifySetVolume(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (event == nullptr || sinkDev_.expired()) {
-        DHLOGE("The input event or sink dev is null.");
+    std::string eventParam;
+    if (GetEventParam(event, eventParam) != DH_SUCCESS) {
+        DHLOGE("Failed to get event parameters.");
         return;
     }
-    std::shared_ptr<AudioEvent> audioEvent = event->GetSharedObject<AudioEvent>();
-    if (audioEvent == nullptr) {
-        DHLOGE("The audio event is nullptr.");
+    auto sinkDevObj = sinkDev_.lock();
+    if (sinkDevObj == nullptr) {
+        DHLOGE("Sink dev is invalid.");
         return;
     }
-    if (sinkDev_.lock()->TaskCloseDMic(audioEvent->content) != DH_SUCCESS) {
-        DHLOGE("Close mic failed.");
+    if (sinkDevObj->TaskSetVolume(eventParam) != DH_SUCCESS) {
+        DHLOGE("Set volume failed.");
         return;
     }
 }
 
 void DAudioSinkDev::SinkEventHandler::NotifyVolumeChange(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (event == nullptr || sinkDev_.expired()) {
-        DHLOGE("The input event or sink dev is null.");
+    std::string eventParam;
+    if (GetEventParam(event, eventParam) != DH_SUCCESS) {
+        DHLOGE("Failed to get event parameters.");
         return;
     }
-    std::shared_ptr<AudioEvent> audioEvent = event->GetSharedObject<AudioEvent>();
-    if (audioEvent == nullptr) {
-        DHLOGE("The audio event is nullptr.");
+    auto sinkDevObj = sinkDev_.lock();
+    if (sinkDevObj == nullptr) {
+        DHLOGE("Sink dev is invalid.");
         return;
     }
-    if (sinkDev_.lock()->TaskVolumeChange(audioEvent->content) != DH_SUCCESS) {
+    if (sinkDevObj->TaskVolumeChange(eventParam) != DH_SUCCESS) {
         DHLOGE("Notify volume change status to source device failed.");
         return;
     }
@@ -673,16 +688,17 @@ void DAudioSinkDev::SinkEventHandler::NotifyVolumeChange(const AppExecFwk::Inner
 
 void DAudioSinkDev::SinkEventHandler::NotifySetParam(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (event == nullptr || sinkDev_.expired()) {
-        DHLOGE("The input event or sink dev is null.");
+    std::string eventParam;
+    if (GetEventParam(event, eventParam) != DH_SUCCESS) {
+        DHLOGE("Failed to get event parameters.");
         return;
     }
-    std::shared_ptr<AudioEvent> audioEvent = event->GetSharedObject<AudioEvent>();
-    if (audioEvent == nullptr) {
-        DHLOGE("The audio event is nullptr.");
+    auto sinkDevObj = sinkDev_.lock();
+    if (sinkDevObj == nullptr) {
+        DHLOGE("Sink dev is invalid.");
         return;
     }
-    if (sinkDev_.lock()->TaskSetParameter(audioEvent->content) != DH_SUCCESS) {
+    if (sinkDevObj->TaskSetParameter(eventParam) != DH_SUCCESS) {
         DHLOGE("Set parameters failed.");
         return;
     }
@@ -690,16 +706,17 @@ void DAudioSinkDev::SinkEventHandler::NotifySetParam(const AppExecFwk::InnerEven
 
 void DAudioSinkDev::SinkEventHandler::NotifySetMute(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (event == nullptr || sinkDev_.expired()) {
-        DHLOGE("The input event or sink dev is null.");
+    std::string eventParam;
+    if (GetEventParam(event, eventParam) != DH_SUCCESS) {
+        DHLOGE("Failed to get event parameters.");
         return;
     }
-    std::shared_ptr<AudioEvent> audioEvent = event->GetSharedObject<AudioEvent>();
-    if (audioEvent == nullptr) {
-        DHLOGE("The audio event is nullptr.");
+    auto sinkDevObj = sinkDev_.lock();
+    if (sinkDevObj == nullptr) {
+        DHLOGE("Sink dev is invalid.");
         return;
     }
-    if (sinkDev_.lock()->TaskSetMute(audioEvent->content) != DH_SUCCESS) {
+    if (sinkDevObj->TaskSetMute(eventParam) != DH_SUCCESS) {
         DHLOGE("Set mute failed.");
         return;
     }
@@ -707,16 +724,17 @@ void DAudioSinkDev::SinkEventHandler::NotifySetMute(const AppExecFwk::InnerEvent
 
 void DAudioSinkDev::SinkEventHandler::NotifyFocusChange(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (event == nullptr || sinkDev_.expired()) {
-        DHLOGE("The input event or sink dev is null.");
+    std::string eventParam;
+    if (GetEventParam(event, eventParam) != DH_SUCCESS) {
+        DHLOGE("Failed to get event parameters.");
         return;
     }
-    std::shared_ptr<AudioEvent> audioEvent = event->GetSharedObject<AudioEvent>();
-    if (audioEvent == nullptr) {
-        DHLOGE("The audio event is nullptr.");
+    auto sinkDevObj = sinkDev_.lock();
+    if (sinkDevObj == nullptr) {
+        DHLOGE("Sink dev is invalid.");
         return;
     }
-    if (sinkDev_.lock()->TaskFocusChange(audioEvent->content) != DH_SUCCESS) {
+    if (sinkDevObj->TaskFocusChange(eventParam) != DH_SUCCESS) {
         DHLOGE("Handle focus change event failed.");
         return;
     }
@@ -724,16 +742,17 @@ void DAudioSinkDev::SinkEventHandler::NotifyFocusChange(const AppExecFwk::InnerE
 
 void DAudioSinkDev::SinkEventHandler::NotifyRenderStateChange(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (event == nullptr || sinkDev_.expired()) {
-        DHLOGE("The input event or sink dev is null.");
+    std::string eventParam;
+    if (GetEventParam(event, eventParam) != DH_SUCCESS) {
+        DHLOGE("Failed to get event parameters.");
         return;
     }
-    std::shared_ptr<AudioEvent> audioEvent = event->GetSharedObject<AudioEvent>();
-    if (audioEvent == nullptr) {
-        DHLOGE("The audio event is nullptr.");
+    auto sinkDevObj = sinkDev_.lock();
+    if (sinkDevObj == nullptr) {
+        DHLOGE("Sink dev is invalid.");
         return;
     }
-    if (sinkDev_.lock()->TaskRenderStateChange(audioEvent->content) != DH_SUCCESS) {
+    if (sinkDevObj->TaskRenderStateChange(eventParam) != DH_SUCCESS) {
         DHLOGE("Handle render state change failed.");
         return;
     }
@@ -741,19 +760,36 @@ void DAudioSinkDev::SinkEventHandler::NotifyRenderStateChange(const AppExecFwk::
 
 void DAudioSinkDev::SinkEventHandler::NotifyPlayStatusChange(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (event == nullptr || sinkDev_.expired()) {
-        DHLOGE("The input event or sink dev is null.");
+    std::string eventParam;
+    if (GetEventParam(event, eventParam) != DH_SUCCESS) {
+        DHLOGE("Failed to get event parameters.");
         return;
     }
-    std::shared_ptr<AudioEvent> audioEvent = event->GetSharedObject<AudioEvent>();
-    if (audioEvent == nullptr) {
-        DHLOGE("The audio event is nullptr.");
+    auto sinkDevObj = sinkDev_.lock();
+    if (sinkDevObj == nullptr) {
+        DHLOGE("Sink dev is invalid.");
         return;
     }
-    if (sinkDev_.lock()->TaskPlayStatusChange(audioEvent->content) != DH_SUCCESS) {
+    if (sinkDevObj->TaskPlayStatusChange(eventParam) != DH_SUCCESS) {
         DHLOGE("Handle play status change event failed.");
         return;
     }
+}
+
+int32_t DAudioSinkDev::SinkEventHandler::GetEventParam(const AppExecFwk::InnerEvent::Pointer &event,
+    std::string &eventParam)
+{
+    if (event == nullptr) {
+        DHLOGE("The input event is null.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    std::shared_ptr<AudioEvent> paramObj = event->GetSharedObject<AudioEvent>();
+    if (paramObj == nullptr) {
+        DHLOGE("The event parameter object is nullptr.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    eventParam = paramObj->content;
+    return DH_SUCCESS;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
