@@ -94,7 +94,7 @@ HWTEST_F(DMicClientTest, SetUp_001, TestSize.Level1)
     micClient_->SetAttrs(devId, clientCallback);
     AudioParam audioParam;
     EXPECT_NE(DH_SUCCESS, micClient_->SetUp(audioParam));
-    EXPECT_EQ(DH_SUCCESS, micClient_->SetUp(audioParam_));//EXPECT_EQ(ERR_DH_AUDIO_TRANS_ERROR, micClient_->SetUp(audioParam_));
+    EXPECT_EQ(DH_SUCCESS, micClient_->SetUp(audioParam_));
 }
 
 /**
@@ -159,7 +159,7 @@ HWTEST_F(DMicClientTest, StopCapture002, TestSize.Level1)
     micClient_->isCaptureReady_.store(true);
     EXPECT_EQ(ERR_DH_AUDIO_CLIENT_CAPTURER_OR_MICTRANS_INSTANCE, micClient_->StopCapture());
     micClient_->SetUp(audioParam_);
-    EXPECT_EQ(ERR_DH_AUDIO_SA_STATUS_ERR, micClient_->StopCapture());//EXPECT_EQ(ERR_DH_AUDIO_FAILED, micClient_->StopCapture());
+    EXPECT_EQ(ERR_DH_AUDIO_SA_STATUS_ERR, micClient_->StopCapture());
 }
 
 /**
