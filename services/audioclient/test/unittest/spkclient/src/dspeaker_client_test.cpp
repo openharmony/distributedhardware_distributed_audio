@@ -99,11 +99,11 @@ HWTEST_F(DSpeakerClientTest, OnStateChange_001, TestSize.Level1)
 HWTEST_F(DSpeakerClientTest, SetUp_001, TestSize.Level1)
 {
     AudioParam audioParam;
-    EXPECT_EQ(DH_SUCCESS, speakerClient_->SetUp(audioParam));//EXPECT_NE(DH_SUCCESS, speakerClient_->SetUp(audioParam));
-    EXPECT_EQ(DH_SUCCESS, speakerClient_->SetUp(audioParam_));//EXPECT_EQ(ERR_DH_AUDIO_TRANS_ERROR, speakerClient_->SetUp(audioParam_));
+    EXPECT_EQ(DH_SUCCESS, speakerClient_->SetUp(audioParam));
+    EXPECT_EQ(DH_SUCCESS, speakerClient_->SetUp(audioParam_));
     speakerClient_->speakerTrans_ = nullptr;
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, speakerClient_->SetUp(audioParam));
-    EXPECT_EQ(DH_SUCCESS, speakerClient_->Release());//EXPECT_EQ(ERR_DH_AUDIO_SA_STATUS_ERR, speakerClient_->Release());
+    EXPECT_EQ(DH_SUCCESS, speakerClient_->Release());
     speakerClient_->clientStatus_ = AudioStatus::STATUS_READY;
     EXPECT_EQ(ERR_DH_AUDIO_CLIENT_RENDER_RELEASE_FAILED, speakerClient_->Release());
 }
