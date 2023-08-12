@@ -58,7 +58,7 @@ HWTEST_F(DMicDevTest, InitReceiverEngine_001, TestSize.Level1)
     size_t size = 4096;
     auto audioData = std::make_shared<AudioData>(size);
     mic_->OnEngineTransDataAvailable(audioData);
-    EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE, mic_->InitReceiverEngine(providerPtr));//EXPECT_EQ(DH_SUCCESS, mic_->InitReceiverEngine(providerPtr));
+    EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE, mic_->InitReceiverEngine(providerPtr));
     mic_->micTrans_ = std::make_shared<MockIAudioDataTransport>();
     EXPECT_EQ(DH_SUCCESS, mic_->InitReceiverEngine(providerPtr));
 }
@@ -208,7 +208,7 @@ HWTEST_F(DMicDevTest, Start_001, TestSize.Level1)
 HWTEST_F(DMicDevTest, Start_002, TestSize.Level1)
 {
     mic_->micTrans_ = nullptr;
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->SetUp());//EXPECT_EQ(ERR_DH_AUDIO_TRANS_ERROR, mic_->SetUp());
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->SetUp());
     EXPECT_NE(DH_SUCCESS, mic_->Start());
 
     mic_->micTrans_ = std::make_shared<MockIAudioDataTransport>();
@@ -249,7 +249,7 @@ HWTEST_F(DMicDevTest, Stop_001, TestSize.Level1)
 HWTEST_F(DMicDevTest, Stop_002, TestSize.Level1)
 {
     mic_->micTrans_ = nullptr;
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->SetUp());//EXPECT_EQ(ERR_DH_AUDIO_TRANS_ERROR, mic_->SetUp());
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->SetUp());
     EXPECT_NE(DH_SUCCESS, mic_->Start());
     EXPECT_EQ(DH_SUCCESS, mic_->Stop());
     EXPECT_FALSE(mic_->IsOpened());
