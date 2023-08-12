@@ -55,7 +55,7 @@ HWTEST_F(DSpeakerDevTest, InitSenderEngine_001, TestSize.Level1)
     spk_->OnEngineTransEvent(event);
     std::shared_ptr<AVTransMessage> message = nullptr;
     spk_->OnEngineTransMessage(message);
-    EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE, spk_->InitSenderEngine(providerPtr));//EXPECT_EQ(DH_SUCCESS, spk_->InitSenderEngine(providerPtr));
+    EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE, spk_->InitSenderEngine(providerPtr));
     spk_->speakerTrans_ = std::make_shared<MockIAudioDataTransport>();
     EXPECT_EQ(DH_SUCCESS, spk_->InitSenderEngine(providerPtr));
 }
