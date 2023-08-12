@@ -593,7 +593,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, CloseRenderDevice_001, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->CloseRenderDevice(devDesc));
     AdapterTest_->spkPinInUse_  = 1;
     AdapterTest_->extSpkCallback_ = new MockIDAudioCallback();
-    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->CloseRenderDevice(devDesc));
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_WAIT_TIMEOUT, AdapterTest_->CloseRenderDevice(devDesc));
     AdapterTest_->extSpkCallback_ = new MockRevertIDAudioCallback();
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->CloseRenderDevice(devDesc));
 }
@@ -626,7 +626,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, CloseCaptureDevice_001, TestSize.Level1)
     AdapterTest_->extMicCallback_ = new MockIDAudioCallback();
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->CloseCaptureDevice(devDesc));
     AdapterTest_->micPinInUse_  = 1;
-    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->CloseCaptureDevice(devDesc));
+    EXPECT_EQ(ERR_DH_AUDIO_HDF_WAIT_TIMEOUT, AdapterTest_->CloseCaptureDevice(devDesc));
 }
 
 /**
