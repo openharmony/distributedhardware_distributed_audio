@@ -289,7 +289,7 @@ void DSpeakerClient::PlayThreadRunning()
             dataQueue_.pop();
             DHLOGD("Pop spk data, dataqueue size: %d.", dataQueue_.size());
         }
-
+        int64_t startTime = GetNowTimeUs();
         int32_t writeOffSet = 0;
         while (writeOffSet < static_cast<int32_t>(audioData->Capacity())) {
             int32_t writeLen = audioRenderer_->Write(audioData->Data() + writeOffSet,
@@ -301,6 +301,10 @@ void DSpeakerClient::PlayThreadRunning()
             }
             writeOffSet += writeLen;
         }
+        int64_t endTime = GetNowTimeUs();
+        DHLOGE("This time cost: %lld, This time than the last time spent: %lld", endTime - startTime,
+            startTime - lastPlayStartTime_);
+        lastPlayStartTime_ = startTime;
     }
 }
 
@@ -333,6 +337,7 @@ void DSpeakerClient::FlushJitterQueue()
 int32_t DSpeakerClient::OnDecodeTransDataDone(const std::shared_ptr<AudioData> &audioData)
 {
     DHLOGI("Write stream buffer.");
+    int64_t startTime = GetNowTimeUs();
     if (audioData == nullptr) {
         DHLOGE("The parameter is empty.");
         return ERR_DH_AUDIO_CLIENT_PARAM_IS_NULL;
@@ -345,6 +350,10 @@ int32_t DSpeakerClient::OnDecodeTransDataDone(const std::shared_ptr<AudioData> &
     dataQueue_.push(audioData);
     dataQueueCond_.notify_all();
     DHLOGI("Push new spk data, buf len: %d.", dataQueue_.size());
+    int64_t endTime = GetNowTimeUs();
+    DHLOGE("This time cost: %lld, This time than the last time spent: %lld", endTime - startTime,
+        startTime - lastTransStartTime_);
+    lastTransStartTime_ = startTime;
     return DH_SUCCESS;
 }
 

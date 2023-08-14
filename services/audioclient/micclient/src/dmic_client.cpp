@@ -231,6 +231,7 @@ void DMicClient::CaptureThreadRunning()
         std::shared_ptr<AudioData> audioData = std::make_shared<AudioData>(audioParam_.comParam.frameSize);
         size_t bytesRead = 0;
         bool errorFlag = false;
+        int64_t startTime = GetNowTimeUs();
         while (bytesRead < audioParam_.comParam.frameSize) {
             int32_t len = audioCapturer_->Read(*(audioData->Data() + bytesRead),
                 audioParam_.comParam.frameSize - bytesRead, isBlocking_.load());
@@ -240,15 +241,24 @@ void DMicClient::CaptureThreadRunning()
                 errorFlag = true;
                 break;
             }
+            int64_t endTime = GetNowTimeUs();
+            DHLOGE("This time cost: %lld, This time than the last time spent: %lld", endTime - startTime,
+                startTime - lastPlayStartTime_);
+            lastPlayStartTime_ = startTime;
         }
         if (errorFlag) {
             DHLOGE("Bytes read failed.");
             break;
         }
+        int64_t startTransTime = GetNowTimeUs();
         int32_t ret = micTrans_->FeedAudioData(audioData);
         if (ret != DH_SUCCESS) {
             DHLOGE("Failed to send data.");
         }
+        int64_t endTransTime = GetNowTimeUs();
+        DHLOGE("This time cost: %lld, This time than the last time spent: %lld", endTransTime - startTransTime,
+            startTransTime - lastTransStartTime_);
+        lastTransStartTime_ = startTransTime;
     }
 }
 
