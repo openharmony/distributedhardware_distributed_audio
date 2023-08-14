@@ -302,7 +302,7 @@ void DSpeakerClient::PlayThreadRunning()
             writeOffSet += writeLen;
         }
         int64_t endTime = GetNowTimeUs();
-        DHLOGE("This time cost: %lld, This time than the last time spent: %lld", endTime - startTime,
+        DHLOGD("This time cost: %lld, This time than the last time spent: %lld", endTime - startTime,
             startTime - lastPlayStartTime_);
         lastPlayStartTime_ = startTime;
     }
@@ -351,7 +351,7 @@ int32_t DSpeakerClient::OnDecodeTransDataDone(const std::shared_ptr<AudioData> &
     dataQueueCond_.notify_all();
     DHLOGI("Push new spk data, buf len: %d.", dataQueue_.size());
     int64_t endTime = GetNowTimeUs();
-    DHLOGE("This time cost: %lld, This time than the last time spent: %lld", endTime - startTime,
+    DHLOGD("This time cost: %lld, This time than the last time spent: %lld", endTime - startTime,
         startTime - lastTransStartTime_);
     lastTransStartTime_ = startTime;
     return DH_SUCCESS;

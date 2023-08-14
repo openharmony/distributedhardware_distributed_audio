@@ -242,7 +242,7 @@ void DMicClient::CaptureThreadRunning()
                 break;
             }
             int64_t endTime = GetNowTimeUs();
-            DHLOGE("This time cost: %lld, This time than the last time spent: %lld", endTime - startTime,
+            DHLOGD("This time cost: %lld, This time than the last time spent: %lld", endTime - startTime,
                 startTime - lastPlayStartTime_);
             lastPlayStartTime_ = startTime;
         }
@@ -256,7 +256,7 @@ void DMicClient::CaptureThreadRunning()
             DHLOGE("Failed to send data.");
         }
         int64_t endTransTime = GetNowTimeUs();
-        DHLOGE("This time cost: %lld, This time than the last time spent: %lld", endTransTime - startTransTime,
+        DHLOGD("This time cost: %lld, This time than the last time spent: %lld", endTransTime - startTransTime,
             startTransTime - lastTransStartTime_);
         lastTransStartTime_ = startTransTime;
     }
