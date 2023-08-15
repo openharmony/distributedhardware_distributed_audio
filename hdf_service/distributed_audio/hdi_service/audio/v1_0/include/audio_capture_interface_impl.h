@@ -85,6 +85,7 @@ private:
     int64_t frameIndex_ = 0;
     int64_t framePeriodNs_ = 0;
     int64_t startTime_ = 0;
+    int64_t lastCaptureFrameStartTime_ = 0;
 
     std::mutex captureMtx_;
     AudioCaptureStatus captureStatus_ = CAPTURE_STATUS_CLOSE;

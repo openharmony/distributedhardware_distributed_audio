@@ -122,6 +122,7 @@ private:
     uint64_t writeNum_ = 0;
     int64_t writeTvSec_ = 0;
     int64_t writeTvNSec_ = 0;
+    int64_t lastReadStartTime_ = 0;
     std::thread enqueueDataThread_;
     std::mutex writeAshmemMutex_;
     std::condition_variable dataQueueCond_;

@@ -67,6 +67,7 @@ int32_t AudioCaptureInterfaceImpl::CaptureFrame(std::vector<int8_t> &frame, uint
     int64_t timeOffset = UpdateTimeOffset(frameIndex_, framePeriodNs_, startTime_);
     DHLOGD("Capture framIndex: %lld, timeOffset: %lld.", frameIndex_, timeOffset);
 
+    int64_t startTime = GetNowTimeUs();
     std::lock_guard<std::mutex> captureLck(captureMtx_);
     if (captureStatus_ != CAPTURE_STATUS_START) {
         DHLOGE("Capture status wrong, return false.");
@@ -93,6 +94,10 @@ int32_t AudioCaptureInterfaceImpl::CaptureFrame(std::vector<int8_t> &frame, uint
     ++frameIndex_;
     AbsoluteSleep(startTime_ + frameIndex_ * framePeriodNs_ - timeOffset);
     DHLOGD("Capture audio frame success.");
+    int64_t endTime = GetNowTimeUs();
+    DHLOGD("This time capture frame spend: %lld, The interval between this capture frame time and the last time: %lld",
+        endTime - startTime, startTime - lastCaptureFrameStartTime_);
+    lastCaptureFrameStartTime_ = startTime;
     return HDF_SUCCESS;
 }
 

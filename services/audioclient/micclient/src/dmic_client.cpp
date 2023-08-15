@@ -242,9 +242,9 @@ void DMicClient::CaptureThreadRunning()
                 break;
             }
             int64_t endTime = GetNowTimeUs();
-            DHLOGD("This time cost: %lld, This time than the last time spent: %lld", endTime - startTime,
-                startTime - lastPlayStartTime_);
-            lastPlayStartTime_ = startTime;
+            DHLOGD("This time capture spend: %lld, The time interval of capture this time and the last time: %lld",
+                endTime - startTime, startTime - lastCaptureStartTime_);
+            lastCaptureStartTime_ = startTime;
         }
         if (errorFlag) {
             DHLOGE("Bytes read failed.");
@@ -256,8 +256,8 @@ void DMicClient::CaptureThreadRunning()
             DHLOGE("Failed to send data.");
         }
         int64_t endTransTime = GetNowTimeUs();
-        DHLOGD("This time cost: %lld, This time than the last time spent: %lld", endTransTime - startTransTime,
-            startTransTime - lastTransStartTime_);
+        DHLOGD("This time send data spend: %lld, The time interval of send data this time and the last time: %lld",
+            endTransTime - startTransTime, startTransTime - lastTransStartTime_);
         lastTransStartTime_ = startTransTime;
     }
 }

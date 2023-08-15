@@ -320,6 +320,7 @@ int32_t DMicDev::WriteStreamData(const std::string& devId, const int32_t dhId, s
 
 int32_t DMicDev::ReadStreamData(const std::string &devId, const int32_t dhId, std::shared_ptr<AudioData> &data)
 {
+    int64_t startTime = GetNowTimeUs();
     if (curStatus_ != AudioStatus::STATUS_START) {
         DHLOGE("Distributed audio is not starting status.");
         return ERR_DH_AUDIO_FAILED;
@@ -340,6 +341,10 @@ int32_t DMicDev::ReadStreamData(const std::string &devId, const int32_t dhId, st
         data = dataQueue_.front();
         dataQueue_.pop();
     }
+    int64_t endTime = GetNowTimeUs();
+    DHLOGD("This time read data spend: %lld, The time interval of read data this time and the last time: %lld",
+        endTime - startTime, startTime - lastReadStartTime_);
+    lastReadStartTime_ = startTime;
     return DH_SUCCESS;
 }
 

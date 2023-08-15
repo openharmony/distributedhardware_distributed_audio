@@ -92,6 +92,7 @@ int32_t AudioRenderInterfaceImpl::RenderFrame(const std::vector<int8_t> &frame, 
         devAttrs_.channelCount, devAttrs_.format, devAttrs_.frameSize);
     DHLOGD("Render frameIndex: %lld.", frameIndex_);
 
+    int64_t startTime = GetNowTimeUs();
     std::lock_guard<std::mutex> renderLck(renderMtx_);
     if (renderStatus_ != RENDER_STATUS_START) {
         DHLOGE("Render status wrong, return false.");
@@ -113,6 +114,10 @@ int32_t AudioRenderInterfaceImpl::RenderFrame(const std::vector<int8_t> &frame, 
 
     ++frameIndex_;
     DHLOGD("Render audio frame success.");
+    int64_t endTime = GetNowTimeUs();
+    DHLOGD("This time render frame spend: %lld, The time interval of render frame this time and the last time: %lld",
+        endTime - startTime, startTime - lastRenderFrameStartTime_);
+    lastRenderFrameStartTime_ = startTime;
     return HDF_SUCCESS;
 }
 

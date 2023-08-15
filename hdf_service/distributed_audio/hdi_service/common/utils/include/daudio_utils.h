@@ -17,6 +17,7 @@
 #define OHOS_DAUDIO_UTILS_H
 
 #include <string>
+#include <chrono>
 
 #define AUDIO_MS_PER_SECOND 1000
 #define AUDIO_US_PER_SECOND 1000000
@@ -36,6 +37,8 @@ int32_t GetAudioParamBool(const std::string &params, const std::string &key, boo
 int32_t SetAudioParamStr(std::string &params, const std::string &key, const std::string &value);
 
 int32_t GetDevTypeByDHId(int32_t dhId);
+
+int64_t GetNowTimeUs();
 
 uint32_t CalculateFrameSize(uint32_t sampleRate, uint32_t channelCount,
     int32_t format, uint32_t timeInterval, bool isMMAP);

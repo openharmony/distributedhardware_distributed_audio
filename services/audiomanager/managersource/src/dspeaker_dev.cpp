@@ -339,6 +339,7 @@ int32_t DSpeakerDev::ReadStreamData(const std::string &devId, const int32_t dhId
 int32_t DSpeakerDev::WriteStreamData(const std::string &devId, const int32_t dhId, std::shared_ptr<AudioData> &data)
 {
     DHLOGD("Write stream data, dhId:%d", dhId);
+    int64_t startTime = GetNowTimeUs();
     if (speakerTrans_ == nullptr) {
         DHLOGE("Write stream data, speaker trans is null.");
         return ERR_DH_AUDIO_SA_SPEAKER_TRANS_NULL;
@@ -348,6 +349,10 @@ int32_t DSpeakerDev::WriteStreamData(const std::string &devId, const int32_t dhI
         DHLOGE("Write stream data failed, ret: %d.", ret);
         return ret;
     }
+    int64_t endTime = GetNowTimeUs();
+    DHLOGD("This time write data spend: %lld, The time interval of write data this time and the last time: %lld",
+        endTime - startTime, startTime - lastwriteStartTime_);
+    lastwriteStartTime_ = startTime;
     return DH_SUCCESS;
 }
 

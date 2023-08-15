@@ -105,6 +105,13 @@ int32_t GetDevTypeByDHId(int32_t dhId)
     return AUDIO_DEVICE_TYPE_UNKNOWN;
 }
 
+int64_t GetNowTimeUs()
+{
+    std::chrono::microseconds nowUs =
+        std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch());
+    return nowUs.count();
+}
+
 uint32_t CalculateFrameSize(uint32_t sampleRate, uint32_t channelCount,
     int32_t format, uint32_t timeInterval, bool isMMAP)
 {

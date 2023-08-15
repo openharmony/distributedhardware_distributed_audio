@@ -277,6 +277,7 @@ void DSpeakerClient::PlayThreadRunning()
 
     FillJitterQueue();
     while (audioRenderer_ != nullptr && isRenderReady_.load()) {
+        int64_t startTime = GetNowTimeUs();
         std::shared_ptr<AudioData> audioData = nullptr;
         {
             std::unique_lock<std::mutex> spkLck(dataQueueMtx_);
@@ -289,7 +290,6 @@ void DSpeakerClient::PlayThreadRunning()
             dataQueue_.pop();
             DHLOGD("Pop spk data, dataqueue size: %d.", dataQueue_.size());
         }
-        int64_t startTime = GetNowTimeUs();
         int32_t writeOffSet = 0;
         while (writeOffSet < static_cast<int32_t>(audioData->Capacity())) {
             int32_t writeLen = audioRenderer_->Write(audioData->Data() + writeOffSet,
@@ -302,8 +302,8 @@ void DSpeakerClient::PlayThreadRunning()
             writeOffSet += writeLen;
         }
         int64_t endTime = GetNowTimeUs();
-        DHLOGD("This time cost: %lld, This time than the last time spent: %lld", endTime - startTime,
-            startTime - lastPlayStartTime_);
+        DHLOGD("This time play spend: %lld, The time interval of play this time and the last time: %lld",
+            endTime - startTime, startTime - lastPlayStartTime_);
         lastPlayStartTime_ = startTime;
     }
 }
@@ -351,9 +351,9 @@ int32_t DSpeakerClient::OnDecodeTransDataDone(const std::shared_ptr<AudioData> &
     dataQueueCond_.notify_all();
     DHLOGI("Push new spk data, buf len: %d.", dataQueue_.size());
     int64_t endTime = GetNowTimeUs();
-    DHLOGD("This time cost: %lld, This time than the last time spent: %lld", endTime - startTime,
-        startTime - lastTransStartTime_);
-    lastTransStartTime_ = startTime;
+    DHLOGD("This time receivce data spend: %lld, The time interval of receivce data this time and the last time: %lld",
+        endTime - startTime, startTime - lastReceiveDataStartTime_);
+    lastReceiveDataStartTime_ = startTime;
     return DH_SUCCESS;
 }
 

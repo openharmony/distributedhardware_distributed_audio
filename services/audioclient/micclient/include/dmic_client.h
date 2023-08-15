@@ -81,7 +81,7 @@ private:
     std::weak_ptr<IAudioEventCallback> eventCallback_;
     std::unique_ptr<AudioStandard::AudioCapturer> audioCapturer_ = nullptr;
     std::shared_ptr<IAudioDataTransport> micTrans_ = nullptr;
-    int64_t lastPlayStartTime_ = 0;
+    int64_t lastCaptureStartTime_ = 0;
     int64_t lastTransStartTime_ = 0;
 };
 } // DistributedHardware
