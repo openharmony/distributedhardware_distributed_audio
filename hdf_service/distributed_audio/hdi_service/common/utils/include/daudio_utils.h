@@ -17,7 +17,6 @@
 #define OHOS_DAUDIO_UTILS_H
 
 #include <string>
-#include <chrono>
 
 #define AUDIO_MS_PER_SECOND 1000
 #define AUDIO_US_PER_SECOND 1000000
