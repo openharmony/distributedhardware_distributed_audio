@@ -120,6 +120,7 @@ int32_t AudioRenderInterfaceImpl::RenderFrame(const std::vector<int8_t> &frame, 
     if (currentInterval > MAX_TIME_INTERVAL_US || twoInterval > MAX_TIME_INTERVAL_US) {
         DHLOGE("This time render frame spend: %lld, The interval of render frame this time and the last time: %lld",
             currentInterval, twoInterval);
+    }
     lastRenderFrameStartTime_ = startTime;
     return HDF_SUCCESS;
 }
