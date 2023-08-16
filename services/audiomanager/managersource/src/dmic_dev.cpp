@@ -342,8 +342,12 @@ int32_t DMicDev::ReadStreamData(const std::string &devId, const int32_t dhId, st
         dataQueue_.pop();
     }
     int64_t endTime = GetNowTimeUs();
-    DHLOGD("This time read data spend: %lld, The time interval of read data this time and the last time: %lld",
-        endTime - startTime, startTime - lastReadStartTime_);
+    int64_t currentInterval = endTime - startTime;
+    int64_t twoInterval = startTime - lastReadStartTime_;
+    if (currentInterval > MAX_TIME_INTERVAL_US || twoInterval > MAX_TIME_INTERVAL_US) {
+        DHLOGE("This time read data spend: %lld, The interval of read data this time and the last time: %lld",
+            currentInterval, twoInterval);
+    }
     lastReadStartTime_ = startTime;
     return DH_SUCCESS;
 }

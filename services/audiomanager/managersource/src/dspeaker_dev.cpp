@@ -350,8 +350,12 @@ int32_t DSpeakerDev::WriteStreamData(const std::string &devId, const int32_t dhI
         return ret;
     }
     int64_t endTime = GetNowTimeUs();
-    DHLOGD("This time write data spend: %lld, The time interval of write data this time and the last time: %lld",
-        endTime - startTime, startTime - lastwriteStartTime_);
+    int64_t currentInterval = endTime - startTime;
+    int64_t twoInterval = startTime - lastwriteStartTime_;
+    if (currentInterval > MAX_TIME_INTERVAL_US || twoInterval > MAX_TIME_INTERVAL_US) {
+        DHLOGE("This time write data spend: %lld, The interval of write data this time and the last time: %lld",
+            currentInterval, twoInterval);
+    }
     lastwriteStartTime_ = startTime;
     return DH_SUCCESS;
 }

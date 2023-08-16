@@ -242,8 +242,12 @@ void DMicClient::CaptureThreadRunning()
                 break;
             }
             int64_t endTime = GetNowTimeUs();
-            DHLOGD("This time capture spend: %lld, The time interval of capture this time and the last time: %lld",
-                endTime - startTime, startTime - lastCaptureStartTime_);
+            int64_t currentInterval = endTime - startTime;
+            int64_t twoInterval = startTime - lastCaptureStartTime_;
+            if (currentInterval > MAX_TIME_INTERVAL_US || twoInterval > MAX_TIME_INTERVAL_US) {
+                DHLOGE("This time capture spend: %lld, The interval of capture this time and the last time: %lld",
+                    currentInterval, twoInterval);
+            }
             lastCaptureStartTime_ = startTime;
         }
         if (errorFlag) {
@@ -256,8 +260,12 @@ void DMicClient::CaptureThreadRunning()
             DHLOGE("Failed to send data.");
         }
         int64_t endTransTime = GetNowTimeUs();
-        DHLOGD("This time send data spend: %lld, The time interval of send data this time and the last time: %lld",
-            endTransTime - startTransTime, startTransTime - lastTransStartTime_);
+        int64_t currentInterval = endTransTime - startTransTime;
+        int64_t twoInterval = startTransTime - lastTransStartTime_;
+        if (currentInterval > MAX_TIME_INTERVAL_US || twoInterval > MAX_TIME_INTERVAL_US) {
+            DHLOGE("This time send data spend: %lld, The interval of send data this time and the last time: %lld",
+                currentInterval, twoInterval);
+        }
         lastTransStartTime_ = startTransTime;
     }
 }

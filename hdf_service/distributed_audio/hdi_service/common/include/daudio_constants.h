@@ -67,6 +67,7 @@ constexpr uint32_t AUDIO_FORMAT_DEFAULT = 16;
 constexpr int32_t MILLISECOND_PER_SECOND = 1000;
 constexpr uint32_t DEFAULT_AUDIO_DATA_SIZE = 4096;
 constexpr int64_t AUDIO_OFFSET_FRAME_NUM = 10;
+constexpr int64_t MAX_TIME_INTERVAL_US = 23000;
 
 constexpr uint32_t AUDIO_DEFAULT_MAX_VOLUME_LEVEL = 15;
 constexpr uint32_t AUDIO_DEFAULT_MIN_VOLUME_LEVEL = 0;
