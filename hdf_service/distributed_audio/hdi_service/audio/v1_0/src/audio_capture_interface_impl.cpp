@@ -95,11 +95,9 @@ int32_t AudioCaptureInterfaceImpl::CaptureFrame(std::vector<int8_t> &frame, uint
     AbsoluteSleep(startTime_ + frameIndex_ * framePeriodNs_ - timeOffset);
     DHLOGD("Capture audio frame success.");
     int64_t endTime = GetNowTimeUs();
-    int64_t currentInterval = endTime - startTime;
-    int64_t twoInterval = startTime - lastCaptureFrameStartTime_;
-    if (currentInterval > MAX_TIME_INTERVAL_US || twoInterval > MAX_TIME_INTERVAL_US) {
+    if (IsLongInterval(startTime, endTime, lastCaptureFrameStartTime_)) {
         DHLOGD("This time capture frame spend: %lld, The interval of this capture frame time and the last time: %lld",
-            currentInterval, twoInterval);
+            endTime - startTime, startTime - lastCaptureFrameStartTime_);
     }
     lastCaptureFrameStartTime_ = startTime;
     return HDF_SUCCESS;
