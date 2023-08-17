@@ -108,7 +108,7 @@ private:
     std::shared_ptr<IAudioDataTransport> speakerTrans_ = nullptr;
     std::weak_ptr<IAudioEventCallback> eventCallback_;
     int64_t lastPlayStartTime_ = 0;
-    int64_t lastReceiveDataStartTime_ = 0;
+    int64_t lastReceiveStartTime_ = 0;
 };
 } // DistributedHardware
 } // OHOS

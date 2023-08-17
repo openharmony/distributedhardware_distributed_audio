@@ -115,11 +115,11 @@ int32_t AudioRenderInterfaceImpl::RenderFrame(const std::vector<int8_t> &frame, 
     ++frameIndex_;
     DHLOGD("Render audio frame success.");
     int64_t endTime = GetNowTimeUs();
-    if (IsLongInterval(startTime, endTime, lastRenderFrameStartTime_)) {
+    if (IsOutDurationRange(startTime, endTime, lastRenderStartTime_)) {
         DHLOGE("This time render frame spend: %lld, The interval of render frame this time and the last time: %lld",
-            endTime - startTime, startTime - lastRenderFrameStartTime_);
+            endTime - startTime, startTime - lastRenderStartTime_);
     }
-    lastRenderFrameStartTime_ = startTime;
+    lastRenderStartTime_ = startTime;
     return HDF_SUCCESS;
 }
 

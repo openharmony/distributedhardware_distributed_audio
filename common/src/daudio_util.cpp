@@ -322,14 +322,11 @@ bool CheckDevIdIsLegal(const std::string &devId)
     return true;
 }
 
-bool IsLongInterval(int64_t startTime, int64_t endTime, int64_t lastStartTime)
+bool IsOutDurationRange(int64_t startTime, int64_t endTime, int64_t lastStartTime)
 {
     int64_t currentInterval = endTime - startTime;
-    int64_t twoInterval = startTime - lastStartTime;
-    if (currentInterval > MAX_TIME_INTERVAL_US || twoInterval > MAX_TIME_INTERVAL_US) {
-        return true;
-    }
-    return false;
+    int64_t twiceInterval = startTime - lastStartTime;
+    return (currentInterval > MAX_TIME_INTERVAL_US || twiceInterval > MAX_TIME_INTERVAL_US) ? true : false;
 }
 
 template <typename T>

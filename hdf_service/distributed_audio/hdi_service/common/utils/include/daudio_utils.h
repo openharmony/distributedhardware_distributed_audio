@@ -52,7 +52,7 @@ int64_t CalculateOffset(const int64_t frameindex, const int64_t framePeriodNs, c
 
 int64_t UpdateTimeOffset(const int64_t frameIndex, const int64_t framePeriodNs, int64_t &startTime);
 
-bool IsLongInterval(int64_t startTime, int64_t endTime, int64_t lastStartTime);
+bool IsOutDurationRange(int64_t startTime, int64_t endTime, int64_t lastStartTime);
 } // DistributedHardware
 } // OHOS
 #endif

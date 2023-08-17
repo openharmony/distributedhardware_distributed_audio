@@ -302,7 +302,7 @@ void DSpeakerClient::PlayThreadRunning()
             writeOffSet += writeLen;
         }
         int64_t endTime = GetNowTimeUs();
-        if (IsLongInterval(startTime, endTime, lastPlayStartTime_)) {
+        if (IsOutDurationRange(startTime, endTime, lastPlayStartTime_)) {
             DHLOGE("This time play spend: %lld, The interval of play this time and the last time: %lld",
                 endTime - startTime, startTime - lastPlayStartTime_);
         }
@@ -353,11 +353,11 @@ int32_t DSpeakerClient::OnDecodeTransDataDone(const std::shared_ptr<AudioData> &
     dataQueueCond_.notify_all();
     DHLOGI("Push new spk data, buf len: %d.", dataQueue_.size());
     int64_t endTime = GetNowTimeUs();
-    if (IsLongInterval(startTime, endTime, lastReceiveDataStartTime_)) {
+    if (IsOutDurationRange(startTime, endTime, lastReceiveStartTime_)) {
         DHLOGE("This time receivce data spend: %lld, The interval of receivce data this time and the last time: %lld",
-            endTime - startTime, startTime - lastReceiveDataStartTime_);
+            endTime - startTime, startTime - lastReceiveStartTime_);
     }
-    lastReceiveDataStartTime_ = startTime;
+    lastReceiveStartTime_ = startTime;
     return DH_SUCCESS;
 }
 
