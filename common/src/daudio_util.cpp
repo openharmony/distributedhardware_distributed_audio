@@ -322,6 +322,13 @@ bool CheckDevIdIsLegal(const std::string &devId)
     return true;
 }
 
+bool IsOutDurationRange(int64_t startTime, int64_t endTime, int64_t lastStartTime)
+{
+    int64_t currentInterval = endTime - startTime;
+    int64_t twiceInterval = startTime - lastStartTime;
+    return (currentInterval > MAX_TIME_INTERVAL_US || twiceInterval > MAX_TIME_INTERVAL_US) ? true : false;
+}
+
 template <typename T>
 bool GetSysPara(const char *key, T &value)
 {

@@ -277,6 +277,7 @@ void DSpeakerClient::PlayThreadRunning()
 
     FillJitterQueue();
     while (audioRenderer_ != nullptr && isRenderReady_.load()) {
+        int64_t startTime = GetNowTimeUs();
         std::shared_ptr<AudioData> audioData = nullptr;
         {
             std::unique_lock<std::mutex> spkLck(dataQueueMtx_);
@@ -289,7 +290,6 @@ void DSpeakerClient::PlayThreadRunning()
             dataQueue_.pop();
             DHLOGD("Pop spk data, dataqueue size: %d.", dataQueue_.size());
         }
-
         int32_t writeOffSet = 0;
         while (writeOffSet < static_cast<int32_t>(audioData->Capacity())) {
             int32_t writeLen = audioRenderer_->Write(audioData->Data() + writeOffSet,
@@ -301,6 +301,12 @@ void DSpeakerClient::PlayThreadRunning()
             }
             writeOffSet += writeLen;
         }
+        int64_t endTime = GetNowTimeUs();
+        if (IsOutDurationRange(startTime, endTime, lastPlayStartTime_)) {
+            DHLOGE("This time play spend: %lld, The interval of play this time and the last time: %lld",
+                endTime - startTime, startTime - lastPlayStartTime_);
+        }
+        lastPlayStartTime_ = startTime;
     }
 }
 
@@ -333,6 +339,7 @@ void DSpeakerClient::FlushJitterQueue()
 int32_t DSpeakerClient::OnDecodeTransDataDone(const std::shared_ptr<AudioData> &audioData)
 {
     DHLOGI("Write stream buffer.");
+    int64_t startTime = GetNowTimeUs();
     if (audioData == nullptr) {
         DHLOGE("The parameter is empty.");
         return ERR_DH_AUDIO_CLIENT_PARAM_IS_NULL;
@@ -345,6 +352,12 @@ int32_t DSpeakerClient::OnDecodeTransDataDone(const std::shared_ptr<AudioData> &
     dataQueue_.push(audioData);
     dataQueueCond_.notify_all();
     DHLOGI("Push new spk data, buf len: %d.", dataQueue_.size());
+    int64_t endTime = GetNowTimeUs();
+    if (IsOutDurationRange(startTime, endTime, lastReceiveStartTime_)) {
+        DHLOGE("This time receivce data spend: %lld, The interval of receivce data this time and the last time: %lld",
+            endTime - startTime, startTime - lastReceiveStartTime_);
+    }
+    lastReceiveStartTime_ = startTime;
     return DH_SUCCESS;
 }
 

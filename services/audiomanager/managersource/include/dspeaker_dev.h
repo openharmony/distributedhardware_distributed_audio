@@ -111,6 +111,7 @@ private:
     int64_t readTvSec_ = 0;
     int64_t readTvNSec_ = 0;
     std::thread enqueueDataThread_;
+    int64_t lastwriteStartTime_ = 0;
 };
 } // DistributedHardware
 } // OHOS

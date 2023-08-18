@@ -115,6 +115,7 @@ private:
     uint32_t volMin_ = 0;
     int64_t frameIndex_ = 0;
     float renderSpeed_ = 0;
+    int64_t lastRenderStartTime_ = 0;
     AudioChannelMode channelMode_ = AUDIO_CHANNEL_NORMAL;
     AudioRenderStatus renderStatus_ = RENDER_STATUS_CLOSE;
     sptr<IDAudioCallback> audioExtCallback_ = nullptr;

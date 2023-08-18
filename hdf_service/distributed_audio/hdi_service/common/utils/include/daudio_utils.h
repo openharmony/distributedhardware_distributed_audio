@@ -37,6 +37,8 @@ int32_t SetAudioParamStr(std::string &params, const std::string &key, const std:
 
 int32_t GetDevTypeByDHId(int32_t dhId);
 
+int64_t GetNowTimeUs();
+
 uint32_t CalculateFrameSize(uint32_t sampleRate, uint32_t channelCount,
     int32_t format, uint32_t timeInterval, bool isMMAP);
 
@@ -49,6 +51,8 @@ int32_t AbsoluteSleep(int64_t nanoTime);
 int64_t CalculateOffset(const int64_t frameindex, const int64_t framePeriodNs, const int64_t startTime);
 
 int64_t UpdateTimeOffset(const int64_t frameIndex, const int64_t framePeriodNs, int64_t &startTime);
+
+bool IsOutDurationRange(int64_t startTime, int64_t endTime, int64_t lastStartTime);
 } // DistributedHardware
 } // OHOS
 #endif

@@ -105,6 +105,13 @@ int32_t GetDevTypeByDHId(int32_t dhId)
     return AUDIO_DEVICE_TYPE_UNKNOWN;
 }
 
+int64_t GetNowTimeUs()
+{
+    std::chrono::microseconds nowUs =
+        std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch());
+    return nowUs.count();
+}
+
 uint32_t CalculateFrameSize(uint32_t sampleRate, uint32_t channelCount,
     int32_t format, uint32_t timeInterval, bool isMMAP)
 {
@@ -160,6 +167,13 @@ int64_t UpdateTimeOffset(const int64_t frameIndex, const int64_t framePeriodNs, 
         timeOffset = CalculateOffset(frameIndex, framePeriodNs, startTime);
     }
     return timeOffset;
+}
+
+bool IsOutDurationRange(int64_t startTime, int64_t endTime, int64_t lastStartTime)
+{
+    int64_t currentInterval = endTime - startTime;
+    int64_t twiceInterval = startTime - lastStartTime;
+    return (currentInterval > MAX_TIME_INTERVAL_US || twiceInterval > MAX_TIME_INTERVAL_US) ? true : false;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

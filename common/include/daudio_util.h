@@ -47,6 +47,7 @@ int64_t UpdateTimeOffset(const int64_t frameIndex, const int64_t framePeriodNs, 
 void GetCurrentTime(int64_t &tvSec, int64_t &tvNSec);
 bool CheckIsNum(const std::string &jsonString);
 bool CheckDevIdIsLegal(const std::string &devId);
+bool IsOutDurationRange(int64_t startTime, int64_t endTime, int64_t lastStartTime);
 
 template <typename T>
 bool GetSysPara(const char *key, T &value);
