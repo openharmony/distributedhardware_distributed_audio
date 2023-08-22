@@ -550,6 +550,7 @@ void DSpeakerClient::Pause()
     if (audioRenderer_ != nullptr) {
         audioRenderer_->Flush();
     }
+    audioRenderer_->Pause();
     clientStatus_ = AudioStatus::STATUS_START;
     isRenderReady_.store(true);
 }
@@ -564,6 +565,7 @@ void DSpeakerClient::ReStart()
         isRenderReady_.store(true);
         renderDataThread_ = std::thread(&DSpeakerClient::PlayThreadRunning, this);
     }
+    audioRenderer_->Start();
     clientStatus_ = AudioStatus::STATUS_START;
 }
 
