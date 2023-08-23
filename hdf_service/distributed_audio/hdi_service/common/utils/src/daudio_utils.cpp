@@ -175,5 +175,15 @@ bool IsOutDurationRange(int64_t startTime, int64_t endTime, int64_t lastStartTim
     int64_t twiceInterval = startTime - lastStartTime;
     return (currentInterval > MAX_TIME_INTERVAL_US || twiceInterval > MAX_TIME_INTERVAL_US) ? true : false;
 }
+
+void SaveFile(std::string fileName, uint8_t *audioData, int32_t size)
+{
+    std::ofstream ofs(fileName, std::ios::binary | std::ios::out | std::ios::app);
+    if (!ofs.is_open()) {
+        return;
+    }
+    ofs.write((const char*)(audioData), size);
+    ofs.close();
+}
 } // namespace DistributedHardware
 } // namespace OHOS

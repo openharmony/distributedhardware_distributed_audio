@@ -31,12 +31,14 @@ const std::string ARGS_HELP = "-h";
 const std::string ARGS_SOURCE_DEVID = "--sourceDevId";
 const std::string ARGS_SINK_INFO = "--sinkInfo";
 const std::string ARGS_ABILITY = "--ability";
+const std::string ARGS_DUMP_AUDIO_DATA = "--dumpAudioData";
 
 const std::map<std::string, HidumpFlag> ARGS_MAP = {
     { ARGS_HELP, HidumpFlag::GET_HELP },
     { ARGS_SOURCE_DEVID, HidumpFlag::GET_SOURCE_DEVID },
     { ARGS_SINK_INFO, HidumpFlag::GET_SINK_INFO },
     { ARGS_ABILITY, HidumpFlag::GET_ABILITY },
+    { ARGS_DUMP_AUDIO_DATA, HidumpFlag::DUMP_AUDIO_DATA },
 };
 }
 
@@ -93,6 +95,9 @@ int32_t DaudioHidumper::ProcessDump(const std::string &args, std::string &result
         }
         case HidumpFlag::GET_ABILITY: {
             return GetAbilityInfo(result);
+        }
+        case HidumpFlag::DUMP_AUDIO_DATA: {
+            return DumpAudioData(result);
         }
         default: {
             return ShowIllegalInfomation(result);
@@ -151,6 +156,19 @@ int32_t DaudioHidumper::GetAbilityInfo(std::string &result)
     return DH_SUCCESS;
 }
 
+int32_t DaudioHidumper::DumpAudioData(std::string &result)
+{
+    DHLOGI("Dump audio data.");
+    result.append("dump...");
+    HidumperFlag_ = true;
+    return DH_SUCCESS;
+}
+
+bool DaudioHidumper::GetFlagStatus()
+{
+    return HidumperFlag_;
+}
+
 void DaudioHidumper::ShowHelp(std::string &result)
 {
     DHLOGI("Show help.");
@@ -163,7 +181,9 @@ void DaudioHidumper::ShowHelp(std::string &result)
         .append("--sinkInfo    ")
         .append(": dump sink info in the system\n")
         .append("--ability     ")
-        .append(": dump current ability of the audio in the system\n");
+        .append(": dump current ability of the audio in the system\n")
+        .append("--dumpAudioData")
+        .append(": dump audio data in the system\n");
 }
 
 int32_t DaudioHidumper::ShowIllegalInfomation(std::string &result)

@@ -84,7 +84,9 @@ int32_t AudioCaptureInterfaceImpl::CaptureFrame(std::vector<int8_t> &frame, uint
         DHLOGE("Read stream data failed.");
         return HDF_FAILURE;
     }
-
+    if (dumpFlag_) {
+        SaveFile(FILE_NAME, reinterpret_cast<uint8_t*>(audioData.data.data()), audioData.data.size());
+    }
     frame.resize(devAttrs_.frameSize);
     ret = memcpy_s(frame.data(), frame.size(), audioData.data.data(), audioData.data.size());
     if (ret != EOK) {
@@ -332,6 +334,11 @@ void AudioCaptureInterfaceImpl::SetAttrs(const std::string &adpName, const Audio
     const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> &callback)
 {
     DHLOGI("Set attrs, not support yet.");
+}
+
+void AudioCaptureInterfaceImpl::SetDumpFlagInner()
+{
+    dumpFlag_ = true;
 }
 
 const AudioDeviceDescriptor &AudioCaptureInterfaceImpl::GetCaptureDesc()

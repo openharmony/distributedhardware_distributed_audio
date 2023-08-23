@@ -37,6 +37,8 @@ typedef enum {
     SPEAKER_CLOSED = 14,
     NOTIFY_OPEN_SPEAKER_RESULT = 15,
     NOTIFY_CLOSE_SPEAKER_RESULT = 16,
+    NOTIFY_HDF_SPK_DUMP = 17,
+    NOTIFY_HDF_MIC_DUMP = 18,
 
     OPEN_MIC = 21,
     CLOSE_MIC = 22,
@@ -92,6 +94,8 @@ typedef enum {
     AUDIO_EVENT_MMAP_STOP_MIC = 17,
     AUDIO_EVENT_START = 18,
     AUDIO_EVENT_STOP = 19,
+    AUDIO_EVENT_SPK_DUMP = 20,
+    AUDIO_EVENT_MIC_DUMP = 21,
 } AudioEventHDF;
 class AudioEvent {
 public:

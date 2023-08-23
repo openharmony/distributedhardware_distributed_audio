@@ -16,6 +16,7 @@
 #ifndef OHOS_DAUDIO_UTILS_H
 #define OHOS_DAUDIO_UTILS_H
 
+#include <fstream>
 #include <string>
 
 #define AUDIO_MS_PER_SECOND 1000
@@ -53,6 +54,8 @@ int64_t CalculateOffset(const int64_t frameindex, const int64_t framePeriodNs, c
 int64_t UpdateTimeOffset(const int64_t frameIndex, const int64_t framePeriodNs, int64_t &startTime);
 
 bool IsOutDurationRange(int64_t startTime, int64_t endTime, int64_t lastStartTime);
+
+void SaveFile(std::string fileName, uint8_t *audioData, int32_t size);
 } // DistributedHardware
 } // OHOS
 #endif

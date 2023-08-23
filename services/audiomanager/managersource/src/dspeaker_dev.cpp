@@ -25,6 +25,7 @@
 #include "audio_encode_transport.h"
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
+#include "daudio_hidumper.h"
 #include "daudio_hisysevent.h"
 #include "daudio_hitrace.h"
 #include "daudio_log.h"
@@ -285,6 +286,7 @@ int32_t DSpeakerDev::Release()
     if (ret != DH_SUCCESS) {
         DHLOGE("Release speaker trans failed, ret: %d.", ret);
     }
+    dumpFlag_.store(false);
     return DH_SUCCESS;
 }
 
@@ -343,6 +345,14 @@ int32_t DSpeakerDev::WriteStreamData(const std::string &devId, const int32_t dhI
     if (speakerTrans_ == nullptr) {
         DHLOGE("Write stream data, speaker trans is null.");
         return ERR_DH_AUDIO_SA_SPEAKER_TRANS_NULL;
+    }
+    if (DaudioHidumper::GetInstance().GetFlagStatus()) {
+        if (!dumpFlag_) {
+            AudioEvent event(NOTIFY_HDF_SPK_DUMP, "");
+            NotifyHdfAudioEvent(event);
+            dumpFlag_.store(true);
+        }
+        SaveFile(FILE_NAME, const_cast<uint8_t*>(data->Data()), data->Size());
     }
     int32_t ret = speakerTrans_->FeedAudioData(data);
     if (ret != DH_SUCCESS) {

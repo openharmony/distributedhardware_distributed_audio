@@ -93,6 +93,7 @@ public:
     uint32_t GetMinVolumeInner() override;
     void SetAttrs(const std::string &adpName, const AudioDeviceDescriptor &desc,
         const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> &callback) override;
+    void SetDumpFlagInner() override;
 
 private:
     float GetFadeRate(uint32_t currentIndex, const uint32_t durationIndex);
@@ -100,6 +101,7 @@ private:
 
 private:
     static constexpr int64_t AUDIO_OFFSET_FRAME_NUM = 10;
+    const std::string FILE_NAME = "/data/hdf_renderframe.pcm";
 
     std::string adapterName_;
     AudioDeviceDescriptor devDesc_;
@@ -108,6 +110,7 @@ private:
     std::mutex renderMtx_;
     std::mutex volMtx_;
     bool firstOpenFlag_ = true;
+    bool dumpFlag_ = false;
     uint32_t timeInterval_ = 5;
     uint32_t currentFrame_ = 0;
     uint32_t vol_ = 0;

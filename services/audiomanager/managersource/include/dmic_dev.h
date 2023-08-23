@@ -91,6 +91,7 @@ private:
     static constexpr size_t LOW_LATENCY_DATA_QUEUE_HALF_SIZE = 10;
     static constexpr uint32_t MMAP_WAIT_FRAME_US = 5000;
     static constexpr const char* ENQUEUE_THREAD = "micEnqueueTh";
+    const std::string FILE_NAME = "/data/source_mic_read.pcm";
 
     std::string devId_;
     std::weak_ptr<IAudioEventCallback> audioEventCallback_;
@@ -100,6 +101,7 @@ private:
     int32_t curPort_ = 0;
     std::atomic<bool> isTransReady_ = false;
     std::atomic<bool> isOpened_ = false;
+    std::atomic<bool> dumpFlag_ = false;
     std::shared_ptr<IAudioDataTransport> micTrans_ = nullptr;
     std::queue<std::shared_ptr<AudioData>> dataQueue_;
     std::set<int32_t> enabledPorts_;

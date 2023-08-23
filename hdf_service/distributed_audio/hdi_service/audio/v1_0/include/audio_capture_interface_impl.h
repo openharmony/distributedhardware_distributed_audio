@@ -75,12 +75,15 @@ public:
     const AudioDeviceDescriptor &GetCaptureDesc() override;
     void SetAttrs(const std::string &adpName, const AudioDeviceDescriptor &desc,
         const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> &callback) override;
+    void SetDumpFlagInner() override;
 
 private:
     static constexpr int64_t AUDIO_OFFSET_FRAME_NUM = 10;
+    const std::string FILE_NAME = "/data/hdf_captureframe.pcm";
     std::string adapterName_;
     AudioDeviceDescriptor devDesc_;
     AudioSampleAttributes devAttrs_;
+    bool dumpFlag_ = false;
     uint32_t timeInterval_ = 5;
     int64_t frameIndex_ = 0;
     int64_t framePeriodNs_ = 0;
