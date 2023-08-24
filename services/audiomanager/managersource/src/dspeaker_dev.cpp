@@ -411,13 +411,13 @@ void DSpeakerDev::EnqueueThread()
     readIndex_ = 0;
     readNum_ = 0;
     frameIndex_ = 0;
-    DHLOGD("Enqueue thread start, lengthPerRead length: %d.", lengthPerTrans_);
+    DHLOGI("Enqueue thread start, lengthPerRead length: %d.", lengthPerTrans_);
     while (ashmem_ != nullptr && isEnqueueRunning_.load()) {
         int64_t timeOffset = UpdateTimeOffset(frameIndex_, LOW_LATENCY_INTERVAL_NS,
             startTime_);
         DHLOGD("Read frameIndex: %lld, timeOffset: %lld.", frameIndex_, timeOffset);
         auto readData = ashmem_->ReadFromAshmem(lengthPerTrans_, readIndex_);
-        DHLOGD("Read from ashmem success! read index: %d, readLength: %d.", readIndex_, lengthPerTrans_);
+        DHLOGI("Read from ashmem success! read index: %d, readLength: %d.", readIndex_, lengthPerTrans_);
         std::shared_ptr<AudioData> audioData = std::make_shared<AudioData>(lengthPerTrans_);
         if (readData != nullptr) {
             const uint8_t *readAudioData = reinterpret_cast<const uint8_t *>(readData);

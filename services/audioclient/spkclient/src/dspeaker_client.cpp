@@ -124,14 +124,14 @@ void DSpeakerClient::OnWriteData(size_t length)
     std::shared_ptr<AudioData> audioData = nullptr;
     {
         std::unique_lock<std::mutex> spkLck(dataQueueMtx_);
-        dataQueueCond_.wait_for(spkLck, std::chrono::milliseconds(REQUEST_DATA_WAIT),
-            [this]() { return !dataQueue_.empty(); });
         if (dataQueue_.empty()) {
-            return;
+            audioData = std::make_shared<AudioData>(bufDesc.bufLength);
+            DHLOGI("Pop spk data, dataQueue is empty. write empty data.");
+        } else {
+            audioData = dataQueue_.front();
+            dataQueue_.pop();
+            DHLOGI("Pop spk data, dataQueue size: %d.", dataQueue_.size());
         }
-        audioData = dataQueue_.front();
-        dataQueue_.pop();
-        DHLOGD("Pop spk data, dataQueue size: %d.", dataQueue_.size());
     }
     if (audioData->Capacity() != bufDesc.bufLength) {
         DHLOGE("Audio data length is not equal to buflength. datalength: %d, bufLength: %d",
@@ -549,8 +549,8 @@ void DSpeakerClient::Pause()
     }
     if (audioRenderer_ != nullptr) {
         audioRenderer_->Flush();
+        audioRenderer_->Pause();
     }
-    audioRenderer_->Pause();
     clientStatus_ = AudioStatus::STATUS_START;
     isRenderReady_.store(true);
 }
@@ -565,7 +565,9 @@ void DSpeakerClient::ReStart()
         isRenderReady_.store(true);
         renderDataThread_ = std::thread(&DSpeakerClient::PlayThreadRunning, this);
     }
-    audioRenderer_->Start();
+    if (audioRenderer_ != nullptr) {
+        audioRenderer_->Start();
+    }
     clientStatus_ = AudioStatus::STATUS_START;
 }
 
