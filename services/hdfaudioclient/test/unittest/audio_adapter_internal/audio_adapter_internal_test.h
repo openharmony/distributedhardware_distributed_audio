@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -54,23 +54,23 @@ public:
     }
 
     int32_t CreateRender(const AudioDeviceDescriptor& desc, const AudioSampleAttributes& attrs,
-        sptr<IAudioRender>& render) override
+        sptr<IAudioRender>& render, uint32_t &renderId) override
     {
         return DH_SUCCESS;
     }
 
-    int32_t DestroyRender(const AudioDeviceDescriptor& desc) override
+    int32_t DestroyRender(uint32_t renderId) override
     {
         return DH_SUCCESS;
     }
 
     int32_t CreateCapture(const AudioDeviceDescriptor& desc, const AudioSampleAttributes& attrs,
-        sptr<IAudioCapture>& capture) override
+        sptr<IAudioCapture>& capture, uint32_t &captureId) override
     {
         return DH_SUCCESS;
     }
 
-    int32_t DestroyCapture(const AudioDeviceDescriptor& desc) override
+    int32_t DestroyCapture(uint32_t captureId) override
     {
         return DH_SUCCESS;
     }

@@ -34,11 +34,18 @@ namespace HDI {
 namespace DistributedAudio {
 namespace Audio {
 namespace V1_0 {
+static constexpr uint32_t MAX_AUDIO_STREAM_NUM = 10;
+
 AudioAdapterInterfaceImpl::AudioAdapterInterfaceImpl(const AudioAdapterDescriptor &desc)
     : adpDescriptor_(desc)
 {
+    renderDevs_ = std::vector<sptr<AudioRenderInterfaceImplBase>>(
+        MAX_AUDIO_STREAM_NUM, sptr<AudioRenderInterfaceImplBase>(nullptr));
+    captureDevs_ = std::vector<sptr<AudioCaptureInterfaceImplBase>>(
+        MAX_AUDIO_STREAM_NUM, sptr<AudioCaptureInterfaceImplBase>(nullptr));
     renderParam_ = { 0, 0, 0, 0, 0, 0 };
     captureParam_ = { 0, 0, 0, 0, 0, 0 };
+
     DHLOGD("Distributed audio adapter constructed, name(%s).", GetAnonyString(desc.adapterName).c_str());
 }
 
@@ -72,11 +79,12 @@ int32_t AudioAdapterInterfaceImpl::InitAllPorts()
 }
 
 int32_t AudioAdapterInterfaceImpl::CreateRender(const AudioDeviceDescriptor &desc,
-    const AudioSampleAttributes &attrs, sptr<IAudioRender> &render)
+    const AudioSampleAttributes &attrs, sptr<IAudioRender> &render, uint32_t &renderId)
 {
     DHLOGI("Create distributed audio render, {pin: %zu, sampleRate: %zu, channel: %zu, formats: %zu, type: %d}.",
         desc.pins, attrs.sampleRate, attrs.channelCount, attrs.format, static_cast<int32_t>(attrs.type));
     render = nullptr;
+    sptr<AudioRenderInterfaceImplBase> audioRender = nullptr;
     {
         std::lock_guard<std::mutex> devLck(devMapMtx_);
         if (mapAudioDevice_.find(desc.pins) == mapAudioDevice_.end()) {
@@ -84,64 +92,100 @@ int32_t AudioAdapterInterfaceImpl::CreateRender(const AudioDeviceDescriptor &des
             return HDF_FAILURE;
         }
     }
+
 #ifdef DAUDIO_SUPPORT_EXTENSION
     if (attrs.type == AUDIO_MMAP_NOIRQ) {
         DHLOGI("Try to mmap mode.");
         renderFlags_ = Audioext::V1_0::MMAP_MODE;
-        audioRender_ = new AudioRenderExtImpl();
-        audioRender_->SetAttrs(adpDescriptor_.adapterName, desc, attrs, extSpkCallback_);
+        audioRender = new AudioRenderExtImpl();
+        audioRender->SetAttrs(adpDescriptor_.adapterName, desc, attrs, extSpkCallback_);
     } else {
         DHLOGI("Try to normal mode.");
         renderFlags_ = Audioext::V1_0::NORMAL_MODE;
-        audioRender_ = new AudioRenderInterfaceImpl(adpDescriptor_.adapterName, desc, attrs, extSpkCallback_);
+        audioRender = new AudioRenderInterfaceImpl(adpDescriptor_.adapterName, desc, attrs, extSpkCallback_);
     }
 #else
     renderFlags_ = Audioext::V1_0::NORMAL_MODE;
-    audioRender_ = new AudioRenderInterfaceImpl(adpDescriptor_.adapterName, desc, attrs, extSpkCallback_);
+    audioRender = new AudioRenderInterfaceImpl(adpDescriptor_.adapterName, desc, attrs, extSpkCallback_);
 #endif
-    if (audioRender_ == nullptr) {
+    if (audioRender == nullptr) {
         DHLOGE("Create render failed.");
         return HDF_FAILURE;
     }
-
     int32_t ret = OpenRenderDevice(desc, attrs);
     if (ret != DH_SUCCESS) {
         DHLOGE("Open render device failed.");
-        audioRender_ = nullptr;
+        audioRender = nullptr;
         return ret == ERR_DH_AUDIO_HDF_WAIT_TIMEOUT ? HDF_ERR_TIMEOUT : HDF_FAILURE;
     }
-    render = audioRender_;
-    DHLOGI("Create render success.");
+    render = audioRender;
+    if (InsertRenderImpl(audioRender, renderId) != HDF_SUCCESS) {
+        DHLOGE("Generrate render ID and insert render failed.");
+        return HDF_FAILURE;
+    }
+    DHLOGI("Create render success, render ID is %u.", renderId);
     return HDF_SUCCESS;
 }
 
-int32_t AudioAdapterInterfaceImpl::DestroyRender(const AudioDeviceDescriptor &desc)
+int32_t AudioAdapterInterfaceImpl::InsertRenderImpl(const sptr<AudioRenderInterfaceImplBase> &audioRender,
+    uint32_t &renderId)
 {
-    DHLOGI("Destroy distributed audio render, {pin: %zu}.", desc.pins);
-    if (audioRender_ == nullptr) {
+    std::lock_guard<std::mutex> devLck(renderDevMtx_);
+    if (renderDevs_.size() != MAX_AUDIO_STREAM_NUM) {
+        DHLOGE("Render device contain check error.");
+        return HDF_FAILURE;
+    }
+    renderId = MAX_AUDIO_STREAM_NUM;
+    for (uint32_t i = 0; i < MAX_AUDIO_STREAM_NUM; i++) {
+        if (renderDevs_[i] == nullptr) {
+            renderId = i;
+            break;
+        }
+    }
+    if (renderId == MAX_AUDIO_STREAM_NUM) {
+        DHLOGE("The device is busy, can't create render anymore.");
+        return HDF_FAILURE;
+    }
+    renderDevs_[renderId] = audioRender;
+    return HDF_SUCCESS;
+}
+
+int32_t AudioAdapterInterfaceImpl::DestroyRender(uint32_t renderId)
+{
+    DHLOGI("Destroy distributed audio render, ID: %u.", renderId);
+    if (!IsIdValid(renderId)) {
+        DHLOGE("The input render ID is invalid.");
+        return HDF_FAILURE;
+    }
+    sptr<AudioRenderInterfaceImplBase> audioRender(nullptr);
+    {
+        std::lock_guard<std::mutex> devLck(renderDevMtx_);
+        audioRender = renderDevs_[renderId];
+    }
+    if (audioRender == nullptr) {
         DHLOGD("Render has not been created, do not need destroy.");
         return HDF_SUCCESS;
     }
-    if (desc.pins != audioRender_->GetRenderDesc().pins) {
-        DHLOGE("Render pin is wrong, destroy render failed.");
-        return HDF_FAILURE;
-    }
 
-    int32_t ret = CloseRenderDevice(desc);
+    int32_t ret = CloseRenderDevice(audioRender->GetRenderDesc());
     if (ret != DH_SUCCESS) {
         DHLOGE("Close render device failed.");
         return HDF_FAILURE;
     }
-    audioRender_ = nullptr;
+    {
+        std::lock_guard<std::mutex> devLck(renderDevMtx_);
+        renderDevs_[renderId] = nullptr;
+    }
     return HDF_SUCCESS;
 }
 
 int32_t AudioAdapterInterfaceImpl::CreateCapture(const AudioDeviceDescriptor &desc,
-    const AudioSampleAttributes &attrs, sptr<IAudioCapture> &capture)
+    const AudioSampleAttributes &attrs, sptr<IAudioCapture> &capture, uint32_t &captureId)
 {
     DHLOGI("Create distributed audio capture, {pin: %zu, sampleRate: %zu, channel: %zu, formats: %zu}.",
         desc.pins, attrs.sampleRate, attrs.channelCount, attrs.format);
     capture = nullptr;
+    sptr<AudioCaptureInterfaceImplBase> audioCapture(nullptr);
     {
         std::lock_guard<std::mutex> devLck(devMapMtx_);
         if (mapAudioDevice_.find(desc.pins) == mapAudioDevice_.end()) {
@@ -149,55 +193,90 @@ int32_t AudioAdapterInterfaceImpl::CreateCapture(const AudioDeviceDescriptor &de
             return HDF_FAILURE;
         }
     }
+
 #ifdef DAUDIO_SUPPORT_EXTENSION
     if (attrs.type == AUDIO_MMAP_NOIRQ) {
         DHLOGI("Try to mmap mode.");
         capturerFlags_ = Audioext::V1_0::MMAP_MODE;
-        audioCapture_ = new AudioCaptureExtImpl();
-        audioCapture_->SetAttrs(adpDescriptor_.adapterName, desc, attrs, extMicCallback_);
+        audioCapture = new AudioCaptureExtImpl();
+        audioCapture->SetAttrs(adpDescriptor_.adapterName, desc, attrs, extMicCallback_);
     } else {
         DHLOGI("Try to normal mode.");
         capturerFlags_ = Audioext::V1_0::NORMAL_MODE;
-        audioCapture_ = new AudioCaptureInterfaceImpl(adpDescriptor_.adapterName, desc, attrs, extMicCallback_);
+        audioCapture = new AudioCaptureInterfaceImpl(adpDescriptor_.adapterName, desc, attrs, extMicCallback_);
     }
 #else
     capturerFlags_ = Audioext::V1_0::NORMAL_MODE;
-    audioCapture_ = new AudioCaptureInterfaceImpl(adpDescriptor_.adapterName, desc, attrs, extMicCallback_);
+    audioCapture = new AudioCaptureInterfaceImpl(adpDescriptor_.adapterName, desc, attrs, extMicCallback_);
 #endif
-    if (audioCapture_ == nullptr) {
+    if (audioCapture == nullptr) {
         DHLOGE("Create capture failed.");
         return HDF_FAILURE;
     }
-
     int32_t ret = OpenCaptureDevice(desc, attrs);
     if (ret != DH_SUCCESS) {
         DHLOGE("Open capture device failed.");
-        audioCapture_ = nullptr;
+        audioCapture = nullptr;
         return ret == ERR_DH_AUDIO_HDF_WAIT_TIMEOUT ? HDF_ERR_TIMEOUT : HDF_FAILURE;
     }
-    capture = audioCapture_;
-    DHLOGI("Create capture success.");
+    capture = audioCapture;
+    if (InsertCapImpl(audioCapture, captureId) != HDF_SUCCESS) {
+        DHLOGE("Generrate capture ID and insert capture failed.");
+        return HDF_FAILURE;
+    }
+    DHLOGI("Create capture success, capture ID is %u.", captureId);
     return HDF_SUCCESS;
 }
 
-int32_t AudioAdapterInterfaceImpl::DestroyCapture(const AudioDeviceDescriptor &desc)
+int32_t AudioAdapterInterfaceImpl::InsertCapImpl(const sptr<AudioCaptureInterfaceImplBase> &audioCapture,
+    uint32_t &captureId)
 {
-    DHLOGI("Destroy distributed audio capture, {pin: %zu}.", desc.pins);
-    if (audioCapture_ == nullptr) {
+    std::lock_guard<std::mutex> devLck(capDevMtx_);
+    if (captureDevs_.size() != MAX_AUDIO_STREAM_NUM) {
+        DHLOGE("Capture device's size check error.");
+        return HDF_FAILURE;
+    }
+    captureId = MAX_AUDIO_STREAM_NUM;
+    for (uint32_t i = 0; i < MAX_AUDIO_STREAM_NUM; i++) {
+        if (captureDevs_[i] == nullptr) {
+            captureId = i;
+            break;
+        }
+    }
+    if (captureId == MAX_AUDIO_STREAM_NUM) {
+        DHLOGE("The device is busy, can't create capture anymore.");
+        return HDF_FAILURE;
+    }
+    captureDevs_[captureId] = audioCapture;
+    return HDF_SUCCESS;
+}
+
+int32_t AudioAdapterInterfaceImpl::DestroyCapture(uint32_t captureId)
+{
+    DHLOGI("Destroy distributed audio capture, ID: %u.", captureId);
+    if (!IsIdValid(captureId)) {
+        DHLOGE("The input capture ID is invalid.");
+        return HDF_FAILURE;
+    }
+    sptr<AudioCaptureInterfaceImplBase> audioCapture(nullptr);
+    {
+        std::lock_guard<std::mutex> devLck(capDevMtx_);
+        audioCapture = captureDevs_[captureId];
+    }
+    if (audioCapture == nullptr) {
         DHLOGD("Capture has not been created, do not need destroy.");
         return HDF_SUCCESS;
     }
-    if (desc.pins != audioCapture_->GetCaptureDesc().pins) {
-        DHLOGE("Capture pin is wrong, destroy capture failed.");
-        return HDF_FAILURE;
-    }
 
-    int32_t ret = CloseCaptureDevice(desc);
+    int32_t ret = CloseCaptureDevice(audioCapture->GetCaptureDesc());
     if (ret != DH_SUCCESS) {
         DHLOGE("Close capture device failed.");
         return HDF_FAILURE;
     }
-    audioCapture_ = nullptr;
+    {
+        std::lock_guard<std::mutex> devLck(capDevMtx_);
+        captureDevs_[captureId] = nullptr;
+    }
     return HDF_SUCCESS;
 }
 
@@ -348,7 +427,7 @@ int32_t AudioAdapterInterfaceImpl::AdapterLoad()
 
 int32_t AudioAdapterInterfaceImpl::AdapterUnload()
 {
-    if (audioRender_ != nullptr || audioCapture_ != nullptr) {
+    if (CheckRendersValid() || CheckCapsValid()) {
         DHLOGE("Adapter is busy, audio render or capture is not null.");
         return HDF_ERR_DEVICE_BUSY;
     }
@@ -410,14 +489,15 @@ int32_t AudioAdapterInterfaceImpl::RemoveAudioDevice(const uint32_t devId)
         }
         mapAudioDevice_.erase(devId);
     }
-    AudioDeviceDescriptor dec;
     if (devId == spkPinInUse_) {
-        dec.pins = static_cast<AudioPortPin>(spkPinInUse_);
-        DestroyRender(dec);
+        for (uint32_t i = 0; i < MAX_AUDIO_STREAM_NUM; i++) {
+            DestroyRender(i);
+        }
     }
     if (devId == micPinInUse_) {
-        dec.pins = static_cast<AudioPortPin>(micPinInUse_);
-        DestroyCapture(dec);
+        for (uint32_t capId = 0; capId < MAX_AUDIO_STREAM_NUM; capId++) {
+            DestroyCapture(capId);
+        }
     }
 
     DHLOGI("Remove audio device success.");
@@ -590,10 +670,6 @@ int32_t AudioAdapterInterfaceImpl::SetAudioVolume(const std::string& condition, 
         DHLOGE("Callback is nullptr.");
         return ERR_DH_AUDIO_HDF_NULLPTR;
     }
-    if (audioRender_ == nullptr) {
-        DHLOGE("Render has not been created.");
-        return ERR_DH_AUDIO_HDF_NULLPTR;
-    }
     std::string content = condition;
     int32_t type = getEventTypeFromCondition(content);
     EXT_PARAM_EVENT eventType;
@@ -615,18 +691,32 @@ int32_t AudioAdapterInterfaceImpl::SetAudioVolume(const std::string& condition, 
         SetAudioParamStr(content, VOLUME_LEVEL, param);
     }
     DAudioEvent event = { eventType, content };
-    int32_t ret =
-        extSpkCallback_->NotifyEvent(adpDescriptor_.adapterName, audioRender_->GetRenderDesc().pins, event);
-    if (ret != HDF_SUCCESS) {
-        DHLOGE("NotifyEvent failed.");
-        return ERR_DH_AUDIO_HDF_FAIL;
+
+    {
+        std::lock_guard<std::mutex> devLck(renderDevMtx_);
+        for (auto render : renderDevs_) {
+            if (render == nullptr) {
+                continue;
+            }
+            if (extSpkCallback_->NotifyEvent(adpDescriptor_.adapterName,
+                render->GetRenderDesc().pins, event) != HDF_SUCCESS) {
+                DHLOGE("NotifyEvent failed.");
+                return ERR_DH_AUDIO_HDF_FAIL;
+            }
+        }
     }
     return DH_SUCCESS;
 }
 
 int32_t AudioAdapterInterfaceImpl::GetAudioVolume(const std::string& condition, std::string &param)
 {
-    if (audioRender_ == nullptr) {
+    int renderId = 0; // fromaudio framwork
+    sptr<AudioRenderInterfaceImplBase> audioRender(nullptr);
+    {
+        std::lock_guard<std::mutex> devLck(renderDevMtx_);
+        audioRender = renderDevs_[renderId];
+    }
+    if (audioRender == nullptr) {
         DHLOGE("Render has not been created.");
         return ERR_DH_AUDIO_HDF_NULLPTR;
     }
@@ -634,13 +724,13 @@ int32_t AudioAdapterInterfaceImpl::GetAudioVolume(const std::string& condition, 
     uint32_t vol;
     switch (type) {
         case VolumeEventType::EVENT_GET_VOLUME:
-            vol = audioRender_->GetVolumeInner();
+            vol = audioRender->GetVolumeInner();
             break;
         case VolumeEventType::EVENT_GET_MAX_VOLUME:
-            vol = audioRender_->GetMaxVolumeInner();
+            vol = audioRender->GetMaxVolumeInner();
             break;
         case VolumeEventType::EVENT_GET_MIN_VOLUME:
-            vol = audioRender_->GetMinVolumeInner();
+            vol = audioRender->GetMinVolumeInner();
             break;
         case VolumeEventType::EVENT_IS_STREAM_MUTE:
             vol = streamMuteStatus_;
@@ -663,7 +753,13 @@ int32_t AudioAdapterInterfaceImpl::getEventTypeFromCondition(const std::string &
 int32_t AudioAdapterInterfaceImpl::HandleVolumeChangeEvent(const DAudioEvent &event)
 {
     DHLOGI("Vol change (%s).", event.content.c_str());
-    if (audioRender_ == nullptr) {
+    int renderId = 0; // daudio SA
+    sptr<AudioRenderInterfaceImplBase> audioRender(nullptr);
+    {
+        std::lock_guard<std::mutex> devLck(renderDevMtx_);
+        audioRender = renderDevs_[renderId];
+    }
+    if (audioRender == nullptr) {
         DHLOGE("Render has not been created.");
         return ERR_DH_AUDIO_HDF_NULLPTR;
     }
@@ -685,18 +781,18 @@ int32_t AudioAdapterInterfaceImpl::HandleVolumeChangeEvent(const DAudioEvent &ev
         if (ret != DH_SUCCESS) {
             DHLOGE("Get min volume value failed, use defult min volume.");
         }
-        audioRender_->SetVolumeInner(vol);
-        audioRender_->SetVolumeRangeInner(maxVol, minVol);
+        audioRender->SetVolumeInner(vol);
+        audioRender->SetVolumeRangeInner(maxVol, minVol);
         return DH_SUCCESS;
     }
 
-    audioRender_->SetVolumeInner(vol);
+    audioRender->SetVolumeInner(vol);
     if (paramCallback_ == nullptr) {
         DHLOGE("Audio param observer is null.");
         return ERR_DH_AUDIO_HDF_NULLPTR;
     }
-    int8_t reserved;
-    int8_t cookie;
+    int8_t reserved = 0;
+    int8_t cookie = 0;
     ret = paramCallback_->ParamCallback(AUDIO_EXT_PARAM_KEY_VOLUME, event.content, std::to_string(vol),
         reserved, cookie);
     if (ret != DH_SUCCESS) {
@@ -713,8 +809,8 @@ int32_t AudioAdapterInterfaceImpl::HandleFocusChangeEvent(const DAudioEvent &eve
         DHLOGE("Audio param observer is null.");
         return ERR_DH_AUDIO_HDF_NULLPTR;
     }
-    int8_t reserved;
-    int8_t cookie;
+    int8_t reserved = 0;
+    int8_t cookie = 0;
     int32_t ret = paramCallback_->ParamCallback(AUDIO_EXT_PARAM_KEY_FOCUS, event.content, "", reserved, cookie);
     if (ret != DH_SUCCESS) {
         DHLOGE("Notify Focus failed.");
@@ -730,8 +826,8 @@ int32_t AudioAdapterInterfaceImpl::HandleRenderStateChangeEvent(const DAudioEven
         DHLOGE("Audio param observer is null.");
         return ERR_DH_AUDIO_HDF_NULLPTR;
     }
-    int8_t reserved;
-    int8_t cookie;
+    int8_t reserved = 0;
+    int8_t cookie = 0;
     int32_t ret = paramCallback_->ParamCallback(AUDIO_EXT_PARAM_KEY_STATUS, event.content, "", reserved, cookie);
     if (ret != DH_SUCCESS) {
         DHLOGE("Notify render state failed.");
@@ -773,14 +869,10 @@ int32_t AudioAdapterInterfaceImpl::HandleSANotifyEvent(const DAudioEvent &event)
             micWaitCond_.notify_all();
             break;
         case HDF_AUDIO_EVENT_SPK_DUMP:
-            if (audioRender_ != nullptr) {
-                audioRender_->SetDumpFlagInner();
-            }
+            SetDumpFlag(true);
             break;
         case HDF_AUDIO_EVENT_MIC_DUMP:
-            if (audioCapture_ != nullptr) {
-                audioCapture_->SetDumpFlagInner();
-            }
+            SetDumpFlag(false);
             break;
         default:
             DHLOGE("Notify not support event type %d, event content: %s.", event.type, event.content.c_str());
@@ -842,8 +934,8 @@ int32_t AudioAdapterInterfaceImpl::HandleDeviceClosed(const DAudioEvent &event)
         std::stringstream ss;
         ss << "ERR_EVENT;DEVICE_TYPE=" <<
             (event.type == HDF_AUDIO_EVENT_SPK_CLOSED ? AUDIO_DEVICE_TYPE_SPEAKER : AUDIO_DEVICE_TYPE_MIC) << ";";
-        int8_t reserved;
-        int8_t cookie;
+        int8_t reserved = 0;
+        int8_t cookie = 0;
         int32_t ret = paramCallback_->ParamCallback(AUDIO_EXT_PARAM_KEY_STATUS, ss.str(),
             std::to_string(EVENT_DEV_CLOSED), reserved, cookie);
         if (ret != DH_SUCCESS) {
@@ -851,15 +943,24 @@ int32_t AudioAdapterInterfaceImpl::HandleDeviceClosed(const DAudioEvent &event)
         }
     }
 
-    AudioDeviceDescriptor dec;
     if (isSpkOpened_ && event.type == HDF_AUDIO_EVENT_SPK_CLOSED) {
         DHLOGE("Render device status error, close render.");
-        dec.pins = static_cast<AudioPortPin>(spkPinInUse_);
-        return DestroyRender(dec);
+        bool destroyStatus = true;
+        for (uint32_t i = 0; i < MAX_AUDIO_STREAM_NUM; i++) {
+            if (DestroyRender(i) != DH_SUCCESS) {
+                destroyStatus = false;
+            }
+        }
+        return destroyStatus ? DH_SUCCESS : ERR_DH_AUDIO_HDF_FAIL;
     } else if (isMicOpened_ && event.type == HDF_AUDIO_EVENT_MIC_CLOSED) {
         DHLOGE("Capture device status error, close capture.");
-        dec.pins = static_cast<AudioPortPin>(micPinInUse_);
-        return DestroyCapture(dec);
+        bool capCloseStatus = true;
+        for (uint32_t i = 0; i < MAX_AUDIO_STREAM_NUM; i++) {
+            if (DestroyCapture(i) != DH_SUCCESS) {
+                capCloseStatus = false;
+            }
+        }
+        return capCloseStatus ? DH_SUCCESS : ERR_DH_AUDIO_HDF_FAIL;
     }
     DHLOGI("Handle device closed success.");
     return DH_SUCCESS;
@@ -869,6 +970,64 @@ bool AudioAdapterInterfaceImpl::IsPortsNoReg()
 {
     std::lock_guard<std::mutex> devLck(devMapMtx_);
     return mapAudioDevice_.empty();
+}
+
+inline bool AudioAdapterInterfaceImpl::IsIdValid(const uint32_t id)
+{
+    if (id >= MAX_AUDIO_STREAM_NUM) {
+        DHLOGE("Current id:%u is not supported.", id);
+        return false;
+    }
+    return true;
+}
+
+bool AudioAdapterInterfaceImpl::CheckRendersValid()
+{
+    {
+        std::lock_guard<std::mutex> devLck(renderDevMtx_);
+        for (uint32_t i = 0; i < MAX_AUDIO_STREAM_NUM; i++) {
+            if (renderDevs_[i] != nullptr) {
+                DHLOGI("Containing active render.");
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool AudioAdapterInterfaceImpl::CheckCapsValid()
+{
+    {
+        std::lock_guard<std::mutex> devLck(capDevMtx_);
+        for (uint32_t i = 0; i < MAX_AUDIO_STREAM_NUM; i++) {
+            if (captureDevs_[i] != nullptr) {
+                DHLOGI("Containing active capture.");
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+void AudioAdapterInterfaceImpl::SetDumpFlag(bool isRender)
+{
+    if (isRender) {
+        std::lock_guard<std::mutex> renderLck(renderDevMtx_);
+        for (auto render : renderDevs_) {
+            if (render == nullptr) {
+                continue;
+            }
+            render->SetDumpFlagInner();
+        }
+    } else {
+        std::lock_guard<std::mutex> capLck(capDevMtx_);
+        for (auto capture : captureDevs_) {
+            if (capture == nullptr) {
+                continue;
+            }
+            capture->SetDumpFlagInner();
+        }
+    }
 }
 } // V1_0
 } // Audio

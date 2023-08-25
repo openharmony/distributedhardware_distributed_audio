@@ -60,7 +60,7 @@ int32_t AudioCaptureInterfaceImpl::GetCapturePosition(uint64_t &frames, AudioTim
     return HDF_SUCCESS;
 }
 
-int32_t AudioCaptureInterfaceImpl::CaptureFrame(std::vector<int8_t> &frame, uint64_t requestBytes)
+int32_t AudioCaptureInterfaceImpl::CaptureFrame(std::vector<int8_t> &frame, uint64_t &replyBytes)
 {
     DHLOGD("Capture frame[sampleRate: %d, channelCount: %d, format: %d, frameSize: %d].", devAttrs_.sampleRate,
         devAttrs_.channelCount, devAttrs_.format, devAttrs_.frameSize);

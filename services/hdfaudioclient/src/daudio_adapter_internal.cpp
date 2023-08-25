@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -87,7 +87,8 @@ static int32_t CreateRenderInternal(struct AudioAdapter *adapter, const struct :
     AudioSampleAttributes attrsHal;
     SetAudioSampleAttributesHAL(attrs, attrsHal);
     sptr<IAudioRender> renderProxy = nullptr;
-    int32_t ret = context->proxy_->CreateRender(descHal, attrsHal, renderProxy);
+    uint32_t renderId;
+    int32_t ret = context->proxy_->CreateRender(descHal, attrsHal, renderProxy, renderId);
     if (ret != DH_SUCCESS) {
         *render = nullptr;
         return ret;
@@ -96,9 +97,10 @@ static int32_t CreateRenderInternal(struct AudioAdapter *adapter, const struct :
     *render = &renderContext->instance_;
     renderContext->proxy_ = renderProxy;
     renderContext->descHal_ = descHal;
+    DHLOGI("The render ID: %u.", renderId);
     {
         std::lock_guard<std::mutex> lock(context->mtx_);
-        context->renders_.push_back(std::move(renderContext));
+        context->renders_.push_back(std::make_pair(renderId, std::move(renderContext)));
     }
     return DH_SUCCESS;
 }
@@ -120,8 +122,8 @@ static int32_t DestroyRenderInternal(struct AudioAdapter *adapter, struct AudioR
     std::lock_guard<std::mutex> lock(adapterContext->mtx_);
 
     for (auto it = adapterContext->renders_.begin(); it != adapterContext->renders_.end(); ++it) {
-        if ((*it).get() == renderContext) {
-            int32_t ret = adapterContext->proxy_->DestroyRender(renderContext->descHal_);
+        if ((it->second).get() == renderContext) {
+            int32_t ret = adapterContext->proxy_->DestroyRender(it->first);
             if (ret != DH_SUCCESS) {
                 return ret;
             }
@@ -154,7 +156,8 @@ static int32_t CreateCaptureInternal(struct AudioAdapter *adapter, const struct 
     AudioSampleAttributes attrsHal;
     SetAudioSampleAttributesHAL(attrs, attrsHal);
     sptr<IAudioCapture> captureProxy = nullptr;
-    int32_t ret = context->proxy_->CreateCapture(descHal, attrsHal, captureProxy);
+    uint32_t captureId;
+    int32_t ret = context->proxy_->CreateCapture(descHal, attrsHal, captureProxy, captureId);
     if (ret != DH_SUCCESS) {
         *capture = nullptr;
         return ret;
@@ -164,9 +167,10 @@ static int32_t CreateCaptureInternal(struct AudioAdapter *adapter, const struct 
     *capture = &captureContext->instance_;
     captureContext->proxy_ = captureProxy;
     captureContext->descHal_ = descHal;
+    DHLOGI("The capture ID: %u.", captureId);
     {
         std::lock_guard<std::mutex> lock(context->mtx_);
-        context->captures_.push_back(std::move(captureContext));
+        context->captures_.push_back(std::make_pair(captureId, std::move(captureContext)));
     }
     return DH_SUCCESS;
 }
@@ -188,8 +192,8 @@ static int32_t DestroyCaptureInternal(struct AudioAdapter *adapter, struct Audio
     std::lock_guard<std::mutex> lock(adapterContext->mtx_);
 
     for (auto it = adapterContext->captures_.begin(); it != adapterContext->captures_.end(); ++it) {
-        if ((*it).get() == captureContext) {
-            int32_t ret = adapterContext->proxy_->DestroyCapture(captureContext->descHal_);
+        if ((it->second).get() == captureContext) {
+            int32_t ret = adapterContext->proxy_->DestroyCapture(it->first);
             if (ret != DH_SUCCESS) {
                 return ret;
             }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,7 +32,7 @@ public:
 
     int32_t RenderCallback(AudioCallbackType type, int8_t &reserved, int8_t &cookie) override;
     int32_t ParamCallback(AudioExtParamKey key, const std::string& condition, const std::string& value,
-        int8_t &reserved, int8_t &cookie) override;
+        int8_t &reserved, int8_t cookie) override;
 
 private:
     ::RenderCallback callback_ = nullptr;
@@ -57,7 +57,7 @@ int32_t AudioRenderCallbackImpl::RenderCallback(AudioCallbackType type, int8_t &
 }
 
 int32_t AudioRenderCallbackImpl::ParamCallback(AudioExtParamKey key, const std::string& condition,
-    const std::string& value, int8_t &reserved, int8_t &cookie)
+    const std::string& value, int8_t &reserved, int8_t cookie)
 {
     (void) reserved;
     (void) cookie;

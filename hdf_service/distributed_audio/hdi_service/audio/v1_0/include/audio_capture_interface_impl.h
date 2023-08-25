@@ -41,7 +41,7 @@ public:
         const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> &callback);
     ~AudioCaptureInterfaceImpl() override;
 
-    int32_t CaptureFrame(std::vector<int8_t> &frame, uint64_t requestBytes) override;
+    int32_t CaptureFrame(std::vector<int8_t> &frame, uint64_t &replyBytes) override;
     int32_t GetCapturePosition(uint64_t &frames, AudioTimeStamp &time) override;
     int32_t CheckSceneCapability(const AudioSceneDescriptor &scene, bool &supported) override;
     int32_t SelectScene(const AudioSceneDescriptor &scene) override;
