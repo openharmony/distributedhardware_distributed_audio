@@ -58,8 +58,6 @@ public:
     int32_t CreateControlChannel(const std::string &peerDevId);
     int32_t RegisterAdapterCallback(const std::shared_ptr<AVSenderAdapterCallback> &back);
 
-    void SaveFile(std::string fileName, uint8_t *lastFrame, int32_t size);
-
     int32_t OnSenderEvent(const AVTransEvent &event) override;
     int32_t OnMessageReceived(const std::shared_ptr<AVTransMessage> &message) override;
 private:

@@ -145,9 +145,10 @@ int32_t AVTransSenderAdapter::PushData(std::shared_ptr<AudioData> &audioData)
 
     int32_t ret = senderEngine_->PushData(transBuffer);
     if (ret != DH_SUCCESS) {
-        DHLOGI("Push data to av transport sender failed");
+        DHLOGE("Push data to av transport sender failed");
         return ERR_DH_AV_TRANS_FEED_DATA_FAILED;
     }
+    DHLOGI("Push data to av sender success. data size: %d.", audioData->Size());
     return DH_SUCCESS;
 }
 
