@@ -19,6 +19,7 @@
 
 #include "daudio_constants.h"
 #include "daudio_hisysevent.h"
+#include "daudio_sink_hidumper.h"
 #include "daudio_sink_manager.h"
 
 #undef DH_LOG_TAG
@@ -251,6 +252,9 @@ void DMicClient::CaptureThreadRunning()
         if (errorFlag) {
             DHLOGE("Bytes read failed.");
             break;
+        }
+        if (DaudioSinkHidumper::GetInstance().GetFlagStatus()) {
+            SaveFile(FILE_NAME, const_cast<uint8_t*>(audioData->Data()), audioData->Size());
         }
         int64_t startTransTime = GetNowTimeUs();
         int32_t ret = micTrans_->FeedAudioData(audioData);

@@ -17,6 +17,7 @@
 #define OHOS_DAUDIO_UTIL_H
 
 #include <chrono>
+#include <fstream>
 #include <string>
 #include "nlohmann/json.hpp"
 
@@ -48,6 +49,7 @@ void GetCurrentTime(int64_t &tvSec, int64_t &tvNSec);
 bool CheckIsNum(const std::string &jsonString);
 bool CheckDevIdIsLegal(const std::string &devId);
 bool IsOutDurationRange(int64_t startTime, int64_t endTime, int64_t lastStartTime);
+void SaveFile(std::string fileName, uint8_t *audioData, int32_t size);
 
 template <typename T>
 bool GetSysPara(const char *key, T &value);

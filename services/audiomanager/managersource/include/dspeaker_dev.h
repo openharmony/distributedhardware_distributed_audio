@@ -84,6 +84,7 @@ private:
 
 private:
     static constexpr const char* ENQUEUE_THREAD = "spkEnqueueTh";
+    const std::string FILE_NAME = "/data/source_spk_write.pcm";
 
     std::string devId_;
     std::weak_ptr<IAudioEventCallback> audioEventCallback_;
@@ -91,6 +92,7 @@ private:
     std::condition_variable channelWaitCond_;
     std::atomic<bool> isTransReady_ = false;
     std::atomic<bool> isOpened_ = false;
+    std::atomic<bool> dumpFlag_ = false;
     int32_t curPort_ = 0;
     std::shared_ptr<IAudioDataTransport> speakerTrans_ = nullptr;
     std::set<int32_t> enabledPorts_;

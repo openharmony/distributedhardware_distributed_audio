@@ -65,6 +65,8 @@ typedef enum AudioExtParamEvent {
     HDF_AUDIO_EVENT_MMAP_STOP_MIC = 17,
     HDF_AUDIO_EVENT_START = 18,
     HDF_AUDIO_EVENT_STOP = 19,
+    HDF_AUDIO_EVENT_SPK_DUMP = 20,
+    HDF_AUDIO_EVENT_MIC_DUMP = 21,
 } EXT_PARAM_EVENT;
 
 typedef enum AudioVolumeEvent {

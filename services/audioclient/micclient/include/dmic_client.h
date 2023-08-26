@@ -69,6 +69,7 @@ private:
 private:
     constexpr static uint8_t CHANNEL_WAIT_SECONDS = 5;
     static constexpr const char* CAPTURETHREAD = "captureThread";
+    const std::string FILE_NAME = "/data/sink_mic_send.pcm";
 
     std::string devId_;
     std::thread captureDataThread_;

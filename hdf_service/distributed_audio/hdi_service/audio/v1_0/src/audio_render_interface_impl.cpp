@@ -101,6 +101,9 @@ int32_t AudioRenderInterfaceImpl::RenderFrame(const std::vector<int8_t> &frame, 
 
     AudioParameter param = { devAttrs_.format, devAttrs_.channelCount, devAttrs_.sampleRate, 0, devAttrs_.frameSize};
     AudioData data = { param, frame };
+    if (dumpFlag_) {
+        SaveFile(FILE_NAME, reinterpret_cast<uint8_t*>(data.data.data()), frame.size());
+    }
     FadeInProcess(DURATION_FRAMES, data.data.data(), frame.size());
     if (audioExtCallback_ == nullptr) {
         DHLOGE("Callback is nullptr.");
@@ -442,6 +445,11 @@ void AudioRenderInterfaceImpl::SetAttrs(const std::string &adpName, const AudioD
     const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> &callback)
 {
     DHLOGI("Set attrs, not support yet.");
+}
+
+void AudioRenderInterfaceImpl::SetDumpFlagInner()
+{
+    dumpFlag_ = true;
 }
 } // V1_0
 } // Audio

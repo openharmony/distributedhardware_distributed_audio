@@ -30,6 +30,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+using OHOS::HDI::DistributedAudio::Audioext::V1_0::DAudioEvent;
 using OHOS::HDI::DistributedAudio::Audioext::V1_0::IDAudioCallback;
 using OHOS::HDI::DistributedAudio::Audioext::V1_0::IDAudioManager;
 class DAudioHdiHandler {
@@ -50,6 +51,7 @@ public:
 private:
     DAudioHdiHandler();
     ~DAudioHdiHandler();
+    void ProcessEventMsg(const AudioEvent &audioEvent, DAudioEvent &newEvent);
 
     const std::string HDF_AUDIO_SERVICE_NAME = "daudio_ext_service";
     std::mutex devMapMtx_;

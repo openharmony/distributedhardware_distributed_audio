@@ -162,16 +162,8 @@ int32_t DAudioHdiHandler::UnRegisterAudioDevice(const std::string &devId, const 
     return DH_SUCCESS;
 }
 
-int32_t DAudioHdiHandler::NotifyEvent(const std::string &devId, const int32_t dhId,
-    const AudioEvent &audioEvent)
+void DAudioHdiHandler::ProcessEventMsg(const AudioEvent &audioEvent, DAudioEvent &newEvent)
 {
-    DHLOGD("Notify event adpname: %s, dhId: %d, event type: %d, event content: %s.",
-        GetAnonyString(devId).c_str(), dhId, audioEvent.type, audioEvent.content.c_str());
-    if (audioSrvHdf_ == nullptr) {
-        DHLOGE("Audio hdi proxy not init");
-        return ERR_DH_AUDIO_HDI_PROXY_NOT_INIT;
-    }
-    OHOS::HDI::DistributedAudio::Audioext::V1_0::DAudioEvent newEvent = {AUDIO_EVENT_UNKNOWN, audioEvent.content};
     switch (audioEvent.type) {
         case AudioEventType::NOTIFY_OPEN_SPEAKER_RESULT:
             newEvent.type = AUDIO_EVENT_OPEN_SPK_RESULT;
@@ -200,10 +192,29 @@ int32_t DAudioHdiHandler::NotifyEvent(const std::string &devId, const int32_t dh
         case AudioEventType::AUDIO_RENDER_STATE_CHANGE:
             newEvent.type = AUDIO_EVENT_RENDER_STATE_CHANGE;
             break;
+        case AudioEventType::NOTIFY_HDF_SPK_DUMP:
+            newEvent.type = AUDIO_EVENT_SPK_DUMP;
+            break;
+        case AudioEventType::NOTIFY_HDF_MIC_DUMP:
+            newEvent.type = AUDIO_EVENT_MIC_DUMP;
+            break;
         default:
             DHLOGE("Unsupport audio event.");
             break;
     }
+}
+
+int32_t DAudioHdiHandler::NotifyEvent(const std::string &devId, const int32_t dhId,
+    const AudioEvent &audioEvent)
+{
+    DHLOGD("Notify event adpname: %s, dhId: %d, event type: %d, event content: %s.",
+        GetAnonyString(devId).c_str(), dhId, audioEvent.type, audioEvent.content.c_str());
+    if (audioSrvHdf_ == nullptr) {
+        DHLOGE("Audio hdi proxy not init");
+        return ERR_DH_AUDIO_HDI_PROXY_NOT_INIT;
+    }
+    DAudioEvent newEvent = {AUDIO_EVENT_UNKNOWN, audioEvent.content};
+    ProcessEventMsg(audioEvent, newEvent);
 
     int32_t res = audioSrvHdf_->NotifyEvent(devId, dhId, newEvent);
     if (res != HDF_SUCCESS) {

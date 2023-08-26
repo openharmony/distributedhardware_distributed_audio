@@ -19,6 +19,7 @@
 #include "system_ability.h"
 #include "ipc_object_stub.h"
 
+#include "daudio_sink_hidumper.h"
 #include "daudio_sink_stub.h"
 
 namespace OHOS {
@@ -36,6 +37,7 @@ public:
     int32_t UnsubscribeLocalHardware(const std::string &dhId) override;
     void DAudioNotify(const std::string &devId, const std::string &dhId, const int32_t eventType,
         const std::string &eventContent) override;
+    int Dump(int32_t fd, const std::vector<std::u16string>& args) override;
 
 protected:
     void OnStart() override;

@@ -23,6 +23,7 @@
 #include "audio_decode_transport.h"
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
+#include "daudio_hidumper.h"
 #include "daudio_hisysevent.h"
 #include "daudio_hitrace.h"
 #include "daudio_log.h"
@@ -302,6 +303,7 @@ int32_t DMicDev::Release()
         DHLOGE("Release mic trans failed, ret: %d.", ret);
         return ret;
     }
+    dumpFlag_.store(false);
     return DH_SUCCESS;
 }
 
@@ -340,6 +342,14 @@ int32_t DMicDev::ReadStreamData(const std::string &devId, const int32_t dhId, st
         }
         data = dataQueue_.front();
         dataQueue_.pop();
+    }
+    if (DaudioHidumper::GetInstance().GetFlagStatus()) {
+        if (!dumpFlag_) {
+            AudioEvent event(NOTIFY_HDF_MIC_DUMP, "");
+            NotifyHdfAudioEvent(event);
+            dumpFlag_.store(true);
+        }
+        SaveFile(FILE_NAME, const_cast<uint8_t*>(data->Data()), data->Size());
     }
     int64_t endTime = GetNowTimeUs();
     if (IsOutDurationRange(startTime, endTime, lastReadStartTime_)) {

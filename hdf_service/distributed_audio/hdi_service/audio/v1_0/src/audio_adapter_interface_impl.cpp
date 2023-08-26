@@ -47,7 +47,6 @@ AudioAdapterInterfaceImpl::~AudioAdapterInterfaceImpl()
     DHLOGD("Distributed audio adapter destructed, name(%s).", GetAnonyString(adpDescriptor_.adapterName).c_str());
 }
 
-
 void AudioAdapterInterfaceImpl::SetSpeakerCallback(const sptr<IDAudioCallback> &spkCallback)
 {
     if (spkCallback == nullptr) {
@@ -373,6 +372,8 @@ int32_t AudioAdapterInterfaceImpl::Notify(const uint32_t devId, const DAudioEven
         case HDF_AUDIO_EVENT_CLOSE_SPK_RESULT:
         case HDF_AUDIO_EVENT_OPEN_MIC_RESULT:
         case HDF_AUDIO_EVENT_CLOSE_MIC_RESULT:
+        case HDF_AUDIO_EVENT_SPK_DUMP:
+        case HDF_AUDIO_EVENT_MIC_DUMP:
             return HandleSANotifyEvent(event);
         case HDF_AUDIO_EVENT_SPK_CLOSED:
         case HDF_AUDIO_EVENT_MIC_CLOSED:
@@ -770,6 +771,16 @@ int32_t AudioAdapterInterfaceImpl::HandleSANotifyEvent(const DAudioEvent &event)
             }
             micNotifyFlag_ = true;
             micWaitCond_.notify_all();
+            break;
+        case HDF_AUDIO_EVENT_SPK_DUMP:
+            if (audioRender_ != nullptr) {
+                audioRender_->SetDumpFlagInner();
+            }
+            break;
+        case HDF_AUDIO_EVENT_MIC_DUMP:
+            if (audioCapture_ != nullptr) {
+                audioCapture_->SetDumpFlagInner();
+            }
             break;
         default:
             DHLOGE("Notify not support event type %d, event content: %s.", event.type, event.content.c_str());

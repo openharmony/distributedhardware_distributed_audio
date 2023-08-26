@@ -17,6 +17,7 @@
 
 #include "daudio_constants.h"
 #include "daudio_hisysevent.h"
+#include "daudio_sink_hidumper.h"
 #include "daudio_util.h"
 #include "daudio_sink_manager.h"
 
@@ -289,6 +290,9 @@ void DSpeakerClient::PlayThreadRunning()
             audioData = dataQueue_.front();
             dataQueue_.pop();
             DHLOGD("Pop spk data, dataqueue size: %d.", dataQueue_.size());
+        }
+        if (DaudioSinkHidumper::GetInstance().GetFlagStatus()) {
+            SaveFile(FILE_NAME, const_cast<uint8_t*>(audioData->Data()), audioData->Size());
         }
         int32_t writeOffSet = 0;
         while (writeOffSet < static_cast<int32_t>(audioData->Capacity())) {
