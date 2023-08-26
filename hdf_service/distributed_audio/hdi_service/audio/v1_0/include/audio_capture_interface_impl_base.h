@@ -45,6 +45,7 @@ public:
     virtual const AudioDeviceDescriptor &GetCaptureDesc() = 0;
     virtual void SetAttrs(const std::string &adpName, const AudioDeviceDescriptor &desc,
         const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> &callback) = 0;
+    virtual void SetDumpFlagInner() = 0;
 };
 } // V1_0
 } // Audio

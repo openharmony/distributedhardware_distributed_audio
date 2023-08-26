@@ -19,8 +19,8 @@
 
 #include "daudio_constants.h"
 #include "daudio_hisysevent.h"
-#include "daudio_sink_manager.h"
 #include "daudio_sink_hidumper.h"
+#include "daudio_sink_manager.h"
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DMicClient"

@@ -35,12 +35,14 @@ enum class HidumpFlag {
     GET_SOURCE_DEVID,
     GET_SINK_INFO,
     GET_ABILITY,
+    DUMP_AUDIO_DATA,
 };
 class DaudioHidumper {
     DECLARE_SINGLE_INSTANCE_BASE(DaudioHidumper);
 
 public:
     bool Dump(const std::vector<std::string> &args, std::string &result);
+    bool GetFlagStatus();
     DaudioHidumper();
     ~DaudioHidumper();
 
@@ -52,11 +54,13 @@ private:
     int32_t GetSourceDevId(std::string &result);
     int32_t GetSinkInfo(std::string &result);
     int32_t GetAbilityInfo(std::string &result);
+    int32_t DumpAudioData(std::string &result);
 
 private:
     std::string g_sourceDevId_ = "";
     AudioManager *g_manager = nullptr;
     AudioAdapterDescriptor *g_devices = nullptr;
+    bool HidumperFlag_ = false;
     int32_t g_deviceNum = 0;
     std::string spkDefault = "1";
     std::string micDefault = "134217729";

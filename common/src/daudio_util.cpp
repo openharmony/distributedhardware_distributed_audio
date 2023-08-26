@@ -365,5 +365,16 @@ bool IsParamEnabled(const std::string &key, bool &isEnabled)
     isEnabled = false;
     return false;
 }
+
+void SaveFile(std::string fileName, uint8_t *audioData, int32_t size)
+{
+    std::ofstream ofs(fileName, std::ios::binary | std::ios::out | std::ios::app);
+    if (!ofs.is_open()) {
+        DHLOGE("open file failed");
+        return;
+    }
+    ofs.write((const char*)(audioData), size);
+    ofs.close();
+}
 } // namespace DistributedHardware
 } // namespace OHOS

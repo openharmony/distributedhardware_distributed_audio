@@ -70,6 +70,7 @@ ohos_shared_library("distributed_audio_sink") {
     "${innerkits_path}/native_cpp/audio_source/src/daudio_source_proxy.cpp",
     "${services_path}/audiomanager/managersink/src/daudio_sink_dev.cpp",
     "${services_path}/audiomanager/managersink/src/daudio_sink_manager.cpp",
+    "src/daudio_sink_hidumper.cpp",
     "src/daudio_sink_service.cpp",
     "src/daudio_sink_stub.cpp",
   ]
