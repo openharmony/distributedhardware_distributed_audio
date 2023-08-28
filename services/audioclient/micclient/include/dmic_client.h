@@ -40,6 +40,9 @@
 #include "iaudio_event_callback.h"
 #include "imic_client.h"
 
+#include "v1_0/audio_types.h"
+#include "v1_0/iaudio_manager.h"
+
 namespace OHOS {
 namespace DistributedHardware {
 class DMicClient : public IAudioDataTransCallback,
@@ -61,6 +64,25 @@ public:
     int32_t StopCapture() override;
     void SetAttrs(const std::string &devId, const std::shared_ptr<IAudioEventCallback> &callback) override;
     int32_t SendMessage(uint32_t type, std::string content, std::string dstDevId) override;
+
+    void AdapterDescFree(struct AudioAdapterDescriptor *dataBlock, bool freeSelf);
+    void ReleaseAdapterDescs(struct AudioAdapterDescriptor **descs, uint32_t descsLen);
+    int32_t GetAudioManager();
+    int32_t GetAdapter();
+    int32_t GetPrimaryDesc(struct AudioAdapterDescriptor *descs, struct AudioAdapterDescriptor
+        **primaryDesc);
+    void ReleaseHDFAudioDevice();
+    int32_t InitHDFAudioDevice();
+    void GenerateAttr(const AudioParam &param);
+    int32_t AudioFwkClientSetUp();
+    int32_t HdfClientSetUp();
+    int32_t TransSetUp();
+    int32_t HdfClientRelease();
+    int32_t TransRelease();
+    int32_t HdfClientStartCapture();
+    void HdfCaptureAudioData(uint32_t lengthPerCapture, const uint32_t lengthPerTrans,
+        const uint32_t len);
+    void AudioFwkCaptureData();
 
     void OnReadData(size_t length) override;
 private:
@@ -84,6 +106,27 @@ private:
     std::shared_ptr<IAudioDataTransport> micTrans_ = nullptr;
     int64_t lastCaptureStartTime_ = 0;
     int64_t lastTransStartTime_ = 0;
+
+    constexpr static uint8_t PORT_ID = 11;
+    constexpr static size_t FRAME_PER_SECOND = 50;
+    constexpr static size_t MAX_AUDIO_ADAPTER_DESC = 5;
+    constexpr static size_t PATH_LEN = 256;
+    constexpr static size_t INT_32_MAX = 0x7fffffff;
+    constexpr static size_t BUFFER_PERIOD_SIZE = 4096;
+    constexpr static size_t AUDIO_BUFFER_SIZE = 16384;
+    constexpr static size_t FORMATNUM = 2;
+    static constexpr const char* ADAPTERNAME = "primary";
+    static constexpr const char* DEVNAME = "devName";
+
+    char adapterName_[PATH_LEN] = {0};
+    struct IAudioManager *audioManager_ = nullptr;
+    struct IAudioAdapter *audioAdapter_ = nullptr;
+    struct IAudioCapture *hdfCapture_ = nullptr;
+    uint32_t captureId_ = 0;
+    int64_t frameIndex_ = 0;
+    bool micInUse_ = false;
+    struct AudioDeviceDescriptor captureDesc_;
+    struct AudioSampleAttributes captureAttr_;
 };
 } // DistributedHardware
 } // OHOS
