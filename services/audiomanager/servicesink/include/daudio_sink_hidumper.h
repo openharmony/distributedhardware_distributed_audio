@@ -16,6 +16,7 @@
 #ifndef OHOS_DISTRIBUTED_AUDIO_SINK_HIDUMPER_H
 #define OHOS_DISTRIBUTED_AUDIO_SINK_HIDUMPER_H
 
+#include <map>
 #include <string>
 #include <vector>
 
