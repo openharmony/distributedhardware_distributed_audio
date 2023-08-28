@@ -175,8 +175,9 @@ HWTEST_F(AudioCtrlChannelTest, SendMsg_001, TestSize.Level1)
 HWTEST_F(AudioCtrlChannelTest, from_audioEventJson_001, TestSize.Level1)
 {
     AudioEvent event;
-    json j;
+    cJSON *j = cJSON_CreateObject();
     EXPECT_NE(DH_SUCCESS, from_audioEventJson(j, event));
+    cJSON_Delete(j);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

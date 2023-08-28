@@ -22,7 +22,7 @@ config("module_private_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "//third_party/json/include",
+    "//third_party/cJSON",
     "${audio_framework_path}/audiopolicy/include",
     "${mediastandardfwk_path}/audiocapturer/include",
     "${mediastandardfwk_path}/audiocommon/include",
@@ -73,6 +73,7 @@ ohos_unittest("DaudioSinkDevTest") {
 
   deps = [
     "${services_path}/audiomanager/servicesink:distributed_audio_sink",
+    "//third_party/cJSON:cjson",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
   ]

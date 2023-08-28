@@ -22,7 +22,6 @@ config("module_private_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "//third_party/json/include",
     "${audio_framework_path}/audiopolicy/include",
     "${driver_audio_path}/include",
     "${fwk_common_path}/utils/include",
@@ -72,6 +71,7 @@ config("module_private_config") {
     "${services_path}/common/taskProcessor/include",
     "${services_path}/hdfaudioclient/include",
     "${softbusadapter_path}/include",
+    "//third_party/cJSON",
   ]
 }
 
@@ -85,6 +85,7 @@ ohos_unittest("DaudioSourceServiceTest") {
 
   deps = [
     "${services_path}/audiomanager/servicesource:distributed_audio_source",
+    "//third_party/cJSON:cjson",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
   ]

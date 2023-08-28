@@ -49,10 +49,13 @@ ohos_fuzztest("SourceServiceConfigDistributedHardwareFuzzTest") {
     "${innerkits_path}/native_cpp/audio_source/include",
     "${distributedaudio_path}/audiohandler/include",
     "${services_path}/audiomanager/servicesource/include",
+    "//third_party/cJSON",
   ]
 
-  deps =
-      [ "${services_path}/audiomanager/servicesource:distributed_audio_source" ]
+  deps = [
+    "${services_path}/audiomanager/servicesource:distributed_audio_source",
+    "//third_party/cJSON:cjson",
+  ]
 
   defines = [
     "HI_LOG_ENABLE",

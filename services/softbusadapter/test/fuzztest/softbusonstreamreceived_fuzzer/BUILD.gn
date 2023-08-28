@@ -37,18 +37,19 @@ ohos_fuzztest("SoftbusOnStreamReceivedFuzzTest") {
     "${fwk_common_path}/log/include",
     "${fwk_common_path}/utils/include",
     "${softbusadapter_path}/include",
-    "//third_party/json/include",
   ]
 
   include_dirs += [
     "include",
     "${common_path}/include",
     "${audio_transport_path}/audiochannel/audiodatachannel/include",
+    "//third_party/cJSON",
   ]
 
   deps = [
     "${audio_transport_path}/audiochannel/audiodatachannel:distributed_audio_data_channel",
     "${services_path}/common:distributed_audio_utils",
+    "//third_party/cJSON:cjson",
   ]
 
   external_deps = [
