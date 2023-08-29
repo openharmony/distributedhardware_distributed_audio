@@ -182,7 +182,7 @@ void SaveFile(std::string fileName, uint8_t *audioData, int32_t size)
     if (!ofs.is_open()) {
         return;
     }
-    ofs.write((const char*)(audioData), size);
+    ofs.write(reinterpret_cast<char *>(audioData), size);
     ofs.close();
 }
 } // namespace DistributedHardware
