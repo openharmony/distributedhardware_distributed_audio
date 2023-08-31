@@ -27,6 +27,7 @@
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "AudioCaptureInterfaceImpl"
+// define DUMP_CAPTURE_FILE for dump file
 
 using namespace OHOS::DistributedHardware;
 namespace OHOS {
@@ -84,9 +85,11 @@ int32_t AudioCaptureInterfaceImpl::CaptureFrame(std::vector<int8_t> &frame, uint
         DHLOGE("Read stream data failed.");
         return HDF_FAILURE;
     }
+#ifdef DUMP_CAPTURE_FILE
     if (dumpFlag_) {
         SaveFile(FILE_NAME, reinterpret_cast<uint8_t*>(audioData.data.data()), audioData.data.size());
     }
+#endif
     frame.resize(devAttrs_.frameSize);
     ret = memcpy_s(frame.data(), frame.size(), audioData.data.data(), audioData.data.size());
     if (ret != EOK) {

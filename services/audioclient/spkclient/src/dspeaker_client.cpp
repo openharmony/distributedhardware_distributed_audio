@@ -23,6 +23,7 @@
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DSpeakerClient"
+// define DUMP_DSPEAKERCLIENT_FILE for dump file
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -291,9 +292,11 @@ void DSpeakerClient::PlayThreadRunning()
             dataQueue_.pop();
             DHLOGD("Pop spk data, dataqueue size: %d.", dataQueue_.size());
         }
+#ifdef DUMP_DSPEAKERCLIENT_FILE
         if (DaudioSinkHidumper::GetInstance().GetFlagStatus()) {
             SaveFile(FILE_NAME, const_cast<uint8_t*>(audioData->Data()), audioData->Size());
         }
+#endif
         int32_t writeOffSet = 0;
         while (writeOffSet < static_cast<int32_t>(audioData->Capacity())) {
             int32_t writeLen = audioRenderer_->Write(audioData->Data() + writeOffSet,

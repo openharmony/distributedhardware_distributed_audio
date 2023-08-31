@@ -34,6 +34,7 @@
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DSpeakerDev"
+// define DUMP_DSPEAKERDEV_FILE for dump file
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -346,6 +347,7 @@ int32_t DSpeakerDev::WriteStreamData(const std::string &devId, const int32_t dhI
         DHLOGE("Write stream data, speaker trans is null.");
         return ERR_DH_AUDIO_SA_SPEAKER_TRANS_NULL;
     }
+#ifdef DUMP_DSPEAKERDEV_FILE
     if (DaudioHidumper::GetInstance().GetFlagStatus()) {
         if (!dumpFlag_) {
             AudioEvent event(NOTIFY_HDF_SPK_DUMP, "");
@@ -354,6 +356,7 @@ int32_t DSpeakerDev::WriteStreamData(const std::string &devId, const int32_t dhI
         }
         SaveFile(FILE_NAME, const_cast<uint8_t*>(data->Data()), data->Size());
     }
+#endif
     int32_t ret = speakerTrans_->FeedAudioData(data);
     if (ret != DH_SUCCESS) {
         DHLOGE("Write stream data failed, ret: %d.", ret);
