@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -45,8 +45,8 @@ struct AudioAdapterContext {
     std::unique_ptr<AudioParamCallbackContext> callbackInternal_ = nullptr;
     ParamCallback callback_ = nullptr;
 
-    std::vector<std::unique_ptr<AudioCaptureContext>> captures_;
-    std::vector<std::unique_ptr<AudioRenderContext>> renders_;
+    std::vector<std::pair<uint32_t, std::unique_ptr<AudioCaptureContext>>> captures_;
+    std::vector<std::pair<uint32_t, std::unique_ptr<AudioRenderContext>>> renders_;
     std::map<uint32_t, std::unique_ptr<::AudioPortCapability>> caps_;
 };
 } // namespace DistributedHardware

@@ -291,7 +291,7 @@ public:
     MockIAudioCapture() {}
     ~MockIAudioCapture() {}
 
-    int32_t CaptureFrame(std::vector<int8_t> &frame, uint64_t requestBytes) override
+    int32_t CaptureFrame(std::vector<int8_t> &frame, uint64_t &replyBytes) override
     {
         return DistributedHardware::DH_SUCCESS;
     }
@@ -458,7 +458,7 @@ public:
     }
 
     int32_t ParamCallback(AudioExtParamKey key, const std::string& condition, const std::string& value,
-        int8_t &reserved, int8_t &cookie) override
+        int8_t &reserved, int8_t cookie) override
     {
         return DistributedHardware::DH_SUCCESS;
     }
@@ -475,7 +475,7 @@ public:
     }
 
     int32_t ParamCallback(AudioExtParamKey key, const std::string& condition, const std::string& value,
-        int8_t &reserved, int8_t &cookie) override
+        int8_t &reserved, int8_t cookie) override
     {
         return DistributedHardware::ERR_DH_AUDIO_HDF_FAIL;
     }
