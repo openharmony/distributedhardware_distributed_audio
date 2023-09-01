@@ -127,7 +127,7 @@ private:
     void SetDumpFlag(bool isRender);
 
 private:
-    static constexpr uint8_t WAIT_SECONDS = 10;
+    static constexpr uint8_t WAIT_SECONDS = 20;
     static constexpr int32_t TYPE_CONDITION = 11;
     AudioAdapterDescriptor adpDescriptor_;
     AudioAdapterStatus status_ = STATUS_OFFLINE;
