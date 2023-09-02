@@ -63,6 +63,13 @@ ohos_shared_library("libaudio_manager_daudio_primary_service_1.0") {
     "LOG_DOMAIN=0xD004100",
   ]
 
+  if (build_variant == "root") {
+    defines += [
+      "DUMP_CAPTURE_FILE",
+      "DUMP_RENDER_FILE",
+    ]
+  }
+
   install_images = [ chipset_base_dir ]
   subsystem_name = "distributedhardware"
   part_name = "drivers_peripheral_distributed_audio"

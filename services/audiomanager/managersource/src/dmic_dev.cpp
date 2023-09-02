@@ -32,7 +32,6 @@
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DMicDev"
-// define DUMP_DMICDEV_FILE for dump file
 
 namespace OHOS {
 namespace DistributedHardware {

@@ -113,7 +113,7 @@ private:
     int32_t CloseMicNew(const std::string &args);
 
 private:
-    static constexpr uint8_t RPC_WAIT_SECONDS = 2;
+    static constexpr uint8_t RPC_WAIT_SECONDS = 10;
     static constexpr uint8_t TASK_QUEUE_CAPACITY = 20;
     static constexpr uint8_t EVENT_NOTIFY_OPEN_SPK = 0x01;
     static constexpr uint8_t EVENT_NOTIFY_CLOSE_SPK = 0x02;

@@ -73,11 +73,11 @@ public:
 
     int32_t InitAllPorts() override;
     int32_t CreateRender(const AudioDeviceDescriptor &desc, const AudioSampleAttributes &attrs,
-        sptr<IAudioRender> &render) override;
-    int32_t DestroyRender(const AudioDeviceDescriptor &desc) override;
+        sptr<IAudioRender> &render, uint32_t &renderId) override;
+    int32_t DestroyRender(uint32_t renderId) override;
     int32_t CreateCapture(const AudioDeviceDescriptor &desc, const AudioSampleAttributes &attrs,
-        sptr<IAudioCapture> &capture) override;
-    int32_t DestroyCapture(const AudioDeviceDescriptor &desc) override;
+        sptr<IAudioCapture> &capture, uint32_t &captureId) override;
+    int32_t DestroyCapture(uint32_t captureId) override;
     int32_t GetPortCapability(const AudioPort &port, AudioPortCapability &capability) override;
     int32_t SetPassthroughMode(const AudioPort &port, AudioPortPassthroughMode mode) override;
     int32_t GetPassthroughMode(const AudioPort &port, AudioPortPassthroughMode &mode) override;
@@ -119,9 +119,15 @@ private:
     int32_t WaitForSANotify(const AudioDeviceEvent &event);
     int32_t HandleDeviceClosed(const DAudioEvent &event);
     int32_t getEventTypeFromCondition(const std::string& condition);
+    int32_t InsertRenderImpl(const sptr<AudioRenderInterfaceImplBase> &audioRender, uint32_t &renderId);
+    int32_t InsertCapImpl(const sptr<AudioCaptureInterfaceImplBase> &audioCapture, uint32_t &captureId);
+    inline bool IsIdValid(const uint32_t id);
+    bool CheckRendersValid();
+    bool CheckCapsValid();
+    void SetDumpFlag(bool isRender);
 
 private:
-    static constexpr uint8_t WAIT_SECONDS = 10;
+    static constexpr uint8_t WAIT_SECONDS = 20;
     static constexpr int32_t TYPE_CONDITION = 11;
     AudioAdapterDescriptor adpDescriptor_;
     AudioAdapterStatus status_ = STATUS_OFFLINE;
@@ -129,9 +135,11 @@ private:
     sptr<IDAudioCallback> extSpkCallback_ = nullptr;
     sptr<IDAudioCallback> extMicCallback_ = nullptr;
     sptr<IAudioCallback> paramCallback_ = nullptr;
-    sptr<AudioRenderInterfaceImplBase> audioRender_ = nullptr;
+    std::mutex renderDevMtx_;
+    std::vector<sptr<AudioRenderInterfaceImplBase>> renderDevs_;
     AudioParameter renderParam_;
-    sptr<AudioCaptureInterfaceImplBase> audioCapture_ = nullptr;
+    std::mutex capDevMtx_;
+    std::vector<sptr<AudioCaptureInterfaceImplBase>> captureDevs_;
     AudioParameter captureParam_;
 
     std::mutex devMapMtx_;

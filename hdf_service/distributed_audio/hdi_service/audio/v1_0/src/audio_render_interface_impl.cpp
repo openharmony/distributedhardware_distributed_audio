@@ -26,7 +26,6 @@
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "AudioRenderInterfaceImpl"
-// define DUMP_RENDER_FILE for dump file
 
 using namespace OHOS::DistributedHardware;
 namespace OHOS {

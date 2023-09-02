@@ -24,7 +24,6 @@
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DMicClient"
-// define DUMP_DMICCLIENT_FILE for dump file
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -261,6 +260,7 @@ void DMicClient::GenerateAttr(const AudioParam &param)
     captureAttr_.silenceThreshold = AUDIO_BUFFER_SIZE;
     captureAttr_.channelCount = param.comParam.channelMask;
     captureAttr_.sampleRate = param.comParam.sampleRate;
+    captureAttr_.sourceType = 1;
 }
 
 int32_t DMicClient::AudioFwkClientSetUp()

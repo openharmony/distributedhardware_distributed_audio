@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,13 +13,35 @@
  * limitations under the License.
  */
 
+/**
+ * @addtogroup HdiAudio
+ * @{
+ *
+ * @brief Provides unified APIs for audio services to access audio drivers.
+ *
+ * An audio service can obtain an audio driver object or agent and then call APIs provided by this object or agent to
+ * access different types of audio devices based on the audio IDs, thereby obtaining audio information,
+ * subscribing to or unsubscribing from audio data, enabling or disabling an audio,
+ * setting the audio data reporting mode, and setting audio options such as the accuracy and measurement range.
+ *
+ * @since 4.0
+ * @version 1.0
+ */
+
 package ohos.hdi.distributed_audio.audio.v1_0;
 
+/**
+ * @brief Enumerates the audio port type.
+ */
 enum AudioPortDirection {
     PORT_OUT    = 1, /**< Output port */
     PORT_IN     = 2, /**< Input port */
     PORT_OUT_IN = 3, /**< Input/output port, supporting both audio input and output */
 };
+
+/**
+ * @brief Enumerates the pin of an audio adapter.
+ */
 enum AudioPortPin {
     PIN_NONE                     = 0,                 /**< Invalid pin */
     PIN_OUT_SPEAKER              = 1 << 0,            /**< Speaker output pin */
@@ -30,21 +52,32 @@ enum AudioPortPin {
     PIN_OUT_USB_EXT              = 1 << 5,            /**< Extended USB output pin*/
     PIN_OUT_EARPIECE             = 1 << 5 | 1 << 4,   /**< Earpiece output pin */
     PIN_OUT_BLUETOOTH_SCO        = 1 << 6,            /**< Bluetooth SCO output pin */
-    PIN_OUT_DAUDIO_DEFAULT       = 1 << 7,
+    PIN_OUT_DAUDIO_DEFAULT       = 1 << 7,            /**< Daudio default output pin */
+    PIN_OUT_HEADPHONE            = 1 << 8,            /**< Wired headphone output pin*/
+    PIN_OUT_USB_HEADSET          = 1 << 9,            /**< ARM USB out pin */
     PIN_IN_MIC                   = 1 << 27 | 1 << 0,  /**< Microphone input pin */
     PIN_IN_HS_MIC                = 1 << 27 | 1 << 1,  /**< Wired headset microphone pin for input */
     PIN_IN_LINEIN                = 1 << 27 | 1 << 2,  /**< Line-in pin */
     PIN_IN_USB_EXT               = 1 << 27 | 1 << 3,  /**< Extended USB input pin*/
     PIN_IN_BLUETOOTH_SCO_HEADSET = 1 << 27 | 1 << 4,  /**< Bluetooth SCO headset input pin */
-    PIN_IN_DAUDIO_DEFAULT        = 1 << 27 | 1 << 5,
+    PIN_IN_DAUDIO_DEFAULT        = 1 << 27 | 1 << 5,  /**< Daudio default input pin */
+    PIN_IN_USB_HEADSET           = 1 << 27 | 1 << 6,  /**< ARM USB input pin */
 };
+
+/**
+ * @brief Enumerates the audio category.
+ */
 enum AudioCategory {
-    AUDIO_IN_MEDIA = 0,
-    AUDIO_IN_COMMUNICATION = 1,
-    AUDIO_IN_RINGTONE = 2,
-    AUDIO_IN_CALL = 3,
-    AUDIO_MMAP_NOIRQ = 4,
+    AUDIO_IN_MEDIA         = 0, /**< Media */
+    AUDIO_IN_COMMUNICATION = 1, /**< Communications */
+    AUDIO_IN_RINGTONE      = 2, /**< Ringtone */
+    AUDIO_IN_CALL          = 3, /**< Call */
+    AUDIO_MMAP_NOIRQ       = 4, /**< Mmap mode */
 };
+
+/**
+ * @brief Enumerates the audio format.
+ */
 enum AudioFormat {
     AUDIO_FORMAT_TYPE_PCM_8_BIT  = 1 << 0,                      /**< 8-bit PCM */
     AUDIO_FORMAT_TYPE_PCM_16_BIT = 1 << 1,                      /**< 16-bit PCM */
@@ -60,12 +93,22 @@ enum AudioFormat {
     AUDIO_FORMAT_TYPE_G711U      = 1 << 25 | 1 << 1,            /**< G711u */
     AUDIO_FORMAT_TYPE_G726       = 1 << 25 | 1 << 1 | 1 << 0,   /**< G726 */
 };
+
+/**
+ * @brief Enumerates the audio channel mask.
+ *
+ * A mask describes an audio channel position.
+ */
 enum AudioChannelMask {
     AUDIO_CHANNEL_FRONT_LEFT  = 1,  /**< Front left channel */
     AUDIO_CHANNEL_FRONT_RIGHT = 2,  /**< Front right channel */
     AUDIO_CHANNEL_MONO        = 1,  /**< Mono channel */
     AUDIO_CHANNEL_STEREO      = 3,  /**< Stereo channel, consisting of front left and front right channels */
 };
+
+/**
+ * @brief Enumerates masks of audio sampling rates.
+ */
 enum AudioSampleRatesMask {
     AUDIO_SAMPLE_RATE_MASK_8000    = 1 << 0,        /**< 8 kHz */
     AUDIO_SAMPLE_RATE_MASK_12000   = 1 << 1,        /**< 12 kHz */
@@ -80,206 +123,362 @@ enum AudioSampleRatesMask {
     AUDIO_SAMPLE_RATE_MASK_96000   = 1 << 10,       /**< 96 kHz */
     AUDIO_SAMPLE_RATE_MASK_INVALID = 4294967295,    /**< Invalid sampling rate */
 };
+
+/**
+ * @brief Enumerates the passthrough data transmission mode of an audio port.
+ */
 enum AudioPortPassthroughMode {
-    PORT_PASSTHROUGH_LPCM = 1,
-    PORT_PASSTHROUGH_RAW = 2,
-    PORT_PASSTHROUGH_HBR2LBR = 4,
-    PORT_PASSTHROUGH_AUTO = 8,
+    PORT_PASSTHROUGH_LPCM    = 1 << 0, /**< Stereo PCM */
+    PORT_PASSTHROUGH_RAW     = 1 << 1, /**< HDMI passthrough */
+    PORT_PASSTHROUGH_HBR2LBR = 1 << 2, /**< Blu-ray next-generation audio output with reduced specifications */
+    PORT_PASSTHROUGH_AUTO    = 1 << 3, /**< Mode automatically matched based on the HDMI EDID */
 };
+
+/**
+ * @brief Defines formats of raw audio samples.
+ */
 enum AudioSampleFormat {
-    AUDIO_SAMPLE_FORMAT_S8 = 0,
-    AUDIO_SAMPLE_FORMAT_S8P = 1,
-    AUDIO_SAMPLE_FORMAT_U8 = 2,
-    AUDIO_SAMPLE_FORMAT_U8P = 3,
-    AUDIO_SAMPLE_FORMAT_S16 = 4,
-    AUDIO_SAMPLE_FORMAT_S16P = 5,
-    AUDIO_SAMPLE_FORMAT_U16 = 6,
-    AUDIO_SAMPLE_FORMAT_U16P = 7,
-    AUDIO_SAMPLE_FORMAT_S24 = 8,
-    AUDIO_SAMPLE_FORMAT_S24P = 9,
-    AUDIO_SAMPLE_FORMAT_U24 = 10,
-    AUDIO_SAMPLE_FORMAT_U24P = 11,
-    AUDIO_SAMPLE_FORMAT_S32 = 12,
-    AUDIO_SAMPLE_FORMAT_S32P = 13,
-    AUDIO_SAMPLE_FORMAT_U32 = 14,
-    AUDIO_SAMPLE_FORMAT_U32P = 15,
-    AUDIO_SAMPLE_FORMAT_S64 = 16,
-    AUDIO_SAMPLE_FORMAT_S64P = 17,
-    AUDIO_SAMPLE_FORMAT_U64 = 18,
-    AUDIO_SAMPLE_FORMAT_U64P = 19,
-    AUDIO_SAMPLE_FORMAT_F32 = 20,
-    AUDIO_SAMPLE_FORMAT_F32P = 21,
-    AUDIO_SAMPLE_FORMAT_F64 = 22,
-    AUDIO_SAMPLE_FORMAT_F64P = 23,
+    /* 8 bits */
+    AUDIO_SAMPLE_FORMAT_S8   = 0,  /**< signed 8 bit sample */
+    AUDIO_SAMPLE_FORMAT_S8P  = 1,  /**< signed 8 bit planar sample */
+    AUDIO_SAMPLE_FORMAT_U8   = 2,  /**< unsigned 8 bit sample */
+    AUDIO_SAMPLE_FORMAT_U8P  = 3,  /**< unsigned 8 bit planar sample */
+    /* 16 bits */
+    AUDIO_SAMPLE_FORMAT_S16  = 4,  /**< signed 16 bit sample */
+    AUDIO_SAMPLE_FORMAT_S16P = 5,  /**< signed 16 bit planar sample */
+    AUDIO_SAMPLE_FORMAT_U16  = 6,  /**< unsigned 16 bit sample */
+    AUDIO_SAMPLE_FORMAT_U16P = 7,  /**< unsigned 16 bit planar sample */
+    /* 24 bits */
+    AUDIO_SAMPLE_FORMAT_S24  = 8,  /**< signed 24 bit sample */
+    AUDIO_SAMPLE_FORMAT_S24P = 9,  /**< signed 24 bit planar sample */
+    AUDIO_SAMPLE_FORMAT_U24  = 10, /**< unsigned 24 bit sample */
+    AUDIO_SAMPLE_FORMAT_U24P = 11, /**< unsigned 24 bit planar sample */
+    /* 32 bits */
+    AUDIO_SAMPLE_FORMAT_S32  = 12, /**< signed 32 bit sample */
+    AUDIO_SAMPLE_FORMAT_S32P = 13, /**< signed 32 bit planar sample */
+    AUDIO_SAMPLE_FORMAT_U32  = 14, /**< unsigned 32 bit sample */
+    AUDIO_SAMPLE_FORMAT_U32P = 15, /**< unsigned 32 bit planar sample */
+    /* 64 bits */
+    AUDIO_SAMPLE_FORMAT_S64  = 16, /**< signed 64 bit sample */
+    AUDIO_SAMPLE_FORMAT_S64P = 17, /**< signed 64 bit planar sample */
+    AUDIO_SAMPLE_FORMAT_U64  = 18, /**< unsigned 64 bit sample */
+    AUDIO_SAMPLE_FORMAT_U64P = 19, /**< unsigned 64 bit planar sample */
+    /* float double */
+    AUDIO_SAMPLE_FORMAT_F32  = 20, /**< float 32 bit sample */
+    AUDIO_SAMPLE_FORMAT_F32P = 21, /**< float 32 bit planar sample */
+    AUDIO_SAMPLE_FORMAT_F64  = 22, /**< double 64 bit sample */
+    AUDIO_SAMPLE_FORMAT_F64P = 23, /**< double 64 bit planar sample */
 };
+
+/**
+ * @brief Enumerates channel modes for audio rendering.
+ *
+ * @attention The following modes are set for rendering dual-channel audios. Others are not supported.
+ */
 enum AudioChannelMode {
-    AUDIO_CHANNEL_NORMAL = 0,
-    AUDIO_CHANNEL_BOTH_LEFT = 1,
-    AUDIO_CHANNEL_BOTH_RIGHT = 2,
-    AUDIO_CHANNEL_EXCHANGE = 3,
-    AUDIO_CHANNEL_MIX = 4,
-    AUDIO_CHANNEL_LEFT_MUTE = 5,
-    AUDIO_CHANNEL_RIGHT_MUTE = 6,
-    AUDIO_CHANNEL_BOTH_MUTE = 7,
+    AUDIO_CHANNEL_NORMAL     = 0, /**< Normal mode. No processing is required. */
+    AUDIO_CHANNEL_BOTH_LEFT  = 1, /**< Two left channels */
+    AUDIO_CHANNEL_BOTH_RIGHT = 2, /**< Two right channels */
+    AUDIO_CHANNEL_EXCHANGE   = 3, /**< Data exchange between the left and right channels. The left channel takes the audio
+                                   * stream of the right channel, and the right channel takes that of the left channel.
+                                   */
+    AUDIO_CHANNEL_MIX        = 4, /**< Mix of streams of the left and right channels */
+    AUDIO_CHANNEL_LEFT_MUTE  = 5, /**< Left channel muted. The stream of the right channel is output. */
+    AUDIO_CHANNEL_RIGHT_MUTE = 6, /**< Right channel muted. The stream of the left channel is output. */
+    AUDIO_CHANNEL_BOTH_MUTE  = 7, /**< Both left and right channels are muted */
 };
+
+/**
+ * @brief Enumerates the execution types of the <b>DrainBuffer</b> function.
+ */
 enum AudioDrainNotifyType {
-    AUDIO_DRAIN_NORMAL_MODE = 0,
-    AUDIO_DRAIN_EARLY_MODE = 1,
+    AUDIO_DRAIN_NORMAL_MODE = 0, /**< The <b>DrainBuffer</b> function returns after all data finishes playback. */
+    AUDIO_DRAIN_EARLY_MODE  = 1, /**< The <b>DrainBuffer</b> function returns before all the data of the current track
+                                  * finishes playback to reserve time for a smooth track switch by the audio service.
+                                  */
+
 };
+
+/**
+ * @brief Enumerates callback notification events.
+ */
 enum AudioCallbackType {
-    AUDIO_NONBLOCK_WRITE_COMPELETED = 0,
-    AUDIO_DRAIN_COMPELETED = 1,
-    AUDIO_FLUSH_COMPLETED = 2,
-    AUDIO_RENDER_FULL = 3,
-    AUDIO_ERROR_OCCUR = 4,
+    AUDIO_NONBLOCK_WRITE_COMPLETED = 0, /**< The non-block write is complete. */
+    AUDIO_DRAIN_COMPLETED          = 1, /**< The draining is complete. */
+    AUDIO_FLUSH_COMPLETED          = 2, /**< The flush is complete. */
+    AUDIO_RENDER_FULL              = 3, /**< The render buffer is full.*/
+    AUDIO_ERROR_OCCUR              = 4, /**< An error occurs.*/
 };
+
+/**
+ * @brief Describes AudioPortRole.
+ */
 enum AudioPortRole {
-    AUDIO_PORT_UNASSIGNED_ROLE = 0,
-    AUDIO_PORT_SOURCE_ROLE = 1,
-    AUDIO_PORT_SINK_ROLE = 2,
+    AUDIO_PORT_UNASSIGNED_ROLE = 0, /**< Unassigned port role */
+    AUDIO_PORT_SOURCE_ROLE     = 1, /**< Assigned source role */
+    AUDIO_PORT_SINK_ROLE       = 2, /**< Assigned sink role */
 };
+
+/**
+ * @brief Describes AudioPortType.
+ */
 enum AudioPortType {
-    AUDIO_PORT_UNASSIGNED_TYPE = 0,
-    AUDIO_PORT_DEVICE_TYPE = 1,
-    AUDIO_PORT_MIX_TYPE = 2,
-    AUDIO_PORT_SESSION_TYPE = 3,
+    AUDIO_PORT_UNASSIGNED_TYPE = 0, /**< Unassigned port type */
+    AUDIO_PORT_DEVICE_TYPE     = 1, /**< Assigned device type */
+    AUDIO_PORT_MIX_TYPE        = 2, /**< Assigned mix type */
+    AUDIO_PORT_SESSION_TYPE    = 3, /**< Assigned session type */
 };
+
+/**
+ * @brief Describes AudioSessionType.
+ */
 enum AudioSessionType {
-    AUDIO_OUTPUT_STAGE_SESSION = 0,
-    AUDIO_OUTPUT_MIX_SESSION = 1,
-    AUDIO_ALLOCATE_SESSION = 2,
-    AUDIO_INVALID_SESSION = 3,
+    AUDIO_OUTPUT_STAGE_SESSION = 0, /**< Assigned output stage session */
+    AUDIO_OUTPUT_MIX_SESSION   = 1, /**< Assigned output mix session */
+    AUDIO_ALLOCATE_SESSION     = 2, /**< Assigned allocate session */
+    AUDIO_INVALID_SESSION      = 3, /**< Assigned invalid session */
 };
+
+/**
+ * @brief Describes AudioDeviceType.
+ */
 enum AudioDeviceType {
-    AUDIO_LINEOUT        = 1 << 0,
-    AUDIO_HEADPHONE      = 1 << 1,
-    AUDIO_HEADSET        = 1 << 2,
-    AUDIO_USB_HEADSET    = 1 << 3,
-    AUDIO_USB_HEADPHONE  = 1 << 4,
-    AUDIO_USBA_HEADSET   = 1 << 5,
-    AUDIO_USBA_HEADPHONE = 1 << 6,
-    AUDIO_PRIMARY_DEVICE = 1 << 7,
-    AUDIO_USB_DEVICE     = 1 << 8,
-    AUDIO_A2DP_DEVICE    = 1 << 9,
-    AUDIO_DEVICE_UNKNOWN,
+    AUDIO_LINEOUT        = 1 << 0, /**< Assigned lineout device type */
+    AUDIO_HEADPHONE      = 1 << 1, /**< Assigned headphone device type */
+    AUDIO_HEADSET        = 1 << 2, /**< Assigned headset device type */
+    AUDIO_USB_HEADSET    = 1 << 3, /**< Assigned usb headset device type */
+    AUDIO_USB_HEADPHONE  = 1 << 4, /**< Assigned usb headphone device type */
+    AUDIO_USBA_HEADSET   = 1 << 5, /**< Assigned usba headset device type */
+    AUDIO_USBA_HEADPHONE = 1 << 6, /**< Assigned usba headphone device type */
+    AUDIO_PRIMARY_DEVICE = 1 << 7, /**< Assigned primary device type */
+    AUDIO_USB_DEVICE     = 1 << 8, /**< Assigned usb device type */
+    AUDIO_A2DP_DEVICE    = 1 << 9, /**< Assigned a2dp device type */
+    AUDIO_HDMI_DEVICE    = 1 << 10, /**< Assigned hdmi device type */
+    AUDIO_ADAPTER_DEVICE = 1 << 11, /**< Assigned adapter device type */
+    AUDIO_DEVICE_UNKNOWN,          /**< Assigned unknown device type */
 };
+
+/**
+ * @brief Describes AudioEventType.
+ */
 enum AudioEventType {
-    AUDIO_DEVICE_ADD = 1,
-    AUDIO_DEVICE_REMOVE = 2,
-    AUDIO_LOAD_SUCCESS = 3,
-    AUDIO_LOAD_FAILURE = 4,
-    AUDIO_UNLOAD = 5,
-    AUDIO_SERVICE_VALID = 7,
-    AUDIO_SERVICE_INVALID = 8,
-    AUDIO_CAPTURE_THRESHOLD = 9,
-    AUDIO_EVENT_UNKNOWN = 10,
+    AUDIO_DEVICE_ADD        = 1,  /**< Assigned add device event type */
+    AUDIO_DEVICE_REMOVE     = 2,  /**< Assigned remove device event type */
+    AUDIO_LOAD_SUCCESS      = 3,  /**< Assigned load sucess event type */
+    AUDIO_LOAD_FAILURE      = 4,  /**< Assigned load failure event type */
+    AUDIO_UNLOAD            = 5,  /**< Assigned unload event type */
+    AUDIO_SERVICE_VALID     = 7,  /**< Assigned valid service event type */
+    AUDIO_SERVICE_INVALID   = 8,  /**< Assigned invalid service event type */
+    AUDIO_CAPTURE_THRESHOLD = 9,  /**< Assigned threshold capture event type */
+    AUDIO_EVENT_UNKNOWN     = 10, /**< Assigned unknown event type */
 };
+
+/**
+ * @brief Enumerates the restricted key type of the parameters
+ */
 enum AudioExtParamKey {
-    AUDIO_EXT_PARAM_KEY_NONE = 0,     /**< Distributed audio extra param key none */
-    AUDIO_EXT_PARAM_KEY_VOLUME = 1,   /**< Distributed audio extra param key volume event */
-    AUDIO_EXT_PARAM_KEY_FOCUS = 2,    /**< Distributed audio extra param key focus event */
-    AUDIO_EXT_PARAM_KEY_BUTTON = 3,   /**< Distributed audio extra param key media button event */
-    AUDIO_EXT_PARAM_KEY_EFFECT = 4,   /**< Distributed audio extra param key audio effect event */
-    AUDIO_EXT_PARAM_KEY_STATUS = 5,   /**< Distributed audio extra param key device status event */
+    AUDIO_EXT_PARAM_KEY_NONE     = 0,    /**< Distributed audio extra param key none */
+    AUDIO_EXT_PARAM_KEY_VOLUME   = 1,    /**< Distributed audio extra param key volume event */
+    AUDIO_EXT_PARAM_KEY_FOCUS    = 2,    /**< Distributed audio extra param key focus event */
+    AUDIO_EXT_PARAM_KEY_BUTTON   = 3,    /**< Distributed audio extra param key media button event */
+    AUDIO_EXT_PARAM_KEY_EFFECT   = 4,    /**< Distributed audio extra param key audio effect event */
+    AUDIO_EXT_PARAM_KEY_STATUS   = 5,    /**< Distributed audio extra param key device status event */
+    AUDIO_EXT_PARAM_KEY_USB_DEVICE = 101, /**< Check USB device type ARM or HIFI */
     AUDIO_EXT_PARAM_KEY_LOWPOWER = 1000, /**< Low power event type */
 };
+
+/**
+ * @brief Describes status of audio deivce.@link enum AudioDeviceType
+ */
 struct AudioDeviceStatus {
-    unsigned int pnpStatus;
+    unsigned int pnpStatus; /**< Audio pnp status */
 };
+
+/**
+ * @brief Describes the audio scene.
+ */
 union SceneDesc {
-    unsigned int id;
+    unsigned int id; /**< Audio scene ID */
 };
+
+/**
+ * @brief Defines the audio port.
+ */
 struct AudioPort {
-    enum AudioPortDirection dir;
-    unsigned int portId;
-    String portName;
+    enum AudioPortDirection dir; /**< Audio port type. For details, see {@link AudioPortDirection} */
+    unsigned int portId;         /**< Audio port ID */
+    String portName;             /**< Audio port name */
 };
+
+/**
+ * @brief Defines the audio adapter descriptor.
+ *
+ * An audio adapter is a set of port drivers for a sound card, including the output and input ports.
+ * One port corresponds to multiple pins, and each pin belongs to a physical component (such as a
+ * speaker or a wired headset).
+ */
 struct AudioAdapterDescriptor {
-    String adapterName;
-    struct AudioPort[] ports;
+    String adapterName;       /**< Name of the audio adapter */
+    struct AudioPort[] ports; /**< List of ports supported by an audio adapter */
 };
+
+/**
+ * @brief Defines the audio device descriptor.
+ */
 struct AudioDeviceDescriptor {
-    unsigned int portId;
-    enum AudioPortPin pins;
-    String desc;
+    unsigned int portId;    /**< Audio port ID */
+    enum AudioPortPin pins; /**< Pins of audio ports (input and output). For details, see {@link AudioPortPin}. */
+    String desc;            /**< Audio device name */
 };
+
+/**
+ * @brief Defines the audio scene descriptor.
+ */
 struct AudioSceneDescriptor {
-    union SceneDesc scene;
-    struct AudioDeviceDescriptor desc;
+    union SceneDesc scene;             /**< Describes the audio scene */
+    struct AudioDeviceDescriptor desc; /**< Audio device descriptor */
 };
+
+/**
+ * @brief Defines audio input type.
+ */
+enum AudioInputType {
+    AUDIO_INPUT_DEFAULT_TYPE             = 0,      /**< Assigned default input type */
+    AUDIO_INPUT_MIC_TYPE                 = 1 << 0, /**< Assigned mic input type */
+    AUDIO_INPUT_SPEECH_WAKEUP_TYPE       = 1 << 1, /**< Assigned speech wakeup input type */
+    AUDIO_INPUT_VOICE_COMMUNICATION_TYPE = 1 << 2, /**< Assigned voice communication input type */
+    AUDIO_INPUT_VOICE_RECOGNITION_TYPE   = 1 << 3, /**< Assigned voice recognition input type */
+};
+
+/**
+ * @brief Defines audio sampling attributes.
+ */
 struct AudioSampleAttributes {
-    enum AudioCategory type;
-    boolean interleaved;
-    enum AudioFormat format;
-    unsigned int sampleRate;
-    unsigned int channelCount;
-    unsigned int period;
-    unsigned int frameSize;
-    boolean isBigEndian;
-    boolean isSignedData;
-    unsigned int startThreshold;
-    unsigned int stopThreshold;
-    unsigned int silenceThreshold;
-    int streamId;
+    enum AudioCategory type;       /**< Audio type. For details, see {@link AudioCategory} */
+    boolean interleaved;           /**< Interleaving flag of audio data */
+    enum AudioFormat format;       /**< Audio data format. For details, see {@link AudioFormat}. */
+    unsigned int sampleRate;       /**< Audio sampling rate */
+    unsigned int channelCount;     /**< Number of audio channels. For example, for the mono channel, the value is 1,
+                                    * and for the stereo channel, the value is 2.
+                                    */
+    unsigned int period;           /**< Audio sampling period */
+    unsigned int frameSize;        /**< Frame size of the audio data */
+    boolean isBigEndian;           /**< Big endian flag of audio data */
+    boolean isSignedData;          /**< Signed or unsigned flag of audio data */
+    unsigned int startThreshold;   /**< Audio render start threshold. */
+    unsigned int stopThreshold;    /**< Audio render stop threshold. */
+    unsigned int silenceThreshold; /**< Audio capture buffer threshold. */
+    int streamId;                  /**< Audio Identifier of render or capture */
+    int sourceType;                /**< Audio sourceType of render or capture */
 };
+
+/**
+ * @brief Defines the audio timestamp, which is a substitute for POSIX <b>timespec</b>.
+ */
 struct AudioTimeStamp {
-    long tvSec;
-    long tvNSec;
+    long tvSec;  /**< Seconds */
+    long tvNSec; /**< Nanoseconds */
 };
+
+/**
+ * @brief Defines the sub-port capability.
+ */
 struct AudioSubPortCapability {
-    unsigned int portId;
-    String desc;
-    enum AudioPortPassthroughMode mask;
+    unsigned int portId;                /**< Sub-port ID */
+    String desc;                        /**< Sub-port name */
+    enum AudioPortPassthroughMode mask; /**< Passthrough mode of data transmission. For details,
+                                         * see {@link AudioPortPassthroughMode}.
+                                         */
 };
+
+/**
+ * @brief Defines the audio port capability.
+ */
 struct AudioPortCapability {
-    unsigned int deviceType;
-    unsigned int deviceId;
-    boolean hardwareMode;
-    unsigned int formatNum;
-    enum AudioFormat[] formats;
-    unsigned int sampleRateMasks;
-    enum AudioChannelMask channelMasks;
-    unsigned int channelCount;
-    struct AudioSubPortCapability[] subPorts;
-    enum AudioSampleFormat[] supportSampleFormats;
+    unsigned int deviceType;                       /**< Device type (output or input) */
+    unsigned int deviceId;                         /**< Device ID used for device binding */
+    boolean hardwareMode;                          /**< Whether to support device binding */
+    unsigned int formatNum;                        /**< Number of the supported audio formats */
+    enum AudioFormat[] formats;                    /**< Supported audio formats. For details, see {@link AudioFormat}. */
+    unsigned int sampleRateMasks;                  /**< Supported audio sampling rates (8 kHz, 16 kHz, 32 kHz, and 48 kHz) */
+    enum AudioChannelMask channelMasks;            /**< Audio channel layout mask of the device. For details,
+                                                    * see {@link AudioChannelMask}.
+                                                    */
+    unsigned int channelCount;                     /**< Supported maximum number of audio channels */
+    struct AudioSubPortCapability[] subPorts;      /**< List of supported sub-ports */
+    enum AudioSampleFormat[] supportSampleFormats; /**< Supported audio sample formats. For details,
+                                                    * see {@link AudioSampleFormat}.
+                                                    */
 };
+
+/**
+ * @brief Describes a mmap buffer.
+ */
 struct AudioMmapBufferDescriptor {
-    byte[] memoryAddress;
-    FileDescriptor memoryFd;
-    int totalBufferFrames;
-    int transferFrameSize;
-    int isShareable;
-    unsigned int offset;
-    String filePath;
+    byte[] memoryAddress;    /**< Pointer to the mmap buffer */
+    FileDescriptor memoryFd; /**< File descriptor of the mmap buffer */
+    int totalBufferFrames;   /**< Total size of the mmap buffer (unit: frame )*/
+    int transferFrameSize;   /**< Transfer size (unit: frame) */
+    int isShareable;         /**< Whether the mmap buffer can be shared among processes */
+    unsigned int offset;     /**< off set */
+    String filePath;         /**< file path */
 };
+
+/**
+ * @brief Describes AudioDevExtInfo.
+ */
 struct AudioDevExtInfo {
-    int moduleId;
-    enum AudioPortPin type;
-    String desc;
+    int moduleId;           /**< Identifier of the module stream is attached to */
+    enum AudioPortPin type; /**< Device type For details, see {@link AudioPortPin}. */
+    String desc;            /**< Address */
 };
+
+/**
+ * @brief Describes AudioMixInfo.
+ */
 struct AudioMixExtInfo {
-    int moduleId;
-    int streamId;
+    int moduleId; /**< Identifier of the module stream is attached to */
+    int streamId; /**< Identifier of the capture or render passed by caller */
 };
+
+/**
+ * @brief Describes AudioSessionExtInfo.
+ */
 struct AudioSessionExtInfo {
-    enum AudioSessionType sessionType;
+    enum AudioSessionType sessionType; /**< Audio session type */
 };
+
+/**
+ * @brief Describes AudioInfo.
+ */
 struct AudioInfo {
-    struct AudioDevExtInfo device;
-    struct AudioMixExtInfo mix;
-    struct AudioSessionExtInfo session;
+    struct AudioDevExtInfo device;      /* Specific Device Ext info */
+    struct AudioMixExtInfo mix;         /* Specific mix info */
+    struct AudioSessionExtInfo session; /* session specific info */
 };
+
+/**
+ * @brief Describes AudioRouteNode.
+ */
 struct AudioRouteNode {
-    int portId;
-    enum AudioPortRole role;
-    enum AudioPortType type;
-    struct AudioInfo ext;
+    int portId;              /**< Audio port ID */
+    enum AudioPortRole role; /**< Audio port as a sink or a source */
+    enum AudioPortType type; /**< device, mix ... */
+    struct AudioInfo ext;    /**< The <b>ext</b> object */
 };
+
+/**
+ * @brief Describes AudioRoute.
+ */
 struct AudioRoute {
-    struct AudioRouteNode[] sources;
-    struct AudioRouteNode[] sinks;
+    struct AudioRouteNode[] sources; /**< List of sources */
+    struct AudioRouteNode[] sinks;   /**< List of sinks */
 };
+
+/**
+ * @brief Describes AudioEvent.
+ */
 struct AudioEvent {
-    unsigned int eventType; /**< @link enum AudioEventType */
+    unsigned int eventType;  /**< @link enum AudioEventType */
     unsigned int deviceType; /**< @link enum AudioDeviceType */
 };

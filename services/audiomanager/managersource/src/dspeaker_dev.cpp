@@ -34,7 +34,6 @@
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DSpeakerDev"
-// define DUMP_DSPEAKERDEV_FILE for dump file
 
 namespace OHOS {
 namespace DistributedHardware {
