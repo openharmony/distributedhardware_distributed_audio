@@ -509,9 +509,11 @@ void DMicClient::AudioFwkCaptureData()
         DHLOGE("Bytes read failed.");
         return;
     }
+#ifdef DUMP_DMICCLIENT_FILE
     if (DaudioSinkHidumper::GetInstance().GetFlagStatus()) {
         SaveFile(FILE_NAME, const_cast<uint8_t*>(audioData->Data()), audioData->Size());
     }
+#endif
     int64_t startTransTime = GetNowTimeUs();
     int32_t ret = micTrans_->FeedAudioData(audioData);
     if (ret != DH_SUCCESS) {

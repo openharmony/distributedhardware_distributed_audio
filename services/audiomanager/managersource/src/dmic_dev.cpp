@@ -343,6 +343,7 @@ int32_t DMicDev::ReadStreamData(const std::string &devId, const int32_t dhId, st
         data = dataQueue_.front();
         dataQueue_.pop();
     }
+#ifdef DUMP_DMICDEV_FILE
     if (DaudioHidumper::GetInstance().GetFlagStatus()) {
         if (!dumpFlag_) {
             AudioEvent event(NOTIFY_HDF_MIC_DUMP, "");
@@ -351,6 +352,7 @@ int32_t DMicDev::ReadStreamData(const std::string &devId, const int32_t dhId, st
         }
         SaveFile(FILE_NAME, const_cast<uint8_t*>(data->Data()), data->Size());
     }
+#endif
     int64_t endTime = GetNowTimeUs();
     if (IsOutDurationRange(startTime, endTime, lastReadStartTime_)) {
         DHLOGE("This time read data spend: %lld, The interval of read data this time and the last time: %lld",

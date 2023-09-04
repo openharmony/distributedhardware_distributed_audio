@@ -84,9 +84,11 @@ int32_t AudioCaptureInterfaceImpl::CaptureFrame(std::vector<int8_t> &frame, uint
         DHLOGE("Read stream data failed.");
         return HDF_FAILURE;
     }
+#ifdef DUMP_CAPTURE_FILE
     if (dumpFlag_) {
         SaveFile(FILE_NAME, reinterpret_cast<uint8_t*>(audioData.data.data()), audioData.data.size());
     }
+#endif
     frame.resize(devAttrs_.frameSize);
     ret = memcpy_s(frame.data(), frame.size(), audioData.data.data(), audioData.data.size());
     if (ret != EOK) {

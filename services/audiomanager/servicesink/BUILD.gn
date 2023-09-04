@@ -118,6 +118,13 @@ ohos_shared_library("distributed_audio_sink") {
     "LOG_DOMAIN=0xD004100",
   ]
 
+  if (build_variant == "root") {
+    defines += [
+      "DUMP_DMICCLIENT_FILE",
+      "DUMP_DSPEAKERCLIENT_FILE",
+    ]
+  }
+
   subsystem_name = "distributedhardware"
 
   part_name = "distributed_audio"

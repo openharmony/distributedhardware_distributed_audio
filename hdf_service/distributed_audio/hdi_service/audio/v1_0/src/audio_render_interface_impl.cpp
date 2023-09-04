@@ -101,9 +101,11 @@ int32_t AudioRenderInterfaceImpl::RenderFrame(const std::vector<int8_t> &frame, 
 
     AudioParameter param = { devAttrs_.format, devAttrs_.channelCount, devAttrs_.sampleRate, 0, devAttrs_.frameSize};
     AudioData data = { param, frame };
+#ifdef DUMP_RENDER_FILE
     if (dumpFlag_) {
         SaveFile(FILE_NAME, reinterpret_cast<uint8_t*>(data.data.data()), frame.size());
     }
+#endif
     FadeInProcess(DURATION_FRAMES, data.data.data(), frame.size());
     if (audioExtCallback_ == nullptr) {
         DHLOGE("Callback is nullptr.");
