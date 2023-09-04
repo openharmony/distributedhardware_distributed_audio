@@ -73,7 +73,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, CreateRender_001, TestSize.Level1)
     AudioDeviceDescriptor devDesc;
     AudioSampleAttributes attrs;
     sptr<IAudioRender> render = nullptr;
-    uint32_t renderId = 10;
+    uint32_t renderId = 0;
     AdapterTest_->extSpkCallback_ = new MockIDAudioCallback();
     EXPECT_NE(HDF_SUCCESS, AdapterTest_->CreateRender(devDesc, attrs, render, renderId));
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->DestroyRender(renderId));
@@ -105,7 +105,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, DestroyRender_001, TestSize.Level1)
 
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->DestroyRender(renderId));
     renderId = 10;
-    EXPECT_NE(HDF_FAILURE, AdapterTest_->DestroyRender(renderId));
+    EXPECT_EQ(HDF_FAILURE, AdapterTest_->DestroyRender(renderId));
+    renderId = 1;
+    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->DestroyRender(renderId));
 }
 
 /**
@@ -119,7 +121,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, CreateCapture_001, TestSize.Level1)
     AudioDeviceDescriptor devDesc;
     AudioSampleAttributes attrs;
     sptr<IAudioCapture> capture = nullptr;
-    uint32_t capId = 10;
+    uint32_t capId = 0;
     AdapterTest_->extMicCallback_ = new MockIDAudioCallback();
     EXPECT_NE(HDF_SUCCESS, AdapterTest_->CreateCapture(devDesc, attrs, capture, capId));
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->DestroyCapture(capId));
@@ -150,7 +152,9 @@ HWTEST_F(AudioAdapterInterfaceImpTest, DestroyCapture_001, TestSize.Level1)
 
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->DestroyCapture(capId));
     capId = 10;
-    EXPECT_NE(HDF_FAILURE, AdapterTest_->DestroyCapture(capId));
+    EXPECT_EQ(HDF_FAILURE, AdapterTest_->DestroyCapture(capId));
+    capId = 1;
+    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->DestroyCapture(capId));
 }
 
 /**
@@ -673,7 +677,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, SetAudioVolume_001, TestSize.Level1)
     std::string param = "1";
     EXPECT_NE(HDF_SUCCESS, AdapterTest_->SetAudioVolume(condition, param));
     AdapterTest_->extSpkCallback_ = new MockIDAudioCallback();
-    EXPECT_NE(HDF_SUCCESS, AdapterTest_->SetAudioVolume(condition, param));
+    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->SetAudioVolume(condition, param));
     std::string adpterName = "adbcef";
     AudioDeviceDescriptor desc;
     AudioSampleAttributes attrs;
