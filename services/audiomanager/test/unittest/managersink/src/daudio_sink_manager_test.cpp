@@ -53,10 +53,10 @@ HWTEST_F(DAudioSinkManagerTest, CreateAudioDevice_001, TestSize.Level1)
     std::string devId = "devId";
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, daudioSinkManager.CreateAudioDevice(devId));
     daudioSinkManager.channelState_ = ChannelState::SPK_CONTROL_OPENED;
-    daudioSinkManager.rcvProviderPtr_ = std::make_shared<IAVEngineProvider>().get();
+    daudioSinkManager.LoadAVReceiverEngineProvider();
     EXPECT_EQ(DH_SUCCESS, daudioSinkManager.CreateAudioDevice(devId));
     daudioSinkManager.channelState_ = ChannelState::MIC_CONTROL_OPENED;
-    daudioSinkManager.sendProviderPtr_ = std::make_shared<IAVEngineProvider>().get();
+    daudioSinkManager.LoadAVReceiverEngineProvider();
     EXPECT_EQ(DH_SUCCESS, daudioSinkManager.CreateAudioDevice(devId));
     auto dev = std::make_shared<DAudioSinkDev>(devId);
     daudioSinkManager.audioDevMap_.emplace(devId, dev);
