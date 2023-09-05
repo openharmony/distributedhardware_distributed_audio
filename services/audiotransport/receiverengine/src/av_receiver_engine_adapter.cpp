@@ -168,12 +168,14 @@ int32_t AVTransReceiverAdapter::OnReceiverEvent(const AVTransEvent &event)
 {
     DHLOGI("On Receiver event, type: %d", event.type);
     switch (event.type) {
+        case EventType::EVENT_CHANNEL_OPEN_FAIL:
         case EventType::EVENT_CHANNEL_OPENED: {
             chnCreateSuccess_ = (event.type == EventType::EVENT_CHANNEL_OPENED);
             chnCreatedCondVar_.notify_one();
             break;
         }
         case EventType::EVENT_CHANNEL_CLOSED:
+        case EventType::EVENT_START_FAIL:
         case EventType::EVENT_START_SUCCESS:
         case EventType::EVENT_STOP_SUCCESS:
         case EventType::EVENT_ENGINE_ERROR:
