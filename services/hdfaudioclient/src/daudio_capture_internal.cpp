@@ -70,7 +70,7 @@ static int32_t CaptureFrameInternal(struct AudioCapture *capture, void *frame, u
     }
     int8_t *uframe = reinterpret_cast<int8_t *>(frame);
     std::vector<int8_t> frameHal;
-    int32_t ret = context->proxy_->CaptureFrame(frameHal, requestBytes);
+    int32_t ret = context->proxy_->CaptureFrame(frameHal, *replyBytes);
     if (ret != DH_SUCCESS) {
         DHLOGE("Failed to capture frames.");
         return ret;
