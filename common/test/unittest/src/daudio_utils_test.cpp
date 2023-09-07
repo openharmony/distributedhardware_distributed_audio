@@ -129,30 +129,22 @@ HWTEST_F(DAudioUtilsTest, DAudioLatencyTest_003, TestSize.Level1)
 
 /**
  * @tc.name: DAudioLogTest_001
- * @tc.desc: Verify the DHLOG definition and DHLog function.
+ * @tc.desc: Verify the GetCurrentTime function and DHLOG definition and DHLog function.
  * @tc.type: FUNC
  * @tc.require: AR000H0E5U
  */
-HWTEST_F(DAudioUtilsTest, DAudioLogTest_001, TestSize.Level1)
+HWTEST_F(DAudioUtilsTest, DAudioUtilTest_001, TestSize.Level1)
 {
     DHLOGD("DAudio TDD test DHLOGD print.");
     DHLOGI("DAudio TDD test DHLOGI print.");
     DHLOGW("DAudio TDD test DHLOGW print.");
     DHLOGE("DAudio TDD test DHLOGE print.");
     DHLog(DHLogLevel::DH_LOG_ERROR, "");
-}
-
-/**
- * @tc.name: DAudioLogTest_001
- * @tc.desc: Verify the GetCurrentTime function.
- * @tc.type: FUNC
- * @tc.require: AR000H0E5U
- */
-HWTEST_F(DAudioUtilsTest, DAudioUtilTest_001, TestSize.Level1)
-{
     int64_t tvSec;
     int64_t tvNSec;
     GetCurrentTime(tvSec, tvNSec);
+    EXPECT_GE(tvSec, 0);
+    EXPECT_GE(tvNSec, 0);
 }
 
 /**
