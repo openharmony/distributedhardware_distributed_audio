@@ -16,16 +16,14 @@ import("//build/ohos_var.gni")
 import("../../distributedaudio.gni")
 
 ohos_shared_library("distributed_audio_softbus_adapter") {
-  include_dirs = [
-    "${fwk_common_path}/utils/include",
-    "//third_party/json/include",
-  ]
+  include_dirs = [ "${fwk_common_path}/utils/include" ]
 
   include_dirs += [
     "${common_path}/include",
     "${services_path}/common/audioparam",
     "${services_path}/common/audiodata/include",
     "${softbusadapter_path}/include",
+    "//third_party/cJSON",
   ]
 
   sources = [
@@ -33,7 +31,10 @@ ohos_shared_library("distributed_audio_softbus_adapter") {
     "src/softbus_adapter.cpp",
   ]
 
-  deps = [ "${services_path}/common:distributed_audio_utils" ]
+  deps = [
+    "${services_path}/common:distributed_audio_utils",
+    "//third_party/cJSON:cjson",
+  ]
 
   external_deps = [
     "c_utils:utils",
