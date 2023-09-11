@@ -20,6 +20,7 @@
 #include <fstream>
 #include <string>
 #include "nlohmann/json.hpp"
+#include "cJSON.h"
 
 using json = nlohmann::json;
 
@@ -37,6 +38,7 @@ int32_t GetAudioParamStr(const std::string &params, const std::string &key, std:
 int32_t GetAudioParamBool(const std::string &params, const std::string &key, bool &value);
 int32_t GetAudioParamInt(const std::string &params, const std::string &key, int32_t &value);
 bool JsonParamCheck(const json &jsonObj, const std::initializer_list<std::string> &key);
+bool CJsonParamCheck(const cJSON *jsonObj, const std::initializer_list<std::string> &keys);
 bool IsString(const json &jsonObj, const std::string &key);
 bool IsInt32(const json &jsonObj, const std::string &key);
 bool IsAudioParam(const json &jsonObj, const std::string &key);

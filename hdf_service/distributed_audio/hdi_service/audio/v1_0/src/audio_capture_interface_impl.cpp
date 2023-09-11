@@ -20,6 +20,8 @@
 #include "sys/time.h"
 #include <securec.h>
 
+#include "cJSON.h"
+
 #include "daudio_constants.h"
 #include "daudio_events.h"
 #include "daudio_log.h"
@@ -36,8 +38,7 @@ namespace Audio {
 namespace V1_0 {
 AudioCaptureInterfaceImpl::AudioCaptureInterfaceImpl(const std::string &adpName, const AudioDeviceDescriptor &desc,
     const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> &callback)
-    : adapterName_(adpName), devDesc_(desc),
-    devAttrs_(attrs), audioExtCallback_(callback)
+    : adapterName_(adpName), devDesc_(desc), devAttrs_(attrs), audioExtCallback_(callback)
 {
     devAttrs_.frameSize = CalculateFrameSize(attrs.sampleRate, attrs.channelCount, attrs.format, timeInterval_, false);
     const int32_t sizePerSec = static_cast<int32_t>(attrs.sampleRate * attrs.channelCount) *attrs.format;
@@ -110,7 +111,22 @@ int32_t AudioCaptureInterfaceImpl::CaptureFrame(std::vector<int8_t> &frame, uint
 int32_t AudioCaptureInterfaceImpl::Start()
 {
     DHLOGI("Start capture.");
-    DAudioEvent event = { HDF_AUDIO_EVENT_START, "" };
+    cJSON *jParam = cJSON_CreateObject();
+    if (jParam == nullptr) {
+        DHLOGE("Failed to create cJSON object.");
+        return HDF_FAILURE;
+    }
+    cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(devDesc_.pins).c_str());
+    char *jsonData = cJSON_PrintUnformatted(jParam);
+    if (jsonData == nullptr) {
+        DHLOGE("Failed to create JSON data.");
+        cJSON_Delete(jParam);
+        return HDF_FAILURE;
+    }
+    std::string content(jsonData);
+    cJSON_Delete(jParam);
+    cJSON_free(jsonData);
+    DAudioEvent event = { HDF_AUDIO_EVENT_START, content };
     if (audioExtCallback_ == nullptr) {
         DHLOGE("Callback is nullptr.");
         return HDF_FAILURE;
@@ -129,7 +145,22 @@ int32_t AudioCaptureInterfaceImpl::Start()
 int32_t AudioCaptureInterfaceImpl::Stop()
 {
     DHLOGI("Stop capture.");
-    DAudioEvent event = { HDF_AUDIO_EVENT_STOP, "" };
+    cJSON *jParam = cJSON_CreateObject();
+    if (jParam == nullptr) {
+        DHLOGE("Failed to create cJSON object.");
+        return HDF_FAILURE;
+    }
+    cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(devDesc_.pins).c_str());
+    char *jsonData = cJSON_PrintUnformatted(jParam);
+    if (jsonData == nullptr) {
+        DHLOGE("Failed to create JSON data.");
+        cJSON_Delete(jParam);
+        return HDF_FAILURE;
+    }
+    cJSON_Delete(jParam);
+    cJSON_free(jsonData);
+    std::string content(jsonData);
+    DAudioEvent event = { HDF_AUDIO_EVENT_STOP, content };
     if (audioExtCallback_ == nullptr) {
         DHLOGE("Callback is nullptr.");
         return HDF_FAILURE;

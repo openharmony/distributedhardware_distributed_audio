@@ -28,8 +28,9 @@ void DMicClientTest::TearDownTestCase(void) {}
 void DMicClientTest::SetUp()
 {
     std::string devId = "hello";
+    int32_t dhId = DEFAULT_CAPTURE_ID;
     clientCallback_ = std::make_shared<MockIAudioEventCallback>();
-    micClient_ = std::make_shared<DMicClient>(devId, clientCallback_);
+    micClient_ = std::make_shared<DMicClient>(devId, dhId, clientCallback_);
     micClient_->micTrans_ = std::make_shared<MockIAudioDataTransport>();
 
     audioParam_.comParam.codecType = AudioCodecType::AUDIO_CODEC_AAC;

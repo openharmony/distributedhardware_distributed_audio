@@ -17,6 +17,8 @@
 
 #include <chrono>
 
+#include "cJSON.h"
+
 #include "daudio_constants.h"
 #include "daudio_hisysevent.h"
 #include "daudio_sink_hidumper.h"
@@ -75,7 +77,21 @@ int32_t DMicClient::OnStateChange(const AudioEventType type)
 {
     DHLOGD("On state change type: %d.", type);
     AudioEvent event;
-    event.content = "";
+    cJSON *jParam = cJSON_CreateObject();
+    if (jParam == nullptr) {
+        DHLOGE("Failed to create cJSON object.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId_).c_str());
+    char *jsonData = cJSON_PrintUnformatted(jParam);
+    if (jsonData == nullptr) {
+        DHLOGE("Failed to create JSON data.");
+        cJSON_Delete(jParam);
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    event.content = std::string(jsonData);
+    cJSON_Delete(jParam);
+    cJSON_free(jsonData);
     switch (type) {
         case AudioEventType::DATA_OPENED: {
             isBlocking_.store(true);

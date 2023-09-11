@@ -25,6 +25,7 @@
 #include "ashmem.h"
 #include "av_sender_engine_transport.h"
 #include "daudio_hdi_handler.h"
+#include "daudio_io_dev.h"
 #include "iaudio_event_callback.h"
 #include "iaudio_data_transport.h"
 #include "iaudio_datatrans_callback.h"
@@ -34,21 +35,23 @@ using json = nlohmann::json;
 
 namespace OHOS {
 namespace DistributedHardware {
-class DSpeakerDev : public IDAudioHdiCallback,
+class DSpeakerDev : public DAudioIoDev,
     public IAudioDataTransCallback,
     public AVSenderTransportCallback,
     public std::enable_shared_from_this<DSpeakerDev> {
 public:
     DSpeakerDev(const std::string &devId, std::shared_ptr<IAudioEventCallback> callback)
-        : devId_(devId), audioEventCallback_(callback) {};
+        : DAudioIoDev(devId), audioEventCallback_(callback) {};
     ~DSpeakerDev() override = default;
+
     void OnEngineTransEvent(const AVTransEvent &event) override;
     void OnEngineTransMessage(const std::shared_ptr<AVTransMessage> &message) override;
-    int32_t InitSenderEngine(IAVEngineProvider *providerPtr);
 
-    int32_t EnableDSpeaker(const int32_t dhId, const std::string& capability);
-    int32_t DisableDSpeaker(const int32_t dhId);
+    int32_t InitReceiverEngine(IAVEngineProvider *providerPtr) override;
+    int32_t InitSenderEngine(IAVEngineProvider *providerPtr) override;
 
+    int32_t EnableDevice(const int32_t dhId, const std::string &capability) override;
+    int32_t DisableDevice(const int32_t dhId) override;
     int32_t OpenDevice(const std::string &devId, const int32_t dhId) override;
     int32_t CloseDevice(const std::string &devId, const int32_t dhId) override;
     int32_t SetParameters(const std::string &devId, const int32_t dhId, const AudioParamHDF &param) override;
@@ -59,34 +62,32 @@ public:
         uint64_t &frames, CurrentTimeHDF &time) override;
     int32_t RefreshAshmemInfo(const std::string &devId, const int32_t dhId,
         int32_t fd, int32_t ashmemLength, int32_t lengthPerTrans) override;
-    int32_t MmapStart();
-    int32_t MmapStop();
+    
+    int32_t MmapStart() override;
+    int32_t MmapStop() override;
 
     int32_t OnStateChange(const AudioEventType type) override;
     int32_t OnDecodeTransDataDone(const std::shared_ptr<AudioData> &audioData) override;
 
-    int32_t SetUp();
-    int32_t Start();
-    int32_t Stop();
-    int32_t Release();
-    bool IsOpened();
-    int32_t Pause();
-    int32_t Restart();
-    int32_t SendMessage(uint32_t type, std::string content, std::string dstDevId);
+    int32_t SetUp() override;
+    int32_t Start() override;
+    int32_t Stop() override;
+    int32_t Release() override;
+    bool IsOpened() override;
+    int32_t Pause() override;
+    int32_t Restart() override;
+    int32_t SendMessage(uint32_t type, std::string content, std::string dstDevId) override;
 
-    AudioParam GetAudioParam() const;
-    int32_t NotifyHdfAudioEvent(const AudioEvent &event);
+    AudioParam GetAudioParam() const override;
+    int32_t NotifyHdfAudioEvent(const AudioEvent &event, const int32_t portId) override;
 
 private:
-    int32_t EnableDevice(const int32_t dhId, const std::string &capability);
-    int32_t DisableDevice(const int32_t dhId);
     void EnqueueThread();
 
 private:
     static constexpr const char* ENQUEUE_THREAD = "spkEnqueueTh";
     const std::string FILE_NAME = "/data/source_spk_write.pcm";
 
-    std::string devId_;
     std::weak_ptr<IAudioEventCallback> audioEventCallback_;
     std::mutex channelWaitMutex_;
     std::condition_variable channelWaitCond_;

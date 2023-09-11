@@ -50,8 +50,8 @@ class DMicClient : public IAudioDataTransCallback,
     public IMicClient, public AVSenderTransportCallback,
     public std::enable_shared_from_this<DMicClient> {
 public:
-    DMicClient(const std::string &devId, const std::shared_ptr<IAudioEventCallback> &callback)
-        : devId_(devId), eventCallback_(callback) {};
+    DMicClient(const std::string &devId, const int32_t dhId, const std::shared_ptr<IAudioEventCallback> &callback)
+        : devId_(devId), dhId_(dhId), eventCallback_(callback) {};
     ~DMicClient() override;
     int32_t OnStateChange(const AudioEventType type) override;
     int32_t OnDecodeTransDataDone(const std::shared_ptr<AudioData> &audioData) override;
@@ -94,6 +94,7 @@ private:
     const std::string FILE_NAME = "/data/sink_mic_send.pcm";
 
     std::string devId_;
+    int32_t dhId_;
     std::thread captureDataThread_;
     AudioParam audioParam_;
     std::atomic<bool> isBlocking_ = false;

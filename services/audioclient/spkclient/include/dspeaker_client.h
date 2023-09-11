@@ -52,8 +52,8 @@ class DSpeakerClient : public IAudioDataTransCallback,
     public AudioStandard::AudioRendererWriteCallback,
     public std::enable_shared_from_this<DSpeakerClient> {
 public:
-    DSpeakerClient(const std::string &devId, const std::shared_ptr<IAudioEventCallback> &callback)
-        : devId_(devId), eventCallback_(callback) {};
+    DSpeakerClient(const std::string &devId, const int32_t &dhId, const std::shared_ptr<IAudioEventCallback> &callback)
+        : devId_(devId), dhId_(dhId), eventCallback_(callback) {};
     ~DSpeakerClient() override;
 
     int32_t OnStateChange(const AudioEventType type) override;
@@ -96,6 +96,7 @@ private:
     const std::string FILE_NAME = "/data/sink_spk_recv.pcm";
 
     std::string devId_;
+    const int32_t dhId_;
     std::thread renderDataThread_;
     AudioParam audioParam_;
     std::atomic<bool> isRenderReady_ = false;
