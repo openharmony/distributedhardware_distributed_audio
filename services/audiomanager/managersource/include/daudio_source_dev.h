@@ -75,7 +75,7 @@ private:
 
     int32_t NotifySinkDevOpenMic(cJSON *jParam);
     int32_t OpenDMicInner();
-    void CleanupJson(cJSON *jParamCopy, cJSON *jParam, char *content);
+    void CleanupJson(cJSON *jParamCopy, char *content);
 
     void OnDisableTaskResult(int32_t resultCode, const std::string &result, const std::string &funcName);
     void OnEnableTaskResult(int32_t resultCode, const std::string &result, const std::string &funcName);
