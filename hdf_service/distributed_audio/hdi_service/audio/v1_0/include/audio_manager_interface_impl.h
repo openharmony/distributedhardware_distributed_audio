@@ -21,6 +21,7 @@
 #include <string>
 
 #include "hdf_device_desc.h"
+#include "iremote_object.h"
 #include <v1_0/iaudio_manager.h>
 #include <v1_0/id_audio_manager.h>
 
@@ -83,7 +84,13 @@ private:
             }
         };
     };
+
+    class AudioManagerRecipient : public IRemoteObject::DeathRecipient {
+    public:
+        void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
+    };
     static Deletor deletor;
+    sptr<AudioManagerRecipient> audioManagerRecipient_;
 
 private:
     static AudioManagerInterfaceImpl *audioManager_;
@@ -91,6 +98,7 @@ private:
     struct HdfDeviceObject *deviceObject_ = nullptr;
     std::mutex adapterMapMtx_;
     std::map<std::string, sptr<AudioAdapterInterfaceImpl>> mapAudioAdapter_;
+    sptr<IRemoteObject> remote_;
 };
 } // V1_0
 } // Audio

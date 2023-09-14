@@ -15,8 +15,12 @@
 
 #include "audio_manager_interface_impl.h"
 
+#include <cstdlib>
 #include <hdf_base.h>
 #include "hdf_device_object.h"
+#include "iservice_registry"
+#include "iproxy_broker.h"
+#include "iservmgr_hid.h"
 #include <sstream>
 
 #include "daudio_constants.h"
@@ -44,6 +48,7 @@ extern "C" IAudioManager *AudioManagerImplGetInstance(void)
 AudioManagerInterfaceImpl::AudioManagerInterfaceImpl()
 {
     DHLOGD("Distributed audio manager constructed.");
+    audioManagerRecipient_ = new AudioManagerRecipient();
 }
 
 AudioManagerInterfaceImpl::~AudioManagerInterfaceImpl()
@@ -124,6 +129,8 @@ int32_t AudioManagerInterfaceImpl::AddAudioDevice(const std::string &adpName, co
             return ERR_DH_AUDIO_HDF_FAIL;
         }
     }
+    remote_ = OHOS::HDI::hdi_objcast<IDAudioCallback>(callback);
+    remote_->AddDeathRecipient(audioManagerRecipient_);
     adp = mapAudioAdapter_.find(adpName);
     if (adp == mapAudioAdapter_.end() || adp->second == nullptr) {
         DHLOGE("Audio device has not been created  or is null ptr.");
@@ -177,7 +184,7 @@ int32_t AudioManagerInterfaceImpl::RemoveAudioDevice(const std::string &adpName,
         DHLOGE("Remove audio device failed, adapter return: %d.", ret);
         return ret;
     }
-
+    remote_->RemoveDeathRecipient(audioManagerRecipient_);
     DAudioDevEvent event = { adpName, dhId, HDF_AUDIO_DEVICE_REMOVE, 0, 0, 0 };
     ret = NotifyFwk(event);
     if (ret != DH_SUCCESS) {
@@ -256,6 +263,11 @@ int32_t AudioManagerInterfaceImpl::CreateAdapter(const std::string &adpName, con
 void AudioManagerInterfaceImpl::SetDeviceObject(struct HdfDeviceObject *deviceObject)
 {
     deviceObject_ = deviceObject;
+}
+
+void AudioManagerInterfaceImpl::AudioManagerRecipient::OnRemoteDied(const wptr<IRemoteObjedct> &remote)
+{
+    _Exit(0);
 }
 } // V1_0
 } // Audio
