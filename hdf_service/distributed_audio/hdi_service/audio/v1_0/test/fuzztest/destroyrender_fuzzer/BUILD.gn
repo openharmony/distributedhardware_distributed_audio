@@ -18,7 +18,7 @@ import("../../../../../../../../distributedaudio.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("DestroyRenderFuzzTest") {
-  module_out_path = "distributed_audio/destroyrender_fuzzer"
+  module_out_path = "${distributedaudio_fuzz_path}/destroyrender_fuzzer"
   fuzz_config_file = "${hdf_ser_aud_path}/test/fuzztest/destroyrender_fuzzer"
 
   cflags = [

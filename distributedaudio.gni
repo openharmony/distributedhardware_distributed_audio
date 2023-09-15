@@ -43,6 +43,8 @@ fwk_common_path = "${distributedhardwarefwk_path}/common"
 fwk_services_path = "${distributedhardwarefwk_path}/services"
 innerkits_path = "${distributedaudio_path}/interfaces/inner_kits"
 
+distributedaudio_fuzz_path = "distributed_audio/distributed_audio"
+
 build_flags = [ "-Werror" ]
 
 declare_args() {

@@ -18,7 +18,8 @@ import("../../../../../../distributedaudio.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("SinkHandlerUnsubscribeLocalHardwareFuzzTest") {
-  module_out_path = "distributed_audio/sinkhandlerunsubscribelocalhardware"
+  module_out_path =
+      "${distributedaudio_fuzz_path}/sinkhandlerunsubscribelocalhardware"
   fuzz_config_file = "${innerkits_path}/native_cpp/test/fuzztest/sinkhandlerunsubscribelocalhardware_fuzzer"
 
   cflags = [

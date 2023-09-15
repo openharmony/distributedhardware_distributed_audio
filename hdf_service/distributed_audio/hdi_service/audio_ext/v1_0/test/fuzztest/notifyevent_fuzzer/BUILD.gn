@@ -18,7 +18,7 @@ import("../../../../../../../../distributedaudio.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("NotifyEventFuzzTest") {
-  module_out_path = "distributed_audio/notifyevent_fuzzer"
+  module_out_path = "${distributedaudio_fuzz_path}/notifyevent_fuzzer"
   fuzz_config_file = "${hdf_ser_aud_ext_path}/test/fuzztest/notifyevent_fuzzer"
 
   cflags = [

@@ -18,7 +18,7 @@ import("../../../../../distributedaudio.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("SoftbusOnBytesReceivedFuzzTest") {
-  module_out_path = "distributed_audio/softbusonbytesreceived"
+  module_out_path = "${distributedaudio_fuzz_path}/softbusonbytesreceived"
   fuzz_config_file =
       "${softbusadapter_path}/test/fuzztest/softbusonbytesreceived_fuzzer"
 

@@ -18,7 +18,8 @@ import("../../../../../../distributedaudio.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("SourceOnLoadSystemAbilityFailFuzzTest") {
-  module_out_path = "distributed_audio/sourceonloadsystemabilityfail"
+  module_out_path =
+      "${distributedaudio_fuzz_path}/sourceonloadsystemabilityfail"
   fuzz_config_file = "${innerkits_path}/native_cpp/test/fuzztest/sourceonloadsystemabilityfail_fuzzer"
 
   cflags = [

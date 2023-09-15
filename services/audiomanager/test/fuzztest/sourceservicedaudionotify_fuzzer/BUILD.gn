@@ -18,7 +18,8 @@ import("../../../../../distributedaudio.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("SourceServiceDAudioNotifyFuzzTest") {
-  module_out_path = "distributed_audio/sourceservicedaudionotify_fuzzer"
+  module_out_path =
+      "${distributedaudio_fuzz_path}/sourceservicedaudionotify_fuzzer"
   fuzz_config_file = "${services_path}/audiomanager/test/fuzztest/sourceservicedaudionotify_fuzzer"
 
   cflags = [

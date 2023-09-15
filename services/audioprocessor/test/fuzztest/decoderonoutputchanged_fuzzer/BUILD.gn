@@ -18,7 +18,7 @@ import("../../../../../distributedaudio.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("DecoderOnOutputChangedFuzzTest") {
-  module_out_path = "distributed_audio/decoderonoutputchanged"
+  module_out_path = "${distributedaudio_fuzz_path}/decoderonoutputchanged"
   fuzz_config_file =
       "${audio_processor_path}/test/fuzztest/decoderonoutputchanged_fuzzer"
 
