@@ -18,7 +18,8 @@ import("../../../../../../distributedaudio.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("SinkProxySubscribeLocalHardwareFuzzTest") {
-  module_out_path = "distributed_audio/sinkproxysubscribelocalhardware"
+  module_out_path =
+      "${distributedaudio_fuzz_path}/sinkproxysubscribelocalhardware"
   fuzz_config_file = "${innerkits_path}/native_cpp/test/fuzztest/sinkproxysubscribelocalhardware_fuzzer"
 
   cflags = [

@@ -18,7 +18,8 @@ import("../../../../../../distributedaudio.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("SourceProxyRegisterDistributedHardwareFuzzTest") {
-  module_out_path = "distributed_audio/sourceproxyregisterdistributedhardware"
+  module_out_path =
+      "${distributedaudio_fuzz_path}/sourceproxyregisterdistributedhardware"
   fuzz_config_file = "${innerkits_path}/native_cpp/test/fuzztest/sourceproxyregisterdistributedhardware_fuzzer"
 
   cflags = [

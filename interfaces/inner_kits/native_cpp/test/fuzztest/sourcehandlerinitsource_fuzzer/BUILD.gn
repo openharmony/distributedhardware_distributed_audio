@@ -18,7 +18,7 @@ import("../../../../../../distributedaudio.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("SourceHandlerInitSourceFuzzTest") {
-  module_out_path = "distributed_audio/sourcehandlerinitsource"
+  module_out_path = "${distributedaudio_fuzz_path}/sourcehandlerinitsource"
   fuzz_config_file = "${innerkits_path}/native_cpp/test/fuzztest/sourcehandlerinitsource_fuzzer"
 
   cflags = [

@@ -18,7 +18,7 @@ import("../../../../../distributedaudio.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("AudioDataSetInit64FuzzTest") {
-  module_out_path = "distributed_audio/audiodatasetinit64_fuzzer"
+  module_out_path = "${distributedaudio_fuzz_path}/audiodatasetinit64_fuzzer"
   fuzz_config_file =
       "${services_path}/common/test/fuzztest/audiodatasetinit64_fuzzer"
 

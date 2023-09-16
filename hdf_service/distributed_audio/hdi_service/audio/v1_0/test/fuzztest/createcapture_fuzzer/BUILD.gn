@@ -18,7 +18,7 @@ import("../../../../../../../../distributedaudio.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("CreateCaptureFuzzTest") {
-  module_out_path = "distributed_audio/createcapture_fuzzer"
+  module_out_path = "${distributedaudio_fuzz_path}/createcapture_fuzzer"
   fuzz_config_file = "${hdf_ser_aud_path}/test/fuzztest/createcapture_fuzzer"
 
   cflags = [

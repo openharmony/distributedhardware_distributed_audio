@@ -18,7 +18,7 @@ import("../../../../../../distributedaudio.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("OnRemoteSinkSvrDiedFuzzTest") {
-  module_out_path = "distributed_audio/onremotesinksvrdied"
+  module_out_path = "${distributedaudio_fuzz_path}/onremotesinksvrdied"
   fuzz_config_file =
       "${innerkits_path}/native_cpp/test/fuzztest/onremotesinksvrdied_fuzzer"
 

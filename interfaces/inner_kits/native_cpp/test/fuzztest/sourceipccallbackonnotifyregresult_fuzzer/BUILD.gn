@@ -18,7 +18,8 @@ import("../../../../../../distributedaudio.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("SourceIpcCallbackOnNotifyRegResultFuzzTest") {
-  module_out_path = "distributed_audio/sourceipccallbackonnotifyregresult"
+  module_out_path =
+      "${distributedaudio_fuzz_path}/sourceipccallbackonnotifyregresult"
   fuzz_config_file = "${innerkits_path}/native_cpp/test/fuzztest/sourceipccallbackonnotifyregresult_fuzzer"
 
   cflags = [

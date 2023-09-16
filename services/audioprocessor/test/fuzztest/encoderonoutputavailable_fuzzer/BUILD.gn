@@ -18,7 +18,7 @@ import("../../../../../distributedaudio.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("EncoderOnOutputAvailableFuzzTest") {
-  module_out_path = "distributed_audio/encoderonoutputavailable"
+  module_out_path = "${distributedaudio_fuzz_path}/encoderonoutputavailable"
   fuzz_config_file =
       "${audio_processor_path}/test/fuzztest/encoderonoutputavailable_fuzzer"
 

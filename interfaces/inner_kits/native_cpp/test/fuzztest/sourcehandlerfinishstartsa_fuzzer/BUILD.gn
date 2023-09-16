@@ -18,7 +18,7 @@ import("../../../../../../distributedaudio.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("SourceHandlerFinishStartSAFuzzTest") {
-  module_out_path = "distributed_audio/sourcehandlerfinishstartsa"
+  module_out_path = "${distributedaudio_fuzz_path}/sourcehandlerfinishstartsa"
   fuzz_config_file = "${innerkits_path}/native_cpp/test/fuzztest/sourcehandlerfinishstartsa_fuzzer"
 
   cflags = [

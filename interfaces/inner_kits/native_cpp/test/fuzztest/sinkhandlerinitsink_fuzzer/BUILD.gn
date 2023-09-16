@@ -18,7 +18,7 @@ import("../../../../../../distributedaudio.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("SinkHandlerInitSinkFuzzTest") {
-  module_out_path = "distributed_audio/sinkhandlerinitsink"
+  module_out_path = "${distributedaudio_fuzz_path}/sinkhandlerinitsink"
   fuzz_config_file =
       "${innerkits_path}/native_cpp/test/fuzztest/sinkhandlerinitsink_fuzzer"
 
