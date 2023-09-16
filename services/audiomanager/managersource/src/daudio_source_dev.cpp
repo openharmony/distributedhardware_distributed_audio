@@ -1330,9 +1330,10 @@ void DAudioSourceDev::OnTaskResult(int32_t resultCode, const std::string &result
         funcName.c_str());
 }
 
-void DAudioSourceDev::CleanupJson(cJSON *jParamCopy, char *content)
+void DAudioSourceDev::CleanupJson(cJSON *jParamCopy, cJSON *jParam, char *content)
 {
     cJSON_Delete(jParamCopy);
+    cJSON_Delete(jParam);
     cJSON_free(content);
 }
 
@@ -1356,16 +1357,19 @@ int32_t DAudioSourceDev::NotifySinkDev(const AudioEventType type, const cJSON *p
     const uint32_t randomTaskCode = rd();
     constexpr uint32_t eventOffset = 4;
     cJSON_AddStringToObject(jParam, KEY_RANDOM_TASK_CODE, std::to_string(randomTaskCode).c_str());
+
     DHLOGD("Notify sink dev, new engine, random task code:%s", std::to_string(randomTaskCode).c_str());
 
     if (speaker_ == nullptr || mic_ == nullptr) {
         cJSON_Delete(jParamCopy);
+        cJSON_Delete(jParam);
         DHLOGE("speaker or mic dev is null.");
         return ERR_DH_AUDIO_NULLPTR;
     }
 
     if (type == OPEN_CTRL || type == CLOSE_CTRL) {
         cJSON_Delete(jParamCopy);
+        cJSON_Delete(jParam);
         DHLOGE("In new engine mode, ctrl is not allowed.");
         return ERR_DH_AUDIO_NULLPTR;
     }
@@ -1376,10 +1380,10 @@ int32_t DAudioSourceDev::NotifySinkDev(const AudioEventType type, const cJSON *p
 
     if (type == CLOSE_SPEAKER || type == CLOSE_MIC) {
         // Close spk || Close mic  do not need to wait RPC
-        CleanupJson(jParamCopy, content);
+        CleanupJson(jParamCopy, jParam, content);
         return DH_SUCCESS;
     }
-    CleanupJson(jParamCopy, content);
+    CleanupJson(jParamCopy, jParam, content);
     return WaitForRPC(static_cast<AudioEventType>(static_cast<int32_t>(type) + eventOffset));
 }
 
