@@ -21,6 +21,7 @@ config("module_private_config") {
 
   include_dirs = [
     "./include",
+    "//third_party/json/include",
     "${services_path}/common/audiodata/include",
     "${common_path}/include",
   ]

@@ -23,6 +23,7 @@ config("module_private_config") {
   include_dirs = [
     "${mediastandard_path}/interfaces/innerkits/native/media/include",
     "${mediastandardfwk_path}/audiocommon/include",
+    "//third_party/json/include",
   ]
 
   include_dirs += [
@@ -35,7 +36,6 @@ config("module_private_config") {
     "${services_path}/common/audiodata/include",
     "${services_path}/common/audioparam",
     "${softbusadapter_path}/include",
-    "//third_party/cJSON",
   ]
 }
 
@@ -53,7 +53,6 @@ ohos_unittest("AVTransReceiverAdapterTest") {
   deps = [
     "${audio_transport_path}/decodetransport:distributed_audio_decode_transport",
     "${services_path}/common:distributed_audio_utils",
-    "//third_party/cJSON:cjson",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
   ]

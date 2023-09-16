@@ -31,6 +31,7 @@ ohos_shared_library("distributed_audio_encode_transport") {
   include_dirs = [
     "${mediastandard_path}/interfaces/innerkits/native/media/include",
     "${mediastandardfwk_path}/audiocommon/include",
+    "//third_party/json/include",
   ]
 
   include_dirs += [
@@ -50,7 +51,6 @@ ohos_shared_library("distributed_audio_encode_transport") {
     "${services_path}/common/audiodata/include",
     "${services_path}/common/audioparam",
     "${softbusadapter_path}/include",
-    "//third_party/cJSON",
   ]
 
   public_configs = [ ":encode_transport_pub_config" ]
@@ -70,7 +70,6 @@ ohos_shared_library("distributed_audio_encode_transport") {
     "${audio_transport_path}/audiochannel/audiodatachannel:distributed_audio_data_channel",
     "${audio_transport_path}/audiotransportstatus:distributed_audio_transport_status",
     "${services_path}/common:distributed_audio_utils",
-    "//third_party/cJSON:cjson",
   ]
 
   external_deps = [
