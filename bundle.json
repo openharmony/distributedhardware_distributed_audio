@@ -45,7 +45,7 @@
                 "samgr"
             ],
             "third_party": [
-                "cJSON"
+                "json"
             ]
         },
         "build": {

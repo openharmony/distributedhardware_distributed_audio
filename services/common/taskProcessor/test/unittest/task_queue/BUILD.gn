@@ -21,7 +21,7 @@ module_out_path = "distributed_audio/services/common/taskProcessor/test"
 config("module_private_config") {
   visibility = [ ":*" ]
 
-  include_dirs = []
+  include_dirs = [ "//third_party/json/include" ]
 
   include_dirs += [
     "${common_path}/include",

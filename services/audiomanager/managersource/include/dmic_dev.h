@@ -19,7 +19,7 @@
 #include <queue>
 #include <set>
 #include <thread>
-#include "cJSON.h"
+#include "nlohmann/json.hpp"
 
 #include "audio_param.h"
 #include "audio_status.h"
@@ -30,6 +30,8 @@
 #include "iaudio_datatrans_callback.h"
 #include "iaudio_event_callback.h"
 #include "idaudio_hdi_callback.h"
+
+using json = nlohmann::json;
 
 namespace OHOS {
 namespace DistributedHardware {

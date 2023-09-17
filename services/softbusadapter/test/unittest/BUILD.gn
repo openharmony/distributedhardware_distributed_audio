@@ -20,6 +20,7 @@ config("module_private_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
+    "//third_party/json/include",
     "${fwk_common_path}/utils/include",
     "${fwk_utils_path}/include/",
   ]
@@ -30,7 +31,6 @@ config("module_private_config") {
     "${services_path}/common/audioparam",
     "${services_path}/common/audiodata/include",
     "${softbusadapter_path}/include",
-    "//third_party/cJSON",
   ]
 }
 
@@ -44,7 +44,6 @@ ohos_unittest("SoftBusAdapterTest") {
 
   deps = [
     "${softbusadapter_path}:distributed_audio_softbus_adapter",
-    "//third_party/cJSON:cjson",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
   ]

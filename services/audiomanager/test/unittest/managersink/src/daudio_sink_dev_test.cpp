@@ -399,12 +399,11 @@ HWTEST_F(DAudioSinkDevTest, TaskRenderStateChange_002, TestSize.Level1)
 {
     std::string args;
     std::string devId = "devId";
-    cJSON *j = cJSON_CreateObject();
+    json j;
     AudioParam audioParam;
     sinkDev_->audioCtrlMgr_ = std::make_shared<DAudioSinkDevCtrlMgr>(devId, sinkDev_);
     EXPECT_NE(DH_SUCCESS, sinkDev_->TaskRenderStateChange(args));
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, sinkDev_->from_json(j, audioParam));
-    cJSON_Delete(j);
 }
 
 /**

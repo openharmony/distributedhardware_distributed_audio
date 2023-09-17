@@ -25,6 +25,7 @@ config("module_private_config") {
     "${mediastandardfwk_path}/audiocommon/include",
     "${mediastandardfwk_path}/audiomanager/include",
     "${mediastandardfwk_path}/audiorenderer/include",
+    "//third_party/json/include",
   ]
 
   include_dirs += [

@@ -55,14 +55,13 @@ config("module_private_config") {
     "${services_path}/common/audioeventcallback",
     "${services_path}/audiomanager/managersource/include",
     "${softbusadapter_path}/include",
+    "//third_party/json/include",
     "${fwk_common_path}/utils/include",
     "${mediastandardfwk_path}/audiocapturer/include",
     "${mediastandardfwk_path}/audiocommon/include",
     "${mediastandardfwk_path}/audiorenderer/include",
     "${mediastandardfwk_path}/audiomanager/include",
   ]
-
-  include_dirs += [ "//third_party/cJSON" ]
 }
 
 ## UnitTest daudio_dfx_test
@@ -77,7 +76,6 @@ ohos_unittest("DAudioDfxTest") {
   deps = [
     "${services_path}/audiomanager/servicesource:distributed_audio_source",
     "${services_path}/common:distributed_audio_utils",
-    "//third_party/cJSON:cjson",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
   ]

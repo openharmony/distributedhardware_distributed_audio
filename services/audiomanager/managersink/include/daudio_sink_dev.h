@@ -22,7 +22,7 @@
 #include <initializer_list>
 
 #include "event_handler.h"
-#include "cJSON.h"
+#include "nlohmann/json.hpp"
 
 #include "daudio_sink_dev_ctrl_manager.h"
 #include "dmic_client.h"
@@ -37,6 +37,8 @@
 #include "direct_dmic_client.h"
 #include "direct_dspeaker_client.h"
 #endif
+
+using json = nlohmann::json;
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -73,13 +75,10 @@ private:
     int32_t TaskPlayStatusChange(const std::string &args);
 
     void NotifySourceDev(const AudioEventType type, const std::string dhId, const int32_t result);
-    int32_t from_json(const cJSON *jsonObj, AudioParam &audioParam);
+    int32_t from_json(const json &j, AudioParam &audioParam);
     int32_t HandleEngineMessage(uint32_t type, std::string content, std::string devId);
     int32_t SendAudioEventToRemote(const AudioEvent &event);
     void JudgeDeviceStatus();
-
-    int32_t GetCJsonObjectItems(const cJSON *jsonObj, AudioParam &audioParam);
-    int32_t GetParamValue(const cJSON *jsonObj, const char* key, int32_t& value);
 
 private:
     std::mutex rpcWaitMutex_;

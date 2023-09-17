@@ -22,7 +22,10 @@ module_out_path =
 config("module_private_config") {
   visibility = [ ":*" ]
 
-  include_dirs = [ "${fwk_common_path}/utils/include" ]
+  include_dirs = [
+    "${fwk_common_path}/utils/include",
+    "//third_party/json/include",
+  ]
 
   include_dirs += [
     "include",

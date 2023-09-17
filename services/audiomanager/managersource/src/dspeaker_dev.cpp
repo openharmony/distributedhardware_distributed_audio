@@ -152,27 +152,11 @@ int32_t DSpeakerDev::OpenDevice(const std::string &devId, const int32_t dhId)
         return ERR_DH_AUDIO_SA_EVENT_CALLBACK_NULL;
     }
 
-    cJSON *jParam = cJSON_CreateObject();
-    if (jParam == nullptr) {
-        DHLOGE("Failed to create cJSON object.");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
-    }
-    cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId).c_str());
-    char *jsonData = cJSON_PrintUnformatted(jParam);
-    if (jsonData == nullptr) {
-        DHLOGE("Failed to create JSON data.");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
-    }
-
-    std::string jsonDataStr(jsonData);
-    AudioEvent event(AudioEventType::OPEN_SPEAKER, jsonDataStr);
+    json jParam = { { KEY_DH_ID, std::to_string(dhId) } };
+    AudioEvent event(AudioEventType::OPEN_SPEAKER, jParam.dump());
     cbObj->NotifyEvent(event);
     DAudioHisysevent::GetInstance().SysEventWriteBehavior(DAUDIO_OPEN, devId, std::to_string(dhId),
         "daudio spk device open success.");
-
-    cJSON_Delete(jParam);
-    cJSON_free(jsonData);
-
     return DH_SUCCESS;
 }
 
@@ -185,27 +169,11 @@ int32_t DSpeakerDev::CloseDevice(const std::string &devId, const int32_t dhId)
         return ERR_DH_AUDIO_SA_EVENT_CALLBACK_NULL;
     }
 
-    cJSON *jParam = cJSON_CreateObject();
-    if (jParam == nullptr) {
-        DHLOGE("Failed to create cJSON object.");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
-    }
-    cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId).c_str());
-    char *jsonData = cJSON_PrintUnformatted(jParam);
-    if (jsonData == nullptr) {
-        DHLOGE("Failed to create JSON data.");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
-    }
-
-    std::string jsonDataStr(jsonData);
-    AudioEvent event(AudioEventType::CLOSE_SPEAKER, jsonDataStr);
+    json jParam = { { KEY_DH_ID, std::to_string(dhId) } };
+    AudioEvent event(AudioEventType::CLOSE_SPEAKER, jParam.dump());
     cbObj->NotifyEvent(event);
     DAudioHisysevent::GetInstance().SysEventWriteBehavior(DAUDIO_CLOSE, devId, std::to_string(dhId),
         "daudio spk device close success.");
-
-    cJSON_Delete(jParam);
-    cJSON_free(jsonData);
-
     curPort_ = 0;
     return DH_SUCCESS;
 }

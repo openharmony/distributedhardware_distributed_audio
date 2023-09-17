@@ -19,7 +19,7 @@
 #include <condition_variable>
 #include <set>
 #include <thread>
-#include "cJSON.h"
+#include "nlohmann/json.hpp"
 
 #include "audio_param.h"
 #include "ashmem.h"
@@ -29,6 +29,8 @@
 #include "iaudio_data_transport.h"
 #include "iaudio_datatrans_callback.h"
 #include "idaudio_hdi_callback.h"
+
+using json = nlohmann::json;
 
 namespace OHOS {
 namespace DistributedHardware {

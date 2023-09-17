@@ -23,6 +23,7 @@ config("module_private_config") {
 
   include_dirs = [
     "${audio_framework_path}/audiopolicy/include",
+    "//third_party/json/include",
     "${fwk_common_path}/utils/include",
     "${mediastandardfwk_path}/audiocapturer/include",
     "${mediastandardfwk_path}/audiocommon/include",
