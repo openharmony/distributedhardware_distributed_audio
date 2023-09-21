@@ -211,36 +211,6 @@ HWTEST_F(DMicClientTest, SendMessage_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: GetAdapter_001
- * @tc.desc: Verify the GetAdapter function.
- * @tc.type: FUNC
- * @tc.require: AR000H0E6G
- */
-HWTEST_F(DMicClientTest, GetAdapter_001, TestSize.Level1)
-{
-    struct IAudioManager *audioManager_;
-    audioManager_ = nullptr;
-    int32_t actual = micClient_->GetAdapter();
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, actual);
-}
-
-/**
- * @tc.name: InitHDFAudioDevice_001
- * @tc.desc: Verify the InitHDFAudioDevice function.
- * @tc.type: FUNC
- * @tc.require: AR000H0E6G
- */
-HWTEST_F(DMicClientTest, InitHDFAudioDevice_001, TestSize.Level1)
-{
-    bool micInUse_ = true;
-    int32_t actual = micClient_->InitHDFAudioDevice();
-    EXPECT_EQ(DH_SUCCESS, actual);
-    micInUse_ = false;
-    actual = micClient_->InitHDFAudioDevice();
-    EXPECT_EQ(DH_SUCCESS, actual);
-}
-
-/**
  * @tc.name: AudioFwkClientSetUp_001
  * @tc.desc: Verify the AudioFwkClientSetUp function.
  * @tc.type: FUNC
@@ -257,24 +227,6 @@ HWTEST_F(DMicClientTest, AudioFwkClientSetUp_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: HdfClientSetUp_001
- * @tc.desc: Verify the HdfClientSetUp function.
- * @tc.type: FUNC
- * @tc.require: AR000H0E6G
- */
-HWTEST_F(DMicClientTest, HdfClientSetUp_001, TestSize.Level1)
-{
-    bool micInUse_;
-    micInUse_ = true;
-    int32_t actual = micClient_->HdfClientSetUp();
-    EXPECT_EQ(DH_SUCCESS, actual);
-    micInUse_ = false;
-    micClient_->micTrans_ = nullptr;
-    actual = micClient_->HdfClientSetUp();
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, actual);
-}
-
-/**
  * @tc.name: TransSetUp_001
  * @tc.desc: Verify the TransSetUp function.
  * @tc.type: FUNC
@@ -287,19 +239,6 @@ HWTEST_F(DMicClientTest, TransSetUp_001, TestSize.Level1)
     micClient_->micTrans_ = nullptr;
     actual = micClient_->TransSetUp();
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, actual);
-}
-
-/**
- * @tc.name: HdfClientRelease_001
- * @tc.desc: Verify the HdfClientRelease function.
- * @tc.type: FUNC
- * @tc.require: AR000H0E6G
- */
-HWTEST_F(DMicClientTest, HdfClientRelease_001, TestSize.Level1)
-{
-    std::shared_ptr<IAudioAdapter> audioAdapter_ = std::make_shared<IAudioAdapter>();
-    int32_t actual = micClient_->HdfClientRelease();
-    EXPECT_EQ(DH_SUCCESS, actual);
 }
 } // DistributedHardware
 } // OHOS

@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("../../distributedaudio.gni")
 
 ohos_executable("audio_distributed_test") {
   include_dirs = [
