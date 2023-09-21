@@ -22,6 +22,7 @@ config("daudio_common_pub_config") {
     "audioparam",
     "${common_path}/dfxutils/include",
     "${common_path}/include",
+    "//third_party/cJSON",
   ]
 }
 
@@ -51,6 +52,7 @@ ohos_shared_library("distributed_audio_utils") {
     "taskProcessor/src/task_queue.cpp",
   ]
 
+  deps = [ "//third_party/cJSON:cjson" ]
   external_deps = [
     "c_utils:utils",
     "dsoftbus:softbus_client",

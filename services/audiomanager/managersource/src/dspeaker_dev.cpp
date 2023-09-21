@@ -37,68 +37,37 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-int32_t DSpeakerDev::EnableDSpeaker(const int32_t dhId, const std::string &capability)
-{
-    DHLOGI("Enable speaker device dhId: %d.", dhId);
-    if (enabledPorts_.empty()) {
-        if (EnableDevice(PIN_OUT_DAUDIO_DEFAULT, capability) != DH_SUCCESS) {
-            return ERR_DH_AUDIO_FAILED;
-        }
-    }
-    int32_t ret = EnableDevice(dhId, capability);
-
-    DaudioFinishAsyncTrace(DAUDIO_REGISTER_AUDIO, DAUDIO_REGISTER_AUDIO_TASKID);
-    DAudioHisysevent::GetInstance().SysEventWriteBehavior(DAUIDO_REGISTER, devId_, std::to_string(dhId),
-        "daudio spk enable success.");
-    return ret;
-}
-
 int32_t DSpeakerDev::EnableDevice(const int32_t dhId, const std::string &capability)
 {
+    DHLOGI("Enable IO device, device pin: %d.", dhId);
     int32_t ret = DAudioHdiHandler::GetInstance().RegisterAudioDevice(devId_, dhId, capability, shared_from_this());
     if (ret != DH_SUCCESS) {
-        DHLOGE("Register speaker device failed, ret: %d.", ret);
+        DHLOGE("Register device failed, ret: %d.", ret);
         DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_REGISTER_FAIL, devId_, std::to_string(dhId), ret,
-            "daudio register speaker device failed.");
+            "daudio register device failed.");
         return ret;
     }
     enabledPorts_.insert(dhId);
     return DH_SUCCESS;
 }
 
-int32_t DSpeakerDev::DisableDSpeaker(const int32_t dhId)
-{
-    DHLOGI("Disable distributed speaker.");
-    if (dhId == curPort_) {
-        isOpened_.store(false);
-    }
-    int32_t ret = DisableDevice(dhId);
-    if (ret != DH_SUCCESS) {
-        return ret;
-    }
-    if (enabledPorts_.size() == SINGLE_ITEM && enabledPorts_.find(PIN_OUT_DAUDIO_DEFAULT) != enabledPorts_.end()) {
-        ret = DisableDevice(PIN_OUT_DAUDIO_DEFAULT);
-        if (ret != DH_SUCCESS) {
-            return ret;
-        }
-    }
-
-    DaudioFinishAsyncTrace(DAUDIO_UNREGISTER_AUDIO, DAUDIO_UNREGISTER_AUDIO_TASKID);
-    DAudioHisysevent::GetInstance().SysEventWriteBehavior(DAUDIO_UNREGISTER, devId_, std::to_string(dhId),
-        "daudio spk disable success.");
-    return DH_SUCCESS;
-}
-
 int32_t DSpeakerDev::DisableDevice(const int32_t dhId)
 {
+    DHLOGI("Disable IO device, device pin: %d.", dhId);
     int32_t ret = DAudioHdiHandler::GetInstance().UnRegisterAudioDevice(devId_, dhId);
     if (ret != DH_SUCCESS) {
-        DHLOGE("UnRegister speaker device failed, ret: %d.", ret);
+        DHLOGE("UnRegister failed, ret: %d.", ret);
         DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_UNREGISTER_FAIL, devId_, std::to_string(dhId), ret,
-            "daudio unregister speaker device failed.");
+            "daudio unregister device failed.");
         return ret;
     }
     enabledPorts_.erase(dhId);
+    return DH_SUCCESS;
+}
+
+int32_t DSpeakerDev::InitReceiverEngine(IAVEngineProvider *providerPtr)
+{
+    DHLOGI("InitReceiverEngine enter.");
     return DH_SUCCESS;
 }
 
@@ -350,7 +319,7 @@ int32_t DSpeakerDev::WriteStreamData(const std::string &devId, const int32_t dhI
     if (DaudioHidumper::GetInstance().GetFlagStatus()) {
         if (!dumpFlag_) {
             AudioEvent event(NOTIFY_HDF_SPK_DUMP, "");
-            NotifyHdfAudioEvent(event);
+            NotifyHdfAudioEvent(event, dhId);
             dumpFlag_.store(true);
         }
         SaveFile(FILE_NAME, const_cast<uint8_t*>(data->Data()), data->Size());
@@ -488,9 +457,9 @@ int32_t DSpeakerDev::SendMessage(uint32_t type, std::string content, std::string
     return DH_SUCCESS;
 }
 
-int32_t DSpeakerDev::NotifyHdfAudioEvent(const AudioEvent &event)
+int32_t DSpeakerDev::NotifyHdfAudioEvent(const AudioEvent &event, const int32_t portId)
 {
-    int32_t ret = DAudioHdiHandler::GetInstance().NotifyEvent(devId_, curPort_, event);
+    int32_t ret = DAudioHdiHandler::GetInstance().NotifyEvent(devId_, portId, event);
     if (ret != DH_SUCCESS) {
         DHLOGE("Notify event: %d, result: %s.", event.type, event.content.c_str());
     }

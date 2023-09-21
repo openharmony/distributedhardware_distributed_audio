@@ -83,68 +83,34 @@ int32_t DMicDev::InitReceiverEngine(IAVEngineProvider *providerPtr)
     return DH_SUCCESS;
 }
 
-int32_t DMicDev::EnableDMic(const int32_t dhId, const std::string &capability)
+int32_t DMicDev::InitSenderEngine(IAVEngineProvider *providerPtr)
 {
-    DHLOGI("Enable distributed mic dhId: %d.", dhId);
-    if (enabledPorts_.empty()) {
-        if (EnableDevice(PIN_IN_DAUDIO_DEFAULT, capability) != DH_SUCCESS) {
-            return ERR_DH_AUDIO_FAILED;
-        }
-    }
-    int32_t ret = EnableDevice(dhId, capability);
-    if (ret != DH_SUCCESS) {
-        return ret;
-    }
-
-    DaudioFinishAsyncTrace(DAUDIO_REGISTER_AUDIO, DAUDIO_REGISTER_AUDIO_TASKID);
-    DAudioHisysevent::GetInstance().SysEventWriteBehavior(DAUIDO_REGISTER, devId_, std::to_string(dhId),
-        "daudio mic enable success.");
+    DHLOGI("InitReceiverEngine enter.");
     return DH_SUCCESS;
 }
 
 int32_t DMicDev::EnableDevice(const int32_t dhId, const std::string &capability)
 {
-    DHLOGI("Enable default mic device.");
+    DHLOGI("Enable IO device, device pin: %d.", dhId);
     int32_t ret = DAudioHdiHandler::GetInstance().RegisterAudioDevice(devId_, dhId, capability, shared_from_this());
     if (ret != DH_SUCCESS) {
-        DHLOGE("Register mic device failed, ret: %d.", ret);
+        DHLOGE("Register device failed, ret: %d.", ret);
         DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_REGISTER_FAIL, devId_, std::to_string(dhId), ret,
-            "daudio register mic device failed.");
+            "daudio register device failed.");
         return ret;
     }
     enabledPorts_.insert(dhId);
     return DH_SUCCESS;
 }
 
-int32_t DMicDev::DisableDMic(const int32_t dhId)
-{
-    DHLOGI("Disable distributed mic.");
-    if (dhId == curPort_) {
-        isOpened_.store(false);
-    }
-    if (DisableDevice(dhId) != DH_SUCCESS) {
-        return ERR_DH_AUDIO_FAILED;
-    }
-
-    if (enabledPorts_.size() == SINGLE_ITEM && enabledPorts_.find(PIN_IN_DAUDIO_DEFAULT) != enabledPorts_.end()) {
-        if (DisableDevice(PIN_IN_DAUDIO_DEFAULT) != DH_SUCCESS) {
-            return ERR_DH_AUDIO_FAILED;
-        }
-    }
-
-    DaudioFinishAsyncTrace(DAUDIO_UNREGISTER_AUDIO, DAUDIO_UNREGISTER_AUDIO_TASKID);
-    DAudioHisysevent::GetInstance().SysEventWriteBehavior(DAUDIO_UNREGISTER, devId_, std::to_string(dhId),
-        "daudio mic disable success.");
-    return DH_SUCCESS;
-}
-
 int32_t DMicDev::DisableDevice(const int32_t dhId)
 {
+    DHLOGI("Disable IO device, device pin: %d.", dhId);
     int32_t ret = DAudioHdiHandler::GetInstance().UnRegisterAudioDevice(devId_, dhId);
     if (ret != DH_SUCCESS) {
-        DHLOGE("unregister audio device failed, ret: %d", ret);
+        DHLOGE("UnRegister failed, ret: %d.", ret);
         DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_UNREGISTER_FAIL, devId_, std::to_string(dhId), ret,
-            "daudio unregister audio mic device failed.");
+            "daudio unregister device failed.");
         return ret;
     }
     enabledPorts_.erase(dhId);
@@ -267,6 +233,18 @@ int32_t DMicDev::Start()
     return DH_SUCCESS;
 }
 
+int32_t DMicDev::Pause()
+{
+    DHLOGI("Not support.");
+    return DH_SUCCESS;
+}
+
+int32_t DMicDev::Restart()
+{
+    DHLOGI("Not surpport.");
+    return DH_SUCCESS;
+}
+
 int32_t DMicDev::Stop()
 {
     DHLOGI("Stop mic device.");
@@ -347,7 +325,7 @@ int32_t DMicDev::ReadStreamData(const std::string &devId, const int32_t dhId, st
     if (DaudioHidumper::GetInstance().GetFlagStatus()) {
         if (!dumpFlag_) {
             AudioEvent event(NOTIFY_HDF_MIC_DUMP, "");
-            NotifyHdfAudioEvent(event);
+            NotifyHdfAudioEvent(event, dhId);
             dumpFlag_.store(true);
         }
         SaveFile(FILE_NAME, const_cast<uint8_t*>(data->Data()), data->Size());
@@ -481,9 +459,9 @@ AudioParam DMicDev::GetAudioParam() const
     return param_;
 }
 
-int32_t DMicDev::NotifyHdfAudioEvent(const AudioEvent &event)
+int32_t DMicDev::NotifyHdfAudioEvent(const AudioEvent &event, const int32_t portId)
 {
-    int32_t ret = DAudioHdiHandler::GetInstance().NotifyEvent(devId_, curPort_, event);
+    int32_t ret = DAudioHdiHandler::GetInstance().NotifyEvent(devId_, portId, event);
     if (ret != DH_SUCCESS) {
         DHLOGE("Notify event: %d, result: %s.", event.type, event.content.c_str());
     }

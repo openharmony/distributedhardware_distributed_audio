@@ -63,7 +63,7 @@ private:
     int32_t TaskCloseCtrlChannel(const std::string &args);
     int32_t TaskOpenDSpeaker(const std::string &args);
     int32_t TaskCloseDSpeaker(const std::string &args);
-    int32_t TaskStartRender();
+    int32_t TaskStartRender(const std::string &args);
     int32_t TaskOpenDMic(const std::string &args);
     int32_t TaskCloseDMic(const std::string &args);
     int32_t TaskSetParameter(const std::string &args);
@@ -80,6 +80,8 @@ private:
     int32_t SendAudioEventToRemote(const AudioEvent &event);
     void JudgeDeviceStatus();
 
+    int32_t ParseDhidFromEvent(std::string args);
+
 private:
     std::mutex rpcWaitMutex_;
     std::condition_variable rpcWaitCond_;
@@ -87,7 +89,11 @@ private:
     std::string spkDhId_;
     std::string micDhId_;
     std::shared_ptr<ISpkClient> speakerClient_ = nullptr;
+    std::mutex spkClientMutex_;
+    std::map<int32_t, std::shared_ptr<ISpkClient>> spkClientMap_;
     std::shared_ptr<IMicClient> micClient_ = nullptr;
+    std::mutex micClientMutex_;
+    std::map<int32_t, std::shared_ptr<IMicClient>> micClientMap_;
     std::shared_ptr<DAudioSinkDevCtrlMgr> audioCtrlMgr_ = nullptr;
 
     std::atomic<bool> isSpkInUse_ = false;

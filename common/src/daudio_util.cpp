@@ -221,6 +221,46 @@ bool JsonParamCheck(const json &jsonObj, const std::initializer_list<std::string
     return true;
 }
 
+static bool IsString(const cJSON *jsonObj, const std::string &key)
+{
+    if (jsonObj == nullptr || !cJSON_IsObject(jsonObj)) {
+        DHLOGE("JSON parameter is invalid.");
+        return false;
+    }
+    cJSON *paramValue = cJSON_GetObjectItemCaseSensitive(jsonObj, key.c_str());
+    if (paramValue == nullptr) {
+        DHLOGE("paramValue is null");
+        return false;
+    }
+
+    if (cJSON_IsString(paramValue)) {
+        return true;
+    }
+    return false;
+}
+
+bool CJsonParamCheck(const cJSON *jsonObj, const std::initializer_list<std::string> &keys)
+{
+    if (jsonObj == nullptr || !cJSON_IsObject(jsonObj)) {
+        DHLOGE("JSON parameter is invalid.");
+        return false;
+    }
+
+    for (auto it = keys.begin(); it != keys.end(); it++) {
+        cJSON *paramValue = cJSON_GetObjectItemCaseSensitive(jsonObj, (*it).c_str());
+        if (paramValue == nullptr) {
+            DHLOGE("JSON parameter does not contain key: %s", (*it).c_str());
+            return false;
+        }
+        bool res = IsString(jsonObj, *it);
+        if (!res) {
+            DHLOGE("The key %s value format in JSON is illegal.", (*it).c_str());
+            return false;
+        }
+    }
+    return true;
+}
+
 bool IsString(const json &jsonObj, const std::string &key)
 {
     return jsonObj[key].is_string();
