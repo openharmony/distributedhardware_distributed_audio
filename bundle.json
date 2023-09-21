@@ -70,7 +70,8 @@
                 "//foundation/distributedhardware/distributed_audio/services/audiotransport/audiochannel/audiodatachannel:distributed_audio_data_channel",
                 "//foundation/distributedhardware/distributed_audio/services/audiotransport/audiotransportstatus:distributed_audio_transport_status",
                 "//foundation/distributedhardware/distributed_audio/services/audiotransport/decodetransport:distributed_audio_decode_transport",
-                "//foundation/distributedhardware/distributed_audio/services/audiotransport/encodetransport:distributed_audio_encode_transport"
+                "//foundation/distributedhardware/distributed_audio/services/audiotransport/encodetransport:distributed_audio_encode_transport",
+                "//foundation/distributedhardware/distributed_audio/services/test_example:audio_distributed_test"
             ],
             "inner_kits": [{
                     "type": "so",
