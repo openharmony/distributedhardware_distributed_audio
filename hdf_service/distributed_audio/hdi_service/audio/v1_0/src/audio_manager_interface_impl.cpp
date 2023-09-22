@@ -18,9 +18,9 @@
 #include <cstdlib>
 #include <hdf_base.h>
 #include "hdf_device_object.h"
-#include "iservice_registry"
+#include "iservice_registry.h"
 #include "iproxy_broker.h"
-#include "iservmgr_hid.h"
+#include "iservmgr_hdi.h"
 #include <sstream>
 
 #include "daudio_constants.h"
@@ -265,7 +265,7 @@ void AudioManagerInterfaceImpl::SetDeviceObject(struct HdfDeviceObject *deviceOb
     deviceObject_ = deviceObject;
 }
 
-void AudioManagerInterfaceImpl::AudioManagerRecipient::OnRemoteDied(const wptr<IRemoteObjedct> &remote)
+void AudioManagerInterfaceImpl::AudioManagerRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     _Exit(0);
 }
