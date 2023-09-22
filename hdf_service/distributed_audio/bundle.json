@@ -22,7 +22,9 @@
                 "hilog",
                 "ipc"
             ],
-            "third_party": []
+            "third_party": [
+                "cJSON"
+            ]
         },
         "build": {
             "sub_component": [

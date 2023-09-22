@@ -17,6 +17,8 @@
 
 #include <chrono>
 
+#include "cJSON.h"
+
 #include "daudio_constants.h"
 #include "daudio_hisysevent.h"
 #include "daudio_sink_hidumper.h"
@@ -75,15 +77,28 @@ int32_t DMicClient::OnStateChange(const AudioEventType type)
 {
     DHLOGD("On state change type: %d.", type);
     AudioEvent event;
-    event.content = "";
+    cJSON *jParam = cJSON_CreateObject();
+    if (jParam == nullptr) {
+        DHLOGE("Failed to create cJSON object.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId_).c_str());
+    char *jsonData = cJSON_PrintUnformatted(jParam);
+    if (jsonData == nullptr) {
+        DHLOGE("Failed to create JSON data.");
+        cJSON_Delete(jParam);
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    event.content = std::string(jsonData);
+    cJSON_Delete(jParam);
+    cJSON_free(jsonData);
     switch (type) {
         case AudioEventType::DATA_OPENED: {
             isBlocking_.store(true);
-            isCaptureReady_.store(true);
-            if (audioParam_.captureOpts.capturerFlags == MMAP_MODE) {
-                frameIndex_ = 0;
+            if (audioParam_.captureOpts.capturerFlags != MMAP_MODE) {
+                isCaptureReady_.store(true);
+                captureDataThread_ = std::thread(&DMicClient::CaptureThreadRunning, this);
             }
-            captureDataThread_ = std::thread(&DMicClient::CaptureThreadRunning, this);
             event.type = AudioEventType::MIC_OPENED;
             break;
         }
@@ -105,164 +120,6 @@ int32_t DMicClient::OnStateChange(const AudioEventType type)
     return DH_SUCCESS;
 }
 
-void DMicClient::AdapterDescFree(struct AudioAdapterDescriptor *dataBlock, bool freeSelf)
-{
-    if (dataBlock == nullptr) {
-        return;
-    }
-    if (dataBlock->adapterName != nullptr) {
-        free(dataBlock->adapterName);
-        dataBlock->adapterName = nullptr;
-    }
-    if (dataBlock->ports != nullptr) {
-        free(dataBlock->ports);
-        dataBlock->ports = nullptr;
-    }
-    if (freeSelf) {
-        free(dataBlock);
-        dataBlock = nullptr;
-    }
-}
-
-void DMicClient::ReleaseAdapterDescs(struct AudioAdapterDescriptor **descs, uint32_t descsLen)
-{
-    if (descsLen > 0 && descs != nullptr && (*descs) != nullptr) {
-        for (uint32_t i = 0; i < descsLen; i++) {
-            AdapterDescFree(&(*descs)[i], false);
-        }
-        free(*descs);
-        *descs = nullptr;
-    }
-}
-
-int32_t DMicClient::GetAudioManager()
-{
-    audioManager_ = IAudioManagerGet(false);
-    if (audioManager_ == nullptr) {
-        DHLOGE("Get audio manager fail");
-        return ERR_DH_AUDIO_FAILED;
-    }
-    return DH_SUCCESS;
-}
-
-int32_t DMicClient::GetAdapter()
-{
-    size_t adapterSize = sizeof(struct AudioAdapterDescriptor) * (MAX_AUDIO_ADAPTER_DESC);
-    struct AudioAdapterDescriptor *descs = reinterpret_cast<struct AudioAdapterDescriptor *>(malloc(adapterSize));
-    if (descs == nullptr) {
-        DHLOGE("malloc for descs failed");
-        return ERR_DH_AUDIO_FAILED;
-    }
-    if (memset_s(descs, adapterSize, 0, adapterSize) != EOK) {
-        DHLOGE("memset for descs failed");
-        ReleaseAdapterDescs(&descs, MAX_AUDIO_ADAPTER_DESC);
-        return ERR_DH_AUDIO_FAILED;
-    }
-    uint32_t size = MAX_AUDIO_ADAPTER_DESC;
-    if (audioManager_ == nullptr) {
-        DHLOGE("AudioManager is nullptr");
-        ReleaseAdapterDescs(&descs, MAX_AUDIO_ADAPTER_DESC);
-        return ERR_DH_AUDIO_FAILED;
-    }
-    int32_t ret = audioManager_->GetAllAdapters(audioManager_, descs, &size);
-    if (size == 0 || descs == nullptr || ret != 0) {
-        DHLOGE("Get audio adapters failed. ret : %d.", ret);
-        ReleaseAdapterDescs(&descs, MAX_AUDIO_ADAPTER_DESC);
-        return ERR_DH_AUDIO_FAILED;
-    }
-    struct AudioAdapterDescriptor *primaryDesc = nullptr;
-    if (GetPrimaryDesc(descs, &primaryDesc) != DH_SUCCESS) {
-        return ERR_DH_AUDIO_FAILED;
-    }
-    ret = audioManager_->LoadAdapter(audioManager_, primaryDesc, &audioAdapter_);
-    if (ret != DH_SUCCESS || audioAdapter_ == nullptr) {
-        DHLOGE("Load primary adapter failed.");
-        ReleaseAdapterDescs(&descs, MAX_AUDIO_ADAPTER_DESC);
-        return ERR_DH_AUDIO_FAILED;
-    }
-    ReleaseAdapterDescs(&descs, MAX_AUDIO_ADAPTER_DESC);
-    (void)audioAdapter_->InitAllPorts(audioAdapter_);
-    return DH_SUCCESS;
-}
-
-int32_t DMicClient::GetPrimaryDesc(struct AudioAdapterDescriptor *descs, struct AudioAdapterDescriptor
-    **primaryDesc)
-{
-    uint32_t size = MAX_AUDIO_ADAPTER_DESC;
-    for (uint32_t index = 0; index < size; index++) {
-        auto desc = &descs[index];
-        if (desc == nullptr || desc->adapterName == nullptr) {
-            continue;
-        }
-        if (!strcmp(desc->adapterName, ADAPTERNAME)) {
-            *primaryDesc = desc;
-            break;
-        }
-    }
-    if (*primaryDesc == nullptr) {
-        DHLOGE("Find primary adapter failed.");
-        ReleaseAdapterDescs(&descs, MAX_AUDIO_ADAPTER_DESC);
-        return ERR_DH_AUDIO_FAILED;
-    }
-    if (strcpy_s(adapterName_, PATH_LEN, (*primaryDesc)->adapterName) < 0) {
-        DHLOGE("Strcpy adapter name failed.");
-        ReleaseAdapterDescs(&descs, MAX_AUDIO_ADAPTER_DESC);
-        return ERR_DH_AUDIO_FAILED;
-    }
-    return DH_SUCCESS;
-}
-
-void DMicClient::ReleaseHDFAudioDevice()
-{
-    if (micInUse_) {
-        return;
-    }
-    if (audioManager_ != nullptr && audioManager_->UnloadAdapter != nullptr) {
-        audioManager_->UnloadAdapter(audioManager_, adapterName_);
-        IAudioAdapterRelease(audioAdapter_, false);
-        audioAdapter_ = nullptr;
-        IAudioManagerRelease(audioManager_, false);
-        audioManager_ = nullptr;
-    }
-}
-
-int32_t DMicClient::InitHDFAudioDevice()
-{
-    if (micInUse_) {
-        return DH_SUCCESS;
-    }
-    if (GetAudioManager() != DH_SUCCESS) {
-        DHLOGE("Get audio manager failed");
-        ReleaseHDFAudioDevice();
-        return ERR_DH_AUDIO_FAILED;
-    }
-
-    if (GetAdapter() != DH_SUCCESS) {
-        DHLOGE("Get audio adapter failed");
-        ReleaseHDFAudioDevice();
-        return ERR_DH_AUDIO_FAILED;
-    }
-    return DH_SUCCESS;
-}
-
-void DMicClient::GenerateAttr(const AudioParam &param)
-{
-    captureDesc_.portId = PORT_ID;
-    captureDesc_.pins = AudioPortPin::PIN_IN_MIC;
-    captureDesc_.desc = strdup(DEVNAME);
-    captureAttr_.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
-    captureAttr_.interleaved = 0;
-    captureAttr_.type = AUDIO_IN_MEDIA;
-    captureAttr_.period = BUFFER_PERIOD_SIZE;
-    captureAttr_.isBigEndian = false;
-    captureAttr_.isSignedData = true;
-    captureAttr_.stopThreshold = INT_32_MAX;
-    captureAttr_.silenceThreshold = AUDIO_BUFFER_SIZE;
-    captureAttr_.channelCount = param.comParam.channelMask;
-    captureAttr_.sampleRate = param.comParam.sampleRate;
-    captureAttr_.sourceType = 1;
-}
-
 int32_t DMicClient::AudioFwkClientSetUp()
 {
     AudioStandard::AudioCapturerOptions capturerOptions = {
@@ -274,7 +131,7 @@ int32_t DMicClient::AudioFwkClientSetUp()
         },
         {
             static_cast<AudioStandard::SourceType>(audioParam_.captureOpts.sourceType),
-            0,
+            audioParam_.captureOpts.capturerFlags == MMAP_MODE ? AudioStandard::STREAM_FLAG_FAST : 0,
         }
     };
     std::lock_guard<std::mutex> lck(devMtx_);
@@ -293,29 +150,6 @@ int32_t DMicClient::AudioFwkClientSetUp()
     return TransSetUp();
 }
 
-int32_t DMicClient::HdfClientSetUp()
-{
-    if (InitHDFAudioDevice() != DH_SUCCESS) {
-        DHLOGE("Init hdf audio device failed.");
-        return ERR_DH_AUDIO_FAILED;
-    }
-    GenerateAttr(audioParam_);
-
-    if (audioAdapter_ == nullptr) {
-        DHLOGE("audio adapter is null");
-        return ERR_DH_AUDIO_FAILED;
-    }
-    int32_t ret = audioAdapter_->CreateCapture(audioAdapter_, &captureDesc_, &captureAttr_,
-        &hdfCapture_, &captureId_);
-    if (ret != DH_SUCCESS || hdfCapture_ == nullptr) {
-        DHLOGE("CreateCapture failed, ret: %d.", ret);
-        return ERR_DH_AUDIO_FAILED;
-    }
-    micInUse_ = true;
-    DHLOGI("Create hdf audio capture success");
-    return TransSetUp();
-}
-
 int32_t DMicClient::TransSetUp()
 {
     if (micTrans_ == nullptr) {
@@ -331,71 +165,6 @@ int32_t DMicClient::TransSetUp()
     return DH_SUCCESS;
 }
 
-int32_t DMicClient::HdfClientRelease()
-{
-    DHLOGI("Release hdf mic client.");
-    if (audioAdapter_ != nullptr) {
-        audioAdapter_->DestroyCapture(audioAdapter_, captureId_);
-    }
-    IAudioCaptureRelease(hdfCapture_, false);
-    hdfCapture_ = nullptr;
-    micInUse_ = false;
-    ReleaseHDFAudioDevice();
-    DHLOGI("Release hdf audio capture success.");
-    return TransRelease();
-}
-
-int32_t DMicClient::TransRelease()
-{
-    if (micTrans_ == nullptr) {
-        DHLOGE("Mic trans is nullptr.");
-        return ERR_DH_AUDIO_FAILED;
-    }
-    if (micTrans_->Release() != DH_SUCCESS) {
-        DHLOGE("Mic trans release failed.");
-    }
-    micTrans_ = nullptr;
-    clientStatus_ = AudioStatus::STATUS_IDLE;
-    return DH_SUCCESS;
-}
-
-int32_t DMicClient::HdfClientStartCapture()
-{
-    if (hdfCapture_ == nullptr) {
-        DHLOGE("Audio capturer is nullptr, can not start.");
-        return ERR_DH_AUDIO_FAILED;
-    }
-    hdfCapture_->Start(hdfCapture_);
-    DHLOGI("Start hdf capture success.");
-    return DH_SUCCESS;
-}
-
-void DMicClient::HdfCaptureAudioData(uint32_t lengthPerCapture, const uint32_t lengthPerTrans,
-    const uint32_t len)
-{
-    auto audioData = std::make_shared<AudioData>(lengthPerCapture);
-    uint64_t size = 0;
-    if (hdfCapture_ == nullptr) {
-        DHLOGE("hdf capture is nullptr.");
-        return;
-    }
-    hdfCapture_->CaptureFrame(hdfCapture_, reinterpret_cast<int8_t *>(audioData->Data()),
-        &lengthPerCapture, &size);
-    DHLOGD("CaptureFrame success, framesize: %d", lengthPerCapture);
-
-    for (uint32_t i = 0; i < len; i++) {
-        std::shared_ptr<AudioData> data = std::make_shared<AudioData>(lengthPerTrans);
-        if (memcpy_s(data->Data(), lengthPerTrans, audioData->Data() + lengthPerTrans * i,
-            lengthPerTrans) != EOK) {
-            DHLOGE("Copy audio data %d failed.", i);
-        }
-        int32_t ret = micTrans_->FeedAudioData(data);
-        if (ret != DH_SUCCESS) {
-            DHLOGE("Failed to send data %d.", i);
-        }
-    }
-}
-
 int32_t DMicClient::SetUp(const AudioParam &param)
 {
     DHLOGI("Set up mic client, param: {sampleRate: %d, bitFormat: %d," +
@@ -403,9 +172,6 @@ int32_t DMicClient::SetUp(const AudioParam &param)
         param.comParam.sampleRate, param.comParam.bitFormat, param.comParam.channelMask, param.captureOpts.sourceType,
         param.captureOpts.capturerFlags, param.comParam.frameSize);
     audioParam_ = param;
-    if (audioParam_.captureOpts.capturerFlags == MMAP_MODE) {
-        return HdfClientSetUp();
-    }
     return AudioFwkClientSetUp();
 }
 
@@ -434,13 +200,22 @@ int32_t DMicClient::Release()
         DHLOGE("Mic status is wrong or mic trans is null, %d.", (int32_t)clientStatus_);
         return ERR_DH_AUDIO_SA_STATUS_ERR;
     }
-    if (audioParam_.captureOpts.capturerFlags == MMAP_MODE) {
-        return HdfClientRelease();
-    }
+    bool isReleaseError = false;
     if (audioCapturer_ == nullptr || !audioCapturer_->Release()) {
         DHLOGE("Audio capturer release failed.");
+        isReleaseError = true;
     }
-    return TransRelease();
+    int32_t ret = micTrans_->Release();
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Mic trans release failed.");
+        isReleaseError = true;
+    }
+    micTrans_ = nullptr;
+    clientStatus_ = AudioStatus::STATUS_IDLE;
+    if (isReleaseError) {
+        return ERR_DH_AUDIO_FAILED;
+    }
+    return DH_SUCCESS;
 }
 
 int32_t DMicClient::StartCapture()
@@ -453,20 +228,16 @@ int32_t DMicClient::StartCapture()
             "daudio init failed or mic status wrong.");
         return ERR_DH_AUDIO_SA_STATUS_ERR;
     }
-    if (audioParam_.captureOpts.capturerFlags == MMAP_MODE) {
-        HdfClientStartCapture();
-    } else {
-        if (audioCapturer_ == nullptr) {
-            DHLOGE("audio capturer is nullptr.");
-            return ERR_DH_AUDIO_CLIENT_CAPTURER_START_FAILED;
-        }
-        if (!audioCapturer_->Start()) {
-            DHLOGE("Audio capturer start failed.");
-            audioCapturer_->Release();
-            DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_OPT_FAIL,
-                ERR_DH_AUDIO_CLIENT_CAPTURER_START_FAILED, "daudio capturer start failed.");
-            return ERR_DH_AUDIO_CLIENT_CAPTURER_START_FAILED;
-        }
+    if (audioCapturer_ == nullptr) {
+        DHLOGE("audio capturer is nullptr.");
+        return ERR_DH_AUDIO_CLIENT_CAPTURER_START_FAILED;
+    }
+    if (!audioCapturer_->Start()) {
+        DHLOGE("Audio capturer start failed.");
+        audioCapturer_->Release();
+        DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_OPT_FAIL,
+            ERR_DH_AUDIO_CLIENT_CAPTURER_START_FAILED, "daudio capturer start failed.");
+        return ERR_DH_AUDIO_CLIENT_CAPTURER_START_FAILED;
     }
     int32_t ret = micTrans_->Start();
     if (ret != DH_SUCCESS) {
@@ -533,23 +304,8 @@ void DMicClient::CaptureThreadRunning()
     if (pthread_setname_np(pthread_self(), CAPTURETHREAD) != DH_SUCCESS) {
         DHLOGE("Capture data thread setname failed.");
     }
-    uint32_t lengthPerCapture;
-    uint32_t lengthPerTrans;
-    uint32_t len;
-    if (audioParam_.captureOpts.capturerFlags == MMAP_MODE) {
-        lengthPerCapture = (audioParam_.comParam.sampleRate * audioParam_.comParam.bitFormat *
-            FORMATNUM * audioParam_.comParam.channelMask) / FRAME_PER_SECOND;
-        lengthPerTrans = audioParam_.comParam.frameSize;
-        len = lengthPerCapture / lengthPerTrans;
-    }
     while (isCaptureReady_.load()) {
-        if (audioParam_.captureOpts.capturerFlags == MMAP_MODE) {
-            DHLOGD("Capture frameIndex: %lld.", frameIndex_);
-            HdfCaptureAudioData(lengthPerCapture, lengthPerTrans, len);
-            ++frameIndex_;
-        } else {
-            AudioFwkCaptureData();
-        }
+        AudioFwkCaptureData();
     }
 }
 
@@ -607,9 +363,11 @@ int32_t DMicClient::StopCapture()
     }
 
     isBlocking_.store(false);
-    isCaptureReady_.store(false);
-    if (captureDataThread_.joinable()) {
-        captureDataThread_.join();
+    if (audioParam_.captureOpts.capturerFlags != MMAP_MODE) {
+        isCaptureReady_.store(false);
+        if (captureDataThread_.joinable()) {
+            captureDataThread_.join();
+        }
     }
 
     bool status = true;
@@ -618,15 +376,9 @@ int32_t DMicClient::StopCapture()
         DHLOGE("Mic trans stop failed.");
         status = false;
     }
-    if (audioParam_.captureOpts.capturerFlags == MMAP_MODE) {
-        if (hdfCapture_ != nullptr) {
-            hdfCapture_->Stop(hdfCapture_);
-        }
-    } else {
-        if (audioCapturer_ == nullptr || !audioCapturer_->Stop()) {
-            DHLOGE("Audio capturer stop failed.");
-            status = false;
-        }
+    if (audioCapturer_ == nullptr || !audioCapturer_->Stop()) {
+        DHLOGE("Audio capturer stop failed.");
+        status = false;
     }
     clientStatus_ = AudioStatus::STATUS_STOP;
     if (!status) {

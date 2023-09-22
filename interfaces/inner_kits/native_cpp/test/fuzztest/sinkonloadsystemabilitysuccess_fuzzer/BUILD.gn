@@ -18,7 +18,8 @@ import("../../../../../../distributedaudio.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("SinkOnLoadSystemAbilitySuccessFuzzTest") {
-  module_out_path = "distributed_audio/sinkonloadsystemabilitysuccess"
+  module_out_path =
+      "${distributedaudio_fuzz_path}/sinkonloadsystemabilitysuccess"
   fuzz_config_file = "${innerkits_path}/native_cpp/test/fuzztest/sinkonloadsystemabilitysuccess_fuzzer"
 
   cflags = [

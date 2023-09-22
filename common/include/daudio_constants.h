@@ -70,6 +70,10 @@ static constexpr int64_t LOW_LATENCY_INTERVAL_NS = 5000000;
 static constexpr int64_t LOW_LATENCY_CLIENT_INTERVAL_NS = 20000000;
 static constexpr int64_t MAX_TIME_INTERVAL_US = 23000;
 
+static constexpr int32_t LOW_LATENCY_RENDER_ID = 1 << 1 | 1 << 0;
+static constexpr int32_t DEFAULT_RENDER_ID = 1;
+static constexpr int32_t DEFAULT_CAPTURE_ID = 1 << 27 | 1 << 0;
+
 const std::string DAUDIO_LOG_TITLE_TAG = "DAUDIO";
 const std::string DAUDIO_PREFIX = "DISTRIBUTED_AUDIO";
 const std::string AUDIO_PREFIX = "AUDIO";

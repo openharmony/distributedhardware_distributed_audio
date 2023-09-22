@@ -257,18 +257,13 @@ HWTEST_F(DAudioUtilsTest, DAudioUtilTest_005, TestSize.Level1)
 HWTEST_F(DAudioUtilsTest, DAudioUtilTest_006, TestSize.Level1)
 {
     std::string tempKey = "TestParam";
-    cJSON *jParam = cJSON_CreateObject();
-    cJSON_AddItemToObject(jParam, KEY_DEV_ID, cJSON_CreateString("TEST_DEV_ID"));
-    cJSON_AddItemToObject(jParam, KEY_AUDIO_PARAM, cJSON_CreateString("TEST_PARAM"));
-    cJSON_AddItemToObject(jParam, KEY_FORMAT, cJSON_CreateString("TEST_8000"));
-    cJSON_AddItemToObject(jParam, tempKey.c_str(), cJSON_CreateString("TEST_TEMP_KEY"));
-
+    json jParam = { { KEY_DEV_ID, "TEST_DEV_ID" }, {KEY_AUDIO_PARAM, "TEST_PARAM" }, {KEY_FORMAT, "TEST_8000" },
+        { tempKey, "TEST_TEMP_KEY" } };
     EXPECT_EQ(false, JsonParamCheck(jParam, { KEY_ATTRS }));
     EXPECT_EQ(false, JsonParamCheck(jParam, { KEY_AUDIO_PARAM }));
     EXPECT_EQ(false, JsonParamCheck(jParam, { KEY_FORMAT }));
     EXPECT_EQ(false, JsonParamCheck(jParam, { tempKey }));
     EXPECT_EQ(true, JsonParamCheck(jParam, { KEY_DEV_ID }));
-    cJSON_Delete(jParam);
 }
 
 /**

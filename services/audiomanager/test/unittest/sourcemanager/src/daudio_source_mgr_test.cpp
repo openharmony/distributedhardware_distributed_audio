@@ -182,12 +182,12 @@ HWTEST_F(DAudioSourceMgrTest, DisableDAudio_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceMgrTest, HandleDAudioNotify_001, TestSize.Level1)
 {
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED,
+    EXPECT_EQ(ERR_DH_AUDIO_SA_DEVICE_NOT_EXIST,
         sourceMgr.HandleDAudioNotify(DEV_ID, DH_ID_SPK, OPEN_SPEAKER, "openspk"));
 
     std::string reqId = GetRandomID();
     EXPECT_EQ(DH_SUCCESS, sourceMgr.EnableDAudio(DEV_ID, DH_ID_SPK, "", ATTRS, reqId));
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceMgr.HandleDAudioNotify(DEV_ID, DH_ID_SPK, OPEN_SPEAKER, "openspk"));
+    EXPECT_EQ(DH_SUCCESS, sourceMgr.HandleDAudioNotify(DEV_ID, DH_ID_SPK, OPEN_SPEAKER, "openspk"));
 
     EXPECT_EQ(DH_SUCCESS, sourceMgr.DisableDAudio(DEV_ID, DH_ID_SPK, reqId));
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceMgr.HandleDAudioNotify(DEV_ID + "1", DH_ID_SPK, CLOSE_CTRL, ""));

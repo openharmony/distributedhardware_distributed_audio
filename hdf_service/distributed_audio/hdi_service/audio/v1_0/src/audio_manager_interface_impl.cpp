@@ -138,10 +138,10 @@ int32_t AudioManagerInterfaceImpl::AddAudioDevice(const std::string &adpName, co
     }
     switch (GetDevTypeByDHId(dhId)) {
         case AUDIO_DEVICE_TYPE_SPEAKER:
-            adp->second->SetSpeakerCallback(callback);
+            adp->second->SetSpeakerCallback(dhId, callback);
             break;
         case AUDIO_DEVICE_TYPE_MIC:
-            adp->second->SetMicCallback(callback);
+            adp->second->SetMicCallback(dhId, callback);
             break;
         case AUDIO_DEVICE_TYPE_UNKNOWN:
         default:
@@ -241,11 +241,12 @@ int32_t AudioManagerInterfaceImpl::NotifyFwk(const DAudioDevEvent &event)
 int32_t AudioManagerInterfaceImpl::CreateAdapter(const std::string &adpName, const uint32_t devId,
     const sptr<IDAudioCallback> &callback)
 {
+    DHLOGI("Create adapter, pin id: %d.", devId);
     if (callback == nullptr) {
         DHLOGE("Adapter callback is null.");
         return ERR_DH_AUDIO_HDF_NULLPTR;
     }
-    if (devId != PIN_OUT_DAUDIO_DEFAULT && devId != PIN_IN_DAUDIO_DEFAULT) {
+    if (devId != DEFAULT_RENDER_ID && devId != DEFAULT_CAPTURE_ID && devId != LOW_LATENCY_RENDER_ID) {
         DHLOGE("Pin is not default, can not create audio adapter.");
         return ERR_DH_AUDIO_HDF_FAIL;
     }

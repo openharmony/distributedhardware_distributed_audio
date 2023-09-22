@@ -76,10 +76,14 @@ HWTEST_F(DAudioSourceDevTest, CreatTasks_001, TestSize.Level1)
     event.type = MIC_CLOSED;
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleDMicClosed(event));
 
-    sourceDev_->speaker_ = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
-    sourceDev_->speaker_->isOpened_ = true;
-    sourceDev_->mic_ = std::make_shared<DMicDev>(DEV_ID, sourceDev_);
-    sourceDev_->mic_->isOpened_ = true;
+    int32_t dhId = DEFAULT_RENDER_ID;
+    auto speaker = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
+    sourceDev_->deviceMap_[dhId] = speaker;
+    speaker->isOpened_ = true;
+    dhId = DEFAULT_CAPTURE_ID;
+    auto mic = std::make_shared<DMicDev>(DEV_ID, sourceDev_);
+    sourceDev_->deviceMap_[dhId] = mic;
+    mic->isOpened_ = true;
     event.type = CTRL_CLOSED;
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleCtrlTransClosed(event));
 
@@ -155,7 +159,7 @@ HWTEST_F(DAudioSourceDevTest, CreatTasks_003, TestSize.Level1)
 {
     sourceDev_->AwakeAudioDev();
     AudioEvent event = AudioEvent(OPEN_SPEAKER, "");
-    EXPECT_NE(ERR_DH_AUDIO_SA_OPEN_CTRL_FAILED, sourceDev_->HandleOpenDSpeaker(event));
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleOpenDSpeaker(event));
 
     event.type = OPEN_MIC;
     EXPECT_NE(ERR_DH_AUDIO_SA_OPEN_CTRL_FAILED, sourceDev_->HandleOpenDMic(event));
@@ -310,39 +314,6 @@ HWTEST_F(DAudioSourceDevTest, CloseCtrlTrans_001, TestSize.Level1)
     AudioEvent event;
     bool isSpk = false;
     EXPECT_EQ(DH_SUCCESS, sourceDev_->CloseCtrlTrans(event, isSpk));
-    sourceDev_->audioCtrlMgr_ = std::make_shared<DAudioSourceDevCtrlMgr>(DEV_ID, sourceDev_);
-    EXPECT_NE(ERR_DH_AUDIO_NULLPTR, sourceDev_->CloseCtrlTrans(event, isSpk));
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->CloseCtrlTrans(event, isSpk));
-}
-
-/**
- * @tc.name: CloseCtrlTrans_002
- * @tc.desc: Verify the CloseCtrlTrans function with task queue run.
- * @tc.type: FUNC
- * @tc.require: AR000H0E5F
- */
-HWTEST_F(DAudioSourceDevTest, CloseCtrlTrans_002, TestSize.Level1)
-{
-    AudioEvent event;
-    sourceDev_->AwakeAudioDev();
-
-    bool isSpk = false;
-    sourceDev_->mic_ = nullptr;
-    sourceDev_->speaker_ = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
-    sourceDev_->speaker_->isOpened_ = false;
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->CloseCtrlTrans(event, isSpk));
-
-    sourceDev_->speaker_->isOpened_ = true;
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->CloseCtrlTrans(event, isSpk));
-
-    isSpk = true;
-    sourceDev_->speaker_ = nullptr;
-    sourceDev_->mic_ = std::make_shared<DMicDev>(DEV_ID, sourceDev_);
-    sourceDev_->mic_->isOpened_ = false;
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->CloseCtrlTrans(event, isSpk));
-
-    sourceDev_->mic_->isOpened_ = true;
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->CloseCtrlTrans(event, isSpk));
 }
 
 /**
@@ -386,16 +357,18 @@ HWTEST_F(DAudioSourceDevTest, HandleCtrlTransClosed_001, TestSize.Level1)
     AudioEvent event = AudioEvent(CTRL_CLOSED, "");
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleCtrlTransClosed(event));
 
-    sourceDev_->speaker_ = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
-    sourceDev_->speaker_->isOpened_ = false;
+    auto speaker = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
+    int32_t dhId = DEFAULT_RENDER_ID;
+    sourceDev_->deviceMap_[dhId] = speaker;
+    speaker->isOpened_ = false;
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleCtrlTransClosed(event));
-    sourceDev_->speaker_->isOpened_ = true;
+    speaker->isOpened_ = true;
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleCtrlTransClosed(event));
 
     sourceDev_->mic_ = std::make_shared<DMicDev>(DEV_ID, sourceDev_);
-    sourceDev_->speaker_->isOpened_ = false;
+    speaker->isOpened_ = false;
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleCtrlTransClosed(event));
-    sourceDev_->speaker_->isOpened_ = true;
+    speaker->isOpened_ = true;
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleCtrlTransClosed(event));
 }
 
@@ -436,11 +409,9 @@ HWTEST_F(DAudioSourceDevTest, HandleNotifyRPC_002, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, HandleNotifyRPC_003, TestSize.Level1)
 {
-    cJSON *jParam = cJSON_CreateObject();
-    EXPECT_NE(NULL, cJSON_AddNumberToObject(jParam, KEY_RESULT, DH_SUCCESS));
-    AudioEvent event(CHANGE_PLAY_STATUS, std::string(cJSON_PrintUnformatted(jParam)));
+    json jParam = { { KEY_RESULT, DH_SUCCESS } };
+    AudioEvent event(CHANGE_PLAY_STATUS, jParam.dump());
     EXPECT_EQ(ERR_DH_AUDIO_NOT_FOUND_KEY, sourceDev_->HandleNotifyRPC(event));
-    cJSON_Delete(jParam);
 
     event.type = NOTIFY_OPEN_SPEAKER_RESULT;
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleNotifyRPC(event));
@@ -519,44 +490,20 @@ HWTEST_F(DAudioSourceDevTest, TaskEnableDAudio_001, TestSize.Level1)
     std::string tempLongStr(DAUDIO_MAX_JSON_LEN + 1, 'a');
     EXPECT_EQ(ERR_DH_AUDIO_SA_PARAM_INVALID, sourceDev_->TaskEnableDAudio(tempLongStr));
 
-    cJSON *jParam1 = cJSON_CreateObject();
-    cJSON_AddStringToObject(jParam1, KEY_DEV_ID, DEV_ID.c_str());
-    cJSON_AddStringToObject(jParam1, KEY_RESULT, "test_result");
-    EXPECT_EQ(ERR_DH_AUDIO_SA_ENABLE_PARAM_INVALID,
-              sourceDev_->TaskEnableDAudio(std::string(cJSON_PrintUnformatted(jParam1))));
-    cJSON_Delete(jParam1);
+    json jParam = { { KEY_DEV_ID, DEV_ID }, { KEY_RESULT, "test_result" } };
+    EXPECT_EQ(ERR_DH_AUDIO_SA_ENABLE_PARAM_INVALID, sourceDev_->TaskEnableDAudio(jParam.dump()));
 
-    cJSON *jParam2 = cJSON_CreateObject();
-    cJSON_AddStringToObject(jParam2, KEY_DEV_ID, DEV_ID.c_str());
-    cJSON_AddStringToObject(jParam2, KEY_DH_ID, "testDhId");
-    cJSON_AddStringToObject(jParam2, KEY_ATTRS, "");
-    EXPECT_EQ(ERR_DH_AUDIO_SA_ENABLE_PARAM_INVALID,
-              sourceDev_->TaskEnableDAudio(std::string(cJSON_PrintUnformatted(jParam2))));
-    cJSON_Delete(jParam2);
+    jParam = { { KEY_DEV_ID, DEV_ID }, { KEY_DH_ID, "testDhId" }, { KEY_ATTRS, "" } };
+    EXPECT_EQ(ERR_DH_AUDIO_SA_ENABLE_PARAM_INVALID, sourceDev_->TaskEnableDAudio(jParam.dump()));
+ 
+    jParam = { { KEY_DEV_ID, DEV_ID }, { KEY_DH_ID, DH_ID_UNKNOWN }, { KEY_ATTRS, "" } };
+    EXPECT_EQ(ERR_DH_AUDIO_NOT_SUPPORT, sourceDev_->TaskEnableDAudio(jParam.dump()));
 
-    cJSON *jParam3 = cJSON_CreateObject();
-    cJSON_AddStringToObject(jParam3, KEY_DEV_ID, DEV_ID.c_str());
-    cJSON_AddStringToObject(jParam3, KEY_DH_ID, DH_ID_UNKNOWN.c_str());
-    cJSON_AddStringToObject(jParam3, KEY_ATTRS, "");
-    EXPECT_EQ(ERR_DH_AUDIO_NOT_SUPPORT,
-              sourceDev_->TaskEnableDAudio(std::string(cJSON_PrintUnformatted(jParam3))));
-    cJSON_Delete(jParam3);
+    json jParam_spk = { { KEY_DEV_ID, DEV_ID }, { KEY_DH_ID, DH_ID_SPK }, { KEY_ATTRS, "" } };
+    EXPECT_NE(DH_SUCCESS, sourceDev_->TaskEnableDAudio(jParam_spk.dump()));
 
-    cJSON *jParamSpk = cJSON_CreateObject();
-    cJSON_AddStringToObject(jParamSpk, KEY_DEV_ID, DEV_ID.c_str());
-    cJSON_AddStringToObject(jParamSpk, KEY_DH_ID, DH_ID_SPK.c_str());
-    cJSON_AddStringToObject(jParamSpk, KEY_ATTRS, "");
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED,
-              sourceDev_->TaskEnableDAudio(std::string(cJSON_PrintUnformatted(jParamSpk))));
-    cJSON_Delete(jParamSpk);
-
-    cJSON *jParamMic = cJSON_CreateObject();
-    cJSON_AddStringToObject(jParamMic, KEY_DEV_ID, DEV_ID.c_str());
-    cJSON_AddStringToObject(jParamMic, KEY_DH_ID, DH_ID_MIC.c_str());
-    cJSON_AddStringToObject(jParamMic, KEY_ATTRS, "");
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED,
-              sourceDev_->TaskEnableDAudio(std::string(cJSON_PrintUnformatted(jParamMic))));
-    cJSON_Delete(jParamMic);
+    json jParam_mic = { { KEY_DEV_ID, DEV_ID }, { KEY_DH_ID, DH_ID_MIC }, { KEY_ATTRS, "" } };
+    EXPECT_NE(DH_SUCCESS, sourceDev_->TaskEnableDAudio(jParam_mic.dump()));
 }
 
 /**
@@ -572,40 +519,20 @@ HWTEST_F(DAudioSourceDevTest, TaskDisableDAudio_001, TestSize.Level1)
     std::string tempLongStr(DAUDIO_MAX_JSON_LEN + 1, 'a');
     EXPECT_EQ(ERR_DH_AUDIO_SA_PARAM_INVALID, sourceDev_->TaskDisableDAudio(tempLongStr));
 
-    cJSON *jParam1 = cJSON_CreateObject();
-    cJSON_AddStringToObject(jParam1, KEY_DEV_ID, DEV_ID.c_str());
-    cJSON_AddStringToObject(jParam1, KEY_RESULT, "test_result");
-    EXPECT_EQ(ERR_DH_AUDIO_SA_DISABLE_PARAM_INVALID,
-              sourceDev_->TaskDisableDAudio(std::string(cJSON_PrintUnformatted(jParam1))));
-    cJSON_Delete(jParam1);
+    json jParam = { { KEY_DEV_ID, DEV_ID }, { KEY_RESULT, "test_result" } };
+    EXPECT_EQ(ERR_DH_AUDIO_SA_DISABLE_PARAM_INVALID, sourceDev_->TaskDisableDAudio(jParam.dump()));
 
-    cJSON *jParam2 = cJSON_CreateObject();
-    cJSON_AddStringToObject(jParam2, KEY_DEV_ID, DEV_ID.c_str());
-    cJSON_AddStringToObject(jParam2, KEY_DH_ID, "testDhId");
-    EXPECT_EQ(ERR_DH_AUDIO_SA_DISABLE_PARAM_INVALID,
-              sourceDev_->TaskDisableDAudio(std::string(cJSON_PrintUnformatted(jParam2))));
-    cJSON_Delete(jParam2);
+    jParam = { { KEY_DEV_ID, DEV_ID }, { KEY_DH_ID, "testDhId" } };
+    EXPECT_EQ(ERR_DH_AUDIO_SA_DISABLE_PARAM_INVALID, sourceDev_->TaskDisableDAudio(jParam.dump()));
+ 
+    jParam = { { KEY_DEV_ID, DEV_ID }, { KEY_DH_ID, DH_ID_UNKNOWN } };
+    EXPECT_EQ(ERR_DH_AUDIO_NOT_SUPPORT, sourceDev_->TaskDisableDAudio(jParam.dump()));
 
-    cJSON *jParam3 = cJSON_CreateObject();
-    cJSON_AddStringToObject(jParam3, KEY_DEV_ID, DEV_ID.c_str());
-    cJSON_AddStringToObject(jParam3, KEY_DH_ID, DH_ID_UNKNOWN.c_str());
-    EXPECT_EQ(ERR_DH_AUDIO_NOT_SUPPORT,
-              sourceDev_->TaskDisableDAudio(std::string(cJSON_PrintUnformatted(jParam3))));
-    cJSON_Delete(jParam3);
+    json jParam_spk = { { KEY_DEV_ID, DEV_ID }, { KEY_DH_ID, DH_ID_SPK } };
+    EXPECT_NE(DH_SUCCESS, sourceDev_->TaskDisableDAudio(jParam_spk.dump()));
 
-    cJSON *jParamSpk = cJSON_CreateObject();
-    cJSON_AddStringToObject(jParamSpk, KEY_DEV_ID, DEV_ID.c_str());
-    cJSON_AddStringToObject(jParamSpk, KEY_DH_ID, DH_ID_SPK.c_str());
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR,
-              sourceDev_->TaskDisableDAudio(std::string(cJSON_PrintUnformatted(jParamSpk))));
-    cJSON_Delete(jParamSpk);
-
-    cJSON *jParamMic = cJSON_CreateObject();
-    cJSON_AddStringToObject(jParamMic, KEY_DEV_ID, DEV_ID.c_str());
-    cJSON_AddStringToObject(jParamMic, KEY_DH_ID, DH_ID_MIC.c_str());
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR,
-              sourceDev_->TaskDisableDAudio(std::string(cJSON_PrintUnformatted(jParamMic))));
-    cJSON_Delete(jParamMic);
+    json jParam_mic = { { KEY_DEV_ID, DEV_ID }, { KEY_DH_ID, DH_ID_MIC } };
+    EXPECT_NE(DH_SUCCESS, sourceDev_->TaskDisableDAudio(jParam_mic.dump()));
 }
 
 /**
@@ -621,21 +548,15 @@ HWTEST_F(DAudioSourceDevTest, OnEnableTaskResult_001, TestSize.Level1)
     std::string tempLongStr(DAUDIO_MAX_JSON_LEN + 1, 'a');
     sourceDev_->OnEnableTaskResult(DH_SUCCESS, tempLongStr, FUNC_NAME);
 
-    cJSON *jParam1 = cJSON_CreateObject();
-    cJSON_AddStringToObject(jParam1, KEY_DEV_ID, DEV_ID.c_str());
-    cJSON_AddStringToObject(jParam1, KEY_RESULT, "test_result");
-    sourceDev_->OnEnableTaskResult(DH_SUCCESS, std::string(cJSON_PrintUnformatted(jParam1)), FUNC_NAME);
-    cJSON_Delete(jParam1);
+    json jParam = { { KEY_DEV_ID, DEV_ID }, { KEY_RESULT, "test_result" } };
+    sourceDev_->OnEnableTaskResult(DH_SUCCESS, jParam.dump(), FUNC_NAME);
 
-    cJSON *jParam2 = cJSON_CreateObject();
-    cJSON_AddStringToObject(jParam2, KEY_DEV_ID, DEV_ID.c_str());
-    cJSON_AddStringToObject(jParam2, KEY_DH_ID, DH_ID_SPK.c_str());
-    sourceDev_->OnEnableTaskResult(DH_SUCCESS, std::string(cJSON_PrintUnformatted(jParam2)), FUNC_NAME);
-    sourceDev_->OnEnableTaskResult(ERR_DH_AUDIO_NULLPTR, std::string(cJSON_PrintUnformatted(jParam2)), FUNC_NAME);
+    jParam = { { KEY_DEV_ID, DEV_ID }, { KEY_DH_ID, DH_ID_SPK } };
+    sourceDev_->OnEnableTaskResult(DH_SUCCESS, jParam.dump(), FUNC_NAME);
+    sourceDev_->OnEnableTaskResult(ERR_DH_AUDIO_NULLPTR, jParam.dump(), FUNC_NAME);
 
     sourceDev_->mgrCallback_ = nullptr;
-    sourceDev_->OnEnableTaskResult(DH_SUCCESS, std::string(cJSON_PrintUnformatted(jParam2)), FUNC_NAME);
-    cJSON_Delete(jParam2);
+    sourceDev_->OnEnableTaskResult(DH_SUCCESS, jParam.dump(), FUNC_NAME);
 
     auto mgrCb = std::make_shared<DAudioSourceMgrCallback>();
     EXPECT_NE(DH_SUCCESS, mgrCb->OnEnableAudioResult(DEV_ID, DH_ID_SPK, DH_SUCCESS));
@@ -654,19 +575,15 @@ HWTEST_F(DAudioSourceDevTest, OnDisableTaskResult_001, TestSize.Level1)
     std::string tempLongStr(DAUDIO_MAX_JSON_LEN + 1, 'a');
     sourceDev_->OnDisableTaskResult(DH_SUCCESS, tempLongStr, FUNC_NAME);
 
-    cJSON *jParam = cJSON_CreateObject();
-    cJSON_AddStringToObject(jParam, KEY_DEV_ID, DEV_ID.c_str());
-    cJSON_AddStringToObject(jParam, KEY_RESULT, "test_result");
-    sourceDev_->OnDisableTaskResult(DH_SUCCESS, std::string(cJSON_PrintUnformatted(jParam)), FUNC_NAME);
+    json jParam = { { KEY_DEV_ID, DEV_ID }, { KEY_RESULT, "test_result" } };
+    sourceDev_->OnDisableTaskResult(DH_SUCCESS, jParam.dump(), FUNC_NAME);
 
-    cJSON_AddStringToObject(jParam, KEY_DEV_ID, DEV_ID.c_str());
-    cJSON_AddStringToObject(jParam, KEY_DH_ID, DH_ID_SPK.c_str());
-    sourceDev_->OnDisableTaskResult(DH_SUCCESS, std::string(cJSON_PrintUnformatted(jParam)), FUNC_NAME);
-    sourceDev_->OnDisableTaskResult(ERR_DH_AUDIO_NULLPTR, std::string(cJSON_PrintUnformatted(jParam)), FUNC_NAME);
+    jParam = { { KEY_DEV_ID, DEV_ID }, { KEY_DH_ID, DH_ID_SPK } };
+    sourceDev_->OnDisableTaskResult(DH_SUCCESS, jParam.dump(), FUNC_NAME);
+    sourceDev_->OnDisableTaskResult(ERR_DH_AUDIO_NULLPTR, jParam.dump(), FUNC_NAME);
 
     sourceDev_->mgrCallback_ = nullptr;
-    sourceDev_->OnDisableTaskResult(DH_SUCCESS, std::string(cJSON_PrintUnformatted(jParam)), FUNC_NAME);
-    cJSON_Delete(jParam);
+    sourceDev_->OnDisableTaskResult(DH_SUCCESS, jParam.dump(), FUNC_NAME);
 
     auto mgrCb = std::make_shared<DAudioSourceMgrCallback>();
     EXPECT_NE(DH_SUCCESS, mgrCb->OnDisableAudioResult(DEV_ID, DH_ID_SPK, DH_SUCCESS));
@@ -680,10 +597,11 @@ HWTEST_F(DAudioSourceDevTest, OnDisableTaskResult_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, EnableDSpeaker_001, TestSize.Level1)
 {
-    int32_t dhId = 0;
-    sourceDev_->speaker_ = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
+    auto speaker = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
+    int32_t dhId = DEFAULT_RENDER_ID;
+    sourceDev_->deviceMap_[dhId] = speaker;
     EXPECT_NE(DH_SUCCESS, sourceDev_->EnableDSpeaker(dhId, ATTRS));
-    sourceDev_->speaker_ = nullptr;
+    sourceDev_->deviceMap_[dhId] = nullptr;
 
     EXPECT_NE(DH_SUCCESS, sourceDev_->EnableDSpeaker(dhId, ATTRS));
 }
@@ -752,22 +670,18 @@ HWTEST_F(DAudioSourceDevTest, TaskOpenDSpeaker_001, TestSize.Level1)
     std::string tempLongStr(DAUDIO_MAX_JSON_LEN + 1, 'a');
     EXPECT_EQ(ERR_DH_AUDIO_SA_PARAM_INVALID, sourceDev_->TaskOpenDSpeaker(tempLongStr));
 
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->TaskOpenDSpeaker(ARGS));
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->TaskOpenDSpeaker(ARGS));
 
-    cJSON *jParamSpk = cJSON_CreateObject();
-    cJSON_AddStringToObject(jParamSpk, KEY_DH_ID, DH_ID_SPK.c_str());
+    json jParam_spk = { { KEY_DH_ID, DH_ID_SPK } };
     sourceDev_->isRpcOpen_.store(false);
-    EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE,
-              sourceDev_->TaskOpenDSpeaker(std::string(cJSON_PrintUnformatted(jParamSpk))));
+    EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE, sourceDev_->TaskOpenDSpeaker(jParam_spk.dump()));
 
     sourceDev_->isRpcOpen_.store(true);
-    EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE,
-              sourceDev_->TaskOpenDSpeaker(std::string(cJSON_PrintUnformatted(jParamSpk))));
+    EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE, sourceDev_->TaskOpenDSpeaker(jParam_spk.dump()));
 
     sourceDev_->rpcResult_ = true;
     sourceDev_->rpcNotify_ = sourceDev_->EVENT_NOTIFY_OPEN_SPK;
-    EXPECT_NE(DH_SUCCESS, sourceDev_->TaskOpenDSpeaker(std::string(cJSON_PrintUnformatted(jParamSpk))));
-    cJSON_Delete(jParamSpk);
+    EXPECT_NE(DH_SUCCESS, sourceDev_->TaskOpenDSpeaker(jParam_spk.dump()));
 }
 
 /**
@@ -780,22 +694,22 @@ HWTEST_F(DAudioSourceDevTest, TaskCloseDSpeaker_001, TestSize.Level1)
 {
     EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskCloseDSpeaker(ARGS));
 
-    sourceDev_->speaker_ = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
+    int32_t dhId = DEFAULT_RENDER_ID;
+    auto speaker = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
+    sourceDev_->deviceMap_[dhId] = speaker;
     EXPECT_EQ(ERR_DH_AUDIO_SA_PARAM_INVALID, sourceDev_->TaskCloseDSpeaker(""));
 
     std::string tempLongStr(DAUDIO_MAX_JSON_LEN + 1, 'a');
     EXPECT_EQ(ERR_DH_AUDIO_SA_PARAM_INVALID, sourceDev_->TaskCloseDSpeaker(tempLongStr));
 
-    sourceDev_->speaker_->isOpened_ = true;
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->TaskCloseDSpeaker(ARGS));
+    speaker->isOpened_ = true;
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->TaskCloseDSpeaker(ARGS));
 
-    sourceDev_->speaker_->isOpened_ = false;
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->TaskCloseDSpeaker(ARGS));
+    speaker->isOpened_ = false;
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->TaskCloseDSpeaker(ARGS));
 
-    cJSON *jParamSpk = cJSON_CreateObject();
-    cJSON_AddStringToObject(jParamSpk, KEY_DH_ID, DH_ID_SPK.c_str());
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskCloseDSpeaker(std::string(cJSON_PrintUnformatted(jParamSpk))));
-    cJSON_Delete(jParamSpk);
+    json jParam_spk = { { KEY_DH_ID, DH_ID_SPK } };
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskCloseDSpeaker(jParam_spk.dump()));
 }
 
 /**
@@ -806,13 +720,13 @@ HWTEST_F(DAudioSourceDevTest, TaskCloseDSpeaker_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, TaskCloseDSpeaker_002, TestSize.Level1)
 {
-    sourceDev_->speaker_ = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
-    sourceDev_->speaker_->speakerTrans_ = std::make_shared<AudioEncodeTransport>(DEV_ID);
+    auto speaker = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
+    int32_t dhId = DEFAULT_RENDER_ID;
+    sourceDev_->deviceMap_[dhId] = speaker;
+    speaker->speakerTrans_ = std::make_shared<AudioEncodeTransport>(DEV_ID);
 
-    cJSON *jParamSpk = cJSON_CreateObject();
-    cJSON_AddStringToObject(jParamSpk, KEY_DH_ID, DH_ID_SPK.c_str());
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->TaskCloseDSpeaker(std::string(cJSON_PrintUnformatted(jParamSpk))));
-    cJSON_Delete(jParamSpk);
+    json jParam_spk = { { KEY_DH_ID, DH_ID_SPK } };
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->TaskCloseDSpeaker(jParam_spk.dump()));
 }
 
 /**
@@ -825,7 +739,9 @@ HWTEST_F(DAudioSourceDevTest, TaskOpenDMic_001, TestSize.Level1)
 {
     EXPECT_EQ(ERR_DH_AUDIO_SA_MIC_DEVICE_NOT_INIT, sourceDev_->TaskOpenDMic(""));
 
-    sourceDev_->mic_ = std::make_shared<DMicDev>(DEV_ID, sourceDev_);
+    auto mic = std::make_shared<DMicDev>(DEV_ID, sourceDev_);
+    int32_t dhId = DEFAULT_CAPTURE_ID;
+    sourceDev_->deviceMap_[dhId] = mic;
     EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE, sourceDev_->TaskOpenDMic(""));
 
     EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE, sourceDev_->TaskOpenDMic(""));
@@ -835,10 +751,8 @@ HWTEST_F(DAudioSourceDevTest, TaskOpenDMic_001, TestSize.Level1)
 
     EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE, sourceDev_->TaskOpenDMic(ARGS));
 
-    cJSON *jParamMic = cJSON_CreateObject();
-    cJSON_AddStringToObject(jParamMic, KEY_DH_ID, DH_ID_MIC.c_str());
-    EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE, sourceDev_->TaskOpenDMic(std::string(cJSON_PrintUnformatted(jParamMic))));
-    cJSON_Delete(jParamMic);
+    json jParam_mic = { { KEY_DH_ID, DH_ID_MIC } };
+    EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE, sourceDev_->TaskOpenDMic(jParam_mic.dump()));
 }
 
 /**
@@ -851,22 +765,23 @@ HWTEST_F(DAudioSourceDevTest, TaskCloseDMic_001, TestSize.Level1)
 {
     EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskCloseDMic(ARGS));
 
-    sourceDev_->mic_ = std::make_shared<DMicDev>(DEV_ID, sourceDev_);
+    auto mic = std::make_shared<DMicDev>(DEV_ID, sourceDev_);
+    int32_t dhId = DEFAULT_CAPTURE_ID;
+    sourceDev_->deviceMap_[dhId] = mic;
+
     EXPECT_EQ(ERR_DH_AUDIO_SA_PARAM_INVALID, sourceDev_->TaskCloseDMic(""));
 
     std::string tempLongStr(DAUDIO_MAX_JSON_LEN + 1, 'a');
     EXPECT_EQ(ERR_DH_AUDIO_SA_PARAM_INVALID, sourceDev_->TaskCloseDMic(tempLongStr));
 
-    sourceDev_->mic_->isOpened_ = true;
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->TaskCloseDMic(ARGS));
+    mic->isOpened_ = true;
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->TaskCloseDMic(ARGS));
 
-    sourceDev_->mic_->isOpened_ = false;
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->TaskCloseDMic(ARGS));
+    mic->isOpened_ = false;
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->TaskCloseDMic(ARGS));
 
-    cJSON *jParamMic = cJSON_CreateObject();
-    cJSON_AddStringToObject(jParamMic, KEY_DH_ID, DH_ID_MIC.c_str());
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskCloseDMic(std::string(cJSON_PrintUnformatted(jParamMic))));
-    cJSON_Delete(jParamMic);
+    json jParam_mic = { { KEY_DH_ID, DH_ID_MIC } };
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskCloseDMic(jParam_mic.dump()));
 }
 
 /**
@@ -877,13 +792,13 @@ HWTEST_F(DAudioSourceDevTest, TaskCloseDMic_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, TaskCloseDMic_002, TestSize.Level1)
 {
-    sourceDev_->mic_ = std::make_shared<DMicDev>(DEV_ID, sourceDev_);
-    sourceDev_->mic_->micTrans_ = std::make_shared<AudioDecodeTransport>(DEV_ID);
+    auto mic = std::make_shared<DMicDev>(DEV_ID, sourceDev_);
+    int32_t dhId = DEFAULT_CAPTURE_ID;
+    sourceDev_->deviceMap_[dhId] = mic;
+    mic->micTrans_ = std::make_shared<AudioDecodeTransport>(DEV_ID);
 
-    cJSON *jParamMic = cJSON_CreateObject();
-    cJSON_AddStringToObject(jParamMic, KEY_DH_ID, DH_ID_MIC.c_str());
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskCloseDMic(std::string(cJSON_PrintUnformatted(jParamMic))));
-    cJSON_Delete(jParamMic);
+    json jParam_mic = { { KEY_DH_ID, DH_ID_MIC } };
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskCloseDMic(jParam_mic.dump()));
 }
 
 /**
@@ -904,19 +819,17 @@ HWTEST_F(DAudioSourceDevTest, TaskOpenCtrlChannel_001, TestSize.Level1)
 
     EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskOpenCtrlChannel(ARGS));
 
-    cJSON *jParam = cJSON_CreateObject();
-    cJSON_AddStringToObject(jParam, KEY_DH_ID, DH_ID_SPK.c_str());
+    json jParam = { { KEY_DH_ID, DH_ID_SPK } };
     sourceDev_->isRpcOpen_.store(false);
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskOpenCtrlChannel(std::string(cJSON_PrintUnformatted(jParam))));
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskOpenCtrlChannel(jParam.dump()));
 
     sourceDev_->isRpcOpen_.store(true);
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskOpenCtrlChannel(std::string(cJSON_PrintUnformatted(jParam))));
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskOpenCtrlChannel(jParam.dump()));
 
     sourceDev_->rpcResult_ = true;
     sourceDev_->rpcNotify_ = sourceDev_->EVENT_NOTIFY_OPEN_MIC;
-    cJSON_AddStringToObject(jParam, KEY_DH_ID, DH_ID_SPK.c_str());
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskOpenCtrlChannel(std::string(cJSON_PrintUnformatted(jParam))));
-    cJSON_Delete(jParam);
+    jParam = { { KEY_DH_ID, DH_ID_SPK } };
+    EXPECT_NE(DH_SUCCESS, sourceDev_->TaskOpenCtrlChannel(jParam.dump()));
 }
 
 /**
@@ -967,10 +880,8 @@ HWTEST_F(DAudioSourceDevTest, TaskSetVolume_002, TestSize.Level1)
     sourceDev_->audioCtrlMgr_ = std::make_shared<DAudioSourceDevCtrlMgr>(DEV_ID, sourceDev_);
     EXPECT_NE(DH_SUCCESS, sourceDev_->TaskSetVolume(ARGS));
 
-    cJSON *jParam = cJSON_CreateObject();
-    cJSON_AddStringToObject(jParam, STREAM_MUTE_STATUS.c_str(), std::to_string(1).c_str());
-    EXPECT_NE(DH_SUCCESS, sourceDev_->TaskSetVolume(std::string(cJSON_PrintUnformatted(jParam))));
-    cJSON_Delete(jParam);
+    json jParam = { { STREAM_MUTE_STATUS, 1 } };
+    EXPECT_NE(DH_SUCCESS, sourceDev_->TaskSetVolume(jParam.dump()));
 
     sourceDev_->OnTaskResult(ERR_DH_AUDIO_NULLPTR, "", FUNC_NAME);
 }
@@ -1063,13 +974,15 @@ HWTEST_F(DAudioSourceDevTest, TaskMicMmapStart_001, TestSize.Level1)
 {
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->TaskMicMmapStart(ARGS));
 
-    sourceDev_->mic_ = std::make_shared<DMicDev>(DEV_ID, nullptr);
+    auto mic = std::make_shared<DMicDev>(DEV_ID, nullptr);
+    int32_t dhId = DEFAULT_CAPTURE_ID;
+    sourceDev_->deviceMap_[dhId] = mic;
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->TaskMicMmapStart(ARGS));
     std::shared_ptr<AudioData> data = std::make_shared<AudioData>(AUDIO_DATA_CAP);
     for (size_t i = 0; i < TASK_QUEUE_LEN; i++) {
-        sourceDev_->mic_->dataQueue_.push(data);
+        mic->dataQueue_.push(data);
     }
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->mic_->MmapStop());
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->deviceMap_[dhId]->MmapStop());
 }
 
 /**
@@ -1081,8 +994,10 @@ HWTEST_F(DAudioSourceDevTest, TaskMicMmapStart_001, TestSize.Level1)
 HWTEST_F(DAudioSourceDevTest, TaskMicMmapStop_001, TestSize.Level1)
 {
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->TaskMicMmapStop(ARGS));
+    auto mic = std::make_shared<DMicDev>(DEV_ID, nullptr);
+    int32_t dhId = DEFAULT_CAPTURE_ID;
+    sourceDev_->deviceMap_[dhId] = mic;
 
-    sourceDev_->mic_ = std::make_shared<DMicDev>(DEV_ID, nullptr);
     EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskMicMmapStop(ARGS));
 }
 
@@ -1097,10 +1012,11 @@ HWTEST_F(DAudioSourceDevTest, NotifyHDF_001, TestSize.Level1)
 {
     AudioEventType type = NOTIFY_CLOSE_MIC_RESULT;
     std::string result = "result";
-    EXPECT_NE(DH_SUCCESS, sourceDev_->NotifyHDF(type, result));
+    int32_t dhId = 1;
+    EXPECT_NE(DH_SUCCESS, sourceDev_->NotifyHDF(type, result, dhId));
 
     sourceDev_->mic_ = std::make_shared<DMicDev>(DEV_ID, sourceDev_);
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->NotifyHDF(type, result));
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->NotifyHDF(type, result, dhId));
 }
 
 /**
@@ -1113,10 +1029,11 @@ HWTEST_F(DAudioSourceDevTest, NotifyHDF_002, TestSize.Level1)
 {
     AudioEventType type = AUDIO_FOCUS_CHANGE;
     std::string result = "result";
-    EXPECT_NE(DH_SUCCESS, sourceDev_->NotifyHDF(type, result));
+    int32_t dhId = 1;
+    EXPECT_NE(DH_SUCCESS, sourceDev_->NotifyHDF(type, result, dhId));
 
     sourceDev_->speaker_ = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->NotifyHDF(type, result));
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->NotifyHDF(type, result, dhId));
 }
 
 /**
@@ -1129,7 +1046,8 @@ HWTEST_F(DAudioSourceDevTest, NotifyHDF_003, TestSize.Level1)
 {
     AudioEventType type = EVENT_UNKNOWN;
     std::string result = "result";
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->NotifyHDF(type, result));
+    int32_t dhId = 1;
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->NotifyHDF(type, result, dhId));
 }
 
 /**
@@ -1140,15 +1058,15 @@ HWTEST_F(DAudioSourceDevTest, NotifyHDF_003, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, NotifySinkDev_001, TestSize.Level1)
 {
-    cJSON *jAudioParam = cJSON_CreateObject();
+    json jAudioParam;
     sourceDev_->isRpcOpen_.store(false);
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->NotifySinkDev(CLOSE_MIC, jAudioParam, DH_ID_SPK));
+
     sourceDev_->isRpcOpen_.store(true);
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->NotifySinkDev(CLOSE_MIC, jAudioParam, DH_ID_SPK));
     sourceDev_->mic_ = std::make_shared<DMicDev>(DEV_ID, sourceDev_);
     sourceDev_->speaker_ = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
     EXPECT_EQ(DH_SUCCESS, sourceDev_->NotifySinkDev(CLOSE_MIC, jAudioParam, DH_ID_SPK));
-    cJSON_Delete(jAudioParam);
 }
 
 /**

@@ -92,8 +92,8 @@ public:
     int32_t RegExtraParamObserver(const sptr<IAudioCallback> &audioCallback, int8_t cookie) override;
 
 public:
-    void SetSpeakerCallback(const sptr<IDAudioCallback> &speakerCallback);
-    void SetMicCallback(const sptr<IDAudioCallback> &micCallback);
+    void SetSpeakerCallback(const int32_t dhId, const sptr<IDAudioCallback> &speakerCallback);
+    void SetMicCallback(const int32_t dhId, const sptr<IDAudioCallback> &micCallback);
     AudioAdapterDescriptor GetAdapterDesc();
     std::string GetDeviceCapabilitys(const uint32_t devId);
     int32_t AdapterLoad();
@@ -101,15 +101,19 @@ public:
     int32_t Notify(const uint32_t devId, const DAudioEvent &event);
     int32_t AddAudioDevice(const uint32_t devId, const std::string &caps);
     int32_t RemoveAudioDevice(const uint32_t devId);
-    int32_t OpenRenderDevice(const AudioDeviceDescriptor &desc, const AudioSampleAttributes &attrs);
-    int32_t CloseRenderDevice(const AudioDeviceDescriptor &desc);
-    int32_t OpenCaptureDevice(const AudioDeviceDescriptor &desc, const AudioSampleAttributes &attrs);
-    int32_t CloseCaptureDevice(const AudioDeviceDescriptor &desc);
     uint32_t GetVolumeGroup(const uint32_t devId);
     uint32_t GetInterruptGroup(const uint32_t devId);
     bool IsPortsNoReg();
 
 private:
+    int32_t OpenRenderDevice(const AudioDeviceDescriptor &desc, const AudioSampleAttributes &attrs,
+        const sptr<IDAudioCallback> extSpkCallback, const int32_t dhId);
+    int32_t CloseRenderDevice(const AudioDeviceDescriptor &desc, const sptr<IDAudioCallback> extSpkCallback,
+        const int32_t dhId);
+    int32_t OpenCaptureDevice(const AudioDeviceDescriptor &desc, const AudioSampleAttributes &attrs,
+        const sptr<IDAudioCallback> extMicCallback, const int32_t dhId);
+    int32_t CloseCaptureDevice(const AudioDeviceDescriptor &desc, const sptr<IDAudioCallback> extMicCallback,
+        const int32_t dhId);
     int32_t SetAudioVolume(const std::string& condition, const std::string &param);
     int32_t GetAudioVolume(const std::string& condition, std::string &param);
     int32_t HandleFocusChangeEvent(const DAudioEvent &event);
@@ -119,12 +123,17 @@ private:
     int32_t WaitForSANotify(const AudioDeviceEvent &event);
     int32_t HandleDeviceClosed(const DAudioEvent &event);
     int32_t getEventTypeFromCondition(const std::string& condition);
-    int32_t InsertRenderImpl(const sptr<AudioRenderInterfaceImplBase> &audioRender, uint32_t &renderId);
-    int32_t InsertCapImpl(const sptr<AudioCaptureInterfaceImplBase> &audioCapture, uint32_t &captureId);
+    int32_t InsertRenderImpl(const sptr<AudioRenderInterfaceImplBase> &audioRender, const int32_t dhId,
+        uint32_t &renderId);
+    int32_t InsertCapImpl(const sptr<AudioCaptureInterfaceImplBase> &audioCapture, const int32_t dhId,
+        uint32_t &captureId);
     inline bool IsIdValid(const uint32_t id);
     bool CheckRendersValid();
     bool CheckCapsValid();
     void SetDumpFlag(bool isRender);
+    sptr<IDAudioCallback> MatchStreamCallback(const AudioSampleAttributes &attrs,
+        const AudioDeviceDescriptor &desc, int32_t &dhId);
+    int32_t GetVolFromEvent(const std::string &content, const std::string &key, int32_t &vol);
 
 private:
     static constexpr uint8_t WAIT_SECONDS = 20;
@@ -132,14 +141,14 @@ private:
     AudioAdapterDescriptor adpDescriptor_;
     AudioAdapterStatus status_ = STATUS_OFFLINE;
 
-    sptr<IDAudioCallback> extSpkCallback_ = nullptr;
-    sptr<IDAudioCallback> extMicCallback_ = nullptr;
+    std::mutex extCallbackMtx_;
+    std::map<int32_t, sptr<IDAudioCallback>> extCallbackMap_;
     sptr<IAudioCallback> paramCallback_ = nullptr;
     std::mutex renderDevMtx_;
-    std::vector<sptr<AudioRenderInterfaceImplBase>> renderDevs_;
+    std::vector<std::pair<int32_t, sptr<AudioRenderInterfaceImplBase>>> renderDevs_;
     AudioParameter renderParam_;
     std::mutex capDevMtx_;
-    std::vector<sptr<AudioCaptureInterfaceImplBase>> captureDevs_;
+    std::vector<std::pair<int32_t, sptr<AudioCaptureInterfaceImplBase>>> captureDevs_;
     AudioParameter captureParam_;
 
     std::mutex devMapMtx_;

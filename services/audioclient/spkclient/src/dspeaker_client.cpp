@@ -15,6 +15,8 @@
 
 #include "dspeaker_client.h"
 
+#include "cJSON.h"
+
 #include "daudio_constants.h"
 #include "daudio_hisysevent.h"
 #include "daudio_sink_hidumper.h"
@@ -398,20 +400,33 @@ int32_t DSpeakerClient::OnStateChange(const AudioEventType type)
 string DSpeakerClient::GetVolumeLevel()
 {
     DHLOGD("Get the volume level.");
-    std::stringstream ss;
     AudioStandard::AudioStreamType streamType = AudioStandard::AudioStreamType::STREAM_DEFAULT;
     auto volumeType = static_cast<AudioStandard::AudioVolumeType>(1);
     int32_t volumeLevel = AudioStandard::AudioSystemManager::GetInstance()->GetVolume(volumeType);
     int32_t maxVolumeLevel = AudioStandard::AudioSystemManager::GetInstance()->GetMaxVolume(volumeType);
     int32_t minVolumeLevel = AudioStandard::AudioSystemManager::GetInstance()->GetMinVolume(volumeType);
     bool isUpdateUi = false;
-    ss << "FIRST_VOLUME_CHANAGE;"
-       << "AUDIO_STREAM_TYPE=" << streamType << ";"
-       << "VOLUME_LEVEL=" << volumeLevel << ";"
-       << "IS_UPDATEUI=" << isUpdateUi << ";"
-       << "MAX_VOLUME_LEVEL=" << maxVolumeLevel << ";"
-       << "MIN_VOLUME_LEVEL=" << minVolumeLevel << ";";
-    std::string str = ss.str();
+    cJSON *jParam = cJSON_CreateObject();
+    if (jParam == nullptr) {
+        DHLOGE("Failed to create cJSON object.");
+        return "";
+    }
+    cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId_).c_str());
+    cJSON_AddStringToObject(jParam, "ChangeType", "FIRST_VOLUME_CHANAGE");
+    cJSON_AddStringToObject(jParam, "AUDIO_STREAM_TYPE", std::to_string(streamType).c_str());
+    cJSON_AddStringToObject(jParam, "VOLUME_LEVEL", std::to_string(volumeLevel).c_str());
+    cJSON_AddStringToObject(jParam, "IS_UPDATEUI", std::to_string(isUpdateUi).c_str());
+    cJSON_AddStringToObject(jParam, "MAX_VOLUME_LEVEL", std::to_string(maxVolumeLevel).c_str());
+    cJSON_AddStringToObject(jParam, "MIN_VOLUME_LEVEL", std::to_string(minVolumeLevel).c_str());
+    char *jsonData = cJSON_PrintUnformatted(jParam);
+    if (jsonData == nullptr) {
+        DHLOGE("Failed to create JSON data.");
+        cJSON_Delete(jParam);
+        return "";
+    }
+    std::string str(jsonData);
+    cJSON_Delete(jParam);
+    cJSON_free(jsonData);
     DHLOGD("Get the volume level result, event: %s.", str.c_str());
     return str;
 }
@@ -424,13 +439,26 @@ void DSpeakerClient::OnVolumeKeyEvent(AudioStandard::VolumeEvent volumeEvent)
         DHLOGE("Event callback is nullptr.");
         return;
     }
-    std::stringstream ss;
-    ss << "VOLUME_CHANAGE;"
-       << "AUDIO_STREAM_TYPE=" << volumeEvent.volumeType << ";"
-       << "VOLUME_LEVEL=" << volumeEvent.volume << ";"
-       << "IS_UPDATEUI=" << volumeEvent.updateUi << ";"
-       << "VOLUME_GROUP_ID=" << volumeEvent.volumeGroupId << ";";
-    std::string str = ss.str();
+    cJSON *jParam = cJSON_CreateObject();
+    if (jParam == nullptr) {
+        DHLOGE("Failed to create cJSON object.");
+        return;
+    }
+    cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId_).c_str());
+    cJSON_AddStringToObject(jParam, "ChangeType", "VOLUME_CHANAGE");
+    cJSON_AddStringToObject(jParam, "AUDIO_STREAM_TYPE", std::to_string(volumeEvent.volumeType).c_str());
+    cJSON_AddStringToObject(jParam, "VOLUME_LEVEL", std::to_string(volumeEvent.volume).c_str());
+    cJSON_AddStringToObject(jParam, "IS_UPDATEUI", std::to_string(volumeEvent.updateUi).c_str());
+    cJSON_AddStringToObject(jParam, "VOLUME_GROUP_ID", std::to_string(volumeEvent.volumeGroupId).c_str());
+    char *jsonData = cJSON_PrintUnformatted(jParam);
+    if (jsonData == nullptr) {
+        DHLOGE("Failed to create JSON data.");
+        cJSON_Delete(jParam);
+        return;
+    }
+    std::string str(jsonData);
+    cJSON_Delete(jParam);
+    cJSON_free(jsonData);
     DHLOGD("Volume change notification result, event: %s.", str.c_str());
 
     AudioEvent audioEvent(VOLUME_CHANGE, str);
@@ -445,12 +473,25 @@ void DSpeakerClient::OnInterrupt(const AudioStandard::InterruptEvent &interruptE
         DHLOGE("Event callback is nullptr.");
         return;
     }
-    std::stringstream ss;
-    ss << "INTERRUPT_EVENT;"
-       << "EVENT_TYPE=" << interruptEvent.eventType << ";"
-       << "FORCE_TYPE=" << interruptEvent.forceType << ";"
-       << "HINT_TYPE=" << interruptEvent.hintType << ";";
-    std::string str = ss.str();
+    cJSON *jParam = cJSON_CreateObject();
+    if (jParam == nullptr) {
+        DHLOGE("Failed to create cJSON object.");
+        return;
+    }
+    cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId_).c_str());
+    cJSON_AddStringToObject(jParam, "ChangeType", "INTERRUPT_EVENT");
+    cJSON_AddStringToObject(jParam, "EVENT_TYPE", std::to_string(interruptEvent.eventType).c_str());
+    cJSON_AddStringToObject(jParam, "FORCE_TYPE", std::to_string(interruptEvent.forceType).c_str());
+    cJSON_AddStringToObject(jParam, "HINT_TYPE", std::to_string(interruptEvent.hintType).c_str());
+    char *jsonData = cJSON_PrintUnformatted(jParam);
+    if (jsonData == nullptr) {
+        DHLOGE("Failed to create JSON data.");
+        cJSON_Delete(jParam);
+        return;
+    }
+    std::string str(jsonData);
+    cJSON_Delete(jParam);
+    cJSON_free(jsonData);
     DHLOGD("Audio focus oninterrupt notification result, event: %s.", str.c_str());
 
     AudioEvent audioEvent(AUDIO_FOCUS_CHANGE, str);
@@ -466,10 +507,23 @@ void DSpeakerClient::OnStateChange(const AudioStandard::RendererState state,
         DHLOGE("Event callback is nullptr.");
         return;
     }
-    std::stringstream ss;
-    ss << "RENDER_STATE_CHANGE_EVENT;"
-       << "STATE=" << state << ";";
-    std::string str = ss.str();
+    cJSON *jParam = cJSON_CreateObject();
+    if (jParam == nullptr) {
+        DHLOGE("Failed to create cJSON object.");
+        return;
+    }
+    cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId_).c_str());
+    cJSON_AddStringToObject(jParam, "ChangeType", "RENDER_STATE_CHANGE_EVENT");
+    cJSON_AddStringToObject(jParam, "STATE", std::to_string(state).c_str());
+    char *jsonData = cJSON_PrintUnformatted(jParam);
+    if (jsonData == nullptr) {
+        DHLOGE("Failed to create JSON data.");
+        cJSON_Delete(jParam);
+        return;
+    }
+    std::string str(jsonData);
+    cJSON_Delete(jParam);
+    cJSON_free(jsonData);
     DHLOGD("Audio render state changes notification result, event: %s.", str.c_str());
 
     AudioEvent audioEvent(AUDIO_RENDER_STATE_CHANGE, str);

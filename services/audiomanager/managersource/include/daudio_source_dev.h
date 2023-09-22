@@ -16,13 +16,15 @@
 #ifndef OHOS_DAUDIO_SOURCE_DEV_H
 #define OHOS_DAUDIO_SOURCE_DEV_H
 
+#include <map>
 #include <mutex>
 #include <initializer_list>
-#include "cJSON.h"
+#include "nlohmann/json.hpp"
 
 #include "event_handler.h"
 
 #include "audio_event.h"
+#include "daudio_io_dev.h"
 #include "daudio_source_dev_ctrl_manager.h"
 #include "daudio_source_mgr_callback.h"
 #include "dmic_dev.h"
@@ -32,6 +34,8 @@
 #include "iaudio_datatrans_callback.h"
 #include "idaudio_ipc_callback.h"
 #include "idaudio_hdi_callback.h"
+
+using json = nlohmann::json;
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -50,7 +54,6 @@ public:
 private:
     int32_t EnableDSpeaker(const int32_t dhId, const std::string &attrs);
     int32_t EnableDMic(const int32_t dhId, const std::string &attrs);
-    int32_t DisableDAudioInner(const std::string &dhId);
     int32_t DisableDSpeaker(const int32_t dhId);
     int32_t DisableDMic(const int32_t dhId);
 
@@ -59,7 +62,7 @@ private:
     int32_t TaskOpenCtrlChannel(const std::string &args);
     int32_t TaskCloseCtrlChannel(const std::string &args);
     int32_t TaskOpenDSpeaker(const std::string &args);
-    int32_t OpenDSpeakerInner();
+    int32_t OpenDSpeakerInner(std::shared_ptr<DAudioIoDev> &speaker, const int32_t dhId);
     int32_t TaskCloseDSpeaker(const std::string &args);
     int32_t TaskOpenDMic(const std::string &args);
     int32_t TaskCloseDMic(const std::string &args);
@@ -72,10 +75,6 @@ private:
     int32_t TaskSpkMmapStop(const std::string &args);
     int32_t TaskMicMmapStart(const std::string &args);
     int32_t TaskMicMmapStop(const std::string &args);
-
-    int32_t NotifySinkDevOpenMic(cJSON *jParam);
-    int32_t OpenDMicInner();
-    void CleanupJson(cJSON *jParamCopy, char *content);
 
     void OnDisableTaskResult(int32_t resultCode, const std::string &result, const std::string &funcName);
     void OnEnableTaskResult(int32_t resultCode, const std::string &result, const std::string &funcName);
@@ -104,17 +103,19 @@ private:
     int32_t HandleMicMmapStart(const AudioEvent &event);
     int32_t HandleMicMmapStop(const AudioEvent &event);
 
-    int32_t NotifySinkDev(const AudioEventType type, const cJSON *param, const std::string dhId);
-    int32_t NotifyHDF(const AudioEventType type, const std::string result);
+    int32_t NotifySinkDev(const AudioEventType type, const json Param, const std::string dhId);
+    int32_t NotifyHDF(const AudioEventType type, const std::string result, const int32_t dhId);
     int32_t OpenCtrlTrans(const AudioEvent &event);
     int32_t CloseCtrlTrans(const AudioEvent &event, bool isSpk);
     AudioEventType getEventTypeFromArgs(const std::string &args);
-    void to_json(cJSON **j, const AudioParam &param);
+    void to_json(json &j, const AudioParam &param);
     int32_t SendAudioEventToRemote(const AudioEvent &event);
     int32_t CloseSpkOld(const std::string &args);
     int32_t CloseSpkNew(const std::string &args);
     int32_t CloseMicOld(const std::string &args);
     int32_t CloseMicNew(const std::string &args);
+    std::shared_ptr<DAudioIoDev> FindIoDevImpl(std::string args);
+    int32_t ParseDhidFromEvent(std::string args);
 
 private:
     static constexpr uint8_t RPC_WAIT_SECONDS = 10;
@@ -128,8 +129,10 @@ private:
 
     std::string devId_;
     std::shared_ptr<DAudioSourceMgrCallback> mgrCallback_;
-    std::shared_ptr<DSpeakerDev> speaker_;
-    std::shared_ptr<DMicDev> mic_;
+    std::mutex ioDevMtx_;
+    std::map<int32_t, std::shared_ptr<DAudioIoDev>> deviceMap_;
+    std::shared_ptr<DAudioIoDev> speaker_;
+    std::shared_ptr<DAudioIoDev> mic_;
     std::shared_ptr<DAudioSourceDevCtrlMgr> audioCtrlMgr_;
 
     std::mutex rpcWaitMutex_;

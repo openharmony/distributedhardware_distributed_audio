@@ -104,10 +104,10 @@ int32_t DAudioHdiHandler::RegisterAudioDevice(const std::string &devId, const in
     std::string searchKey;
     switch (GetDevTypeByDHId(dhId)) {
         case AUDIO_DEVICE_TYPE_SPEAKER:
-            searchKey = devId + "Speaker";
+            searchKey = devId + "Speaker" + std::to_string(dhId);
             break;
         case AUDIO_DEVICE_TYPE_MIC:
-            searchKey = devId + "Mic";
+            searchKey = devId + "Mic" + std::to_string(dhId);
             break;
         case AUDIO_DEVICE_TYPE_UNKNOWN:
         default:

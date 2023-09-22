@@ -18,8 +18,7 @@ import("../../../../../distributedaudio.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("SourceServiceUnregisterDistributedHardwareFuzzTest") {
-  module_out_path =
-      "distributed_audio/sourceserviceunregisterdistributedhardware_fuzzer"
+  module_out_path = "${distributedaudio_fuzz_path}/sourceserviceunregisterdistributedhardware_fuzzer"
   fuzz_config_file = "${services_path}/audiomanager/test/fuzztest/sourceserviceunregisterdistributedhardware_fuzzer"
 
   cflags = [
@@ -49,13 +48,10 @@ ohos_fuzztest("SourceServiceUnregisterDistributedHardwareFuzzTest") {
     "${innerkits_path}/native_cpp/audio_source/include",
     "${distributedaudio_path}/audiohandler/include",
     "${services_path}/audiomanager/servicesource/include",
-    "//third_party/cJSON",
   ]
 
-  deps = [
-    "${services_path}/audiomanager/servicesource:distributed_audio_source",
-    "//third_party/cJSON:cjson",
-  ]
+  deps =
+      [ "${services_path}/audiomanager/servicesource:distributed_audio_source" ]
 
   defines = [
     "HI_LOG_ENABLE",

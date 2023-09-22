@@ -17,6 +17,7 @@ import("../../../distributedaudio.gni")
 
 ohos_shared_library("distributed_audio_sink") {
   include_dirs = [
+    "//third_party/json/include",
     "//third_party/cJSON",
     "${fwk_common_path}/utils/include",
   ]

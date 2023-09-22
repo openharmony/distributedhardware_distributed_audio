@@ -69,7 +69,8 @@ HWTEST_F(DAudioSinkDevTest, TaskPlayStatusChange_001, TestSize.Level1)
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sinkDev_->TaskPlayStatusChange(""));
 
     std::string devId = "devid";
-    sinkDev_->speakerClient_ = std::make_shared<DSpeakerClient>(devId, sinkDev_);
+    int32_t dhId = 1;
+    sinkDev_->speakerClient_ = std::make_shared<DSpeakerClient>(devId, dhId, sinkDev_);
     EXPECT_EQ(DH_SUCCESS, sinkDev_->TaskPlayStatusChange(AUDIO_EVENT_PAUSE));
 }
 
@@ -174,7 +175,8 @@ HWTEST_F(DAudioSinkDevTest, TaskCloseDSpeaker_002, TestSize.Level1)
 {
     std::string args;
     std::string devId = "devId";
-    sinkDev_->speakerClient_ = std::make_shared<DSpeakerClient>(devId, sinkDev_);
+    int32_t dhId = 1;
+    sinkDev_->speakerClient_ = std::make_shared<DSpeakerClient>(devId, dhId, sinkDev_);
     EXPECT_EQ(DH_SUCCESS, sinkDev_->TaskCloseDSpeaker(args));
 }
 
@@ -187,10 +189,12 @@ HWTEST_F(DAudioSinkDevTest, TaskCloseDSpeaker_002, TestSize.Level1)
 HWTEST_F(DAudioSinkDevTest, TaskStartRender_001, TestSize.Level1)
 {
     std::string devId = "devId";
+    int32_t dhId = 1;
+    std::string args = "{\"dhId\":\"1\"}";
     sinkDev_->speakerClient_ = nullptr;
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sinkDev_->TaskStartRender());
-    sinkDev_->speakerClient_ = std::make_shared<DSpeakerClient>(devId, sinkDev_);
-    EXPECT_NE(DH_SUCCESS, sinkDev_->TaskStartRender());
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sinkDev_->TaskStartRender(args));
+    sinkDev_->speakerClient_ = std::make_shared<DSpeakerClient>(devId, dhId, sinkDev_);
+    EXPECT_NE(DH_SUCCESS, sinkDev_->TaskStartRender(args));
 }
 
 /**
@@ -239,7 +243,8 @@ HWTEST_F(DAudioSinkDevTest, TaskCloseDMic_002, TestSize.Level1)
 {
     std::string args;
     std::string devId;
-    sinkDev_->micClient_ = std::make_shared<DMicClient>(devId, sinkDev_);
+    int32_t dhId = 1 << 27 | 1 << 0;
+    sinkDev_->micClient_ = std::make_shared<DMicClient>(devId, dhId, sinkDev_);
     EXPECT_EQ(DH_SUCCESS, sinkDev_->TaskCloseDMic(args));
 }
 
@@ -265,7 +270,8 @@ HWTEST_F(DAudioSinkDevTest, TaskSetParameter_002, TestSize.Level1)
 {
     std::string args;
     std::string devId;
-    sinkDev_->speakerClient_ = std::make_shared<DSpeakerClient>(devId, sinkDev_);
+    int32_t dhId = 1;
+    sinkDev_->speakerClient_ = std::make_shared<DSpeakerClient>(devId, dhId, sinkDev_);
     EXPECT_NE(DH_SUCCESS, sinkDev_->TaskSetParameter(args));
 }
 
@@ -291,7 +297,8 @@ HWTEST_F(DAudioSinkDevTest, TaskSetVolume_002, TestSize.Level1)
 {
     std::string args;
     std::string devId;
-    sinkDev_->speakerClient_ = std::make_shared<DSpeakerClient>(devId, sinkDev_);
+    int32_t dhId = 1;
+    sinkDev_->speakerClient_ = std::make_shared<DSpeakerClient>(devId, dhId, sinkDev_);
     EXPECT_NE(DH_SUCCESS, sinkDev_->TaskSetVolume(args));
 }
 
@@ -317,7 +324,8 @@ HWTEST_F(DAudioSinkDevTest, TaskSetMute_002, TestSize.Level1)
 {
     std::string args;
     std::string devId;
-    sinkDev_->speakerClient_ = std::make_shared<DSpeakerClient>(devId, sinkDev_);
+    int32_t dhId = 1;
+    sinkDev_->speakerClient_ = std::make_shared<DSpeakerClient>(devId, dhId, sinkDev_);
     EXPECT_NE(DH_SUCCESS, sinkDev_->TaskSetMute(args));
 }
 
@@ -399,12 +407,11 @@ HWTEST_F(DAudioSinkDevTest, TaskRenderStateChange_002, TestSize.Level1)
 {
     std::string args;
     std::string devId = "devId";
-    cJSON *j = cJSON_CreateObject();
+    json j;
     AudioParam audioParam;
     sinkDev_->audioCtrlMgr_ = std::make_shared<DAudioSinkDevCtrlMgr>(devId, sinkDev_);
     EXPECT_NE(DH_SUCCESS, sinkDev_->TaskRenderStateChange(args));
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, sinkDev_->from_json(j, audioParam));
-    cJSON_Delete(j);
 }
 
 /**
@@ -416,10 +423,11 @@ HWTEST_F(DAudioSinkDevTest, TaskRenderStateChange_002, TestSize.Level1)
 HWTEST_F(DAudioSinkDevTest, SendAudioEventToRemote_002, TestSize.Level1)
 {
     std::string devId = "devId";
+    int32_t dhId = 1;
     AudioEvent event;
     sinkDev_->speakerClient_ = nullptr;
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sinkDev_->SendAudioEventToRemote(event));
-    sinkDev_->speakerClient_ = std::make_shared<DSpeakerClient>(devId, sinkDev_);
+    sinkDev_->speakerClient_ = std::make_shared<DSpeakerClient>(devId, dhId, sinkDev_);
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sinkDev_->SendAudioEventToRemote(event));
 }
 } // DistributedHardware

@@ -17,7 +17,7 @@ import("../distributedaudio.gni")
 
 ohos_shared_library("distributed_audio_handler") {
   include_dirs = [
-    "//third_party/cJSON",
+    "//third_party/json/include",
     "${fwk_common_path}/utils/include",
     "${fwk_utils_path}/include",
     "${mediastandardfwk_path}/audiomanager/include",
@@ -33,10 +33,7 @@ ohos_shared_library("distributed_audio_handler") {
 
   sources = [ "src/daudio_handler.cpp" ]
 
-  deps = [
-    "${services_path}/common:distributed_audio_utils",
-    "//third_party/cJSON:cjson",
-  ]
+  deps = [ "${services_path}/common:distributed_audio_utils" ]
 
   external_deps = [
     "audio_framework:audio_capturer",

@@ -18,7 +18,7 @@ import("../../../../../../../../distributedaudio.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("UnloadAdapterFuzzTest") {
-  module_out_path = "distributed_audio/unloadadapter_fuzzer"
+  module_out_path = "${distributedaudio_fuzz_path}/unloadadapter_fuzzer"
   fuzz_config_file = "${hdf_ser_aud_path}/test/fuzztest/unloadadapter_fuzzer"
 
   cflags = [

@@ -135,33 +135,15 @@ int32_t AudioCtrlChannel::SendData(const std::shared_ptr<AudioData> &data)
 int32_t AudioCtrlChannel::SendEvent(const AudioEvent &audioEvent)
 {
     DHLOGD("Send event, sessionId: %d.", sessionId_);
-
-    cJSON *jAudioEvent = cJSON_CreateObject();
-    if (jAudioEvent == nullptr) {
-        DHLOGE("Failed to create cJSON object.");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
-    }
-
-    cJSON_AddNumberToObject(jAudioEvent, KEY_TYPE, static_cast<int>(audioEvent.type));
-    cJSON_AddStringToObject(jAudioEvent, KEY_EVENT_CONTENT, audioEvent.content.c_str());
-
-    char *jsonData = cJSON_PrintUnformatted(jAudioEvent);
-    if (jsonData == nullptr) {
-        cJSON_Delete(jAudioEvent);
-        DHLOGE("Failed to create JSON message.");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
-    }
-    std::string message(jsonData);
-
+    json jAudioEvent;
+    jAudioEvent[KEY_TYPE] = audioEvent.type;
+    jAudioEvent[KEY_EVENT_CONTENT] = audioEvent.content;
+    std::string message = jAudioEvent.dump();
     int ret = SendMsg(message);
     if (ret != DH_SUCCESS) {
         DHLOGE("Send audio event failed ret: %d.", ret);
-        cJSON_Delete(jAudioEvent);
-        cJSON_free(jsonData);
         return ret;
     }
-    cJSON_Delete(jAudioEvent);
-    cJSON_free(jsonData);
 
     return DH_SUCCESS;
 }
@@ -247,21 +229,13 @@ void AudioCtrlChannel::OnBytesReceived(int32_t sessionId, const void *data, uint
 
     std::string message(buf, buf + dataLen);
     DHLOGI("On bytes received message: %s.", message.c_str());
-    cJSON *jParam = cJSON_Parse(message.c_str());
-    if (jParam == nullptr) {
-        DHLOGE("Failed to parse JSON message.");
-        cJSON_Delete(jParam);
-        free(buf);
-        return;
-    }
     AudioEvent audioEvent;
+    json jParam = json::parse(message, nullptr, false);
     if (from_audioEventJson(jParam, audioEvent) != DH_SUCCESS) {
-        DHLOGE("Get audioEvent from JSON failed.");
-        cJSON_Delete(jParam);
+        DHLOGE("Get audioEvent from json failed.");
         free(buf);
         return;
     }
-    cJSON_Delete(jParam);
     free(buf);
     DHLOGI("On bytes received end");
 
@@ -279,28 +253,15 @@ void AudioCtrlChannel::OnStreamReceived(int32_t sessionId, const StreamData *dat
     DHLOGI("Ctrl channel not support yet.");
 }
 
-int from_audioEventJson(const cJSON *jsonObj, AudioEvent &audioEvent)
+int from_audioEventJson(const json &j, AudioEvent &audioEvent)
 {
-    if (!JsonParamCheck(jsonObj, {KEY_TYPE, KEY_EVENT_CONTENT})) {
-        DHLOGE("JSON data is illegal.");
+    if (!JsonParamCheck(j, {KEY_TYPE, KEY_EVENT_CONTENT})) {
+        DHLOGE("Json data is illegal.");
         return ERR_DH_AUDIO_TRANS_NULL_VALUE;
     }
 
-    cJSON *typeValue = cJSON_GetObjectItemCaseSensitive(jsonObj, KEY_TYPE);
-    cJSON *contentValue = cJSON_GetObjectItemCaseSensitive(jsonObj, KEY_EVENT_CONTENT);
-    if (typeValue == nullptr || !cJSON_IsNumber(typeValue) ||
-        contentValue == nullptr || !cJSON_IsString(contentValue)) {
-        DHLOGE("Failed to retrieve values from JSON.");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
-    }
-    int32_t typeInt = typeValue->valueint;
-    if (typeInt < EVENT_UNKNOWN || typeInt >= AUDIO_STOP) {
-        DHLOGE("Invalid AudioEventType value.");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
-    }
-    audioEvent.type = static_cast<AudioEventType>(typeInt);
-    audioEvent.content = contentValue->valuestring;
-
+    j.at(KEY_TYPE).get_to(audioEvent.type);
+    j.at(KEY_EVENT_CONTENT).get_to(audioEvent.content);
     return DH_SUCCESS;
 }
 } // namespace DistributedHardware

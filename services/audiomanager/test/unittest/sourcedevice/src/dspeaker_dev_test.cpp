@@ -68,11 +68,11 @@ HWTEST_F(DSpeakerDevTest, InitSenderEngine_001, TestSize.Level1)
  */
 HWTEST_F(DSpeakerDevTest, EnableDSpeaker_001, TestSize.Level1)
 {
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, spk_->EnableDSpeaker(DH_ID, CAP));
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, spk_->EnableDevice(DH_ID, CAP));
     EXPECT_EQ(ERR_DH_AUDIO_HDI_PROXY_NOT_INIT, spk_->EnableDevice(DH_ID, CAP));
 
     spk_->enabledPorts_.insert(DH_ID_SPK);
-    EXPECT_EQ(ERR_DH_AUDIO_HDI_PROXY_NOT_INIT, spk_->EnableDSpeaker(DH_ID_SPK, CAP));
+    EXPECT_EQ(ERR_DH_AUDIO_HDI_PROXY_NOT_INIT, spk_->EnableDevice(DH_ID_SPK, CAP));
 }
 
 /**
@@ -86,10 +86,10 @@ HWTEST_F(DSpeakerDevTest, DisableDSpeaker_001, TestSize.Level1)
     spk_->enabledPorts_.insert(DH_ID);
     EXPECT_EQ(ERR_DH_AUDIO_HDI_PROXY_NOT_INIT, spk_->DisableDevice(DH_ID));
 
-    EXPECT_EQ(ERR_DH_AUDIO_HDI_PROXY_NOT_INIT, spk_->DisableDSpeaker(DH_ID));
+    EXPECT_EQ(ERR_DH_AUDIO_HDI_PROXY_NOT_INIT, spk_->DisableDevice(DH_ID));
 
     spk_->curPort_ = DH_ID_SPK;
-    EXPECT_EQ(ERR_DH_AUDIO_HDI_PROXY_NOT_INIT, spk_->DisableDSpeaker(DH_ID_SPK));
+    EXPECT_EQ(ERR_DH_AUDIO_HDI_PROXY_NOT_INIT, spk_->DisableDevice(DH_ID_SPK));
     EXPECT_FALSE(spk_->IsOpened());
 }
 
@@ -364,11 +364,12 @@ HWTEST_F(DSpeakerDevTest, WriteStreamData_002, TestSize.Level1)
 HWTEST_F(DSpeakerDevTest, NotifyHdfAudioEvent_001, TestSize.Level1)
 {
     AudioEvent event = AudioEvent(OPEN_SPEAKER, "OPEN_SPEAKER");
-    EXPECT_EQ(DH_SUCCESS, spk_->NotifyHdfAudioEvent(event));
+    int32_t dhId = 0;
+    EXPECT_EQ(DH_SUCCESS, spk_->NotifyHdfAudioEvent(event, dhId));
 
     event.type = SPEAKER_OPENED;
-    spk_->curPort_ = DH_ID_SPK;
-    EXPECT_EQ(DH_SUCCESS, spk_->NotifyHdfAudioEvent(event));
+    dhId = DH_ID_SPK;
+    EXPECT_EQ(DH_SUCCESS, spk_->NotifyHdfAudioEvent(event, dhId));
 }
 
 /**

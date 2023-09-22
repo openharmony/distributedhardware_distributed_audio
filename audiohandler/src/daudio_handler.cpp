@@ -19,6 +19,7 @@
 
 #include "audio_system_manager.h"
 #include "avcodec_list.h"
+#include "nlohmann/json.hpp"
 #include "string_ex.h"
 
 #include "histreamer_query_tool.h"
@@ -29,6 +30,8 @@
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DAudioHandler"
+
+using json = nlohmann::json;
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -79,59 +82,43 @@ std::vector<DHItem> DAudioHandler::Query()
     for (auto dev : audioDevices) {
         auto dhId = audioSrv->GetPinValueFromType(dev->deviceType_, dev->deviceRole_);
 
-        cJSON* infoJson = cJSON_CreateObject();
-        if (infoJson == nullptr) {
-            DHLOGE("Failed to create cJSON object.");
-            return dhItemVec;
+        json infoJson;
+        int32_t deviceType = GetDevTypeByDHId(dhId);
+        if (deviceType == AUDIO_DEVICE_TYPE_MIC) {
+            infoJson["SampleRates"] = micInfos_.sampleRates;
+            infoJson["ChannelMasks"] = micInfos_.channels;
+            infoJson["Formats"] = micInfos_.formats;
+        } else if (deviceType == AUDIO_DEVICE_TYPE_SPEAKER) {
+            infoJson["SampleRates"] = spkInfos_.sampleRates;
+            infoJson["ChannelMasks"] = spkInfos_.channels;
+            infoJson["Formats"] = spkInfos_.formats;
         }
-
-        AddItemsToObject(infoJson, dhId);
-        cJSON_AddNumberToObject(infoJson, "INTERRUPT_GROUP_ID", dev->interruptGroupId_);
-        cJSON_AddNumberToObject(infoJson, "VOLUME_GROUP_ID", dev->volumeGroupId_);
+        infoJson["INTERRUPT_GROUP_ID"] = dev->interruptGroupId_;
+        infoJson["VOLUME_GROUP_ID"] = dev->volumeGroupId_;
 
         std::string audioEncoders =
             HiStreamerQueryTool::GetInstance().QueryHiStreamerPluginInfo(HISTREAM_PLUGIN_TYPE::AUDIO_ENCODER);
         DHLOGI("DScreen QueryAudioEncoderAbility info: %s", audioEncoders.c_str());
-        cJSON_AddStringToObject(infoJson, KEY_HISTREAMER_AUDIO_ENCODER.c_str(), audioEncoders.c_str());
+        infoJson[KEY_HISTREAMER_AUDIO_ENCODER] = audioEncoders;
 
         std::string audioDecoders =
             HiStreamerQueryTool::GetInstance().QueryHiStreamerPluginInfo(HISTREAM_PLUGIN_TYPE::AUDIO_DECODER);
         DHLOGI("DScreen QueryAudioDecoderAbility info: %s", audioDecoders.c_str());
-        cJSON_AddStringToObject(infoJson, KEY_HISTREAMER_AUDIO_DECODER.c_str(), audioDecoders.c_str());
+        infoJson[KEY_HISTREAMER_AUDIO_DECODER] = audioDecoders;
 
         DHItem dhItem;
         dhItem.dhId = std::to_string(dhId);
-        char *jsonStr = cJSON_Print(infoJson);
-        dhItem.attrs = jsonStr;
+        dhItem.attrs = infoJson.dump();
         dhItemVec.push_back(dhItem);
-        DHLOGD("Query result: dhId: %d, attrs: %s.", dhId, jsonStr);
-
-        cJSON_Delete(infoJson);
-        cJSON_free(jsonStr);
+        DHLOGD("Query result: dhId: %d, attrs: %s.", dhId, infoJson.dump().c_str());
+        if (dhId == DEFAULT_RENDER_ID) {
+            dhItem.dhId = std::to_string(LOW_LATENCY_RENDER_ID);
+            dhItemVec.push_back(dhItem);
+            DHLOGD("Query result: dhId: %d, attrs: %s.", LOW_LATENCY_RENDER_ID, infoJson.dump().c_str());
+        }
     }
     ablityForDumpVec_ = dhItemVec;
     return dhItemVec;
-}
-
-void DAudioHandler::AddItemsToObject(cJSON* infoJson, const int32_t &dhId)
-{
-    DHLOGD("Get dhId and then add other items into json object");
-    int32_t deviceType = GetDevTypeByDHId(dhId);
-    if (deviceType == AUDIO_DEVICE_TYPE_MIC) {
-        cJSON_AddItemToObject(infoJson, "SampleRates",
-                              cJSON_CreateIntArray(micInfos_.sampleRates.data(), micInfos_.sampleRates.size()));
-        cJSON_AddItemToObject(infoJson, "ChannelMasks",
-                              cJSON_CreateIntArray(micInfos_.channels.data(), micInfos_.channels.size()));
-        cJSON_AddItemToObject(infoJson, "Formats",
-                              cJSON_CreateIntArray(micInfos_.formats.data(), micInfos_.formats.size()));
-    } else if (deviceType == AUDIO_DEVICE_TYPE_SPEAKER) {
-        cJSON_AddItemToObject(infoJson, "SampleRates",
-                              cJSON_CreateIntArray(spkInfos_.sampleRates.data(), spkInfos_.sampleRates.size()));
-        cJSON_AddItemToObject(infoJson, "ChannelMasks",
-                              cJSON_CreateIntArray(spkInfos_.channels.data(), spkInfos_.channels.size()));
-        cJSON_AddItemToObject(infoJson, "Formats",
-                              cJSON_CreateIntArray(spkInfos_.formats.data(), spkInfos_.formats.size()));
-    }
 }
 
 std::vector<DHItem> DAudioHandler::ablityForDump()

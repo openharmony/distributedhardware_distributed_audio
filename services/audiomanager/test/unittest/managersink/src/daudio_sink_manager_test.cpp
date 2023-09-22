@@ -60,8 +60,6 @@ HWTEST_F(DAudioSinkManagerTest, CreateAudioDevice_001, TestSize.Level1)
     EXPECT_EQ(DH_SUCCESS, daudioSinkManager.CreateAudioDevice(devId));
     auto dev = std::make_shared<DAudioSinkDev>(devId);
     daudioSinkManager.audioDevMap_.emplace(devId, dev);
-    daudioSinkManager.channelState_ = ChannelState::MIC_CONTROL_OPENED;
-    daudioSinkManager.LoadAVSenderEngineProvider();
     EXPECT_EQ(DH_SUCCESS, daudioSinkManager.CreateAudioDevice(devId));
     daudioSinkManager.channelState_ = ChannelState::MIC_CONTROL_OPENED;
     daudioSinkManager.sendProviderPtr_ = nullptr;

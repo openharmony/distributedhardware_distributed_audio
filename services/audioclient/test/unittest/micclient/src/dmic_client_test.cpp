@@ -28,8 +28,9 @@ void DMicClientTest::TearDownTestCase(void) {}
 void DMicClientTest::SetUp()
 {
     std::string devId = "hello";
+    int32_t dhId = DEFAULT_CAPTURE_ID;
     clientCallback_ = std::make_shared<MockIAudioEventCallback>();
-    micClient_ = std::make_shared<DMicClient>(devId, clientCallback_);
+    micClient_ = std::make_shared<DMicClient>(devId, dhId, clientCallback_);
     micClient_->micTrans_ = std::make_shared<MockIAudioDataTransport>();
 
     audioParam_.comParam.codecType = AudioCodecType::AUDIO_CODEC_AAC;
@@ -208,6 +209,37 @@ HWTEST_F(DMicClientTest, SendMessage_001, TestSize.Level1)
     EXPECT_EQ(DH_SUCCESS, micClient_->SendMessage(NOTIFY_OPEN_MIC_RESULT, content, dstDevId));
     micClient_->micTrans_ = nullptr;
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, micClient_->SendMessage(NOTIFY_OPEN_MIC_RESULT, content, dstDevId));
+}
+
+/**
+ * @tc.name: AudioFwkClientSetUp_001
+ * @tc.desc: Verify the AudioFwkClientSetUp function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6G
+ */
+HWTEST_F(DMicClientTest, AudioFwkClientSetUp_001, TestSize.Level1)
+{
+    audioParam_.captureOpts.capturerFlags = MMAP_MODE;
+    int32_t actual = micClient_->AudioFwkClientSetUp();
+    EXPECT_EQ(ERR_DH_AUDIO_CLIENT_CREATE_CAPTURER_FAILED, actual);
+    audioParam_.captureOpts.capturerFlags = NORMAL_MODE;
+    actual = micClient_->AudioFwkClientSetUp();
+    EXPECT_NE(DH_SUCCESS, actual);
+}
+
+/**
+ * @tc.name: TransSetUp_001
+ * @tc.desc: Verify the TransSetUp function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6G
+ */
+HWTEST_F(DMicClientTest, TransSetUp_001, TestSize.Level1)
+{
+    int32_t actual = micClient_->TransSetUp();
+    EXPECT_EQ(DH_SUCCESS, actual);
+    micClient_->micTrans_ = nullptr;
+    actual = micClient_->TransSetUp();
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, actual);
 }
 } // DistributedHardware
 } // OHOS

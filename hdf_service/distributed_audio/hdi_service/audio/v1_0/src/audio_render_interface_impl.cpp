@@ -19,6 +19,7 @@
 #include <unistd.h>
 #include "sys/time.h"
 
+#include "cJSON.h"
 #include "daudio_constants.h"
 #include "daudio_events.h"
 #include "daudio_log.h"
@@ -192,7 +193,23 @@ int32_t AudioRenderInterfaceImpl::Start()
     if (firstOpenFlag_) {
         firstOpenFlag_ = false;
     } else {
-        DAudioEvent event = { HDF_AUDIO_EVENT_CHANGE_PLAY_STATUS, HDF_EVENT_RESTART };
+        cJSON *jParam = cJSON_CreateObject();
+        if (jParam == nullptr) {
+            DHLOGE("Failed to create cJSON object.");
+            return HDF_FAILURE;
+        }
+        cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(devDesc_.pins).c_str());
+        cJSON_AddStringToObject(jParam, "ChangeType", HDF_EVENT_RESTART.c_str());
+        char *jsonData = cJSON_PrintUnformatted(jParam);
+        if (jsonData == nullptr) {
+            DHLOGE("Failed to create JSON data.");
+            cJSON_Delete(jParam);
+            return HDF_FAILURE;
+        }
+        std::string content(jsonData);
+        cJSON_Delete(jParam);
+        cJSON_free(jsonData);
+        DAudioEvent event = { HDF_AUDIO_EVENT_CHANGE_PLAY_STATUS, content};
         int32_t ret = audioExtCallback_->NotifyEvent(adapterName_, devDesc_.pins, event);
         if (ret != HDF_SUCCESS) {
             DHLOGE("Restart failed.");
@@ -208,7 +225,23 @@ int32_t AudioRenderInterfaceImpl::Start()
 int32_t AudioRenderInterfaceImpl::Stop()
 {
     DHLOGI("Stop render.");
-    DAudioEvent event = { HDF_AUDIO_EVENT_CHANGE_PLAY_STATUS, HDF_EVENT_PAUSE };
+    cJSON *jParam = cJSON_CreateObject();
+    if (jParam == nullptr) {
+        DHLOGE("Failed to create cJSON object.");
+        return HDF_FAILURE;
+    }
+    cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(devDesc_.pins).c_str());
+    cJSON_AddStringToObject(jParam, "ChangeType", HDF_EVENT_RESTART.c_str());
+    char *jsonData = cJSON_PrintUnformatted(jParam);
+    if (jsonData == nullptr) {
+        DHLOGE("Failed to create JSON data.");
+        cJSON_Delete(jParam);
+        return HDF_FAILURE;
+    }
+    std::string content(jsonData);
+    cJSON_Delete(jParam);
+    cJSON_free(jsonData);
+    DAudioEvent event = { HDF_AUDIO_EVENT_CHANGE_PLAY_STATUS, content};
     int32_t ret = audioExtCallback_->NotifyEvent(adapterName_, devDesc_.pins, event);
     if (ret != HDF_SUCCESS) {
         DHLOGE("Pause and clear cache streams failed.");
