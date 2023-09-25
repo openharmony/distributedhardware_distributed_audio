@@ -234,6 +234,7 @@ int32_t DAudioHdiHandler::NotifyEvent(const std::string &devId, const int32_t dh
 
 void DAudioHdiHandler::AudioHdiRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
+    DHLOGE("Exit the current process.");
     _Exit(0);
 }
 } // namespace DistributedHardware

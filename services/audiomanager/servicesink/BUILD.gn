@@ -20,7 +20,6 @@ ohos_shared_library("distributed_audio_sink") {
     "//third_party/json/include",
     "//third_party/cJSON",
     "${fwk_common_path}/utils/include",
-    "//base/security/access_token/interfaces/innerkits/accesstoken/include",
   ]
 
   include_dirs += [

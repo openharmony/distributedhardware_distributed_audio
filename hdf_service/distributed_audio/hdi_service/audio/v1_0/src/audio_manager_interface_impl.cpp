@@ -268,6 +268,7 @@ void AudioManagerInterfaceImpl::SetDeviceObject(struct HdfDeviceObject *deviceOb
 
 void AudioManagerInterfaceImpl::AudioManagerRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
+    DHLOGE("Exit the current process.");
     _Exit(0);
 }
 } // V1_0

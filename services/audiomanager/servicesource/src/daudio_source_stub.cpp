@@ -16,10 +16,8 @@
 #include "daudio_source_stub.h"
 
 #include "accesstoken_kit.h"
-#include <cstdio>
 #include "ipc_skeleton.h"
 #include "tokenid_kit.h"
-#include <unistd.h>
 
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
@@ -51,29 +49,39 @@ DAudioSourceStub::DAudioSourceStub()
 int32_t DAudioSourceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
-    Security::AccessToken::AccessTokenID callerToken = IPCSkeleton::GetCallingTokenID();
-    int result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, "ohos.permisson.DISTRIBUTEHARDWARE_ENABLE");
-    if (result = Security::AccessToekn::PERMISSION_GRANTED) {
-        std::u16string desc = DAudioSourceStub::GetDescriptor();
-        std::u16string remoteDesc = data.ReadInterfaceToken();
-        if (desc != remoteDesc) {
-            DHLOGE("Remote desc is invalid.");
-            return ERR_DH_AUDIO_SA_INVALID_INTERFACE_TOKEN;
-        }
-
-        const auto &iter = memberFuncMap_.find(code);
-        if (iter == memberFuncMap_.end()) {
-            DHLOGE("Invalid request code.");
-            return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
-        }
-        DAudioSourceServiceFunc &func = iter->second;
-        return (this->*func)(data, reply, option);
+    std::u16string desc = DAudioSourceStub::GetDescriptor();
+    std::u16string remoteDesc = data.ReadInterfaceToken();
+    if (desc != remoteDesc) {
+        DHLOGE("Remote desc is invalid.");
+        return ERR_DH_AUDIO_SA_INVALID_INTERFACE_TOKEN;
     }
-    return ERR_DH_AUDIO_FAILED;
+
+    const auto &iter = memberFuncMap_.find(code);
+    if (iter == memberFuncMap_.end()) {
+        DHLOGE("Invalid request code.");
+        return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+    }
+    DAudioSourceServiceFunc &func = iter->second;
+    return (this->*func)(data, reply, option);
+}
+
+bool DAudioSourceStub::VerifyPass()
+{
+    Security::AccessToken::AccessTokenID callerToken = IPCSkeleton::GetCallingTokenID();
+    int result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, AUDIO_PERMISSION_NAME);
+    if (result == Security::AccessToken::PERMISSION_GRANTED) {
+        return true;
+    }
+    return false;
 }
 
 int32_t DAudioSourceStub::InitSourceInner(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (VerifyPass()) {
+        DHLOGI("Permission verification success.");
+    } else {
+        DHLOGE("Permission verification fail.");
+    }
     std::string param = data.ReadString();
     sptr<IRemoteObject> remoteObject = data.ReadRemoteObject();
     if (remoteObject == nullptr) {
@@ -89,6 +97,11 @@ int32_t DAudioSourceStub::InitSourceInner(MessageParcel &data, MessageParcel &re
 
 int32_t DAudioSourceStub::ReleaseSourceInner(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (VerifyPass()) {
+        DHLOGI("Permission verification success.");
+    } else {
+        DHLOGE("Permission verification fail.");
+    }
     int32_t ret = ReleaseSource();
     reply.WriteInt32(ret);
     return DH_SUCCESS;
@@ -97,6 +110,11 @@ int32_t DAudioSourceStub::ReleaseSourceInner(MessageParcel &data, MessageParcel 
 int32_t DAudioSourceStub::RegisterDistributedHardwareInner(MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
+    if (VerifyPass()) {
+        DHLOGI("Permission verification success.");
+    } else {
+        DHLOGE("Permission verification fail.");
+    }
     std::string networkId = data.ReadString();
     std::string dhId = data.ReadString();
     std::string version = data.ReadString();
@@ -114,6 +132,11 @@ int32_t DAudioSourceStub::RegisterDistributedHardwareInner(MessageParcel &data, 
 int32_t DAudioSourceStub::UnregisterDistributedHardwareInner(MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
+    if (VerifyPass()) {
+        DHLOGI("Permission verification success.");
+    } else {
+        DHLOGE("Permission verification fail.");
+    }
     std::string networkId = data.ReadString();
     std::string dhId = data.ReadString();
     std::string reqId = data.ReadString();

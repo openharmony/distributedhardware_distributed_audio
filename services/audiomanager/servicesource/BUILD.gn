@@ -24,7 +24,6 @@ ohos_shared_library("distributed_audio_source") {
     "${mediastandardfwk_path}/audiocapturer/include",
     "${mediastandardfwk_path}/audiocommon/include",
     "${mediastandardfwk_path}/audiomanager/include",
-    "//base/security/access_token/interfaces/innerkits/accesstoken/include",
   ]
 
   include_dirs += [

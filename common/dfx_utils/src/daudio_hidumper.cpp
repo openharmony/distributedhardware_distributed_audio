@@ -15,6 +15,7 @@
 
 #include "daudio_hidumper.h"
 
+#include "daudio_constants.h"
 #include "daudio_errorcode.h"
 #include "daudio_log.h"
 #include "daudio_util.h"
@@ -163,8 +164,8 @@ int32_t DaudioHidumper::GetAbilityInfo(std::string &result)
 
 int32_t DaudioHidumper::StartDumpData(std::string &result)
 {
-    if (access(FILE_PATH.c_str(), 0) < 0) {
-        if (mkdir(FILE_PATH.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)) {
+    if (access(DUMP_FILE_PATH.c_str(), 0) < 0) {
+        if (mkdir(DUMP_FILE_PATH.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)) {
             DHLOGE("Create dir error");
             return ERR_DH_AUDIO_FAILED;
         }
@@ -202,7 +203,7 @@ void DaudioHidumper::ShowHelp(std::string &result)
         .append("--ability     ")
         .append(": dump current ability of the audio in the system\n")
         .append("--startDump")
-        .append(": start dump audio data in the system\n")
+        .append(": start dump audio data in the system /data/data/daudio\n")
         .append("--stopDump")
         .append(": stop dump audio data in the system\n");
 }

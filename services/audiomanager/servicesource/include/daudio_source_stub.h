@@ -37,6 +37,7 @@ private:
     int32_t UnregisterDistributedHardwareInner(MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int32_t ConfigDistributedHardwareInner(MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int32_t DAudioNotifyInner(MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    bool VerifyPass();
 
     using DAudioSourceServiceFunc = int32_t (DAudioSourceStub::*)(MessageParcel &data, MessageParcel &reply,
         MessageOption &option);

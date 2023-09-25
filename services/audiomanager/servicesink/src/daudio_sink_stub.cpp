@@ -16,10 +16,8 @@
 #include "daudio_sink_stub.h"
 
 #include "accesstoken_kit.h"
-#include <cstdio>
 #include "ipc_skeleton.h"
 #include "tokenid_kit.h"
-#include <unistd.h>
 
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
@@ -54,29 +52,39 @@ DAudioSinkStub::~DAudioSinkStub()
 int32_t DAudioSinkStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     DHLOGD("On remote request, code: %d.", code);
-    Security::AccessToken::AccessTokenID callerToken = IPCSkeleton::GetCallingTokenID();
-    int result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, "ohos.permisson.DISTRIBUTEHARDWARE_ENABLE");
-    if (result = Security::AccessToekn::PERMISSION_GRANTED) {
-        std::u16string desc = DAudioSinkStub::GetDescriptor();
-        std::u16string remoteDesc = data.ReadInterfaceToken();
-        if (desc != remoteDesc) {
-            DHLOGE("RemoteDesc is invalid.");
-            return ERR_DH_AUDIO_SA_INVALID_INTERFACE_TOKEN;
-        }
-
-        const auto &iter = memberFuncMap_.find(code);
-        if (iter == memberFuncMap_.end()) {
-            DHLOGE("Invalid request code.");
-            return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
-        }
-        DAudioSinkServiceFunc &func = iter->second;
-        return (this->*func)(data, reply, option);
+    std::u16string desc = DAudioSinkStub::GetDescriptor();
+    std::u16string remoteDesc = data.ReadInterfaceToken();
+    if (desc != remoteDesc) {
+        DHLOGE("RemoteDesc is invalid.");
+        return ERR_DH_AUDIO_SA_INVALID_INTERFACE_TOKEN;
     }
-    return ERR_DH_AUDIO_FAILED;
+
+    const auto &iter = memberFuncMap_.find(code);
+    if (iter == memberFuncMap_.end()) {
+        DHLOGE("Invalid request code.");
+        return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+    }
+    DAudioSinkServiceFunc &func = iter->second;
+    return (this->*func)(data, reply, option);
+}
+
+bool DAudioSinkStub::VerifyPass()
+{
+    Security::AccessToken::AccessTokenID callerToken = IPCSkeleton::GetCallingTokenID();
+    int result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, AUDIO_PERMISSION_NAME);
+    if (result == Security::AccessToken::PERMISSION_GRANTED) {
+        return true;
+    }
+    return false;
 }
 
 int32_t DAudioSinkStub::InitSinkInner(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (VerifyPass()) {
+        DHLOGI("Permission verification success.");
+    } else {
+        DHLOGE("Permission verification fail.");
+    }
     std::string param = data.ReadString();
     int32_t ret = InitSink(param);
     reply.WriteInt32(ret);
@@ -85,6 +93,11 @@ int32_t DAudioSinkStub::InitSinkInner(MessageParcel &data, MessageParcel &reply,
 
 int32_t DAudioSinkStub::ReleaseSinkInner(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (VerifyPass()) {
+        DHLOGI("Permission verification success.");
+    } else {
+        DHLOGE("Permission verification fail.");
+    }
     int32_t ret = ReleaseSink();
     reply.WriteInt32(ret);
     return DH_SUCCESS;

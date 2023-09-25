@@ -50,7 +50,6 @@ private:
 
 private:
     bool HidumperFlag_ = false;
-    const std::string FILE_PATH = "/data/data/daudio";
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -67,7 +67,6 @@ private:
     int32_t g_deviceNum = 0;
     std::string spkDefault = "1";
     std::string micDefault = "134217729";
-    const std::string FILE_PATH = "/data/data/daudio";
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -36,6 +36,7 @@
 #include "audio_decode_transport.h"
 #include "audio_event.h"
 #include "av_receiver_engine_transport.h"
+#include "daudio_constants.h"
 #include "daudio_errorcode.h"
 #include "daudio_log.h"
 #include "iaudio_data_transport.h"
@@ -93,7 +94,7 @@ private:
     constexpr static size_t DATA_QUEUE_SIZE = 8;
     constexpr static size_t SLEEP_TIME = 5000;
     static constexpr const char* RENDERTHREAD = "renderThread";
-    const std::string FILE_NAME = "/data/data/daudio/sink_spk_recv.pcm";
+    const std::string FILE_NAME = DUMP_FILE_PATH + "/sink_spk_recv.pcm";
 
     std::string devId_;
     const int32_t dhId_;
