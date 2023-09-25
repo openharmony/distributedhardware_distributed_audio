@@ -76,9 +76,9 @@ constexpr int32_t DAUDIO_MAX_ASHMEM_LEN = 100000;
 constexpr int32_t DAUDIO_MIN_ASHMEM_LEN = 10;
 
 constexpr const char *KEY_DH_ID = "dhId";
-static constexpr int32_t LOW_LATENCY_RENDER_ID = 1 << 1 | 1 << 0;
-static constexpr int32_t DEFAULT_RENDER_ID = 1;
-static constexpr int32_t DEFAULT_CAPTURE_ID = 1 << 27 | 1 << 0;
+constexpr int32_t LOW_LATENCY_RENDER_ID = 1 << 1 | 1 << 0;
+constexpr int32_t DEFAULT_RENDER_ID = 1;
+constexpr int32_t DEFAULT_CAPTURE_ID = 1 << 27 | 1 << 0;
 } // DistributeHardware
 } // OHOS
 #endif // OHOS_DAUDIO_CONSTANTS_H

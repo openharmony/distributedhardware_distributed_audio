@@ -74,7 +74,7 @@ public:
     int32_t IsSupportsPauseAndResume(bool &supportPause, bool &supportResume) override;
     const AudioDeviceDescriptor &GetCaptureDesc() override;
     void SetAttrs(const std::string &adpName, const AudioDeviceDescriptor &desc,
-        const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> &callback) override;
+        const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> &callback, const int32_t dhId) override;
     void SetDumpFlagInner() override;
 
 private:

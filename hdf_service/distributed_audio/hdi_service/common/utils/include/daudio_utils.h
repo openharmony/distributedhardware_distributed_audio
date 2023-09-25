@@ -56,6 +56,8 @@ int64_t UpdateTimeOffset(const int64_t frameIndex, const int64_t framePeriodNs, 
 bool IsOutDurationRange(int64_t startTime, int64_t endTime, int64_t lastStartTime);
 
 void SaveFile(std::string fileName, uint8_t *audioData, int32_t size);
+
+int32_t WrapCJsonItem(const std::initializer_list<std::pair<std::string, std::string>> &keys, std::string &content);
 } // DistributedHardware
 } // OHOS
 #endif

@@ -17,6 +17,8 @@
 
 #include <ctime>
 
+#include "cJSON.h"
+
 #include "daudio_constants.h"
 #include "daudio_errcode.h"
 
@@ -184,6 +186,26 @@ void SaveFile(std::string fileName, uint8_t *audioData, int32_t size)
     }
     ofs.write(reinterpret_cast<char *>(audioData), size);
     ofs.close();
+}
+
+int32_t WrapCJsonItem(const std::initializer_list<std::pair<std::string, std::string>> &keys, std::string &content)
+{
+    cJSON *jParam = cJSON_CreateObject();
+    if (jParam == nullptr) {
+        return ERR_DH_AUDIO_HDF_FAIL;
+    }
+    for (auto item : keys) {
+        cJSON_AddStringToObject(jParam, item.first.c_str(), item.second.c_str());
+    }
+    char *jsonData = cJSON_PrintUnformatted(jParam);
+    if (jsonData == nullptr) {
+        cJSON_Delete(jParam);
+        return ERR_DH_AUDIO_HDF_FAIL;
+    }
+    content = std::string(jsonData);
+    cJSON_Delete(jParam);
+    cJSON_free(jsonData);
+    return DH_SUCCESS;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -92,7 +92,7 @@ public:
     uint32_t GetMaxVolumeInner() override;
     uint32_t GetMinVolumeInner() override;
     void SetAttrs(const std::string &adpName, const AudioDeviceDescriptor &desc,
-        const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> &callback) override;
+        const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> &callback, const int32_t dhId) override;
     void SetDumpFlagInner() override;
 
 private:

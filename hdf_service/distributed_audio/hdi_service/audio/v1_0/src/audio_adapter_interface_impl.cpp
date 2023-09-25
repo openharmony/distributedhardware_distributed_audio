@@ -97,12 +97,9 @@ int32_t AudioAdapterInterfaceImpl::CreateRender(const AudioDeviceDescriptor &des
         desc.pins, attrs.sampleRate, attrs.channelCount, attrs.format, static_cast<int32_t>(attrs.type));
     render = nullptr;
     sptr<AudioRenderInterfaceImplBase> audioRender = nullptr;
-    {
-        std::lock_guard<std::mutex> devLck(devMapMtx_);
-        if (mapAudioDevice_.find(desc.pins) == mapAudioDevice_.end()) {
-            DHLOGE("Can not find device, create render failed.");
-            return HDF_FAILURE;
-        }
+    if (!CheckDevCapability(desc)) {
+        DHLOGE("Can not find device, create render failed.");
+        return HDF_FAILURE;
     }
     int renderPinId = 0;
     auto extSpkCallback = MatchStreamCallback(attrs, desc, renderPinId);
@@ -110,13 +107,12 @@ int32_t AudioAdapterInterfaceImpl::CreateRender(const AudioDeviceDescriptor &des
         DHLOGE("Matched callback is null.");
         return HDF_FAILURE;
     }
-
 #ifdef DAUDIO_SUPPORT_EXTENSION
     if (attrs.type == AUDIO_MMAP_NOIRQ) {
         DHLOGI("Try to mmap mode.");
         renderFlags_ = Audioext::V1_0::MMAP_MODE;
         audioRender = new AudioRenderExtImpl();
-        audioRender->SetAttrs(adpDescriptor_.adapterName, desc, attrs, extSpkCallback);
+        audioRender->SetAttrs(adpDescriptor_.adapterName, desc, attrs, extSpkCallback, renderPinId);
     } else {
         DHLOGI("Try to normal mode.");
         renderFlags_ = Audioext::V1_0::NORMAL_MODE;
@@ -151,9 +147,6 @@ sptr<IDAudioCallback> AudioAdapterInterfaceImpl::MatchStreamCallback(const Audio
     dhId = static_cast<int32_t>(desc.pins);
     if (desc.pins == DEFAULT_RENDER_ID && attrs.type == AUDIO_MMAP_NOIRQ) {
         dhId = LOW_LATENCY_RENDER_ID;
-    }
-    if (desc.pins == DEFAULT_CAPTURE_ID && attrs.type == AUDIO_MMAP_NOIRQ) {
-        dhId = DEFAULT_CAPTURE_ID - 1;
     }
 
     std::lock_guard<std::mutex> devLck(extCallbackMtx_);
@@ -221,6 +214,16 @@ int32_t AudioAdapterInterfaceImpl::DestroyRender(uint32_t renderId)
     return HDF_SUCCESS;
 }
 
+bool AudioAdapterInterfaceImpl::CheckDevCapability(const AudioDeviceDescriptor &desc)
+{
+    std::lock_guard<std::mutex> devLck(devMapMtx_);
+    if (mapAudioDevice_.find(desc.pins) == mapAudioDevice_.end()) {
+        DHLOGE("Can not find device, create render failed.");
+        return false;
+    }
+    return true;
+}
+
 int32_t AudioAdapterInterfaceImpl::CreateCapture(const AudioDeviceDescriptor &desc,
     const AudioSampleAttributes &attrs, sptr<IAudioCapture> &capture, uint32_t &captureId)
 {
@@ -228,12 +231,9 @@ int32_t AudioAdapterInterfaceImpl::CreateCapture(const AudioDeviceDescriptor &de
         desc.pins, attrs.sampleRate, attrs.channelCount, attrs.format);
     capture = nullptr;
     sptr<AudioCaptureInterfaceImplBase> audioCapture(nullptr);
-    {
-        std::lock_guard<std::mutex> devLck(devMapMtx_);
-        if (mapAudioDevice_.find(desc.pins) == mapAudioDevice_.end()) {
-            DHLOGE("Can not find device, create capture failed.");
-            return HDF_FAILURE;
-        }
+    if (!CheckDevCapability(desc)) {
+        DHLOGE("Can not find device, create capture failed.");
+        return HDF_FAILURE;
     }
     int32_t capPinId = 0;
     auto extMicCallback = MatchStreamCallback(attrs, desc, capPinId);
@@ -241,13 +241,12 @@ int32_t AudioAdapterInterfaceImpl::CreateCapture(const AudioDeviceDescriptor &de
         DHLOGE("Matched callback is null.");
         return HDF_FAILURE;
     }
-
 #ifdef DAUDIO_SUPPORT_EXTENSION
     if (attrs.type == AUDIO_MMAP_NOIRQ) {
         DHLOGI("Try to mmap mode.");
         capturerFlags_ = Audioext::V1_0::MMAP_MODE;
         audioCapture = new AudioCaptureExtImpl();
-        audioCapture->SetAttrs(adpDescriptor_.adapterName, desc, attrs, extMicCallback);
+        audioCapture->SetAttrs(adpDescriptor_.adapterName, desc, attrs, extMicCallback, desc.pins);
     } else {
         DHLOGI("Try to normal mode.");
         capturerFlags_ = Audioext::V1_0::NORMAL_MODE;
