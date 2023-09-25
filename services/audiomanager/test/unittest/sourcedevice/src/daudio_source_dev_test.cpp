@@ -155,10 +155,10 @@ HWTEST_F(DAudioSourceDevTest, CreatTasks_003, TestSize.Level1)
 {
     sourceDev_->AwakeAudioDev();
     AudioEvent event = AudioEvent(OPEN_SPEAKER, "");
-    EXPECT_EQ(ERR_DH_AUDIO_SA_OPEN_CTRL_FAILED, sourceDev_->HandleOpenDSpeaker(event));
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleOpenDSpeaker(event));
 
     event.type = OPEN_MIC;
-    EXPECT_EQ(ERR_DH_AUDIO_SA_OPEN_CTRL_FAILED, sourceDev_->HandleOpenDMic(event));
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleOpenDMic(event));
 }
 
 /**
@@ -844,7 +844,7 @@ HWTEST_F(DAudioSourceDevTest, TaskOpenCtrlChannel_001, TestSize.Level1)
     sourceDev_->rpcResult_ = true;
     sourceDev_->rpcNotify_ = sourceDev_->EVENT_NOTIFY_OPEN_MIC;
     jParam = { { KEY_DH_ID, DH_ID_SPK } };
-    EXPECT_NE(DH_SUCCESS, sourceDev_->TaskOpenCtrlChannel(jParam.dump()));
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskOpenCtrlChannel(jParam.dump()));
 }
 
 /**
