@@ -130,6 +130,7 @@ private:
     inline bool IsIdValid(const uint32_t id);
     bool CheckRendersValid();
     bool CheckCapsValid();
+    bool CheckDevCapability(const AudioDeviceDescriptor &desc);
     void SetDumpFlag(bool isRender);
     sptr<IDAudioCallback> MatchStreamCallback(const AudioSampleAttributes &attrs,
         const AudioDeviceDescriptor &desc, int32_t &dhId);

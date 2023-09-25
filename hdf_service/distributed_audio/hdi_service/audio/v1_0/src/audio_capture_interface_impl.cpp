@@ -364,7 +364,7 @@ int32_t AudioCaptureInterfaceImpl::GetFrameBufferSize(uint64_t &bufferSize)
 }
 
 void AudioCaptureInterfaceImpl::SetAttrs(const std::string &adpName, const AudioDeviceDescriptor &desc,
-    const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> &callback)
+    const AudioSampleAttributes &attrs, const sptr<IDAudioCallback> &callback, const int32_t dhId)
 {
     DHLOGI("Set attrs, not support yet.");
 }

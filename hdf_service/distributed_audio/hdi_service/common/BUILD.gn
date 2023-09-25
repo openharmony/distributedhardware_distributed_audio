@@ -19,6 +19,7 @@ ohos_shared_library("libdaudio_hdf_utils") {
     "include",
     "log/include",
     "utils/include",
+    "//third_party/cJSON",
   ]
 
   sources = [
@@ -26,6 +27,7 @@ ohos_shared_library("libdaudio_hdf_utils") {
     "utils/src/daudio_utils.cpp",
   ]
 
+  deps = [ "//third_party/cJSON:cjson" ]
   external_deps = [
     "c_utils:utils",
     "hdf_core:libhdf_utils",
