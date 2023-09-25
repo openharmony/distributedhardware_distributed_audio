@@ -103,12 +103,13 @@ static int32_t GetUserInput()
     size_t count = 3;
     std::cout << ">>";
     std::cin >> res;
-    while (std::cin.fail() && count-- > 0) {
+    while (std::cin.fail() && count > 0) {
         std::cin.clear();
         std::cin.ignore();
         std::cout << "invalid input, not a number! Please retry with a number." << std::endl;
         std::cout << ">>";
         std::cin >> res;
+        count--;
     }
     return res;
 }
@@ -306,7 +307,7 @@ static void StartRender()
             struct stat statbuf;
             stat(SPK_FILE_PATH, &statbuf);
             int32_t size = statbuf.st_size;
-            g_frameNum = (size - headerSize) / RENDER_FRAME_SIZE;
+            g_frameNum = (size - static_cast<int32_t>(headerSize)) / RENDER_FRAME_SIZE;
             std::cout << "Audio file frame num: " << g_frameNum << std::endl;
             for (int32_t j = 0; j < g_frameNum; j++) {
                 uint8_t *frame = new uint8_t[RENDER_FRAME_SIZE]();
@@ -486,8 +487,8 @@ static void Capture()
             std::cout << "CaptureFrame failed, ret: " << ret << std::endl;
             return;
         }
-        int32_t writeCnt = fwrite(data, 1, RENDER_FRAME_SIZE, g_micFile);
-        if (writeCnt != RENDER_FRAME_SIZE) {
+        size_t writeCnt = fwrite(data, 1, RENDER_FRAME_SIZE, g_micFile);
+        if (static_cast<int32_t>(writeCnt) != RENDER_FRAME_SIZE) {
             std::cout << "fwrite data failed." << std::endl;
         }
         g_micFrameNum++;
