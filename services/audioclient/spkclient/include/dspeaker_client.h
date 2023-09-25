@@ -93,7 +93,7 @@ private:
     constexpr static size_t DATA_QUEUE_SIZE = 8;
     constexpr static size_t SLEEP_TIME = 5000;
     static constexpr const char* RENDERTHREAD = "renderThread";
-    const std::string FILE_NAME = "/data/sink_spk_recv.pcm";
+    const std::string FILE_NAME = "/data/data/daudio/sink_spk_recv.pcm";
 
     std::string devId_;
     const int32_t dhId_;

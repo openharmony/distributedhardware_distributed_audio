@@ -87,6 +87,7 @@ private:
 private:
     static constexpr const char* ENQUEUE_THREAD = "spkEnqueueTh";
     const std::string FILE_NAME = "/data/source_spk_write.pcm";
+    const std::string FILE_NAME = "/data/data/daudio/source_spk_write.pcm";
 
     std::weak_ptr<IAudioEventCallback> audioEventCallback_;
     std::mutex channelWaitMutex_;

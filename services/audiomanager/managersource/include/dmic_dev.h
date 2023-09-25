@@ -95,7 +95,7 @@ private:
     static constexpr size_t LOW_LATENCY_DATA_QUEUE_HALF_SIZE = 10;
     static constexpr uint32_t MMAP_WAIT_FRAME_US = 5000;
     static constexpr const char* ENQUEUE_THREAD = "micEnqueueTh";
-    const std::string FILE_NAME = "/data/source_mic_read.pcm";
+     const std::string FILE_NAME = "/data/data/daudio/source_mic_read.pcm";
 
     std::weak_ptr<IAudioEventCallback> audioEventCallback_;
     std::mutex dataQueueMtx_;

@@ -20,6 +20,7 @@ ohos_shared_library("distributed_audio_sink") {
     "//third_party/json/include",
     "//third_party/cJSON",
     "${fwk_common_path}/utils/include",
+    "//base/security/access_token/interfaces/innerkits/accesstoken/include",
   ]
 
   include_dirs += [
@@ -92,6 +93,8 @@ ohos_shared_library("distributed_audio_sink") {
   ]
 
   external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "access_token:libtokenid_sdk",
     "audio_framework:audio_capturer",
     "audio_framework:audio_client",
     "audio_framework:audio_renderer",

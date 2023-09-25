@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include <unistd.h>
+
 #include "daudio_sink_hidumper.h"
 
 #include "daudio_errorcode.h"
@@ -28,11 +30,13 @@ IMPLEMENT_SINGLE_INSTANCE(DaudioSinkHidumper);
 
 namespace {
 const std::string ARGS_HELP = "-h";
-const std::string ARGS_DUMP_SINK_AUDIO_DATA = "--dumpSinkAudioData";
+const std::string ARGS_DUMP_AUDIO_DATA_START = "--startDump";
+const std::string ARGS_DUMP_AUDIO_DATA_STOP = "--stopDump";
 
 const std::map<std::string, HidumpFlag> ARGS_MAP = {
     { ARGS_HELP, HidumpFlag::GET_HELP },
-    { ARGS_DUMP_SINK_AUDIO_DATA, HidumpFlag::DUMP_SINK_AUDIO_DATA },
+    { ARGS_DUMP_AUDIO_DATA_START, HidumpFlag::DUMP_AUDIO_DATA_START },
+    { ARGS_DUMP_AUDIO_DATA_STOP, HidumpFlag::DUMP_AUDIO_DATA_STOP },
 };
 }
 
@@ -81,8 +85,11 @@ int32_t DaudioSinkHidumper::ProcessDump(const std::string &args, std::string &re
     }
     result.clear();
     switch (hf) {
-        case HidumpFlag::DUMP_SINK_AUDIO_DATA: {
-            return DumpAudioData(result);
+        case HidumpFlag::DUMP_AUDIO_DATA_START: {
+            return StartDumpData(result);
+        }
+        case HidumpFlag::DUMP_AUDIO_DATA_STOP: {
+            return StopDumpData(result);
         }
         default: {
             return ShowIllegalInfomation(result);
@@ -90,11 +97,25 @@ int32_t DaudioSinkHidumper::ProcessDump(const std::string &args, std::string &re
     }
 }
 
-int32_t DaudioSinkHidumper::DumpAudioData(std::string &result)
+int32_t DaudioSinkHidumper::StartDumpData(std::string &result)
 {
-    DHLOGI("Dump audio data.");
-    result.append("Dump...");
+    if (access(FILE_PATH.c_str(), 0) < 0) {
+        if (mkdir(FILE_PATH.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)) {
+            DHLOGE("Create dir error");
+            return ERR_DH_AUDIO_FAILED;
+        }
+    }
+    DHLOGI("start dump audio data.");
+    result.append("start dump...");
     HidumperFlag_ = true;
+    return DH_SUCCESS;
+}
+
+int32_t DaudioSinkHidumper::StopDumpData(std::string &result)
+{
+    DHLOGI("stop dump audio data.");
+    result.append("stop dump...");
+    HidumperFlag_ = false;
     return DH_SUCCESS;
 }
 
@@ -110,8 +131,10 @@ void DaudioSinkHidumper::ShowHelp(std::string &result)
         .append("Description:\n")
         .append("-h            ")
         .append(": show help\n")
-        .append("--dumpSinkAudioData     ")
-        .append(": dump sink audio data\n");
+        .append("--startDump")
+        .append(": start dump audio data in the system\n")
+        .append("--stopDump")
+        .append(": stop dump audio data in the system\n");
 }
 
 int32_t DaudioSinkHidumper::ShowIllegalInfomation(std::string &result)

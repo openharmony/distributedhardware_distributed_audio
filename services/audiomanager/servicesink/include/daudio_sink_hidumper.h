@@ -19,6 +19,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include "sys/stat.h"
 
 #include "single_instance.h"
 
@@ -27,7 +28,8 @@ namespace DistributedHardware {
 enum class HidumpFlag {
     UNKNOWN = 0,
     GET_HELP,
-    DUMP_SINK_AUDIO_DATA,
+    DUMP_AUDIO_DATA_START,
+    DUMP_AUDIO_DATA_STOP,
 };
 class DaudioSinkHidumper {
     DECLARE_SINGLE_INSTANCE_BASE(DaudioSinkHidumper);
@@ -43,10 +45,12 @@ private:
     int32_t ShowIllegalInfomation(std::string &result);
     int32_t ProcessDump(const std::string &args, std::string &result);
 
-    int32_t DumpAudioData(std::string &result);
+    int32_t StartDumpData(std::string &result);
+    int32_t StopDumpData(std::string &result);
 
 private:
     bool HidumperFlag_ = false;
+    const std::string FILE_PATH = "/data/data/daudio";
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -15,6 +15,12 @@
 
 #include "daudio_source_stub.h"
 
+#include "accesstoken_kit.h"
+#include <cstdio>
+#include "ipc_skeleton.h"
+#include "tokenid_kit.h"
+#include <unistd.h>
+
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
 #include "daudio_ipc_callback_proxy.h"
@@ -45,20 +51,25 @@ DAudioSourceStub::DAudioSourceStub()
 int32_t DAudioSourceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
-    std::u16string desc = DAudioSourceStub::GetDescriptor();
-    std::u16string remoteDesc = data.ReadInterfaceToken();
-    if (desc != remoteDesc) {
-        DHLOGE("Remote desc is invalid.");
-        return ERR_DH_AUDIO_SA_INVALID_INTERFACE_TOKEN;
-    }
+    Security::AccessToken::AccessTokenID callerToken = IPCSkeleton::GetCallingTokenID();
+    int result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, "ohos.permisson.DISTRIBUTEHARDWARE_ENABLE");
+    if (result = Security::AccessToekn::PERMISSION_GRANTED) {
+        std::u16string desc = DAudioSourceStub::GetDescriptor();
+        std::u16string remoteDesc = data.ReadInterfaceToken();
+        if (desc != remoteDesc) {
+            DHLOGE("Remote desc is invalid.");
+            return ERR_DH_AUDIO_SA_INVALID_INTERFACE_TOKEN;
+        }
 
-    const auto &iter = memberFuncMap_.find(code);
-    if (iter == memberFuncMap_.end()) {
-        DHLOGE("Invalid request code.");
-        return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+        const auto &iter = memberFuncMap_.find(code);
+        if (iter == memberFuncMap_.end()) {
+            DHLOGE("Invalid request code.");
+            return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+        }
+        DAudioSourceServiceFunc &func = iter->second;
+        return (this->*func)(data, reply, option);
     }
-    DAudioSourceServiceFunc &func = iter->second;
-    return (this->*func)(data, reply, option);
+    return ERR_DH_AUDIO_FAILED;
 }
 
 int32_t DAudioSourceStub::InitSourceInner(MessageParcel &data, MessageParcel &reply, MessageOption &option)

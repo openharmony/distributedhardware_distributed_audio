@@ -15,6 +15,12 @@
 
 #include "daudio_sink_stub.h"
 
+#include "accesstoken_kit.h"
+#include <cstdio>
+#include "ipc_skeleton.h"
+#include "tokenid_kit.h"
+#include <unistd.h>
+
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
 #include "daudio_ipc_interface_code.h"
@@ -48,20 +54,25 @@ DAudioSinkStub::~DAudioSinkStub()
 int32_t DAudioSinkStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     DHLOGD("On remote request, code: %d.", code);
-    std::u16string desc = DAudioSinkStub::GetDescriptor();
-    std::u16string remoteDesc = data.ReadInterfaceToken();
-    if (desc != remoteDesc) {
-        DHLOGE("RemoteDesc is invalid.");
-        return ERR_DH_AUDIO_SA_INVALID_INTERFACE_TOKEN;
-    }
+    Security::AccessToken::AccessTokenID callerToken = IPCSkeleton::GetCallingTokenID();
+    int result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, "ohos.permisson.DISTRIBUTEHARDWARE_ENABLE");
+    if (result = Security::AccessToekn::PERMISSION_GRANTED) {
+        std::u16string desc = DAudioSinkStub::GetDescriptor();
+        std::u16string remoteDesc = data.ReadInterfaceToken();
+        if (desc != remoteDesc) {
+            DHLOGE("RemoteDesc is invalid.");
+            return ERR_DH_AUDIO_SA_INVALID_INTERFACE_TOKEN;
+        }
 
-    const auto &iter = memberFuncMap_.find(code);
-    if (iter == memberFuncMap_.end()) {
-        DHLOGE("Invalid request code.");
-        return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+        const auto &iter = memberFuncMap_.find(code);
+        if (iter == memberFuncMap_.end()) {
+            DHLOGE("Invalid request code.");
+            return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+        }
+        DAudioSinkServiceFunc &func = iter->second;
+        return (this->*func)(data, reply, option);
     }
-    DAudioSinkServiceFunc &func = iter->second;
-    return (this->*func)(data, reply, option);
+    return ERR_DH_AUDIO_FAILED;
 }
 
 int32_t DAudioSinkStub::InitSinkInner(MessageParcel &data, MessageParcel &reply, MessageOption &option)
