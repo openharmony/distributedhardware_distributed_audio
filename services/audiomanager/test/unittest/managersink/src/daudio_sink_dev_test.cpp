@@ -94,7 +94,7 @@ HWTEST_F(DAudioSinkDevTest, TaskOpenCtrlChannel_001, TestSize.Level1)
 HWTEST_F(DAudioSinkDevTest, TaskOpenCtrlChannel_002, TestSize.Level1)
 {
     std::string args = "args";
-    EXPECT_NE(DH_SUCCESS, sinkDev_->TaskOpenCtrlChannel(args));
+    EXPECT_EQ(DH_SUCCESS, sinkDev_->TaskOpenCtrlChannel(args));
     EXPECT_EQ(DH_SUCCESS, sinkDev_->TaskOpenCtrlChannel(args));
 }
 
