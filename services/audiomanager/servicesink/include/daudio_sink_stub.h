@@ -36,6 +36,7 @@ private:
     int32_t SubscribeLocalHardwareInner(MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int32_t UnsubscribeLocalHardwareInner(MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int32_t DAudioNotifyInner(MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    bool VerifyPass();
 
     using DAudioSinkServiceFunc = int32_t (DAudioSinkStub::*)(MessageParcel &data, MessageParcel &reply,
         MessageOption &option);

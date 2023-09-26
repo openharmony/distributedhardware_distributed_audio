@@ -79,7 +79,7 @@ public:
 
 private:
     static constexpr int64_t AUDIO_OFFSET_FRAME_NUM = 10;
-    const std::string FILE_NAME = "/data/hdf_captureframe.pcm";
+    const std::string FILE_NAME = "/data/data/daudio/hdf_captureframe.pcm";
     std::string adapterName_;
     AudioDeviceDescriptor devDesc_;
     AudioSampleAttributes devAttrs_;

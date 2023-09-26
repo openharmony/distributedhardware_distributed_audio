@@ -28,6 +28,8 @@
         ],
         "deps": {
             "components": [
+                "access_token",
+                "accessibility",
                 "audio_framework",
                 "c_utils",
                 "distributed_hardware_fwk",

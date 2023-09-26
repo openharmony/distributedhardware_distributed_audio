@@ -33,6 +33,7 @@
 #include "audio_param.h"
 #include "audio_status.h"
 #include "av_sender_engine_transport.h"
+#include "daudio_constants.h"
 #include "daudio_errorcode.h"
 #include "daudio_log.h"
 #include "iaudio_data_transport.h"
@@ -72,7 +73,7 @@ private:
 private:
     constexpr static uint8_t CHANNEL_WAIT_SECONDS = 5;
     static constexpr const char* CAPTURETHREAD = "captureThread";
-    const std::string FILE_NAME = "/data/sink_mic_send.pcm";
+    const std::string FILE_NAME = DUMP_FILE_PATH + "/sink_mic_send.pcm";
 
     std::string devId_;
     int32_t dhId_;

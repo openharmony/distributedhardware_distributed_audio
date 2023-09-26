@@ -17,6 +17,10 @@
 
 #include <string>
 #include <hdf_base.h>
+#include <cstdlib>
+#include "iservice_registry.h"
+#include "iservmgr_hdi.h"
+#include "iproxy_broker.h"
 
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
@@ -36,6 +40,7 @@ IMPLEMENT_SINGLE_INSTANCE(DAudioHdiHandler);
 DAudioHdiHandler::DAudioHdiHandler()
 {
     DHLOGD("Distributed audio hdi handler construct.");
+    audioHdiRecipient_ = new AudioHdiRecipient();
 }
 
 DAudioHdiHandler::~DAudioHdiHandler()
@@ -65,6 +70,8 @@ int32_t DAudioHdiHandler::InitHdiHandler()
         return ERR_DH_AUDIO_HDI_PROXY_NOT_INIT;
     }
 
+    remote_ = OHOS::HDI::hdi_objcast<IDAudioManager>(audioSrvHdf_);
+    remote_->AddDeathRecipient(audioHdiRecipient_);
     DHLOGI("Init hdi handler success.");
     return DH_SUCCESS;
 }
@@ -81,6 +88,7 @@ int32_t DAudioHdiHandler::UninitHdiHandler()
         DHLOGE("Unload hdf driver failed, ret: %d", ret);
         return ret;
     }
+    remote_->RemoveDeathRecipient(audioHdiRecipient_);
     DHLOGI("Uninit hdi handler success.");
     return DH_SUCCESS;
 }
@@ -222,6 +230,12 @@ int32_t DAudioHdiHandler::NotifyEvent(const std::string &devId, const int32_t dh
         return ERR_DH_AUDIO_HDI_CALL_FAILED;
     }
     return DH_SUCCESS;
+}
+
+void DAudioHdiHandler::AudioHdiRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
+{
+    DHLOGE("Exit the current process.");
+    _Exit(0);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -15,6 +15,10 @@
 
 #include "daudio_sink_stub.h"
 
+#include "accesstoken_kit.h"
+#include "ipc_skeleton.h"
+#include "tokenid_kit.h"
+
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
 #include "daudio_ipc_interface_code.h"
@@ -64,8 +68,23 @@ int32_t DAudioSinkStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Mess
     return (this->*func)(data, reply, option);
 }
 
+bool DAudioSinkStub::VerifyPass()
+{
+    Security::AccessToken::AccessTokenID callerToken = IPCSkeleton::GetCallingTokenID();
+    int result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, AUDIO_PERMISSION_NAME);
+    if (result == Security::AccessToken::PERMISSION_GRANTED) {
+        return true;
+    }
+    return false;
+}
+
 int32_t DAudioSinkStub::InitSinkInner(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (VerifyPass()) {
+        DHLOGI("Permission verification success.");
+    } else {
+        DHLOGE("Permission verification fail.");
+    }
     std::string param = data.ReadString();
     int32_t ret = InitSink(param);
     reply.WriteInt32(ret);
@@ -74,6 +93,11 @@ int32_t DAudioSinkStub::InitSinkInner(MessageParcel &data, MessageParcel &reply,
 
 int32_t DAudioSinkStub::ReleaseSinkInner(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (VerifyPass()) {
+        DHLOGI("Permission verification success.");
+    } else {
+        DHLOGE("Permission verification fail.");
+    }
     int32_t ret = ReleaseSink();
     reply.WriteInt32(ret);
     return DH_SUCCESS;

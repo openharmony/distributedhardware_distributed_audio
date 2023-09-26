@@ -124,6 +124,9 @@ constexpr const char *KEY_CONTENT_TYPE = "contentType";
 constexpr const char *KEY_STREAM_USAGE = "streamUsage";
 constexpr const char *KEY_RENDER_FLAGS = "renderFlags";
 constexpr const char *KEY_CAPTURE_FLAGS = "capturerFlags";
+
+const std::string DUMP_FILE_PATH = "/data/data/daudio";
+const std::string AUDIO_PERMISSION_NAME = "ohos.permission.ENABLE_DISTRIBUTED_HARDWARE";
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DAUDIO_CONSTANTS_H

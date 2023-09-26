@@ -18,6 +18,7 @@
 
 #include <string>
 #include <vector>
+#include "sys/stat.h"
 
 #include "audio_capturer.h"
 #include "audio_info.h"
@@ -35,7 +36,8 @@ enum class HidumpFlag {
     GET_SOURCE_DEVID,
     GET_SINK_INFO,
     GET_ABILITY,
-    DUMP_AUDIO_DATA,
+    DUMP_AUDIO_DATA_START,
+    DUMP_AUDIO_DATA_STOP,
 };
 class DaudioHidumper {
     DECLARE_SINGLE_INSTANCE_BASE(DaudioHidumper);
@@ -54,7 +56,8 @@ private:
     int32_t GetSourceDevId(std::string &result);
     int32_t GetSinkInfo(std::string &result);
     int32_t GetAbilityInfo(std::string &result);
-    int32_t DumpAudioData(std::string &result);
+    int32_t StartDumpData(std::string &result);
+    int32_t StopDumpData(std::string &result);
 
 private:
     std::string g_sourceDevId_ = "";

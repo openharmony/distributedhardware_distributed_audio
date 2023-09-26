@@ -24,6 +24,7 @@
 #include "audio_param.h"
 #include "ashmem.h"
 #include "av_sender_engine_transport.h"
+#include "daudio_constants.h"
 #include "daudio_hdi_handler.h"
 #include "daudio_io_dev.h"
 #include "iaudio_event_callback.h"
@@ -86,7 +87,7 @@ private:
 
 private:
     static constexpr const char* ENQUEUE_THREAD = "spkEnqueueTh";
-    const std::string FILE_NAME = "/data/source_spk_write.pcm";
+    const std::string FILE_NAME = DUMP_FILE_PATH + "/source_spk_write.pcm";
 
     std::weak_ptr<IAudioEventCallback> audioEventCallback_;
     std::mutex channelWaitMutex_;

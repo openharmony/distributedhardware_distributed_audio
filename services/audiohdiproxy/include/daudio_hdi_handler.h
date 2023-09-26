@@ -22,6 +22,7 @@
 
 #include <v1_0/id_audio_callback.h>
 #include <v1_0/id_audio_manager.h>
+#include "iremote_object.h"
 
 #include "audio_event.h"
 #include "daudio_manager_callback.h"
@@ -53,11 +54,18 @@ private:
     ~DAudioHdiHandler();
     void ProcessEventMsg(const AudioEvent &audioEvent, DAudioEvent &newEvent);
 
+    class AudioHdiRecipient : public IRemoteObject::DeathRecipient {
+    public:
+        void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
+    };
+    sptr<AudioHdiRecipient> audioHdiRecipient_;
+
     const std::string HDF_AUDIO_SERVICE_NAME = "daudio_ext_service";
     std::mutex devMapMtx_;
     sptr<IDAudioManager> audioSrvHdf_;
     std::map<std::string, sptr<DAudioManagerCallback>> mapAudioMgrCallback_;
     std::map<std::string, std::set<int32_t>> mapAudioMgrDhIds_;
+    sptr<IRemoteObject> remote_;
 };
 } // DistributedHardware
 } // OHOS
