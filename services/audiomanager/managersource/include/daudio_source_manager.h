@@ -57,6 +57,7 @@ private:
     void DeleteAudioDevice(const std::string &devId, const std::string &dhId);
     std::string GetRequestId(const std::string &devId, const std::string &dhId);
     void ClearAudioDev(const std::string &devId);
+    void ListenAudioDev();
 
     typedef struct {
         std::string devId;
@@ -66,6 +67,10 @@ private:
 
 private:
     static constexpr const char* DEVCLEAR_THREAD = "sourceClearTh";
+    static constexpr const char* LISTEN_THREAD = "sourceListenTh";
+    static constexpr int32_t WATCHDOG_INTERVAL_TIME = 20000;
+    static constexpr int32_t WATCHDOG_DELAY_TIME = 5000;
+    static constexpr size_t SLEEP_TIME = 5000;
 
     std::string localDevId_;
     std::mutex devMapMtx_;
@@ -75,6 +80,7 @@ private:
     sptr<IDAudioIpcCallback> ipcCallback_ = nullptr;
     std::shared_ptr<DAudioSourceMgrCallback> daudioMgrCallback_ = nullptr;
     std::thread devClearThread_;
+    std::thread listenThread_;
     IAVEngineProvider *sendProviderPtr_ = nullptr;
     IAVEngineProvider *rcvProviderPtr_ = nullptr;
     void *pSHandler_ = nullptr;

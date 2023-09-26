@@ -49,6 +49,9 @@ public:
 
     int32_t EnableDAudio(const std::string &dhId, const std::string &attrs);
     int32_t DisableDAudio(const std::string &dhId);
+    int32_t RestoreThreadStatus();
+    void SetThreadStatusFlag();
+    bool GetThreadStatusFlag();
     void NotifyEvent(const AudioEvent &event) override;
 
 private:
@@ -140,6 +143,7 @@ private:
     std::atomic<bool> isRpcOpen_ = false;
     bool rpcResult_ = false;
     uint8_t rpcNotify_ = 0;
+    std::atomic<bool> threadStatusFlag_ = false;
 
     class SourceEventHandler : public AppExecFwk::EventHandler {
     public:
@@ -166,6 +170,7 @@ private:
         void SpkMmapStopCallback(const AppExecFwk::InnerEvent::Pointer &event);
         void MicMmapStartCallback(const AppExecFwk::InnerEvent::Pointer &event);
         void MicMmapStopCallback(const AppExecFwk::InnerEvent::Pointer &event);
+        void SetThreadStatusFlagTrue(const AppExecFwk::InnerEvent::Pointer &event);
         int32_t GetEventParam(const AppExecFwk::InnerEvent::Pointer &event, std::string &eventParam);
 
     private:

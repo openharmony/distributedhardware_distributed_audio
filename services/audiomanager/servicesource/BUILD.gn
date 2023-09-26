@@ -101,6 +101,7 @@ ohos_shared_library("distributed_audio_source") {
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
     "hdf_core:libhdi",
+    "hicollie:libhicollie",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "ipc:ipc_core",
