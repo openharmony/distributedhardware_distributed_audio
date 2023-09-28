@@ -15,6 +15,12 @@ import("//build/ohos.gni")
 import("../../distributedaudio.gni")
 
 ohos_executable("audio_distributed_test") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   include_dirs = [
     "./include",
     "${driver_audio_path}/include",

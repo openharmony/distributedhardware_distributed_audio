@@ -16,6 +16,12 @@ import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("../../distributedaudio.gni")
 
 ohos_shared_library("daudio_client") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   include_dirs = [
     "./include",
     "${common_path}/include",
