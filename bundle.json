@@ -37,6 +37,7 @@
                 "dsoftbus",
                 "eventhandler",
                 "hdf_core",
+                "hicollie",
                 "hisysevent",
                 "hitrace",
                 "hilog",

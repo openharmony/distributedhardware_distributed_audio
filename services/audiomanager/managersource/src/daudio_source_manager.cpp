@@ -18,6 +18,7 @@
 #include <dlfcn.h>
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
+#include "xcollie/watchdog.h"
 
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
@@ -56,6 +57,10 @@ DAudioSourceManager::~DAudioSourceManager()
     if (devClearThread_.joinable()) {
         devClearThread_.join();
     }
+
+    if (listenThread_.joinable()) {
+        listenThread_.join();
+    }
     DHLOGD("Distributed audio source manager destructed.");
 }
 
@@ -87,6 +92,10 @@ int32_t DAudioSourceManager::Init(const sptr<IDAudioIpcCallback> &callback)
         DHLOGE("load av transport receiver engine provider failed.");
         return ERR_DH_AUDIO_FAILED;
     }
+    listenThread_ = std::thread(&DAudioSourceManager::ListenAudioDev, this);
+    if (pthread_setname_np(listenThread_.native_handle(), LISTEN_THREAD) != DH_SUCCESS) {
+        DHLOGE("Dev clear thread setname failed.");
+    }
     return DH_SUCCESS;
 }
 
@@ -107,6 +116,10 @@ int32_t DAudioSourceManager::UnInit()
     }
     if (devClearThread_.joinable()) {
         devClearThread_.join();
+    }
+
+    if (listenThread_.joinable()) {
+        listenThread_.join();
     }
 
     ipcCallback_ = nullptr;
@@ -327,6 +340,33 @@ void DAudioSourceManager::ClearAudioDev(const std::string &devId)
     if (audioDevMap_[devId].ports.empty()) {
         audioDevMap_[devId].dev->SleepAudioDev();
         audioDevMap_.erase(devId);
+    }
+}
+
+void DAudioSourceManager::ListenAudioDev()
+{
+    auto taskFunc = [this]() {
+        std::lock_guard<std::mutex> lock(devMapMtx_);
+        for (auto &iter : audioDevMap_) {
+            if (iter.second.dev->GetThreadStatusFlag()) {
+                iter.second.dev->SetThreadStatusFlag();
+            } else {
+                DHLOGE("Exit the current proces");
+                _Exit(0);
+            }
+        }
+    };
+    OHOS::HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask("SourceService", taskFunc,
+        WATCHDOG_INTERVAL_TIME, WATCHDOG_DELAY_TIME);
+
+    while (true) {
+        std::lock_guard<std::mutex> lock(devMapMtx_);
+        if (!audioDevMap_.empty()) {
+            for (auto &iter : audioDevMap_) {
+                iter.second.dev->RestoreThreadStatus();
+            }
+        }
+        usleep(SLEEP_TIME);
     }
 }
 
