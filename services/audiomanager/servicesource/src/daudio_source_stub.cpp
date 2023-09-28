@@ -121,8 +121,8 @@ int32_t DAudioSourceStub::RegisterDistributedHardwareInner(MessageParcel &data, 
     std::string attrs = data.ReadString();
     std::string reqId = data.ReadString();
     EnableParam enableParam;
-    enableParam.version = version;
-    enableParam.attrs = attrs;
+    enableParam.sinkVersion = version;
+    enableParam.sinkAttrs = attrs;
 
     int32_t ret = RegisterDistributedHardware(networkId, dhId, enableParam, reqId);
     reply.WriteInt32(ret);

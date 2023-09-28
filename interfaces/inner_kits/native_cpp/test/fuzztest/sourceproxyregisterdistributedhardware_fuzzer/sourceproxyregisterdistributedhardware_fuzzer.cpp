@@ -37,8 +37,8 @@ void SourceProxyRegisterDistributedHardwareFuzzTest(const uint8_t* data, size_t 
     std::string version(reinterpret_cast<const char*>(data), size);
     std::string attrs(reinterpret_cast<const char*>(data), size);
     EnableParam param;
-    param.version = version;
-    param.attrs = attrs;
+    param.sinkVersion = version;
+    param.sinkAttrs = attrs;
 
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgr == nullptr) {
