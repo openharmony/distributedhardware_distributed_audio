@@ -122,10 +122,6 @@ int32_t AudioAdapterInterfaceImpl::CreateRender(const AudioDeviceDescriptor &des
     renderFlags_ = Audioext::V1_0::NORMAL_MODE;
     audioRender = new AudioRenderInterfaceImpl(adpDescriptor_.adapterName, desc, attrs, extSpkCallback);
 #endif
-    if (audioRender == nullptr) {
-        DHLOGE("Create render failed.");
-        return HDF_FAILURE;
-    }
     int32_t ret = OpenRenderDevice(desc, attrs, extSpkCallback, renderPinId);
     if (ret != DH_SUCCESS) {
         DHLOGE("Open render device failed.");
@@ -170,15 +166,12 @@ int32_t AudioAdapterInterfaceImpl::InsertRenderImpl(const sptr<AudioRenderInterf
     for (uint32_t i = 0; i < MAX_AUDIO_STREAM_NUM; i++) {
         if (renderDevs_[i].second == nullptr) {
             renderId = i;
-            break;
+            renderDevs_[renderId] = std::make_pair(dhId, audioRender);
+            return HDF_SUCCESS;
         }
     }
-    if (renderId == MAX_AUDIO_STREAM_NUM) {
-        DHLOGE("The device is busy, can't create render anymore.");
-        return HDF_FAILURE;
-    }
-    renderDevs_[renderId] = std::make_pair(dhId, audioRender);
-    return HDF_SUCCESS;
+    DHLOGE("The device is busy, can't create render anymore.");
+    return HDF_FAILURE;
 }
 
 int32_t AudioAdapterInterfaceImpl::DestroyRender(uint32_t renderId)
@@ -256,10 +249,6 @@ int32_t AudioAdapterInterfaceImpl::CreateCapture(const AudioDeviceDescriptor &de
     capturerFlags_ = Audioext::V1_0::NORMAL_MODE;
     audioCapture = new AudioCaptureInterfaceImpl(adpDescriptor_.adapterName, desc, attrs, extMicCallback);
 #endif
-    if (audioCapture == nullptr) {
-        DHLOGE("Create capture failed.");
-        return HDF_FAILURE;
-    }
     int32_t ret = OpenCaptureDevice(desc, attrs, extMicCallback, capPinId);
     if (ret != DH_SUCCESS) {
         DHLOGE("Open capture device failed.");
@@ -287,15 +276,12 @@ int32_t AudioAdapterInterfaceImpl::InsertCapImpl(const sptr<AudioCaptureInterfac
     for (uint32_t i = 0; i < MAX_AUDIO_STREAM_NUM; i++) {
         if (captureDevs_[i].second == nullptr) {
             captureId = i;
-            break;
+            captureDevs_[captureId] = std::make_pair(dhId, audioCapture);
+            return HDF_SUCCESS;
         }
     }
-    if (captureId == MAX_AUDIO_STREAM_NUM) {
-        DHLOGE("The device is busy, can't create capture anymore.");
-        return HDF_FAILURE;
-    }
-    captureDevs_[captureId] = std::make_pair(dhId, audioCapture);
-    return HDF_SUCCESS;
+    DHLOGE("The device is busy, can't create capture anymore.");
+    return HDF_FAILURE;
 }
 
 int32_t AudioAdapterInterfaceImpl::DestroyCapture(uint32_t captureId)
@@ -748,7 +734,7 @@ int32_t AudioAdapterInterfaceImpl::SetAudioVolume(const std::string& condition, 
 
     {
         std::lock_guard<std::mutex> devLck(renderDevMtx_);
-        for (auto item : renderDevs_) {
+        for (const auto &item : renderDevs_) {
             std::lock_guard<std::mutex> devLck(extCallbackMtx_);
             sptr<IDAudioCallback> extSpkCallback(extCallbackMap_[item.first]);
             SetAudioParamStr(event.content, "dhId", std::to_string(item.first));
