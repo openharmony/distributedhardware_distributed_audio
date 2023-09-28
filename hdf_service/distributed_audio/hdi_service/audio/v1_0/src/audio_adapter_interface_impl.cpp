@@ -565,7 +565,7 @@ int32_t AudioAdapterInterfaceImpl::OpenRenderDevice(const AudioDeviceDescriptor 
         return DH_SUCCESS;
     }
     std::lock_guard<std::mutex> devLck(renderOptMtx_);
-    spkPinInUse_ = dhId;
+    spkPinInUse_ = static_cast<uint32_t>(dhId);
     renderParam_.format = attrs.format;
     renderParam_.channelCount = attrs.channelCount;
     renderParam_.sampleRate = attrs.sampleRate;
