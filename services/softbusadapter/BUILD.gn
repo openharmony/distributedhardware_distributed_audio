@@ -16,6 +16,12 @@ import("//build/ohos_var.gni")
 import("../../distributedaudio.gni")
 
 ohos_shared_library("distributed_audio_softbus_adapter") {
+  sanitize = {
+    boundary_sanitize = true
+    integer_overflow = true
+    ubsan = true
+  }
+  stack_protector_ret = true
   include_dirs = [
     "${fwk_common_path}/utils/include",
     "//third_party/json/include",

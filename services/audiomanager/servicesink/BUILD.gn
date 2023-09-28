@@ -16,6 +16,12 @@ import("//build/ohos_var.gni")
 import("../../../distributedaudio.gni")
 
 ohos_shared_library("distributed_audio_sink") {
+  sanitize = {
+    boundary_sanitize = true
+    integer_overflow = true
+    ubsan = true
+  }
+  stack_protector_ret = true
   include_dirs = [
     "//third_party/json/include",
     "//third_party/cJSON",
