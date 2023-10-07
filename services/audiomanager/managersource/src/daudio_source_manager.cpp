@@ -58,6 +58,7 @@ DAudioSourceManager::~DAudioSourceManager()
         devClearThread_.join();
     }
 
+    isHicollieRunning_.store(false);
     if (listenThread_.joinable()) {
         listenThread_.join();
     }
@@ -92,6 +93,7 @@ int32_t DAudioSourceManager::Init(const sptr<IDAudioIpcCallback> &callback)
         DHLOGE("load av transport receiver engine provider failed.");
         return ERR_DH_AUDIO_FAILED;
     }
+    isHicollieRunning_.store(true);
     listenThread_ = std::thread(&DAudioSourceManager::ListenAudioDev, this);
     if (pthread_setname_np(listenThread_.native_handle(), LISTEN_THREAD) != DH_SUCCESS) {
         DHLOGE("Dev clear thread setname failed.");
@@ -114,6 +116,7 @@ int32_t DAudioSourceManager::UnInit()
         }
         audioDevMap_.clear();
     }
+    isHicollieRunning_.store(false);
     if (devClearThread_.joinable()) {
         devClearThread_.join();
     }
@@ -359,7 +362,7 @@ void DAudioSourceManager::ListenAudioDev()
     OHOS::HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask("SourceService", taskFunc,
         WATCHDOG_INTERVAL_TIME, WATCHDOG_DELAY_TIME);
 
-    while (true) {
+    while (isHicollieRunning_.load()) {
         std::lock_guard<std::mutex> lock(devMapMtx_);
         if (!audioDevMap_.empty()) {
             for (auto &iter : audioDevMap_) {
