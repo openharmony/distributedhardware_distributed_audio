@@ -85,6 +85,7 @@ private:
     IAVEngineProvider *rcvProviderPtr_ = nullptr;
     void *pSHandler_ = nullptr;
     void *pRHandler_ = nullptr;
+    std::atomic<bool> isHicollieRunning_ = false;
 };
 } // DistributedHardware
 } // OHOS
