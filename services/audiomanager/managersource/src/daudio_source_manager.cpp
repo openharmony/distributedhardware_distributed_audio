@@ -116,11 +116,11 @@ int32_t DAudioSourceManager::UnInit()
         }
         audioDevMap_.clear();
     }
-    isHicollieRunning_.store(false);
     if (devClearThread_.joinable()) {
         devClearThread_.join();
     }
 
+    isHicollieRunning_.store(false);
     if (listenThread_.joinable()) {
         listenThread_.join();
     }
