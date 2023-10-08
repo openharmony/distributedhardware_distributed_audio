@@ -62,7 +62,7 @@ void AudioAdapterInterfaceImpl::SetSpeakerCallback(const int32_t dhId, const spt
         DHLOGE("Callback is nullptr.");
         return;
     }
-    std::lock_guard<std::mutex> devLck(extCallbackMtx_);
+    std::lock_guard<std::mutex> callbackLck(extCallbackMtx_);
     if (extCallbackMap_.find(dhId) != extCallbackMap_.end()) {
         DHLOGI("The callback of daudio is already set.");
         return;
@@ -76,7 +76,7 @@ void AudioAdapterInterfaceImpl::SetMicCallback(const int32_t dhId, const sptr<ID
         DHLOGE("Callback is nullptr.");
         return;
     }
-    std::lock_guard<std::mutex> devLck(extCallbackMtx_);
+    std::lock_guard<std::mutex> callbackLck(extCallbackMtx_);
     if (extCallbackMap_.find(dhId) != extCallbackMap_.end()) {
         DHLOGI("The callback of daudio is already set.");
         return;
@@ -145,7 +145,7 @@ sptr<IDAudioCallback> AudioAdapterInterfaceImpl::MatchStreamCallback(const Audio
         dhId = LOW_LATENCY_RENDER_ID;
     }
 
-    std::lock_guard<std::mutex> devLck(extCallbackMtx_);
+    std::lock_guard<std::mutex> callbackLck(extCallbackMtx_);
     auto iter = extCallbackMap_.find(dhId);
     if (iter == extCallbackMap_.end()) {
         DHLOGE("Can't find matched callback");
@@ -188,7 +188,7 @@ int32_t AudioAdapterInterfaceImpl::DestroyRender(uint32_t renderId)
         audioRender = renderDevs_[renderId].second;
         dhId = renderDevs_[renderId].first;
     }
-    std::lock_guard<std::mutex> devLck(extCallbackMtx_);
+    std::lock_guard<std::mutex> callbackLck(extCallbackMtx_);
     sptr<IDAudioCallback> extSpkCallback(extCallbackMap_[dhId]);
     if (audioRender == nullptr) {
         DHLOGD("Render has not been created, do not need destroy.");
@@ -298,7 +298,7 @@ int32_t AudioAdapterInterfaceImpl::DestroyCapture(uint32_t captureId)
         audioCapture = captureDevs_[captureId].second;
         dhId = captureDevs_[captureId].first;
     }
-    std::lock_guard<std::mutex> devLck(extCallbackMtx_);
+    std::lock_guard<std::mutex> callbackLck(extCallbackMtx_);
     sptr<IDAudioCallback> extMicCallback(extCallbackMap_[dhId]);
     if (audioCapture == nullptr) {
         DHLOGD("Capture has not been created, do not need destroy.");
@@ -735,7 +735,7 @@ int32_t AudioAdapterInterfaceImpl::SetAudioVolume(const std::string& condition, 
     {
         std::lock_guard<std::mutex> devLck(renderDevMtx_);
         for (const auto &item : renderDevs_) {
-            std::lock_guard<std::mutex> devLck(extCallbackMtx_);
+            std::lock_guard<std::mutex> callbackLck(extCallbackMtx_);
             sptr<IDAudioCallback> extSpkCallback(extCallbackMap_[item.first]);
             SetAudioParamStr(event.content, "dhId", std::to_string(item.first));
             auto render = item.second;
