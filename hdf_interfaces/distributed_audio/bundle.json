@@ -32,13 +32,6 @@
 
             ],
             "inner_kits": [{
-                    "name": "//foundation/distributedhardware/distributed_audio/hdf_interfaces/distributed_audio/audio/v1_0:libdaudio_proxy_1.0",
-                    "header": {
-                        "header_files": [],
-                        "header_base": "//foundation/distributedhardware/distributed_audio/hdf_interfaces/distributed_audio/audio"
-                    }
-                },
-                {
                     "name": "//drivers/interface/distributed_audio/audio/v1_0:libdaudio_proxy_1.0",
                     "header": {
                         "header_files": [],
@@ -46,7 +39,21 @@
                     }
                 },
                 {
+                    "name": "//drivers/interface/distributed_audio/audio/v1_0:libdaudio_stub_1.0",
+                    "header": {
+                        "header_files": [],
+                        "header_base": "//drivers/interface/distributed_audio/audio"
+                    }
+                },
+                {
                     "name": "//drivers/interface/distributed_audio/audioext/v1_0:libdaudioext_proxy_1.0",
+                    "header": {
+                        "header_files": [],
+                        "header_base": "//drivers/interface/distributed_audio/audioext"
+                    }
+                },
+                {
+                    "name": "//drivers/interface/distributed_audio/audioext/v1_0:libdaudioext_stub_1.0",
                     "header": {
                         "header_files": [],
                         "header_base": "//drivers/interface/distributed_audio/audioext"
