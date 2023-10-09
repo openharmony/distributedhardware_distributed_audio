@@ -67,7 +67,6 @@ ohos_unittest("DaudioSourceMgrTest") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "${hdf_interfaces_path}/audioext/v1_0:libdaudioext_proxy_1.0",
     "${innerkits_path}/native_cpp/audio_source:distributed_audio_source_sdk",
     "${services_path}/audiomanager/servicesource:distributed_audio_source",
     "${services_path}/common:distributed_audio_utils",
@@ -80,6 +79,7 @@ ohos_unittest("DaudioSourceMgrTest") {
     "distributed_hardware_fwk:distributed_av_receiver",
     "distributed_hardware_fwk:distributed_av_sender",
     "drivers_interface_audio:libaudio_proxy_1.0",
+    "drivers_interface_distributed_audio:libdaudioext_proxy_1.0",
     "dsoftbus:softbus_client",
     "hdf_core:libhdi",
     "ipc:ipc_core",

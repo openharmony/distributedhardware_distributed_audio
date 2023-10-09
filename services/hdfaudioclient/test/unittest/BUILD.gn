@@ -41,7 +41,7 @@ ohos_unittest("AudioAdapterHdiTest") {
   ]
 
   external_deps = [
-    "drivers_interface_audio:libaudio_proxy_1.0",
+    "drivers_interface_distributed_audio:libdaudio_proxy_1.0",
     "ipc:ipc_core",
   ]
 
@@ -73,6 +73,7 @@ ohos_unittest("AudioRenderInternalTest") {
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
+  external_deps = [ "drivers_interface_distributed_audio:libdaudio_proxy_1.0" ]
 
   defines = [
     "HI_LOG_ENABLE",
@@ -102,6 +103,7 @@ ohos_unittest("AudioCaptureInternalTest") {
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
+  external_deps = [ "drivers_interface_distributed_audio:libdaudio_proxy_1.0" ]
 
   defines = [
     "HI_LOG_ENABLE",
@@ -127,13 +129,15 @@ ohos_unittest("AudioAdapterInternalTest") {
   sources = [ "audio_adapter_internal/audio_adapter_internal_test.cpp" ]
 
   deps = [
-    "${hdf_interfaces_path}/audio/v1_0:libdaudio_proxy_1.0",
     "${services_path}/hdfaudioclient:daudio_client",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
 
-  external_deps = [ "c_utils:utils" ]
+  external_deps = [
+    "c_utils:utils",
+    "drivers_interface_distributed_audio:libdaudio_proxy_1.0",
+  ]
 
   defines = [
     "HI_LOG_ENABLE",

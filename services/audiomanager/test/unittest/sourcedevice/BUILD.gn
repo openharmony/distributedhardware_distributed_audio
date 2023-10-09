@@ -71,7 +71,6 @@ ohos_unittest("DaudioSourceDevTest") {
   deps = [
     "${audio_transport_path}/decodetransport:distributed_audio_decode_transport",
     "${audio_transport_path}/encodetransport:distributed_audio_encode_transport",
-    "${hdf_interfaces_path}/audioext/v1_0:libdaudioext_proxy_1.0",
     "${services_path}/audiomanager/servicesource:distributed_audio_source",
     "${services_path}/common:distributed_audio_utils",
     "//third_party/googletest:gmock",
@@ -83,6 +82,7 @@ ohos_unittest("DaudioSourceDevTest") {
     "distributed_hardware_fwk:distributed_av_receiver",
     "distributed_hardware_fwk:distributed_av_sender",
     "drivers_interface_audio:libaudio_proxy_1.0",
+    "drivers_interface_distributed_audio:libdaudioext_proxy_1.0",
     "dsoftbus:softbus_client",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
@@ -99,7 +99,6 @@ ohos_unittest("DMicDevTest") {
 
   deps = [
     "${audio_transport_path}/decodetransport:distributed_audio_decode_transport",
-    "${hdf_interfaces_path}/audioext/v1_0:libdaudioext_proxy_1.0",
     "${services_path}/audiomanager/servicesource:distributed_audio_source",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
@@ -108,6 +107,7 @@ ohos_unittest("DMicDevTest") {
   external_deps = [
     "distributed_hardware_fwk:distributed_av_receiver",
     "distributed_hardware_fwk:distributed_av_sender",
+    "drivers_interface_distributed_audio:libdaudioext_proxy_1.0",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]
@@ -123,7 +123,6 @@ ohos_unittest("DSpeakerDevTest") {
 
   deps = [
     "${audio_transport_path}/encodetransport:distributed_audio_encode_transport",
-    "${hdf_interfaces_path}/audioext/v1_0:libdaudioext_proxy_1.0",
     "${services_path}/audiomanager/servicesource:distributed_audio_source",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
@@ -132,6 +131,7 @@ ohos_unittest("DSpeakerDevTest") {
   external_deps = [
     "distributed_hardware_fwk:distributed_av_receiver",
     "distributed_hardware_fwk:distributed_av_sender",
+    "drivers_interface_distributed_audio:libdaudioext_proxy_1.0",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]

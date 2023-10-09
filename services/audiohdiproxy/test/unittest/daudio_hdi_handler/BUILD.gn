@@ -42,7 +42,6 @@ ohos_unittest("DAudioHdiHandlerTest") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "${hdf_interfaces_path}/audioext/v1_0:libdaudioext_proxy_1.0",
     "${services_path}/audiomanager/servicesource:distributed_audio_source",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
@@ -50,6 +49,7 @@ ohos_unittest("DAudioHdiHandlerTest") {
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_distributed_audio:libdaudioext_proxy_1.0",
     "ipc:ipc_core",
   ]
 }
