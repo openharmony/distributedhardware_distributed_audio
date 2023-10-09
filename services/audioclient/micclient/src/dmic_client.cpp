@@ -281,8 +281,8 @@ void DMicClient::AudioFwkCaptureData()
         return;
     }
 #ifdef DUMP_DMICCLIENT_FILE
-    if (DaudioSinkHidumper::GetInstance().GetFlagStatus()) {
-        SaveFile(FILE_NAME, const_cast<uint8_t*>(audioData->Data()), audioData->Size());
+    if (DaudioSinkHidumper::GetInstance().QueryDumpDataFlag()) {
+        SaveFile(MIC_CLIENT_FILENAME, const_cast<uint8_t*>(audioData->Data()), audioData->Size());
     }
 #endif
     int64_t startTransTime = GetNowTimeUs();

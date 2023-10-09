@@ -114,30 +114,31 @@ int32_t DaudioHidumper::ProcessDump(const std::string &args, std::string &result
 int32_t DaudioHidumper::GetSourceDevId(std::string &result)
 {
     DHLOGI("Get source devId dump.");
-    int32_t ret = GetLocalDeviceNetworkId(g_sourceDevId_);
+    std::string sourceDevId = "";
+    int32_t ret = GetLocalDeviceNetworkId(sourceDevId);
     if (ret != DH_SUCCESS) {
         DHLOGE("Get local network id failed.");
         result.append("sourceDevId: ").append("");
         return ret;
     }
-    result.append("sourceDevId: ").append(GetAnonyString(g_sourceDevId_));
+    result.append("sourceDevId: ").append(GetAnonyString(sourceDevId));
     return DH_SUCCESS;
 }
 
 int32_t DaudioHidumper::GetSinkInfo(std::string &result)
 {
     DHLOGI("Get sink info dump.");
-    g_manager = GetAudioManagerFuncs();
-    if (g_manager == nullptr) {
+    audioManager_ = GetAudioManagerFuncs();
+    if (audioManager_ == nullptr) {
         return ERR_DH_AUDIO_NULLPTR;
     }
-    int32_t ret = g_manager->GetAllAdapters(g_manager, &g_devices, &g_deviceNum);
+    int32_t ret = audioManager_->GetAllAdapters(audioManager_, &adapterdesc_, &g_deviceNum);
     if (ret != DH_SUCCESS) {
         DHLOGE("Get all adapters failed.");
         return ERR_DH_AUDIO_NULLPTR;
     }
     for (int32_t index = 0; index < g_deviceNum; index++) {
-        AudioAdapterDescriptor &desc = g_devices[index];
+        AudioAdapterDescriptor &desc = adapterdesc_[index];
         result.append("sinkDevId: ").append(GetAnonyString(desc.adapterName)).append("    portId: ");
         for (uint32_t i = 0; i < desc.portNum; i++) {
             result.append(std::to_string(desc.ports[i].portId)).append(" ");
@@ -152,10 +153,10 @@ int32_t DaudioHidumper::GetAbilityInfo(std::string &result)
     DHLOGI("Obtaining capability information.");
     std::vector<DHItem> abilityInfo = DAudioHandler::GetInstance().ablityForDump();
     for (DHItem dhItem : abilityInfo) {
-        if (dhItem.dhId == spkDefault) {
+        if (dhItem.dhId == DEFAULT_SPK_DHID) {
             result.append("spkAbilityInfo:").append(dhItem.attrs).append("      ");
         }
-        if (dhItem.dhId == micDefault) {
+        if (dhItem.dhId == DEFAULT_MIC_DHID) {
             result.append("micAbilityInfo:").append(dhItem.attrs).append("      ");
         }
     }
@@ -172,7 +173,7 @@ int32_t DaudioHidumper::StartDumpData(std::string &result)
     }
     DHLOGI("Start dump audio data.");
     result.append("start dump...");
-    HidumperFlag_ = true;
+    dumpAudioDataFlag_ = true;
     return DH_SUCCESS;
 }
 
@@ -180,13 +181,13 @@ int32_t DaudioHidumper::StopDumpData(std::string &result)
 {
     DHLOGI("Stop dump audio data.");
     result.append("stop dump...");
-    HidumperFlag_ = false;
+    dumpAudioDataFlag_ = false;
     return DH_SUCCESS;
 }
 
-bool DaudioHidumper::GetFlagStatus()
+bool DaudioHidumper::QueryDumpDataFlag()
 {
-    return HidumperFlag_;
+    return dumpAudioDataFlag_;
 }
 
 void DaudioHidumper::ShowHelp(std::string &result)

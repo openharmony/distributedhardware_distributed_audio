@@ -87,7 +87,7 @@ int32_t AudioCaptureInterfaceImpl::CaptureFrame(std::vector<int8_t> &frame, uint
     }
 #ifdef DUMP_CAPTURE_FILE
     if (dumpFlag_) {
-        SaveFile(FILE_NAME, reinterpret_cast<uint8_t*>(audioData.data.data()), audioData.data.size());
+        SaveFile(HDF_CAPTURE_FILENAME, reinterpret_cast<uint8_t*>(audioData.data.data()), audioData.data.size());
     }
 #endif
     frame.resize(devAttrs_.frameSize);

@@ -108,7 +108,7 @@ int32_t DaudioSinkHidumper::StartDumpData(std::string &result)
     }
     DHLOGI("start dump audio data.");
     result.append("start dump...");
-    HidumperFlag_ = true;
+    dumpAudioDataFlag_ = true;
     return DH_SUCCESS;
 }
 
@@ -116,13 +116,13 @@ int32_t DaudioSinkHidumper::StopDumpData(std::string &result)
 {
     DHLOGI("stop dump audio data.");
     result.append("stop dump...");
-    HidumperFlag_ = false;
+    dumpAudioDataFlag_ = false;
     return DH_SUCCESS;
 }
 
-bool DaudioSinkHidumper::GetFlagStatus()
+bool DaudioSinkHidumper::QueryDumpDataFlag()
 {
-    return HidumperFlag_;
+    return dumpAudioDataFlag_;
 }
 
 void DaudioSinkHidumper::ShowHelp(std::string &result)

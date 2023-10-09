@@ -36,7 +36,7 @@ class DaudioSinkHidumper {
 
 public:
     bool Dump(const std::vector<std::string> &args, std::string &result);
-    bool GetFlagStatus();
+    bool QueryDumpDataFlag();
     DaudioSinkHidumper();
     ~DaudioSinkHidumper();
 
@@ -49,7 +49,7 @@ private:
     int32_t StopDumpData(std::string &result);
 
 private:
-    bool HidumperFlag_ = false;
+    bool dumpAudioDataFlag_ = false;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

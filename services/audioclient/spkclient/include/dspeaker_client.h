@@ -94,7 +94,7 @@ private:
     constexpr static size_t DATA_QUEUE_SIZE = 8;
     constexpr static size_t SLEEP_TIME = 5000;
     static constexpr const char* RENDERTHREAD = "renderThread";
-    const std::string FILE_NAME = DUMP_FILE_PATH + "/sink_spk_recv.pcm";
+    const std::string SPK_CLIENT_FILENAME = DUMP_FILE_PATH + "/sink_spk_recv_from_trans.pcm";
 
     std::string devId_;
     const int32_t dhId_;

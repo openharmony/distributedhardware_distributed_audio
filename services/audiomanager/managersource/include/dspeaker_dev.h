@@ -87,7 +87,8 @@ private:
 
 private:
     static constexpr const char* ENQUEUE_THREAD = "spkEnqueueTh";
-    const std::string FILE_NAME = DUMP_FILE_PATH + "/source_spk_write.pcm";
+    const std::string SPK_DEV_FILENAME = DUMP_FILE_PATH + "/source_spk_write_to_trans.pcm";
+    const std::string SPK_LOWLATENCY_FILENAME = DUMP_FILE_PATH + "/source_spk_read_from_ashmem.pcm";
 
     std::weak_ptr<IAudioEventCallback> audioEventCallback_;
     std::mutex channelWaitMutex_;

@@ -294,8 +294,8 @@ void DSpeakerClient::PlayThreadRunning()
             DHLOGD("Pop spk data, dataqueue size: %d.", dataQueue_.size());
         }
 #ifdef DUMP_DSPEAKERCLIENT_FILE
-        if (DaudioSinkHidumper::GetInstance().GetFlagStatus()) {
-            SaveFile(FILE_NAME, const_cast<uint8_t*>(audioData->Data()), audioData->Size());
+        if (DaudioSinkHidumper::GetInstance().QueryDumpDataFlag()) {
+            SaveFile(SPK_CLIENT_FILENAME, const_cast<uint8_t*>(audioData->Data()), audioData->Size());
         }
 #endif
         int32_t writeOffSet = 0;
