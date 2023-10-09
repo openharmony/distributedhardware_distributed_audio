@@ -110,6 +110,21 @@ public:
         (void) callback;
         return 0;
     }
+
+    bool StartDumpMediaData() override
+    {
+        return false;
+    }
+
+    bool StopDumpMediaData() override
+    {
+        return false;
+    }
+
+    bool ReStartDumpMediaData() override
+    {
+        return false;
+    }
 };
 
 class MockIAVSenderEngine : public IAVSenderEngine {
@@ -166,6 +181,21 @@ public:
     {
         (void) callback;
         return 0;
+    }
+
+    bool StartDumpMediaData() override
+    {
+        return false;
+    }
+
+    bool StopDumpMediaData() override
+    {
+        return false;
+    }
+
+    bool ReStartDumpMediaData() override
+    {
+        return false;
     }
 };
 } // DistributedHardware
