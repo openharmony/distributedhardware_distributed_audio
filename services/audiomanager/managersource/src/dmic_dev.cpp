@@ -322,13 +322,13 @@ int32_t DMicDev::ReadStreamData(const std::string &devId, const int32_t dhId, st
         dataQueue_.pop();
     }
 #ifdef DUMP_DMICDEV_FILE
-    if (DaudioHidumper::GetInstance().GetFlagStatus()) {
+    if (DaudioHidumper::GetInstance().QueryDumpDataFlag()) {
         if (!dumpFlag_) {
             AudioEvent event(NOTIFY_HDF_MIC_DUMP, "");
             NotifyHdfAudioEvent(event, dhId);
             dumpFlag_.store(true);
         }
-        SaveFile(FILE_NAME, const_cast<uint8_t*>(data->Data()), data->Size());
+        SaveFile(MIC_DEV_FILENAME, const_cast<uint8_t*>(data->Data()), data->Size());
     }
 #endif
     int64_t endTime = GetNowTimeUs();
@@ -412,6 +412,11 @@ void DMicDev::EnqueueThread()
                 dataQueue_.pop();
             }
         }
+#ifdef DUMP_DMICDEV_FILE
+    if (DaudioHidumper::GetInstance().QueryDumpDataFlag()) {
+        SaveFile(MIC_LOWLATENCY_FILENAME, const_cast<uint8_t*>(audioData->Data()), audioData->Size());
+    }
+#endif
         bool writeRet = ashmem_->WriteToAshmem(audioData->Data(), audioData->Size(), writeIndex_);
         if (writeRet) {
             DHLOGD("Write to ashmem success! write index: %d, writeLength: %d.", writeIndex_, lengthPerTrans_);

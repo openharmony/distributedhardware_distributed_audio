@@ -316,13 +316,13 @@ int32_t DSpeakerDev::WriteStreamData(const std::string &devId, const int32_t dhI
         return ERR_DH_AUDIO_SA_SPEAKER_TRANS_NULL;
     }
 #ifdef DUMP_DSPEAKERDEV_FILE
-    if (DaudioHidumper::GetInstance().GetFlagStatus()) {
+    if (DaudioHidumper::GetInstance().QueryDumpDataFlag()) {
         if (!dumpFlag_) {
             AudioEvent event(NOTIFY_HDF_SPK_DUMP, "");
             NotifyHdfAudioEvent(event, dhId);
             dumpFlag_.store(true);
         }
-        SaveFile(FILE_NAME, const_cast<uint8_t*>(data->Data()), data->Size());
+        SaveFile(SPK_DEV_FILENAME, const_cast<uint8_t*>(data->Data()), data->Size());
     }
 #endif
     int32_t ret = speakerTrans_->FeedAudioData(data);
@@ -410,6 +410,11 @@ void DSpeakerDev::EnqueueThread()
             DHLOGE("Speaker enqueue thread, trans is nullptr.");
             return;
         }
+#ifdef DUMP_DSPEAKERDEV_FILE
+    if (DaudioHidumper::GetInstance().QueryDumpDataFlag()) {
+        SaveFile(SPK_LOWLATENCY_FILENAME, const_cast<uint8_t*>(audioData->Data()), audioData->Size());
+    }
+#endif
         int32_t ret = speakerTrans_->FeedAudioData(audioData);
         if (ret != DH_SUCCESS) {
             DHLOGE("Speaker enqueue thread, write stream data failed, ret: %d.", ret);

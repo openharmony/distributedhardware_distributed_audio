@@ -185,7 +185,6 @@ int32_t DAudioSourceDev::RestoreThreadStatus()
         DHLOGE("Send event failed.");
         return ERR_DH_AUDIO_FAILED;
     }
-    DHLOGD("Enable audio task generate successfully.");
     return DH_SUCCESS;
 }
 

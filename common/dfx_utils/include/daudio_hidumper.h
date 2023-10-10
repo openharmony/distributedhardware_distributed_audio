@@ -44,7 +44,7 @@ class DaudioHidumper {
 
 public:
     bool Dump(const std::vector<std::string> &args, std::string &result);
-    bool GetFlagStatus();
+    bool QueryDumpDataFlag();
     DaudioHidumper();
     ~DaudioHidumper();
 
@@ -60,13 +60,12 @@ private:
     int32_t StopDumpData(std::string &result);
 
 private:
-    std::string g_sourceDevId_ = "";
-    AudioManager *g_manager = nullptr;
-    AudioAdapterDescriptor *g_devices = nullptr;
-    bool HidumperFlag_ = false;
+    AudioManager *audioManager_ = nullptr;
+    AudioAdapterDescriptor *adapterdesc_ = nullptr;
+    bool dumpAudioDataFlag_ = false;
     int32_t g_deviceNum = 0;
-    std::string spkDefault = "1";
-    std::string micDefault = "134217729";
+    const std::string DEFAULT_SPK_DHID = "1";
+    const std::string DEFAULT_MIC_DHID = "134217729";
 };
 } // namespace DistributedHardware
 } // namespace OHOS

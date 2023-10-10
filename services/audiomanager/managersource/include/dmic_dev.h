@@ -96,7 +96,8 @@ private:
     static constexpr size_t LOW_LATENCY_DATA_QUEUE_HALF_SIZE = 10;
     static constexpr uint32_t MMAP_WAIT_FRAME_US = 5000;
     static constexpr const char* ENQUEUE_THREAD = "micEnqueueTh";
-    const std::string FILE_NAME = DUMP_FILE_PATH + "/source_mic_read.pcm";
+    const std::string MIC_DEV_FILENAME = DUMP_FILE_PATH + "/source_mic_read_from_trans.pcm";
+    const std::string MIC_LOWLATENCY_FILENAME = DUMP_FILE_PATH + "/source_mic_write_to_ashmem.pcm";
 
     std::weak_ptr<IAudioEventCallback> audioEventCallback_;
     std::mutex dataQueueMtx_;
