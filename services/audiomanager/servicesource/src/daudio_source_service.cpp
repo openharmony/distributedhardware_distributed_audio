@@ -102,8 +102,8 @@ int32_t DAudioSourceService::RegisterDistributedHardware(const std::string &devI
 {
     DHLOGI("Register distributed audio device, devId: %s, dhId: %s.", GetAnonyString(devId).c_str(),
         dhId.c_str());
-    std::string version = param.version;
-    std::string attrs = param.attrs;
+    std::string version = param.sinkVersion;
+    std::string attrs = param.sinkAttrs;
     return DAudioSourceManager::GetInstance().EnableDAudio(devId, dhId, version, attrs, reqId);
 }
 

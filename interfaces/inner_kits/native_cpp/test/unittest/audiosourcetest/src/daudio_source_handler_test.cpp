@@ -47,8 +47,8 @@ HWTEST_F(DAudioSourceHandlerTest, RegisterDistributedHardware_001, TestSize.Leve
     const std::string devId = "devId";
     const std::string dhId = "dhId";
     EnableParam param;
-    param.version = "1";
-    param.attrs = "attrs";
+    param.sinkVersion = "1";
+    param.sinkAttrs = "attrs";
     std::shared_ptr<RegisterCallback> callback = std::make_shared<RegisterCallbackTest>();
     DAudioSourceHandler::GetInstance().dAudioSourceProxy_ = new MockIDAudioSource();
     int32_t ret = DAudioSourceHandler::GetInstance().RegisterDistributedHardware(devId, dhId, param, callback);
@@ -69,8 +69,8 @@ HWTEST_F(DAudioSourceHandlerTest, RegisterDistributedHardware_002, TestSize.Leve
     const std::string devId = "devId";
     const std::string dhId = "dhId";
     EnableParam param;
-    param.version = "1";
-    param.attrs = "attrs";
+    param.sinkVersion = "1";
+    param.sinkAttrs = "attrs";
     std::shared_ptr<RegisterCallback> callback = std::make_shared<RegisterCallbackTest>();
     DAudioSourceHandler::GetInstance().dAudioIpcCallback_ = nullptr;
     DAudioSourceHandler::GetInstance().dAudioSourceProxy_ = new MockIDAudioSource();
@@ -92,8 +92,8 @@ HWTEST_F(DAudioSourceHandlerTest, RegisterDistributedHardware_003, TestSize.Leve
     const std::string devId = "devId";
     const std::string dhId = "dhId";
     EnableParam param;
-    param.version = "1";
-    param.attrs = "attrs";
+    param.sinkVersion = "1";
+    param.sinkAttrs = "attrs";
     std::shared_ptr<RegisterCallback> callback = std::make_shared<RegisterCallbackTest>();
     DAudioSourceHandler::GetInstance().dAudioIpcCallback_ = nullptr;
     DAudioSourceHandler::GetInstance().dAudioSourceProxy_ = nullptr;
@@ -117,8 +117,8 @@ HWTEST_F(DAudioSourceHandlerTest, RegisterDistributedHardware_004, TestSize.Leve
     devId.resize(DAUDIO_MAX_DEVICE_ID_LEN);
     const std::string dhId = "dhId";
     EnableParam param;
-    param.version = "1";
-    param.attrs = "attrs";
+    param.sinkVersion = "1";
+    param.sinkAttrs = "attrs";
     std::shared_ptr<RegisterCallback> callback = std::make_shared<RegisterCallbackTest>();
     DAudioSourceHandler::GetInstance().dAudioSourceProxy_ = new MockIDAudioSource();
     DAudioSourceHandler::GetInstance().dAudioIpcCallback_ = new DAudioIpcCallback();

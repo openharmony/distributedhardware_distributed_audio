@@ -70,8 +70,8 @@ int32_t DAudioSourceProxy::RegisterDistributedHardware(const std::string &devId,
         reqId.length() > DAUDIO_MAX_DEVICE_ID_LEN) {
         return ERR_DH_AUDIO_SA_DEVID_ILLEGAL;
     }
-    if (!data.WriteString(devId) || !data.WriteString(dhId) || !data.WriteString(param.version) ||
-        !data.WriteString(param.attrs) || !data.WriteString(reqId)) {
+    if (!data.WriteString(devId) || !data.WriteString(dhId) || !data.WriteString(param.sinkVersion) ||
+        !data.WriteString(param.sinkAttrs) || !data.WriteString(reqId)) {
         return ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED;
     }
 

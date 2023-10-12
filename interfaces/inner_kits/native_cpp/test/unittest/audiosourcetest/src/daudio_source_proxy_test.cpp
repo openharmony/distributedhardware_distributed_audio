@@ -57,8 +57,8 @@ HWTEST_F(DAudioSourceProxyTest, RegisterDistributedHardware_001, TestSize.Level1
     const std::string dhId = "dhId";
     const std::string reqId = "reqId";
     EnableParam param;
-    param.version = "1";
-    param.attrs = "attrs";
+    param.sinkVersion = "1";
+    param.sinkAttrs = "attrs";
 
     int32_t ret = dAudioProxy->RegisterDistributedHardware(devId, dhId, param, reqId);
     EXPECT_EQ(DH_SUCCESS, ret);
@@ -82,8 +82,8 @@ HWTEST_F(DAudioSourceProxyTest, RegisterDistributedHardware_002, TestSize.Level1
     const std::string dhId = "dhId";
     const std::string reqId = "reqId";
     EnableParam param;
-    param.version = "1";
-    param.attrs = "attrs";
+    param.sinkVersion = "1";
+    param.sinkAttrs = "attrs";
 
     int32_t ret = dAudioProxy->RegisterDistributedHardware(devId, dhId, param, reqId);
     EXPECT_EQ(ERR_DH_AUDIO_SA_DEVID_ILLEGAL, ret);
