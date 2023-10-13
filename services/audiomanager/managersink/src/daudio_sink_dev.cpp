@@ -15,7 +15,7 @@
 
 #include "daudio_sink_dev.h"
 
-#include <dlfcn.h>
+
 #include <random>
 
 #include "cJSON.h"
@@ -202,7 +202,13 @@ int32_t DAudioSinkDev::ParseDhidFromEvent(std::string args)
         cJSON_Delete(jParam);
         return -1;
     }
-    int32_t dhId = std::stoi(std::string(cJSON_GetObjectItem(jParam, KEY_DH_ID)->valuestring));
+    cJSON *dhIdItem = cJSON_GetObjectItem(jParam, KEY_DH_ID);
+    if (dhIdItem == NULL || !cJSON_IsString(dhIdItem)) {
+        DHLOGE("Not found the keys of dhId.");
+        cJSON_Delete(jParam);
+        return ERR_DH_AUDIO_FAILED;
+    }
+    int32_t dhId = std::stoi(std::string(dhIdItem->valuestring));
     cJSON_Delete(jParam);
     DHLOGI("Parsed dhId is: %d.", dhId);
     return dhId;
