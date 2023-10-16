@@ -89,6 +89,7 @@ private:
     int64_t framePeriodNs_ = 0;
     int64_t startTime_ = 0;
     int64_t lastCaptureStartTime_ = 0;
+    std::atomic<bool> muteState_ = false;
 
     std::mutex captureMtx_;
     AudioCaptureStatus captureStatus_ = CAPTURE_STATUS_CLOSE;
