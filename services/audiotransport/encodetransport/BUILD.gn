@@ -28,12 +28,6 @@ config("encode_transport_pub_config") {
 }
 
 ohos_shared_library("distributed_audio_encode_transport") {
-  sanitize = {
-    boundary_sanitize = true
-    integer_overflow = true
-    ubsan = true
-  }
-  stack_protector_ret = true
   include_dirs = [
     "${mediastandard_path}/interfaces/innerkits/native/media/include",
     "${mediastandardfwk_path}/audiocommon/include",
