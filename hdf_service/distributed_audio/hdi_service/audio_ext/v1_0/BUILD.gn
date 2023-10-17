@@ -47,7 +47,7 @@ ohos_shared_library("libdaudio_manager_daudio_ext_service_1.0") {
   ]
 
   install_images = [ chipset_base_dir ]
-  subsystem_name = "distributedhardware"
+  subsystem_name = "hdf"
   part_name = "drivers_peripheral_distributed_audio"
 }
 
@@ -72,7 +72,7 @@ ohos_shared_library("libdaudio_ext_driver") {
 
   shlib_type = "hdi"
   install_images = [ chipset_base_dir ]
-  subsystem_name = "distributedhardware"
+  subsystem_name = "hdf"
   part_name = "drivers_peripheral_distributed_audio"
 }
 

@@ -21,6 +21,7 @@ hdf_ser_aud_path = "${hdf_service_path}/hdi_service/audio/v1_0"
 hdf_ser_aud_ext_path = "${hdf_service_path}/hdi_service/audio_ext/v1_0"
 common_path = "${hdf_service_path}/common"
 
+distributedaudio_fuzz_path = "distributed_audio/distributed_audio"
 build_flags = [ "-Werror" ]
 
 declare_args() {
