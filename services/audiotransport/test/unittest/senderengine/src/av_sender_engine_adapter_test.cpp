@@ -49,7 +49,7 @@ HWTEST_F(AVSenderEngineAdapterTest, Initialize_001, TestSize.Level1)
 {
     IAVEngineProvider *providerPtr = nullptr;
     std::string peerDevId = "peerDevId";
-    EXPECT_EQ(ERR_DH_AV_TRANS_NULL_VALUE, senderAdapter_->Initialize(providerPtr, peerDevId));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, senderAdapter_->Initialize(providerPtr, peerDevId));
     senderAdapter_->initialized_ = true;
     EXPECT_EQ(DH_SUCCESS, senderAdapter_->Initialize(providerPtr, peerDevId));
 }
@@ -77,8 +77,8 @@ HWTEST_F(AVSenderEngineAdapterTest, Initialize_002, TestSize.Level1)
  */
 HWTEST_F(AVSenderEngineAdapterTest, Start_001, TestSize.Level1)
 {
-    EXPECT_EQ(ERR_DH_AV_TRANS_NULL_VALUE, senderAdapter_->Start());
-    EXPECT_EQ(ERR_DH_AV_TRANS_NULL_VALUE, senderAdapter_->Stop());
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, senderAdapter_->Start());
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, senderAdapter_->Stop());
 }
 
 /**
@@ -90,7 +90,7 @@ HWTEST_F(AVSenderEngineAdapterTest, Start_001, TestSize.Level1)
 HWTEST_F(AVSenderEngineAdapterTest, SetParameter_001, TestSize.Level1)
 {
     std::string param = "param";
-    EXPECT_EQ(ERR_DH_AV_TRANS_NULL_VALUE, senderAdapter_->SetParameter(AVTransTag::AUDIO_SAMPLE_RATE, param));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, senderAdapter_->SetParameter(AVTransTag::AUDIO_SAMPLE_RATE, param));
 }
 
 /**
@@ -116,7 +116,7 @@ HWTEST_F(AVSenderEngineAdapterTest, PushData_001, TestSize.Level1)
 {
     size_t bufLen = 4096;
     std::shared_ptr<AudioData> audioData = std::make_shared<AudioData>(bufLen);
-    EXPECT_EQ(ERR_DH_AV_TRANS_NULL_VALUE, senderAdapter_->PushData(audioData));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, senderAdapter_->PushData(audioData));
     senderAdapter_->senderEngine_ = std::make_shared<MockIAVSenderEngine>();
     EXPECT_EQ(DH_SUCCESS, senderAdapter_->PushData(audioData));
 }
@@ -130,7 +130,7 @@ HWTEST_F(AVSenderEngineAdapterTest, PushData_001, TestSize.Level1)
 HWTEST_F(AVSenderEngineAdapterTest, CreateControlChannel_001, TestSize.Level1)
 {
     std::string peerDevId = "peerDevId";
-    EXPECT_EQ(ERR_DH_AV_TRANS_NULL_VALUE, senderAdapter_->CreateControlChannel(peerDevId));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, senderAdapter_->CreateControlChannel(peerDevId));
     senderAdapter_->chnCreateSuccess_ = true;
     EXPECT_EQ(DH_SUCCESS, senderAdapter_->CreateControlChannel(peerDevId));
 }
@@ -144,7 +144,7 @@ HWTEST_F(AVSenderEngineAdapterTest, CreateControlChannel_001, TestSize.Level1)
 HWTEST_F(AVSenderEngineAdapterTest, CreateControlChannel_002, TestSize.Level1)
 {
     std::string peerDevId = "peerDevId";
-    EXPECT_EQ(ERR_DH_AV_TRANS_NULL_VALUE, senderAdapter_->CreateControlChannel(peerDevId));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, senderAdapter_->CreateControlChannel(peerDevId));
     senderAdapter_->senderEngine_ = std::make_shared<MockIAVSenderEngine>();
     EXPECT_EQ(ERR_DH_AV_TRANS_CREATE_CHANNEL_FAILED, senderAdapter_->CreateControlChannel(peerDevId));
 }
@@ -161,7 +161,7 @@ HWTEST_F(AVSenderEngineAdapterTest, SendMessageToRemote_001, TestSize.Level1)
     std::string content = "content";
     std::string dstDevId = "dstDevId";
     auto message = std::make_shared<AVTransMessage>(type, content, dstDevId);
-    EXPECT_EQ(ERR_DH_AV_TRANS_NULL_VALUE, senderAdapter_->SendMessageToRemote(message));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, senderAdapter_->SendMessageToRemote(message));
     senderAdapter_->senderEngine_ = std::make_shared<MockIAVSenderEngine>();
     EXPECT_EQ(DH_SUCCESS, senderAdapter_->SendMessageToRemote(message));
 }
@@ -175,7 +175,7 @@ HWTEST_F(AVSenderEngineAdapterTest, SendMessageToRemote_001, TestSize.Level1)
 HWTEST_F(AVSenderEngineAdapterTest, RegisterAdapterCallback_001, TestSize.Level1)
 {
     std::shared_ptr<AVSenderAdapterCallback> callback = nullptr;
-    EXPECT_EQ(ERR_DH_AV_TRANS_NULL_VALUE, senderAdapter_->RegisterAdapterCallback(callback));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, senderAdapter_->RegisterAdapterCallback(callback));
     callback = std::make_shared<MockAVSenderAdapterCallback>();
     EXPECT_EQ(DH_SUCCESS, senderAdapter_->RegisterAdapterCallback(callback));
 }

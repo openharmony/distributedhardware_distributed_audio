@@ -42,7 +42,7 @@ static int32_t GetCapturePositionInternal(struct AudioCapture *capture, uint64_t
     AudioCaptureContext *context = reinterpret_cast<AudioCaptureContext *>(capture);
     if (context->proxy_ == nullptr) {
         DHLOGE("The context or proxy for the context is nullptr.");
-        return ERR_DH_AUDIO_HDI_NULLPTR;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     AudioTimeStamp timeHal;
     int32_t ret = context->proxy_->GetCapturePosition(*frames, timeHal);
@@ -66,7 +66,7 @@ static int32_t CaptureFrameInternal(struct AudioCapture *capture, void *frame, u
     AudioCaptureContext *context = reinterpret_cast<AudioCaptureContext *>(capture);
     if (context->proxy_ == nullptr) {
         DHLOGE("The context or proxy for the context is nullptr.");
-        return ERR_DH_AUDIO_HDI_NULLPTR;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     int8_t *uframe = reinterpret_cast<int8_t *>(frame);
     std::vector<int8_t> frameHal;

@@ -86,12 +86,12 @@ int32_t DAudioSinkService::ReleaseSink()
     auto systemAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (systemAbilityMgr == nullptr) {
         DHLOGE("Failed to get systemabilitymanager.");
-        return ERR_DH_AUDIO_BAD_VALUE;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     int32_t ret = systemAbilityMgr->UnloadSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID);
     if (ret != DH_SUCCESS) {
         DHLOGE("Sink systemabilitymgr unloadsystemability failed, ret: %d", ret);
-        return ERR_DH_AUDIO_BAD_VALUE;
+        return ERR_DH_AUDIO_SA_LOAD_FAILED;
     }
     DHLOGI("Sink systemabilitymgr unloadsystemability successfully!");
     return DH_SUCCESS;

@@ -89,7 +89,7 @@ HWTEST_F(AudioCtrlTransportTest, Release_002, TestSize.Level1)
 HWTEST_F(AudioCtrlTransportTest, Start_001, TestSize.Level1)
 {
     trans->OnSessionOpened();
-    EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE, trans->Start());
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, trans->Start());
 }
 
 /**
@@ -155,7 +155,7 @@ HWTEST_F(AudioCtrlTransportTest, SendAudioEvent_001, TestSize.Level1)
 HWTEST_F(AudioCtrlTransportTest, SendAudioEvent_002, TestSize.Level1)
 {
     AudioEvent event ;
-    EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE, trans->SendAudioEvent(event));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, trans->SendAudioEvent(event));
 }
 
 /**
@@ -167,7 +167,7 @@ HWTEST_F(AudioCtrlTransportTest, SendAudioEvent_002, TestSize.Level1)
 HWTEST_F(AudioCtrlTransportTest, RegisterChannelListener_001, TestSize.Level1)
 {
     std::shared_ptr<IAudioChannelListener> listener = nullptr;
-    EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE, trans->RegisterChannelListener());
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, trans->RegisterChannelListener());
 }
 
 /**

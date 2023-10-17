@@ -86,7 +86,7 @@ int32_t DAudioSourceStub::InitSourceInner(MessageParcel &data, MessageParcel &re
     sptr<IRemoteObject> remoteObject = data.ReadRemoteObject();
     if (remoteObject == nullptr) {
         DHLOGE("Read param failed.");
-        return ERR_DH_AUDIO_SA_READ_PARAM_FAILED;
+        return ERR_DH_AUDIO_NULLPTR;
     }
 
     sptr<DAudioIpcCallbackProxy> dAudioIpcCallbackProxy(new DAudioIpcCallbackProxy(remoteObject));

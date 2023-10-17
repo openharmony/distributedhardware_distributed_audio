@@ -57,7 +57,7 @@ int32_t DAudioSourceHandler::InitSource(const std::string &params)
         sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
         if (samgr == nullptr) {
             DHLOGE("Failed to get system ability mgr.");
-            return ERR_DH_AUDIO_SA_GET_SAMGR_FAILED;
+            return ERR_DH_AUDIO_NULLPTR;
         }
         sptr<DAudioSourceLoadCallback> loadCallback = new DAudioSourceLoadCallback(params);
         int32_t ret = samgr->LoadSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SOURCE_SA_ID, loadCallback);
@@ -76,8 +76,8 @@ int32_t DAudioSourceHandler::InitSource(const std::string &params)
     if (!waitStatus) {
         DHLOGE("Load audio SA timeout.");
         DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_INIT_FAIL, DISTRIBUTED_HARDWARE_AUDIO_SOURCE_SA_ID,
-            ERR_DH_AUDIO_SA_LOAD_TIMEOUT, "daudio source sa load timeout.");
-        return ERR_DH_AUDIO_SA_LOAD_TIMEOUT;
+            ERR_DH_AUDIO_SA_LOAD_FAILED, "daudio source sa load timeout.");
+        return ERR_DH_AUDIO_SA_LOAD_FAILED;
     }
     return DH_SUCCESS;
 }
@@ -109,7 +109,7 @@ int32_t DAudioSourceHandler::RegisterDistributedHardware(const std::string &devI
     }
     if (dAudioIpcCallback_ == nullptr) {
         DHLOGE("Daudio ipc callback is null.");
-        return ERR_DH_AUDIO_SA_IPCCALLBACK_NOT_INIT;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     if (devId.length() > DAUDIO_MAX_DEVICE_ID_LEN || dhId.length() > DAUDIO_MAX_DEVICE_ID_LEN) {
         return ERR_DH_AUDIO_SA_DEVID_ILLEGAL;
@@ -132,7 +132,7 @@ int32_t DAudioSourceHandler::UnregisterDistributedHardware(const std::string &de
     }
     if (dAudioIpcCallback_ == nullptr) {
         DHLOGE("Daudio ipc callback is null.");
-        return ERR_DH_AUDIO_SA_IPCCALLBACK_NOT_INIT;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     if (devId.length() > DAUDIO_MAX_DEVICE_ID_LEN || dhId.length() > DAUDIO_MAX_DEVICE_ID_LEN) {
         return ERR_DH_AUDIO_SA_DEVID_ILLEGAL;

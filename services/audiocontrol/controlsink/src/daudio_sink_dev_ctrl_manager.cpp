@@ -140,7 +140,7 @@ int32_t DAudioSinkDevCtrlMgr::SendAudioEvent(const AudioEvent &event)
 {
     DHLOGD("Send audio event.");
     if (audioCtrlTrans_ == nullptr) {
-        return ERR_DH_AUDIO_SA_SINK_CTRL_TRANS_NULL;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     int32_t ret = audioCtrlTrans_->SendAudioEvent(event);
     if (ret != DH_SUCCESS) {

@@ -73,12 +73,12 @@ int32_t DMicDev::InitReceiverEngine(IAVEngineProvider *providerPtr)
     int32_t ret = micTrans_->InitEngine(providerPtr);
     if (ret != DH_SUCCESS) {
         DHLOGE("Mic dev initialize av receiver adapter failed.");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+        return ret;
     }
     ret = micTrans_->CreateCtrl();
     if (ret != DH_SUCCESS) {
         DHLOGE("Create ctrl channel failed. micdev");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+        return ret;
     }
     return DH_SUCCESS;
 }
@@ -123,7 +123,7 @@ int32_t DMicDev::OpenDevice(const std::string &devId, const int32_t dhId)
     std::shared_ptr<IAudioEventCallback> cbObj = audioEventCallback_.lock();
     if (cbObj == nullptr) {
         DHLOGE("Event callback is null");
-        return ERR_DH_AUDIO_SA_MICCALLBACK_NULL;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     json jParam = { { KEY_DH_ID, std::to_string(dhId) } };
     AudioEvent event(AudioEventType::OPEN_MIC, jParam.dump());
@@ -139,7 +139,7 @@ int32_t DMicDev::CloseDevice(const std::string &devId, const int32_t dhId)
     std::shared_ptr<IAudioEventCallback> cbObj = audioEventCallback_.lock();
     if (cbObj == nullptr) {
         DHLOGE("Event callback is null");
-        return ERR_DH_AUDIO_SA_MICCALLBACK_NULL;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     json jParam = { { KEY_DH_ID, std::to_string(dhId) } };
     AudioEvent event(AudioEventType::CLOSE_MIC, jParam.dump());
@@ -175,7 +175,7 @@ int32_t DMicDev::NotifyEvent(const std::string &devId, const int32_t dhId, const
     std::shared_ptr<IAudioEventCallback> cbObj = audioEventCallback_.lock();
     if (cbObj == nullptr) {
         DHLOGE("Event callback is null");
-        return ERR_DH_AUDIO_SA_EVENT_CALLBACK_NULL;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     switch (event.type) {
         case AudioEventType::AUDIO_START:
@@ -215,7 +215,7 @@ int32_t DMicDev::Start()
     DHLOGI("Start mic device.");
     if (micTrans_ == nullptr) {
         DHLOGE("Mic trans is null.");
-        return ERR_DH_AUDIO_SA_MIC_TRANS_NULL;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     int32_t ret = micTrans_->Start();
     if (ret != DH_SUCCESS) {
@@ -227,7 +227,7 @@ int32_t DMicDev::Start()
         [this]() { return isTransReady_.load(); });
     if (!status) {
         DHLOGE("Wait channel open timeout(%ds).", CHANNEL_WAIT_SECONDS);
-        return ERR_DH_AUDIO_SA_MIC_CHANNEL_WAIT_TIMEOUT;
+        return ERR_DH_AUDIO_SA_WAIT_TIMEOUT;
     }
     isOpened_.store(true);
     return DH_SUCCESS;
@@ -493,7 +493,7 @@ int32_t DMicDev::OnStateChange(const AudioEventType type)
     std::shared_ptr<IAudioEventCallback> cbObj = audioEventCallback_.lock();
     if (cbObj == nullptr) {
         DHLOGE("Event callback is null");
-        return ERR_DH_AUDIO_SA_MICCALLBACK_NULL;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     cbObj->NotifyEvent(event);
     return DH_SUCCESS;

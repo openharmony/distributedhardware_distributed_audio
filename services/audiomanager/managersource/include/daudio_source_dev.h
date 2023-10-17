@@ -91,8 +91,6 @@ private:
     int32_t HandleCloseDMic(const AudioEvent &event);
     int32_t HandleDMicOpened(const AudioEvent &event);
     int32_t HandleDMicClosed(const AudioEvent &event);
-    int32_t HandleOpenCtrlTrans(const AudioEvent &event);
-    int32_t HandleCloseCtrlTrans(const AudioEvent &event);
     int32_t HandleCtrlTransClosed(const AudioEvent &event);
     int32_t HandleNotifyRPC(const AudioEvent &event);
     int32_t WaitForRPC(const AudioEventType type);
@@ -108,8 +106,6 @@ private:
 
     int32_t NotifySinkDev(const AudioEventType type, const json Param, const std::string dhId);
     int32_t NotifyHDF(const AudioEventType type, const std::string result, const int32_t dhId);
-    int32_t OpenCtrlTrans(const AudioEvent &event);
-    int32_t CloseCtrlTrans(const AudioEvent &event, bool isSpk);
     AudioEventType getEventTypeFromArgs(const std::string &args);
     void to_json(json &j, const AudioParam &param);
     int32_t SendAudioEventToRemote(const AudioEvent &event);

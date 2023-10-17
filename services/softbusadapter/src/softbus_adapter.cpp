@@ -142,7 +142,7 @@ int32_t SoftbusAdapter::OpenSoftbusSession(const std::string &localSessionName, 
     int32_t sessionId = OpenSession(localSessionName.c_str(), peerSessionName.c_str(), peerDevId.c_str(), "0", &attr);
     if (sessionId < 0) {
         DHLOGE("Open softbus session failed sessionId: %d.", sessionId);
-        return ERR_DH_AUDIO_ADAPTER_OPEN_SESSION_FAIL;
+        return ERR_DH_AUDIO_FAILED;
     }
     DHLOGI("Open softbus session success.");
     return sessionId;
@@ -175,7 +175,7 @@ int32_t SoftbusAdapter::SendSoftbusStream(int32_t sessionId, const std::shared_p
     DHLOGI("Send audio data, sessionId: %d.", sessionId);
     if (audioData == nullptr) {
         DHLOGE("Audio data is null.");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     std::lock_guard<std::mutex> lck(dataQueueMtx_);
     while (audioDataQueue_.size() >= DATA_QUEUE_MAX_SIZE) {
@@ -216,7 +216,7 @@ int32_t SoftbusAdapter::OnSoftbusSessionOpened(int32_t sessionId, int32_t result
     DHLOGI("On session opened, sessionId: %d, result: %d.", sessionId, result);
     if (result != SOFTBUS_OK) {
         DHLOGE("Session open failed.");
-        return ERR_DH_AUDIO_ADAPTER_OPEN_SESSION_FAIL;
+        return ERR_DH_AUDIO_FAILED;
     }
     auto &listener = GetSoftbusListenerByName(sessionId);
     if (!listener) {

@@ -67,7 +67,7 @@ int32_t DAudioHdiHandler::InitHdiHandler()
     audioSrvHdf_ = IDAudioManager::Get(HDF_AUDIO_SERVICE_NAME.c_str(), false);
     if (audioSrvHdf_ == nullptr) {
         DHLOGE("Can not get hdf audio manager.");
-        return ERR_DH_AUDIO_HDI_PROXY_NOT_INIT;
+        return ERR_DH_AUDIO_NULLPTR;
     }
 
     remote_ = OHOS::HDI::hdi_objcast<IDAudioManager>(audioSrvHdf_);
@@ -99,7 +99,7 @@ int32_t DAudioHdiHandler::RegisterAudioDevice(const std::string &devId, const in
     DHLOGI("Register audio device, adpname: %s, dhId: %d", GetAnonyString(devId).c_str(), dhId);
     if (audioSrvHdf_ == nullptr) {
         DHLOGE("Audio hdi proxy not init.");
-        return ERR_DH_AUDIO_HDI_PROXY_NOT_INIT;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     std::string searchKey;
     switch (GetDevTypeByDHId(dhId)) {
@@ -112,7 +112,7 @@ int32_t DAudioHdiHandler::RegisterAudioDevice(const std::string &devId, const in
         case AUDIO_DEVICE_TYPE_UNKNOWN:
         default:
             DHLOGE("Unknown audio device.");
-            return ERR_DH_AUDIO_HDI_UNKNOWN_DEVTYPE;
+            return ERR_DH_AUDIO_NOT_SUPPORT;
     }
     {
         std::lock_guard<std::mutex> devLck(devMapMtx_);
@@ -145,7 +145,7 @@ int32_t DAudioHdiHandler::UnRegisterAudioDevice(const std::string &devId, const 
     DHLOGI("Unregister audio device, adpname: %s, dhId: %d", GetAnonyString(devId).c_str(), dhId);
     if (audioSrvHdf_ == nullptr) {
         DHLOGE("Audio hdi proxy not init");
-        return ERR_DH_AUDIO_HDI_PROXY_NOT_INIT;
+        return ERR_DH_AUDIO_NULLPTR;
     }
 
     int32_t res = audioSrvHdf_->UnRegisterAudioDevice(devId, dhId);
@@ -159,7 +159,7 @@ int32_t DAudioHdiHandler::UnRegisterAudioDevice(const std::string &devId, const 
         auto iter = mapAudioMgrDhIds_.find(devId);
         if (iter == mapAudioMgrDhIds_.end()) {
             DHLOGE("Can not find register devId. devId: %s", GetAnonyString(devId).c_str());
-            return ERR_DH_AUDIO_HDI_CALLBACK_NOT_EXIST;
+            return ERR_DH_AUDIO_SA_CALLBACK_NOT_FOUND;
         }
 
         iter->second.erase(dhId);
@@ -219,7 +219,7 @@ int32_t DAudioHdiHandler::NotifyEvent(const std::string &devId, const int32_t dh
         GetAnonyString(devId).c_str(), dhId, audioEvent.type, audioEvent.content.c_str());
     if (audioSrvHdf_ == nullptr) {
         DHLOGE("Audio hdi proxy not init");
-        return ERR_DH_AUDIO_HDI_PROXY_NOT_INIT;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     DAudioEvent newEvent = {AUDIO_EVENT_UNKNOWN, audioEvent.content};
     ProcessEventMsg(audioEvent, newEvent);

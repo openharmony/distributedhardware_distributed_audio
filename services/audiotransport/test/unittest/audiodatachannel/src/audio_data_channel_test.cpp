@@ -102,7 +102,7 @@ HWTEST_F(AudioDataChannelTest, SendData_001, TestSize.Level1)
     dataChannel_->OnSessionOpened(sessionId, result);
 
     std::shared_ptr<AudioData> data = nullptr;
-    EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE, dataChannel_->SendData(data));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, dataChannel_->SendData(data));
 }
 
 /**

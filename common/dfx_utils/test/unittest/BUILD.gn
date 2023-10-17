@@ -50,7 +50,6 @@ config("module_private_config") {
     "${innerkits_path}/native_cpp/audio_source/include",
     "${innerkits_path}/native_cpp/audio_sink/include",
     "${services_path}/common/audioparam",
-    "${services_path}/common/taskProcessor/include",
     "${services_path}/common/audiodata/include",
     "${services_path}/common/audioeventcallback",
     "${services_path}/audiomanager/managersource/include",

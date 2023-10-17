@@ -43,7 +43,7 @@ int32_t DAudioIpcCallback::OnNotifyRegResult(const std::string &devId, const std
         return DH_SUCCESS;
     }
 
-    return ERR_DH_AUDIO_SA_REGISTERCALLBACK_NOT_FOUND;
+    return ERR_DH_AUDIO_SA_CALLBACK_NOT_FOUND;
 }
 
 int32_t DAudioIpcCallback::OnNotifyUnregResult(const std::string &devId, const std::string &dhId,
@@ -63,7 +63,7 @@ int32_t DAudioIpcCallback::OnNotifyUnregResult(const std::string &devId, const s
         unregisterCallbackMap_.erase(reqId);
         return DH_SUCCESS;
     }
-    return ERR_DH_AUDIO_SA_UNREGISTERCALLBACK_NOT_FOUND;
+    return ERR_DH_AUDIO_SA_CALLBACK_NOT_FOUND;
 }
 
 void DAudioIpcCallback::PushRegisterCallback(const std::string &reqId,

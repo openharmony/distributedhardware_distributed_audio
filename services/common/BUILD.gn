@@ -30,7 +30,6 @@ config("daudio_common_private_config") {
   include_dirs = [ "//third_party/json/include" ]
 
   include_dirs += [
-    "taskProcessor/include",
     "${common_path}/include",
     "${common_path}/dfx_utils/include",
   ]
@@ -48,8 +47,6 @@ ohos_shared_library("distributed_audio_utils") {
     "${common_path}/src/daudio_log.cpp",
     "${common_path}/src/daudio_util.cpp",
     "audiodata/src/audio_data.cpp",
-    "taskProcessor/src/task_impl.cpp",
-    "taskProcessor/src/task_queue.cpp",
   ]
 
   deps = [ "//third_party/cJSON:cjson" ]

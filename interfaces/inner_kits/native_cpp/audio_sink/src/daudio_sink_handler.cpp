@@ -68,8 +68,8 @@ int32_t DAudioSinkHandler::InitSink(const std::string &params)
     if (!waitStatus) {
         DHLOGE("Audio load sa timeout.");
         DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_INIT_FAIL, DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID,
-            ERR_DH_AUDIO_SA_LOAD_TIMEOUT, "daudio sink sa load timeout.");
-        return ERR_DH_AUDIO_SA_LOAD_TIMEOUT;
+            ERR_DH_AUDIO_SA_LOAD_FAILED, "daudio sink sa load timeout.");
+        return ERR_DH_AUDIO_SA_LOAD_FAILED;
     }
     return DH_SUCCESS;
 }

@@ -130,7 +130,7 @@ HWTEST_F(DAudioSinkDevCtrlMgrTest, SendAudioEvent_001, TestSize.Level1)
 {
     AudioEvent event;
     sinkDevCtrl_->audioCtrlTrans_ = nullptr;
-    EXPECT_EQ(ERR_DH_AUDIO_SA_SINK_CTRL_TRANS_NULL, sinkDevCtrl_->SendAudioEvent(event));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sinkDevCtrl_->SendAudioEvent(event));
 }
 
 /**

@@ -88,7 +88,7 @@ HWTEST_F(DSpeakerClientTest, OnStateChange_001, TestSize.Level1)
     EXPECT_EQ(DH_SUCCESS, speakerClient_->OnStateChange(AudioEventType::DATA_OPENED));
     EXPECT_EQ(DH_SUCCESS, speakerClient_->OnStateChange(AudioEventType::DATA_CLOSED));
     EXPECT_NE(DH_SUCCESS, speakerClient_->OnStateChange(AudioEventType::SPEAKER_OPENED));
-    EXPECT_EQ(ERR_DH_AUDIO_CLIENT_STATE_IS_INVALID, speakerClient_->OnStateChange(AudioEventType::EVENT_UNKNOWN));
+    EXPECT_EQ(ERR_DH_AUDIO_NOT_SUPPORT, speakerClient_->OnStateChange(AudioEventType::EVENT_UNKNOWN));
 }
 
 /**
@@ -124,7 +124,7 @@ HWTEST_F(DSpeakerClientTest, StartRender001, TestSize.Level1)
     EXPECT_EQ(ERR_DH_AUDIO_SA_STATUS_ERR, speakerClient_->StartRender());
     EXPECT_EQ(ERR_DH_AUDIO_SA_STATUS_ERR, speakerClient_->StopRender());
     speakerClient_->isRenderReady_.store(true);
-    EXPECT_EQ(ERR_DH_AUDIO_CLIENT_RENDER_OR_TRANS_IS_NULL, speakerClient_->StopRender());
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, speakerClient_->StopRender());
     speakerClient_->CreateAudioRenderer(audioParam_);
     EXPECT_EQ(ERR_DH_AUDIO_CLIENT_RENDER_STOP_FAILED, speakerClient_->StopRender());
 }
@@ -168,7 +168,7 @@ HWTEST_F(DSpeakerClientTest, StopRender001, TestSize.Level1)
 HWTEST_F(DSpeakerClientTest, OnDecodeTransDataDone001, TestSize.Level1)
 {
     std::shared_ptr<AudioData> audioData = nullptr;
-    EXPECT_EQ(ERR_DH_AUDIO_CLIENT_PARAM_IS_NULL, speakerClient_->OnDecodeTransDataDone(audioData));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, speakerClient_->OnDecodeTransDataDone(audioData));
     for (size_t i = 0; i < 11; i++) {
         std::shared_ptr<AudioData> data = std::make_shared<AudioData>(4096);
         speakerClient_->dataQueue_.push(data);

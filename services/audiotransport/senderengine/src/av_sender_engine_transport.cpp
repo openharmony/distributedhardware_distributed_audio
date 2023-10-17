@@ -35,7 +35,7 @@ int32_t AVTransSenderTransport::InitEngine(IAVEngineProvider *providerPtr)
     int32_t ret = senderAdapter_->Initialize(providerPtr, devId_);
     if (ret != DH_SUCCESS) {
         DHLOGE("initialize av sender adapter failed.");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+        return ret;
     }
     DHLOGI("Init SenderEngine success");
     ret = senderAdapter_->RegisterAdapterCallback(shared_from_this());
@@ -58,14 +58,13 @@ int32_t AVTransSenderTransport::Start()
     DHLOGI("StartSenderEngine enter.");
     if (senderAdapter_ == nullptr) {
         DHLOGE("av transport sender adapter is null");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     int32_t ret = senderAdapter_->Start();
     if (ret != DH_SUCCESS) {
         DHLOGE("start av sender engine failed");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
     }
-    return DH_SUCCESS;
+    return ret;
 }
 
 int32_t AVTransSenderTransport::CreateCtrl()
@@ -73,14 +72,13 @@ int32_t AVTransSenderTransport::CreateCtrl()
     DHLOGI("Create ctrl enter.");
     if (senderAdapter_ == nullptr) {
         DHLOGE("av transport sender adapter is null");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     int32_t ret = senderAdapter_->CreateControlChannel(devId_);
     if (ret != DH_SUCCESS) {
         DHLOGE("create av sender control channel failed.");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
     }
-    return DH_SUCCESS;
+    return ret;
 }
 
 int32_t AVTransSenderTransport::Stop()
@@ -88,14 +86,13 @@ int32_t AVTransSenderTransport::Stop()
     DHLOGI("StopSenderEngine enter.");
     if (senderAdapter_ == nullptr) {
         DHLOGE("av transport sender adapter is null");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     int32_t ret = senderAdapter_->Stop();
     if (ret != DH_SUCCESS) {
         DHLOGE("av transport sender adapter is null");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
     }
-    return DH_SUCCESS;
+    return ret;
 }
 
 int32_t AVTransSenderTransport::Pause()
@@ -125,28 +122,26 @@ int32_t AVTransSenderTransport::Release()
     DHLOGI("RelaseSenderEngine enter.");
     if (senderAdapter_ == nullptr) {
         DHLOGE("ReleaseSenderEngine sender adapter is null.");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     int32_t ret = senderAdapter_->Release();
     if (ret != DH_SUCCESS) {
         DHLOGE("Release av sender engine failed.");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
     }
-    return DH_SUCCESS;
+    return ret;
 }
 
 int32_t AVTransSenderTransport::FeedAudioData(std::shared_ptr<AudioData> &audioData)
 {
     if (senderAdapter_ == nullptr) {
         DHLOGE("FeedAudioData sender adapter is null.");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     int32_t ret = senderAdapter_->PushData(audioData);
     if (ret != DH_SUCCESS) {
         DHLOGE("push data failed.");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
     }
-    return DH_SUCCESS;
+    return ret;
 }
 
 int32_t AVTransSenderTransport::SendMessage(uint32_t type, std::string content, std::string dstDevId)
@@ -154,15 +149,14 @@ int32_t AVTransSenderTransport::SendMessage(uint32_t type, std::string content, 
     DHLOGI("Send message to remote. type: %u, content: %s.", type, content.c_str());
     if (senderAdapter_ == nullptr) {
         DHLOGE("FeedAudioData sender adapter is null.");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     auto message = std::make_shared<AVTransMessage>(type, content, dstDevId);
     int32_t ret = senderAdapter_->SendMessageToRemote(message);
     if (ret != DH_SUCCESS) {
         DHLOGE("Send message to remote engine failed");
-        return ret;
     }
-    return DH_SUCCESS;
+    return ret;
 }
 
 void AVTransSenderTransport::OnEngineEvent(const AVTransEvent &event)

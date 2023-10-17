@@ -25,7 +25,6 @@
 #include "daudio_log.h"
 #include "daudio_sink_manager.h"
 #include "daudio_util.h"
-#include "task_impl.h"
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DAudioSinkDev"
@@ -326,7 +325,7 @@ int32_t DAudioSinkDev::TaskSetParameter(const std::string &args)
         speakerClient = spkClientMap_[dhId];
     }
     if (speakerClient == nullptr) {
-        return ERR_DH_AUDIO_SA_SPEAKER_CLIENT_NOT_INIT;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     return speakerClient->SetAudioParameters(event);
 }

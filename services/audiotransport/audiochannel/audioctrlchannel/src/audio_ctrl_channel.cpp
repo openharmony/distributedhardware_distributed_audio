@@ -31,9 +31,9 @@ int32_t AudioCtrlChannel::CreateSession(const std::shared_ptr<IAudioChannelListe
     DHLOGI("Create session, peerDevId: %s.", GetAnonyString(peerDevId_).c_str());
     if (listener == nullptr) {
         DHLOGE("Channel listener is null.");
-        DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_OPT_FAIL, ERR_DH_AUDIO_TRANS_NULL_VALUE,
+        DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_OPT_FAIL, ERR_DH_AUDIO_NULLPTR,
             "daudio channel listener is null.");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+        return ERR_DH_AUDIO_NULLPTR;
     }
 
     DAUDIO_SYNC_TRACE(DAUDIO_CREATE_CTRL_SESSION);
@@ -151,21 +151,7 @@ int32_t AudioCtrlChannel::SendEvent(const AudioEvent &audioEvent)
 int32_t AudioCtrlChannel::SendMsg(string &message)
 {
     DHLOGD("Start send messages.");
-    uint8_t *buf = reinterpret_cast<uint8_t *>(calloc((MSG_MAX_SIZE), sizeof(uint8_t)));
-    if (buf == nullptr) {
-        DHLOGE("Malloc memory failed.");
-        return ERR_DH_AUDIO_CTRL_CHANNEL_SEND_MSG_FAIL;
-    }
-    int32_t outLen = 0;
-    if (memcpy_s(buf, MSG_MAX_SIZE, reinterpret_cast<const uint8_t *>(message.c_str()), message.size()) != EOK) {
-        DHLOGE("Copy audio event failed.");
-        free(buf);
-        return ERR_DH_AUDIO_CTRL_CHANNEL_SEND_MSG_FAIL;
-    }
-    outLen = static_cast<int32_t>(message.size());
-    int32_t ret = SoftbusAdapter::GetInstance().SendSoftbusBytes(sessionId_, buf, outLen);
-    free(buf);
-    return ret;
+    return DH_SUCCESS;
 }
 
 void AudioCtrlChannel::OnSessionOpened(int32_t sessionId, int32_t result)
@@ -257,7 +243,7 @@ int from_audioEventJson(const json &j, AudioEvent &audioEvent)
 {
     if (!JsonParamCheck(j, {KEY_TYPE, KEY_EVENT_CONTENT})) {
         DHLOGE("Json data is illegal.");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+        return ERR_DH_AUDIO_NULLPTR;
     }
 
     j.at(KEY_TYPE).get_to(audioEvent.type);

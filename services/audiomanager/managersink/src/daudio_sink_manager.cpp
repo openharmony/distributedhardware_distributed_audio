@@ -218,17 +218,17 @@ int32_t DAudioSinkManager::DAudioNotify(const std::string &devId, const std::str
     auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgr == nullptr) {
         DHLOGE("Failed to get system ability mgr.");
-        return ERR_DH_AUDIO_SA_GET_SAMGR_FAILED;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     auto remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SOURCE_SA_ID, devId);
     if (remoteObject == nullptr) {
         DHLOGE("remoteObject is null.");
-        return ERR_DH_AUDIO_SA_GET_REMOTE_SINK_FAILED;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     sptr<IDAudioSource> remoteSvrProxy = iface_cast<IDAudioSource>(remoteObject);
     if (remoteSvrProxy == nullptr) {
         DHLOGE("Failed to get remote daudio sink SA.");
-        return ERR_DH_AUDIO_SA_GET_REMOTE_SINK_FAILED;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     {
         std::lock_guard<std::mutex> lck(remoteSvrMutex_);
@@ -267,12 +267,12 @@ int32_t DAudioSinkManager::LoadAVReceiverEngineProvider()
     if ((LIB_LOAD_PATH.length() + RECEIVER_SO_NAME.length()) > PATH_MAX ||
         realpath((LIB_LOAD_PATH + RECEIVER_SO_NAME).c_str(), path) == nullptr) {
         DHLOGE("File open failed");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     pRHandler_ = dlopen(path, RTLD_LAZY | RTLD_NODELETE);
     if (pRHandler_ == nullptr) {
         DHLOGE("%s handler load failed, failed reason : %s", path, dlerror());
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     AVTransProviderClass getEngineFactoryFunc = (AVTransProviderClass)dlsym(pRHandler_,
         GET_RECEIVER_PROVIDER_FUNC.c_str());
@@ -280,7 +280,7 @@ int32_t DAudioSinkManager::LoadAVReceiverEngineProvider()
         DHLOGE("av transport engine factory function handler is null, failed reason : %s", dlerror());
         dlclose(pRHandler_);
         pRHandler_ = nullptr;
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     rcvProviderPtr_ = getEngineFactoryFunc(OWNER_NAME_D_SPEAKER);
     DHLOGE("LoadAVReceiverEngineProvider success.");
@@ -304,12 +304,12 @@ int32_t DAudioSinkManager::LoadAVSenderEngineProvider()
     if ((LIB_LOAD_PATH.length() + SENDER_SO_NAME.length()) > PATH_MAX ||
         realpath((LIB_LOAD_PATH + SENDER_SO_NAME).c_str(), path) == nullptr) {
         DHLOGE("File open failed");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     pSHandler_ = dlopen(path, RTLD_LAZY | RTLD_NODELETE);
     if (pSHandler_ == nullptr) {
         DHLOGE("%s handler load failed, failed reason : %s", path, dlerror());
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     AVTransProviderClass getEngineFactoryFunc = (AVTransProviderClass)dlsym(pSHandler_,
         GET_SENDER_PROVIDER_FUNC.c_str());
@@ -317,7 +317,7 @@ int32_t DAudioSinkManager::LoadAVSenderEngineProvider()
         DHLOGE("av transport engine factory function handler is null, failed reason : %s", dlerror());
         dlclose(pSHandler_);
         pSHandler_ = nullptr;
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     sendProviderPtr_ = getEngineFactoryFunc(OWNER_NAME_D_MIC);
     return DH_SUCCESS;

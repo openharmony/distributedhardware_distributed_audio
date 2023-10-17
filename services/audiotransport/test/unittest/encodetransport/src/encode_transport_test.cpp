@@ -194,7 +194,7 @@ HWTEST_F(EncodeTransportTest, encode_transport_test_004, TestSize.Level1)
     encodeTrans_->OnStateNotify(event);
     encodeTrans_->OnAudioDataDone(audioData);
 
-    EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE, encodeTrans_->FeedAudioData(audioData));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, encodeTrans_->FeedAudioData(audioData));
 }
 
 /**

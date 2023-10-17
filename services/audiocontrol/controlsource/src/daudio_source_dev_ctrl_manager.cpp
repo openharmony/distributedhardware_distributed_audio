@@ -58,7 +58,7 @@ int32_t DAudioSourceDevCtrlMgr::Start()
     DHLOGI("Start source device control manager.");
     if (audioCtrlTrans_ == nullptr) {
         DHLOGE("Audio ctrl trans is null, start failed");
-        return ERR_DH_AUDIO_SA_CTRL_TRANS_NULL;
+        return ERR_DH_AUDIO_NULLPTR;
     }
 
     int32_t ret = audioCtrlTrans_->Start();
@@ -72,7 +72,7 @@ int32_t DAudioSourceDevCtrlMgr::Start()
         [this]() { return isOpened_.load(); });
     if (!status) {
         DHLOGE("Wait channel open timeout(%ds).", CHANNEL_WAIT_SECONDS);
-        return ERR_DH_AUDIO_SA_CTRL_CHANNEL_WAIT_TIMEOUT;
+        return ERR_DH_AUDIO_NULLPTR;
     }
 
     return DH_SUCCESS;
@@ -116,7 +116,7 @@ int32_t DAudioSourceDevCtrlMgr::SendAudioEvent(const AudioEvent &event)
     DHLOGD("Send audio event.");
     if (audioCtrlTrans_ == nullptr) {
         DHLOGE("Send audio event, Audio ctrl trans is null");
-        return ERR_DH_AUDIO_SA_CTRL_TRANS_NULL;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     return audioCtrlTrans_->SendAudioEvent(event);
 }

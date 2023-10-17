@@ -202,7 +202,7 @@ HWTEST_F(DAudioSourceMgrTest, HandleDAudioNotify_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceMgrTest, DAudioNotify_001, TestSize.Level1)
 {
-    EXPECT_EQ(ERR_DH_AUDIO_SA_GET_REMOTE_SINK_FAILED,
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR,
         sourceMgr.DAudioNotify(DEV_ID, DH_ID_SPK, OPEN_SPEAKER, "openspk"));
 }
 
@@ -253,7 +253,8 @@ HWTEST_F(DAudioSourceMgrTest, OnDisableDAudio_001, TestSize.Level1)
     std::string reqId = GetRandomID();
     EXPECT_EQ(DH_SUCCESS, sourceMgr.CreateAudioDevice(DEV_ID));
     sourceMgr.audioDevMap_[DEV_ID].ports[DH_ID_SPK] = reqId;
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceMgr.OnDisableDAudio(DEV_ID, DH_ID_SPK, ERR_DH_AUDIO_REPEAT_OPREATOR));
+    int32_t ret = -40003;
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceMgr.OnDisableDAudio(DEV_ID, DH_ID_SPK, ret));
     EXPECT_EQ(DH_SUCCESS, sourceMgr.UnInit());
 }
 
@@ -269,7 +270,8 @@ HWTEST_F(DAudioSourceMgrTest, OnDisableDAudio_003, TestSize.Level1)
     EXPECT_EQ(DH_SUCCESS, sourceMgr.CreateAudioDevice(DEV_ID));
     sourceMgr.audioDevMap_[DEV_ID].ports[DH_ID_SPK] = reqId;
     sourceMgr.ipcCallback_ = ipcCallbackProxy_;
-    EXPECT_EQ(DH_SUCCESS, sourceMgr.OnDisableDAudio(DEV_ID, DH_ID_SPK, ERR_DH_AUDIO_REPEAT_OPREATOR));
+    int32_t ret = -40003;
+    EXPECT_EQ(DH_SUCCESS, sourceMgr.OnDisableDAudio(DEV_ID, DH_ID_SPK, ret));
     EXPECT_EQ(DH_SUCCESS, sourceMgr.UnInit());
 }
 

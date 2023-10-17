@@ -25,7 +25,6 @@
 #include "daudio_log.h"
 #include "daudio_source_manager.h"
 #include "daudio_util.h"
-#include "task_impl.h"
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DAudioSourceDev"
@@ -33,8 +32,6 @@
 namespace OHOS {
 namespace DistributedHardware {
 namespace {
-constexpr uint32_t EVENT_OPEN_CTRL = 1;
-constexpr uint32_t EVENT_CLOSE_CTRL = 2;
 constexpr uint32_t EVENT_OPEN_SPEAKER = 11;
 constexpr uint32_t EVENT_CLOSE_SPEAKER = 12;
 constexpr uint32_t EVENT_OPEN_MIC = 21;
@@ -142,7 +139,7 @@ int32_t DAudioSourceDev::DisableDAudio(const std::string &dhId)
 
     if (!CheckIsNum(dhId)) {
         DHLOGE("Disable audio device dhId param error.");
-        return ERR_DH_AUDIO_SA_DISABLE_PARAM_INVALID;
+        return ERR_DH_AUDIO_SA_PARAM_INVALID;
     }
     json jParamClose = { { KEY_DH_ID, dhId } };
     AudioEvent event(AudioEventType::EVENT_UNKNOWN, jParamClose.dump());
@@ -217,10 +214,7 @@ int32_t DAudioSourceDev::HandleOpenDSpeaker(const AudioEvent &event)
         DHLOGE("Event handler is null.");
         return ERR_DH_AUDIO_NULLPTR;
     }
-    int32_t ret = OpenCtrlTrans(event);
-    if (ret != DH_SUCCESS) {
-        return ret;
-    }
+
     auto eventParam = std::make_shared<AudioEvent>(event);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_OPEN_SPEAKER, eventParam, 0);
     if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
@@ -246,7 +240,7 @@ int32_t DAudioSourceDev::HandleCloseDSpeaker(const AudioEvent &event)
         return ERR_DH_AUDIO_FAILED;
     }
     DHLOGD("Closing DSpeaker event is sent successfully.");
-    return CloseCtrlTrans(event, true);
+    return DH_SUCCESS;
 }
 
 int32_t DAudioSourceDev::HandleDSpeakerOpened(const AudioEvent &event)
@@ -294,10 +288,6 @@ int32_t DAudioSourceDev::HandleOpenDMic(const AudioEvent &event)
         DHLOGE("Event handler is null.");
         return ERR_DH_AUDIO_NULLPTR;
     }
-    int32_t ret = OpenCtrlTrans(event);
-    if (ret != DH_SUCCESS) {
-        return ret;
-    }
 
     auto eventParam = std::make_shared<AudioEvent>(event);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_OPEN_MIC, eventParam, 0);
@@ -324,7 +314,7 @@ int32_t DAudioSourceDev::HandleCloseDMic(const AudioEvent &event)
         return ERR_DH_AUDIO_FAILED;
     }
     DHLOGD("Closing DSpeaker event is sent successfully.");
-    return CloseCtrlTrans(event, false);
+    return DH_SUCCESS;
 }
 
 int32_t DAudioSourceDev::HandleDMicOpened(const AudioEvent &event)
@@ -348,52 +338,6 @@ int32_t DAudioSourceDev::HandleDMicClosed(const AudioEvent &event)
         return DH_SUCCESS;
     }
     return mic->NotifyHdfAudioEvent(event, dhId);
-}
-
-int32_t DAudioSourceDev::OpenCtrlTrans(const AudioEvent &event)
-{
-    return DH_SUCCESS;
-}
-
-int32_t DAudioSourceDev::CloseCtrlTrans(const AudioEvent &event, bool isSpk)
-{
-    return DH_SUCCESS;
-}
-
-int32_t DAudioSourceDev::HandleOpenCtrlTrans(const AudioEvent &event)
-{
-    DHLOGI("Open control trans.");
-    if (handler_ == nullptr) {
-        DHLOGE("Event handler is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
-
-    auto eventParam = std::make_shared<AudioEvent>(event);
-    auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_OPEN_CTRL, eventParam, 0);
-    if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
-        DHLOGE("Send event failed.");
-        return ERR_DH_AUDIO_FAILED;
-    }
-    DHLOGD("Opening ctrl trans channel event is sent successfully.");
-    return DH_SUCCESS;
-}
-
-int32_t DAudioSourceDev::HandleCloseCtrlTrans(const AudioEvent &event)
-{
-    DHLOGI("Close control trans.");
-    if (handler_ == nullptr) {
-        DHLOGE("Event handler is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
-
-    auto eventParam = std::make_shared<AudioEvent>(event);
-    auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_CLOSE_CTRL, eventParam, 0);
-    if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
-        DHLOGE("Send event failed.");
-        return ERR_DH_AUDIO_FAILED;
-    }
-    DHLOGD("Close ctrl trans channel event is sent successfully.");
-    return DH_SUCCESS;
 }
 
 int32_t DAudioSourceDev::HandleCtrlTransClosed(const AudioEvent &event)
@@ -611,7 +555,7 @@ int32_t DAudioSourceDev::WaitForRPC(const AudioEventType type)
     });
     if (!status) {
         DHLOGE("RPC notify wait timeout(%ds).", RPC_WAIT_SECONDS);
-        return ERR_DH_AUDIO_SA_RPC_WAIT_TIMEOUT;
+        return ERR_DH_AUDIO_SA_WAIT_TIMEOUT;
     }
     if (!rpcResult_) {
         DHLOGE("RPC notify Result Failed.");
@@ -632,7 +576,7 @@ int32_t DAudioSourceDev::TaskEnableDAudio(const std::string &args)
     json jParam = json::parse(args, nullptr, false);
     if (!JsonParamCheck(jParam, { KEY_DH_ID, KEY_ATTRS }) || !CheckIsNum((std::string)jParam[KEY_DH_ID])) {
         DHLOGE("The keys or values is invalid.");
-        return ERR_DH_AUDIO_SA_ENABLE_PARAM_INVALID;
+        return ERR_DH_AUDIO_SA_PARAM_INVALID;
     }
     int32_t dhId = std::stoi((std::string)jParam[KEY_DH_ID]);
 
@@ -709,7 +653,7 @@ int32_t DAudioSourceDev::TaskDisableDAudio(const std::string &args)
     }
     json jParam = json::parse(args, nullptr, false);
     if (!JsonParamCheck(jParam, { KEY_DH_ID }) || !CheckIsNum((std::string)jParam[KEY_DH_ID])) {
-        return ERR_DH_AUDIO_SA_DISABLE_PARAM_INVALID;
+        return ERR_DH_AUDIO_SA_PARAM_INVALID;
     }
     int32_t dhId = std::stoi((std::string)jParam[KEY_DH_ID]);
     switch (GetDevTypeByDHId(dhId)) {
@@ -957,7 +901,7 @@ int32_t DAudioSourceDev::TaskOpenDMic(const std::string &args)
     auto mic = FindIoDevImpl(args);
     if (mic == nullptr) {
         DHLOGE("Mic device not init");
-        return ERR_DH_AUDIO_SA_MIC_DEVICE_NOT_INIT;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     int32_t ret = mic->InitReceiverEngine(DAudioSourceManager::GetInstance().getReceiverProvider());
     if (ret != DH_SUCCESS) {
@@ -1386,8 +1330,6 @@ DAudioSourceDev::SourceEventHandler::SourceEventHandler(const std::shared_ptr<Ap
     mapEventFuncs_[EVENT_CLOSE_SPEAKER] = &DAudioSourceDev::SourceEventHandler::CloseDSpeakerCallback;
     mapEventFuncs_[EVENT_OPEN_MIC] = &DAudioSourceDev::SourceEventHandler::OpenDMicCallback;
     mapEventFuncs_[EVENT_CLOSE_MIC] = &DAudioSourceDev::SourceEventHandler::CloseDMicCallback;
-    mapEventFuncs_[EVENT_OPEN_CTRL] = &DAudioSourceDev::SourceEventHandler::OpenCtrlCallback;
-    mapEventFuncs_[EVENT_CLOSE_CTRL] = &DAudioSourceDev::SourceEventHandler::CloseCtrlCallback;
     mapEventFuncs_[EVENT_VOLUME_SET] = &DAudioSourceDev::SourceEventHandler::SetVolumeCallback;
     mapEventFuncs_[EVENT_VOLUME_CHANGE] = &DAudioSourceDev::SourceEventHandler::ChangeVolumeCallback;
     mapEventFuncs_[EVENT_AUDIO_FOCUS_CHANGE] = &DAudioSourceDev::SourceEventHandler::ChangeFocusCallback;
