@@ -13,30 +13,30 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DAUDIO_SOURCE_DEV_CTRL_MANAGER_TEST_H
-#define OHOS_DAUDIO_SOURCE_DEV_CTRL_MANAGER_TEST_H
+#ifndef OHOS_DAUDIO_SOURCE_DEV_CTRL_MANAGER_H
+#define OHOS_DAUDIO_SOURCE_DEV_CTRL_MANAGER_H
 
-#include <gtest/gtest.h>
-#include <gmock/gmock.h>
+#include <map>
+#include <mutex>
+#include <condition_variable>
 
 #include "audio_event.h"
-#include "daudio_errorcode.h"
 #include "iaudio_event_callback.h"
-#define private public
-#include "daudio_source_dev_ctrl_mgr.h"
-#undef private
 
 namespace OHOS {
 namespace DistributedHardware {
-class DAudioSourceDevCtrlMgrTest : public testing::Test {
+class DAudioSourceDevCtrlMgr {
 public:
-    static void SetUpTestCase(void);
-    static void TearDownTestCase(void);
-    void SetUp();
-    void TearDown();
+    DAudioSourceDevCtrlMgr(const std::string &networkId, std::shared_ptr<IAudioEventCallback> audioEventCallback);
+    ~DAudioSourceDevCtrlMgr();
 
-    std::shared_ptr<DAudioSourceDevCtrlMgr> sourceDevCtrl_ = nullptr;
+    int32_t SetUp();
+    int32_t Start();
+    int32_t Stop();
+    int32_t Release();
+    bool IsOpened();
+    int32_t SendAudioEvent(const AudioEvent &event);
 };
-} // namespace DistributedHardware
-} // namespace OHOS
-#endif // OHOS_DAUDIO_SOURCE_DEV_CTRL_MANAGER_TEST_H
+} // DistributedHardware
+} // OHOS
+#endif // OHOS_DAUDIO_SOURCE_DEV_CTRL_MANAGER_H

@@ -345,7 +345,7 @@ void DAudioSinkManager::SetChannelState(const std::string &content)
 
 int32_t EngineProviderListener::OnProviderEvent(const AVTransEvent &event)
 {
-    DHLOGI("On provider event :%d", event.type);
+    DHLOGI("On provider event :%d, eventContent: %s.", event.type, event.content.c_str());
     if (event.type == EventType::EVENT_CHANNEL_OPENED) {
         DHLOGI("Received control channel opened event, create audio device for peerDevId=%s, content=%s.",
             GetAnonyString(event.peerDevId).c_str(), event.content.c_str());

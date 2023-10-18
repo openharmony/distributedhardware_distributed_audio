@@ -29,10 +29,7 @@ config("module_private_config") {
     "${services_path}/common/audioeventcallback",
     "${audio_transport_path}/interface",
     "${audio_transport_path}/audiochannel/interface",
-    "${audio_transport_path}/audioctrltransport/include",
-    "${audio_transport_path}/audioctrltransport/interface",
     "${audio_control_path}/controlsource/include",
-    "${audio_control_path}/test/unittest/audiocontrolutils/inlcude",
   ]
 }
 

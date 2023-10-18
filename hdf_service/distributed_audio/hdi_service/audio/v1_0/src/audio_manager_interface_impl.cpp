@@ -130,6 +130,10 @@ int32_t AudioManagerInterfaceImpl::AddAudioDevice(const std::string &adpName, co
         }
     }
     remote_ = OHOS::HDI::hdi_objcast<IDAudioCallback>(callback);
+    if (remote_ == nullptr) {
+        DHLOGE("remote callback is nullptr.");
+        return ERR_DH_AUDIO_HDF_FAIL;
+    }
     remote_->AddDeathRecipient(audioManagerRecipient_);
     adp = mapAudioAdapter_.find(adpName);
     if (adp == mapAudioAdapter_.end() || adp->second == nullptr) {

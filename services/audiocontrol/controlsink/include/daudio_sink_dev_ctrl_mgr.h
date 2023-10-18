@@ -21,30 +21,21 @@
 #include <mutex>
 
 #include "audio_event.h"
-#include "iaudio_ctrl_transport.h"
 #include "iaudio_event_callback.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class DAudioSinkDevCtrlMgr : public IAudioCtrlTransCallback, public std::enable_shared_from_this<DAudioSinkDevCtrlMgr> {
+class DAudioSinkDevCtrlMgr {
 public:
     DAudioSinkDevCtrlMgr(const std::string &networkId, std::shared_ptr<IAudioEventCallback> audioEventCallback);
-    ~DAudioSinkDevCtrlMgr() override;
+    ~DAudioSinkDevCtrlMgr();
 
-    void OnStateChange(int32_t type) override;
-    void OnEventReceived(const AudioEvent &event) override;
     int32_t SetUp();
     int32_t Start();
     int32_t Stop();
     int32_t Release();
     bool IsOpened();
     int32_t SendAudioEvent(const AudioEvent &event);
-
-private:
-    std::string devId_;
-    std::weak_ptr<IAudioEventCallback> audioEventCallback_;
-    std::shared_ptr<IAudioCtrlTransport> audioCtrlTrans_ = nullptr;
-    std::atomic<bool> isOpened_ = false;
 };
 } // DistributedHardware
 } // OHOS

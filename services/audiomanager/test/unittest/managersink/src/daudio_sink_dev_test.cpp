@@ -75,60 +75,6 @@ HWTEST_F(DAudioSinkDevTest, TaskPlayStatusChange_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: TaskOpenCtrlChannel_001
- * @tc.desc: Verify the TaskOpenCtrlChannel function.
- * @tc.type: FUNC
- * @tc.require: AR000H0E5F
- */
-HWTEST_F(DAudioSinkDevTest, TaskOpenCtrlChannel_001, TestSize.Level1)
-{
-    std::string args;
-    EXPECT_EQ(DH_SUCCESS, sinkDev_->TaskOpenCtrlChannel(args));
-}
-
-/**
- * @tc.name: TaskOpenCtrlChannel_002
- * @tc.desc: Verify the TaskOpenCtrlChannel function.
- * @tc.type: FUNC
- * @tc.require: AR000H0E5F
- */
-HWTEST_F(DAudioSinkDevTest, TaskOpenCtrlChannel_002, TestSize.Level1)
-{
-    std::string args = "args";
-    EXPECT_EQ(DH_SUCCESS, sinkDev_->TaskOpenCtrlChannel(args));
-    EXPECT_EQ(DH_SUCCESS, sinkDev_->TaskOpenCtrlChannel(args));
-}
-
-/**
- * @tc.name: TaskCloseCtrlChannel_001
- * @tc.desc: Verify the TaskCloseCtrlChannel function.
- * @tc.type: FUNC
- * @tc.require: AR000H0E5F
- */
-HWTEST_F(DAudioSinkDevTest, TaskCloseCtrlChannel_001, TestSize.Level1)
-{
-    std::string args;
-    sinkDev_->audioCtrlMgr_ = nullptr;
-    EXPECT_EQ(DH_SUCCESS, sinkDev_->TaskCloseCtrlChannel(args));
-}
-
-/**
- * @tc.name: TaskCloseCtrlChannel_002
- * @tc.desc: Verify the TaskCloseCtrlChannel function.
- * @tc.type: FUNC
- * @tc.require: AR000H0E5F
- */
-HWTEST_F(DAudioSinkDevTest, TaskCloseCtrlChannel_002, TestSize.Level1)
-{
-    std::string args;
-    std::string devId = "devId";
-    EXPECT_EQ(DH_SUCCESS, sinkDev_->TaskCloseCtrlChannel(args));
-    EXPECT_EQ(DH_SUCCESS, sinkDev_->TaskCloseCtrlChannel(args));
-    sinkDev_->audioCtrlMgr_ = std::make_shared<DAudioSinkDevCtrlMgr>(devId, sinkDev_);
-    EXPECT_EQ(DH_SUCCESS, sinkDev_->TaskCloseCtrlChannel(args));
-}
-
-/**
  * @tc.name: TaskOpenDSpeaker_001
  * @tc.desc: Verify the TaskOpenDSpeaker function.
  * @tc.type: FUNC

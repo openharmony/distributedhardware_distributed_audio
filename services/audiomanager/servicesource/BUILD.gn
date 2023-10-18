@@ -82,7 +82,6 @@ ohos_shared_library("distributed_audio_source") {
   ]
 
   deps = [
-    "${audio_transport_path}/audioctrltransport:distributed_audio_control",
     "${audio_transport_path}/decodetransport:distributed_audio_decode_transport",
     "${audio_transport_path}/encodetransport:distributed_audio_encode_transport",
     "${distributedaudio_path}/audiohandler:distributed_audio_handler",

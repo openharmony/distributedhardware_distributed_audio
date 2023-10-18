@@ -32,7 +32,6 @@ config("module_private_config") {
     "${audio_transport_path}/audioctrltransport/include",
     "${audio_transport_path}/audioctrltransport/interface",
     "${audio_control_path}/controlsink/include",
-    "${audio_control_path}/test/unittest/audiocontrolutils/inlcude",
   ]
 }
 

@@ -25,7 +25,7 @@
 
 #include "audio_event.h"
 #include "daudio_io_dev.h"
-#include "daudio_source_dev_ctrl_manager.h"
+#include "daudio_source_dev_ctrl_mgr.h"
 #include "daudio_source_mgr_callback.h"
 #include "dmic_dev.h"
 #include "dspeaker_dev.h"
@@ -62,8 +62,6 @@ private:
 
     int32_t TaskEnableDAudio(const std::string &args);
     int32_t TaskDisableDAudio(const std::string &args);
-    int32_t TaskOpenCtrlChannel(const std::string &args);
-    int32_t TaskCloseCtrlChannel(const std::string &args);
     int32_t TaskOpenDSpeaker(const std::string &args);
     int32_t OpenDSpeakerInner(std::shared_ptr<DAudioIoDev> &speaker, const int32_t dhId);
     int32_t TaskCloseDSpeaker(const std::string &args);
@@ -109,12 +107,11 @@ private:
     AudioEventType getEventTypeFromArgs(const std::string &args);
     void to_json(json &j, const AudioParam &param);
     int32_t SendAudioEventToRemote(const AudioEvent &event);
-    int32_t CloseSpkOld(const std::string &args);
     int32_t CloseSpkNew(const std::string &args);
-    int32_t CloseMicOld(const std::string &args);
     int32_t CloseMicNew(const std::string &args);
     std::shared_ptr<DAudioIoDev> FindIoDevImpl(std::string args);
     int32_t ParseDhidFromEvent(std::string args);
+    int32_t ConvertString2Int(std::string val);
 
 private:
     static constexpr uint8_t RPC_WAIT_SECONDS = 10;
@@ -137,7 +134,7 @@ private:
     std::mutex rpcWaitMutex_;
     std::condition_variable rpcWaitCond_;
     std::atomic<bool> isRpcOpen_ = false;
-    bool rpcResult_ = false;
+    int32_t rpcResult_ = ERR_DH_AUDIO_FAILED;
     uint8_t rpcNotify_ = 0;
     std::atomic<bool> threadStatusFlag_ = false;
 
@@ -155,8 +152,6 @@ private:
         void CloseDSpeakerCallback(const AppExecFwk::InnerEvent::Pointer &event);
         void OpenDMicCallback(const AppExecFwk::InnerEvent::Pointer &event);
         void CloseDMicCallback(const AppExecFwk::InnerEvent::Pointer &event);
-        void OpenCtrlCallback(const AppExecFwk::InnerEvent::Pointer &event);
-        void CloseCtrlCallback(const AppExecFwk::InnerEvent::Pointer &event);
         void SetVolumeCallback(const AppExecFwk::InnerEvent::Pointer &event);
         void ChangeVolumeCallback(const AppExecFwk::InnerEvent::Pointer &event);
         void ChangeFocusCallback(const AppExecFwk::InnerEvent::Pointer &event);

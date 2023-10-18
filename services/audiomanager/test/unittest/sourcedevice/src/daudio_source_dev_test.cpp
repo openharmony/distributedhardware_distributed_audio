@@ -211,7 +211,7 @@ HWTEST_F(DAudioSourceDevTest, WaitForRPC_001, TestSize.Level1)
     type = CHANGE_PLAY_STATUS;
     EXPECT_EQ(ERR_DH_AUDIO_SA_WAIT_TIMEOUT, sourceDev_->WaitForRPC(type));
 
-    sourceDev_->rpcResult_ = false;
+    sourceDev_->rpcResult_ = ERR_DH_AUDIO_FAILED;
     type = NOTIFY_OPEN_SPEAKER_RESULT;
     sourceDev_->rpcNotify_ = sourceDev_->EVENT_NOTIFY_OPEN_SPK;
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->WaitForRPC(type));
@@ -225,32 +225,32 @@ HWTEST_F(DAudioSourceDevTest, WaitForRPC_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, WaitForRPC_002, TestSize.Level1)
 {
-    sourceDev_->rpcResult_ = true;
+    sourceDev_->rpcResult_ = DH_SUCCESS;
     AudioEventType type = NOTIFY_OPEN_SPEAKER_RESULT;
     sourceDev_->rpcNotify_ = sourceDev_->EVENT_NOTIFY_OPEN_SPK;
     EXPECT_EQ(DH_SUCCESS, sourceDev_->WaitForRPC(type));
 
-    sourceDev_->rpcResult_ = true;
+    sourceDev_->rpcResult_ = DH_SUCCESS;
     type = NOTIFY_CLOSE_SPEAKER_RESULT;
     sourceDev_->rpcNotify_ = sourceDev_->EVENT_NOTIFY_CLOSE_SPK;
     EXPECT_EQ(DH_SUCCESS, sourceDev_->WaitForRPC(type));
 
-    sourceDev_->rpcResult_ = true;
+    sourceDev_->rpcResult_ = DH_SUCCESS;
     type = NOTIFY_OPEN_MIC_RESULT;
     sourceDev_->rpcNotify_ = sourceDev_->EVENT_NOTIFY_OPEN_MIC;
     EXPECT_EQ(DH_SUCCESS, sourceDev_->WaitForRPC(type));
 
-    sourceDev_->rpcResult_ = true;
+    sourceDev_->rpcResult_ = DH_SUCCESS;
     type = NOTIFY_CLOSE_MIC_RESULT;
     sourceDev_->rpcNotify_ = sourceDev_->EVENT_NOTIFY_CLOSE_MIC;
     EXPECT_EQ(DH_SUCCESS, sourceDev_->WaitForRPC(type));
 
-    sourceDev_->rpcResult_ = true;
+    sourceDev_->rpcResult_ = DH_SUCCESS;
     type = NOTIFY_OPEN_CTRL_RESULT;
     sourceDev_->rpcNotify_ = sourceDev_->EVENT_NOTIFY_OPEN_CTRL;
     EXPECT_EQ(DH_SUCCESS, sourceDev_->WaitForRPC(type));
 
-    sourceDev_->rpcResult_ = true;
+    sourceDev_->rpcResult_ = DH_SUCCESS;
     type = NOTIFY_CLOSE_CTRL_RESULT;
     sourceDev_->rpcNotify_ = sourceDev_->EVENT_NOTIFY_CLOSE_CTRL;
     EXPECT_EQ(DH_SUCCESS, sourceDev_->WaitForRPC(type));
@@ -615,7 +615,7 @@ HWTEST_F(DAudioSourceDevTest, TaskOpenDSpeaker_001, TestSize.Level1)
     sourceDev_->isRpcOpen_.store(true);
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->TaskOpenDSpeaker(jParam_spk.dump()));
 
-    sourceDev_->rpcResult_ = true;
+    sourceDev_->rpcResult_ = DH_SUCCESS;
     sourceDev_->rpcNotify_ = sourceDev_->EVENT_NOTIFY_OPEN_SPK;
     EXPECT_NE(DH_SUCCESS, sourceDev_->TaskOpenDSpeaker(jParam_spk.dump()));
 }
@@ -731,63 +731,6 @@ HWTEST_F(DAudioSourceDevTest, TaskCloseDMic_002, TestSize.Level1)
 
     json jParam_mic = { { KEY_DH_ID, DH_ID_MIC } };
     EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskCloseDMic(jParam_mic.dump()));
-}
-
-/**
- * @tc.name: TaskOpenCtrlChannel_001
- * @tc.desc: Verify the TaskOpenCtrlChannel function.
- * @tc.type: FUNC
- * @tc.require: AR000H0E5F
- */
-HWTEST_F(DAudioSourceDevTest, TaskOpenCtrlChannel_001, TestSize.Level1)
-{
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskOpenCtrlChannel(""));
-
-    sourceDev_->audioCtrlMgr_ = std::make_shared<DAudioSourceDevCtrlMgr>(DEV_ID, sourceDev_);
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskOpenCtrlChannel(""));
-
-    std::string tempLongStr(DAUDIO_MAX_JSON_LEN + 1, 'a');
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskOpenCtrlChannel(tempLongStr));
-
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskOpenCtrlChannel(ARGS));
-
-    json jParam = { { KEY_DH_ID, DH_ID_SPK } };
-    sourceDev_->isRpcOpen_.store(false);
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskOpenCtrlChannel(jParam.dump()));
-
-    sourceDev_->isRpcOpen_.store(true);
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskOpenCtrlChannel(jParam.dump()));
-
-    sourceDev_->rpcResult_ = true;
-    sourceDev_->rpcNotify_ = sourceDev_->EVENT_NOTIFY_OPEN_MIC;
-    jParam = { { KEY_DH_ID, DH_ID_SPK } };
-    EXPECT_NE(DH_SUCCESS, sourceDev_->TaskOpenCtrlChannel(jParam.dump()));
-}
-
-/**
- * @tc.name: TaskCloseCtrlChannel_001
- * @tc.desc: Verify the TaskCloseCtrlChannel function.
- * @tc.type: FUNC
- * @tc.require: AR000H0E5F
- */
-HWTEST_F(DAudioSourceDevTest, TaskCloseCtrlChannel_001, TestSize.Level1)
-{
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskCloseCtrlChannel(ARGS));
-    sourceDev_->OnTaskResult(DH_SUCCESS, "", FUNC_NAME);
-}
-
-/**
- * @tc.name: TaskCloseCtrlChannel_002
- * @tc.desc: Verify the TaskCloseCtrlChannel function.
- * @tc.type: FUNC
- * @tc.require: AR000H0E5F
- */
-HWTEST_F(DAudioSourceDevTest, TaskCloseCtrlChannel_002, TestSize.Level1)
-{
-    sourceDev_->audioCtrlMgr_ = std::make_shared<DAudioSourceDevCtrlMgr>(DEV_ID, sourceDev_);
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskCloseCtrlChannel(ARGS));
-
-    sourceDev_->OnTaskResult(DH_SUCCESS, "", FUNC_NAME);
 }
 
 /**
