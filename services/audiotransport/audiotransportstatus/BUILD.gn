@@ -16,6 +16,12 @@ import("//build/ohos_var.gni")
 import("../../../distributedaudio.gni")
 
 ohos_shared_library("distributed_audio_transport_status") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   include_dirs = [
     "${fwk_common_path}/utils/include",
     "${mediastandard_path}/interfaces/innerkits/native/media/include",

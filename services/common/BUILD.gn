@@ -37,6 +37,12 @@ config("daudio_common_private_config") {
 }
 
 ohos_shared_library("distributed_audio_utils") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   configs = [ ":daudio_common_private_config" ]
 
   public_configs = [ ":daudio_common_pub_config" ]
