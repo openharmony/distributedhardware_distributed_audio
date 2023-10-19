@@ -38,11 +38,14 @@ config("daudio_common_private_config") {
 
 ohos_shared_library("distributed_audio_utils") {
   sanitize = {
+    boundary_sanitize = true
     cfi = true
     cfi_cross_dso = true
     debug = false
+    integer_overflow = true
+    ubsan = true
   }
-
+  stack_protector_ret = true
   configs = [ ":daudio_common_private_config" ]
 
   public_configs = [ ":daudio_common_pub_config" ]
