@@ -30,7 +30,7 @@ int32_t AudioDataChannel::CreateSession(const std::shared_ptr<IAudioChannelListe
     DHLOGI("Create session, peerDevId: %s.", GetAnonyString(peerDevId_).c_str());
     if (listener == nullptr) {
         DHLOGE("Channel listener is null.");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+        return ERR_DH_AUDIO_NULLPTR;
     }
 
     DAUDIO_SYNC_TRACE(DAUDIO_CREATE_DATA_SESSION);

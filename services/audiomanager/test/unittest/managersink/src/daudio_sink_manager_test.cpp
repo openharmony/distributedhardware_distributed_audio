@@ -80,7 +80,7 @@ HWTEST_F(DAudioSinkManagerTest, DAudioNotify_001, TestSize.Level1)
     std::string dhId = "dhId";
     const int32_t eventType = 1;
     const std::string eventContent = "eventContent";
-    EXPECT_EQ(ERR_DH_AUDIO_SA_GET_REMOTE_SINK_FAILED,
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR,
         daudioSinkManager.DAudioNotify(devId, dhId, eventType, eventContent));
 }
 

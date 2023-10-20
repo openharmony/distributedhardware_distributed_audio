@@ -92,7 +92,7 @@ HWTEST_F(AudioRenderTest, RenderFrameInternal_002, TestSize.Level1)
     int32_t ret = renderContext.instance_.RenderFrame(render, frame, requestBytes, replyBytes);
     delete render;
     delete replyBytes;
-    EXPECT_EQ(ERR_DH_AUDIO_HDI_NULLPTR, ret);
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, ret);
 }
 
 /**
@@ -127,7 +127,7 @@ HWTEST_F(AudioRenderTest, GetRenderPositionInternal_002, TestSize.Level1)
     delete render;
     delete frames;
     delete time;
-    EXPECT_EQ(ERR_DH_AUDIO_HDI_NULLPTR, ret);
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, ret);
 }
 
 /**
@@ -158,7 +158,7 @@ HWTEST_F(AudioRenderTest, SetRenderSpeedInternal_002, TestSize.Level1)
     float speed = 0.0;
     int32_t ret = renderContext.instance_.SetRenderSpeed(render, speed);
     delete render;
-    EXPECT_EQ(ERR_DH_AUDIO_HDI_NULLPTR, ret);
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, ret);
 }
 
 /**
@@ -190,7 +190,7 @@ HWTEST_F(AudioRenderTest, GetRenderSpeedInternal_002, TestSize.Level1)
     int32_t ret = renderContext.instance_.GetRenderSpeed(render, speed);
     delete render;
     delete speed;
-    EXPECT_EQ(ERR_DH_AUDIO_HDI_NULLPTR, ret);
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, ret);
 }
 
 /**
@@ -219,7 +219,7 @@ HWTEST_F(AudioRenderTest, SetChannelModeInternal_002, TestSize.Level1)
     struct AudioRender *render = new AudioRender;
     int32_t ret = renderContext.instance_.SetChannelMode(render, AUDIO_CHANNEL_NORMAL);
     delete render;
-    EXPECT_EQ(ERR_DH_AUDIO_HDI_NULLPTR, ret);
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, ret);
 }
 
 /**
@@ -251,7 +251,7 @@ HWTEST_F(AudioRenderTest, GetChannelModeInternal_002, TestSize.Level1)
     int32_t ret = renderContext.instance_.GetChannelMode(render, mode);
     delete render;
     delete mode;
-    EXPECT_EQ(ERR_DH_AUDIO_HDI_NULLPTR, ret);
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, ret);
 }
 
 /**
@@ -299,7 +299,7 @@ HWTEST_F(AudioRenderTest, DrainBufferInternal_002, TestSize.Level1)
     int32_t ret = renderContext.instance_.DrainBuffer(render, type);
     delete render;
     delete type;
-    EXPECT_EQ(ERR_DH_AUDIO_HDI_NULLPTR, ret);
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, ret);
 }
 } // DistributedHardware
 } // OHOS

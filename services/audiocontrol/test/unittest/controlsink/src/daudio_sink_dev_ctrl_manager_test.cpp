@@ -14,10 +14,8 @@
  */
 
 #include "daudio_sink_dev_ctrl_manager_test.h"
-#include "audiocontrol_test_utils.h"
 
 using namespace testing::ext;
-
 namespace OHOS {
 namespace DistributedHardware {
 void DAudioSinkDevCtrlMgrTest::SetUpTestCase(void) {}
@@ -45,11 +43,6 @@ void DAudioSinkDevCtrlMgrTest::TearDown(void)
 
 HWTEST_F(DAudioSinkDevCtrlMgrTest, SetUp_001, TestSize.Level1)
 {
-    int32_t type = static_cast<int32_t>(AudioEventType::CTRL_OPENED);
-    sinkDevCtrl_->OnStateChange(type);
-
-    std::string devId = "devId";
-    sinkDevCtrl_->audioCtrlTrans_ = std::make_shared<MockIAudioCtrlTransport>(devId);
     EXPECT_EQ(DH_SUCCESS, sinkDevCtrl_->SetUp());
 }
 
@@ -61,8 +54,6 @@ HWTEST_F(DAudioSinkDevCtrlMgrTest, SetUp_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSinkDevCtrlMgrTest, Start_001, TestSize.Level1)
 {
-    std::string devId = "devId";
-    sinkDevCtrl_->audioCtrlTrans_ = std::make_shared<MockIAudioCtrlTransport>(devId);
     EXPECT_EQ(DH_SUCCESS, sinkDevCtrl_->Start());
 }
 
@@ -74,20 +65,6 @@ HWTEST_F(DAudioSinkDevCtrlMgrTest, Start_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSinkDevCtrlMgrTest, Stop_001, TestSize.Level1)
 {
-    sinkDevCtrl_->audioCtrlTrans_ = nullptr;
-    EXPECT_EQ(DH_SUCCESS, sinkDevCtrl_->Stop());
-}
-
-/**
- * @tc.name: Stop_002
- * @tc.desc: Verify the Stop function.
- * @tc.type: FUNC
- * @tc.require: AR000H0E5F
- */
-HWTEST_F(DAudioSinkDevCtrlMgrTest, Stop_002, TestSize.Level1)
-{
-    std::string devId = "devId";
-    sinkDevCtrl_->audioCtrlTrans_ = std::make_shared<MockIAudioCtrlTransport>(devId);
     EXPECT_EQ(DH_SUCCESS, sinkDevCtrl_->Stop());
 }
 
@@ -99,8 +76,6 @@ HWTEST_F(DAudioSinkDevCtrlMgrTest, Stop_002, TestSize.Level1)
  */
 HWTEST_F(DAudioSinkDevCtrlMgrTest, Release_001, TestSize.Level1)
 {
-    std::string devId = "devId";
-    sinkDevCtrl_->audioCtrlTrans_ = std::make_shared<MockIAudioCtrlTransport>(devId);
     EXPECT_EQ(DH_SUCCESS, sinkDevCtrl_->Release());
 }
 
@@ -112,11 +87,6 @@ HWTEST_F(DAudioSinkDevCtrlMgrTest, Release_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSinkDevCtrlMgrTest, IsOpened_001, TestSize.Level1)
 {
-    AudioEvent event;
-    sinkDevCtrl_->audioEventCallback_ = std::make_shared<MockIAudioEventCallback>();
-    sinkDevCtrl_->OnEventReceived(event);
-
-    sinkDevCtrl_->isOpened_ = true;
     EXPECT_EQ(true, sinkDevCtrl_->IsOpened());
 }
 
@@ -129,21 +99,6 @@ HWTEST_F(DAudioSinkDevCtrlMgrTest, IsOpened_001, TestSize.Level1)
 HWTEST_F(DAudioSinkDevCtrlMgrTest, SendAudioEvent_001, TestSize.Level1)
 {
     AudioEvent event;
-    sinkDevCtrl_->audioCtrlTrans_ = nullptr;
-    EXPECT_EQ(ERR_DH_AUDIO_SA_SINK_CTRL_TRANS_NULL, sinkDevCtrl_->SendAudioEvent(event));
-}
-
-/**
- * @tc.name: SendAudioEvent_002
- * @tc.desc: Verify the SendAudioEvent function.
- * @tc.type: FUNC
- * @tc.require: AR000H0E5F
- */
-HWTEST_F(DAudioSinkDevCtrlMgrTest, SendAudioEvent_002, TestSize.Level1)
-{
-    std::string devId = "devId";
-    AudioEvent event;
-    sinkDevCtrl_->audioCtrlTrans_ = std::make_shared<MockIAudioCtrlTransport>(devId);
     EXPECT_EQ(DH_SUCCESS, sinkDevCtrl_->SendAudioEvent(event));
 }
 } // namespace DistributedHardware

@@ -69,7 +69,7 @@ int32_t DSpeakerClient::InitReceiverEngine(IAVEngineProvider *providerPtr)
     int32_t ret = speakerTrans_->InitEngine(providerPtr);
     if (ret != DH_SUCCESS) {
         DHLOGE("Spk client initialize av receiver adapter failed.");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     return DH_SUCCESS;
 }
@@ -98,7 +98,7 @@ int32_t DSpeakerClient::CreateAudioRenderer(const AudioParam &param)
     audioRenderer_ = AudioStandard::AudioRenderer::Create(rendererOptions);
     if (audioRenderer_ == nullptr) {
         DHLOGE("Audio renderer create failed.");
-        return ERR_DH_AUDIO_CLIENT_CREATE_RENDER_FAILED;
+        return ERR_DH_AUDIO_CLIENT_RENDER_CREATE_FAILED;
     }
     audioRenderer_ ->SetRendererCallback(shared_from_this());
     if (audioParam_.renderOpts.renderFlags != MMAP_MODE) {
@@ -107,7 +107,7 @@ int32_t DSpeakerClient::CreateAudioRenderer(const AudioParam &param)
     int32_t ret = audioRenderer_->SetRendererWriteCallback(shared_from_this());
     if (ret != DH_SUCCESS) {
         DHLOGE("Client save write callback failed.");
-        return ERR_DH_AUDIO_CLIENT_CREATE_RENDER_FAILED;
+        return ERR_DH_AUDIO_CLIENT_RENDER_CREATE_FAILED;
     }
     return DH_SUCCESS;
 }
@@ -248,9 +248,9 @@ int32_t DSpeakerClient::StopRender()
     }
     if (audioRenderer_ == nullptr) {
         DHLOGE("Audio renderer is nullptr.");
-        DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_OPT_FAIL, ERR_DH_AUDIO_CLIENT_RENDER_OR_TRANS_IS_NULL,
+        DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_OPT_FAIL, ERR_DH_AUDIO_NULLPTR,
             "daudio renderer is nullptr.");
-        return ERR_DH_AUDIO_CLIENT_RENDER_OR_TRANS_IS_NULL;
+        return ERR_DH_AUDIO_NULLPTR;
     }
 
     FlushJitterQueue();
@@ -350,7 +350,7 @@ int32_t DSpeakerClient::OnDecodeTransDataDone(const std::shared_ptr<AudioData> &
     int64_t startTime = GetNowTimeUs();
     if (audioData == nullptr) {
         DHLOGE("The parameter is empty.");
-        return ERR_DH_AUDIO_CLIENT_PARAM_IS_NULL;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     std::lock_guard<std::mutex> lock(dataQueueMtx_);
     while (dataQueue_.size() > DATA_QUEUE_MAX_SIZE) {
@@ -385,13 +385,13 @@ int32_t DSpeakerClient::OnStateChange(const AudioEventType type)
         }
         default:
             DHLOGE("Invalid parameter type: %d.", type);
-            return ERR_DH_AUDIO_CLIENT_STATE_IS_INVALID;
+            return ERR_DH_AUDIO_NOT_SUPPORT;
     }
 
     std::shared_ptr<IAudioEventCallback> cbObj = eventCallback_.lock();
     if (cbObj == nullptr) {
         DHLOGE("Event callback is nullptr.");
-        return ERR_DH_AUDIO_CLIENT_EVENT_CALLBACK_IS_NULL;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     cbObj->NotifyEvent(event);
     return DH_SUCCESS;
@@ -544,7 +544,7 @@ int32_t DSpeakerClient::SetAudioParameters(const AudioEvent &event)
     DHLOGD("Audio volume type, volumeType = %d.", volumeType);
     if (event.type != VOLUME_SET) {
         DHLOGE("Invalid parameter.");
-        return ERR_DH_AUDIO_CLIENT_INVALID_VOLUME_PARAMETER;
+        return ERR_DH_AUDIO_CLIENT_PARAM_ERROR;
     }
 
     int32_t audioVolumeLevel;
@@ -583,7 +583,7 @@ int32_t DSpeakerClient::SetMute(const AudioEvent &event)
     DHLOGD("Audio volume type, volumeType = %d.", volumeType);
     if (event.type != VOLUME_MUTE_SET) {
         DHLOGE("Invalid parameter.");
-        return ERR_DH_AUDIO_CLIENT_INVALID_VOLUME_PARAMETER;
+        return ERR_DH_AUDIO_CLIENT_PARAM_ERROR;
     }
     ret = AudioStandard::AudioSystemManager::GetInstance()->SetMute(volumeType, muteStatus);
     if (ret != DH_SUCCESS) {

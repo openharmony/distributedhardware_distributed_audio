@@ -221,7 +221,7 @@ HWTEST_F(DMicClientTest, AudioFwkClientSetUp_001, TestSize.Level1)
 {
     audioParam_.captureOpts.capturerFlags = MMAP_MODE;
     int32_t actual = micClient_->AudioFwkClientSetUp();
-    EXPECT_EQ(ERR_DH_AUDIO_CLIENT_CREATE_CAPTURER_FAILED, actual);
+    EXPECT_EQ(ERR_DH_AUDIO_CLIENT_CAPTURER_CREATE_FAILED, actual);
     audioParam_.captureOpts.capturerFlags = NORMAL_MODE;
     actual = micClient_->AudioFwkClientSetUp();
     EXPECT_NE(DH_SUCCESS, actual);

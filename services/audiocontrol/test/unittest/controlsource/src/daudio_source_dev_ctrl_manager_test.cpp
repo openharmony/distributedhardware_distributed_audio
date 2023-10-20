@@ -19,8 +19,6 @@
 #include "nativetoken_kit.h"
 #include "token_setproc.h"
 
-#include "audiocontrol_test_utils.h"
-
 using namespace testing::ext;
 
 namespace OHOS {
@@ -66,8 +64,6 @@ void DAudioSourceDevCtrlMgrTest::TearDown(void)
  */
 HWTEST_F(DAudioSourceDevCtrlMgrTest, SetUp_001, TestSize.Level1)
 {
-    std::string devId = "devId";
-    sourceDevCtrl_->audioCtrlTrans_ = std::make_shared<MockIAudioCtrlTransport>(devId);
     EXPECT_EQ(DH_SUCCESS, sourceDevCtrl_->SetUp());
 }
 
@@ -79,21 +75,6 @@ HWTEST_F(DAudioSourceDevCtrlMgrTest, SetUp_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevCtrlMgrTest, Start_001, TestSize.Level1)
 {
-    sourceDevCtrl_->audioCtrlTrans_ = nullptr;
-    EXPECT_EQ(ERR_DH_AUDIO_SA_CTRL_TRANS_NULL, sourceDevCtrl_->Start());
-}
-
-/**
- * @tc.name: Start_002
- * @tc.desc: Verify the Start function.
- * @tc.type: FUNC
- * @tc.require: AR000H0E5F
- */
-HWTEST_F(DAudioSourceDevCtrlMgrTest, Start_002, TestSize.Level1)
-{
-    std::string devId = "devId";
-    sourceDevCtrl_->isOpened_ = true;
-    sourceDevCtrl_->audioCtrlTrans_ = std::make_shared<MockIAudioCtrlTransport>(devId);
     EXPECT_EQ(DH_SUCCESS, sourceDevCtrl_->Start());
 }
 
@@ -105,20 +86,6 @@ HWTEST_F(DAudioSourceDevCtrlMgrTest, Start_002, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevCtrlMgrTest, Stop_001, TestSize.Level1)
 {
-    sourceDevCtrl_->audioCtrlTrans_ = nullptr;
-    EXPECT_EQ(DH_SUCCESS, sourceDevCtrl_->Stop());
-}
-
-/**
- * @tc.name: Stop_002
- * @tc.desc: Verify the Stop function.
- * @tc.type: FUNC
- * @tc.require: AR000H0E5F
- */
-HWTEST_F(DAudioSourceDevCtrlMgrTest, Stop_002, TestSize.Level1)
-{
-    std::string devId = "devId";
-    sourceDevCtrl_->audioCtrlTrans_ = std::make_shared<MockIAudioCtrlTransport>(devId);
     EXPECT_EQ(DH_SUCCESS, sourceDevCtrl_->Stop());
 }
 
@@ -130,20 +97,6 @@ HWTEST_F(DAudioSourceDevCtrlMgrTest, Stop_002, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevCtrlMgrTest, Release_001, TestSize.Level1)
 {
-    sourceDevCtrl_->audioCtrlTrans_ = nullptr;
-    EXPECT_EQ(DH_SUCCESS, sourceDevCtrl_->Release());
-}
-
-/**
- * @tc.name: Release_002
- * @tc.desc: Verify the Release function.
- * @tc.type: FUNC
- * @tc.require: AR000H0E5F
- */
-HWTEST_F(DAudioSourceDevCtrlMgrTest, Release_002, TestSize.Level1)
-{
-    std::string devId = "devId";
-    sourceDevCtrl_->audioCtrlTrans_ = std::make_shared<MockIAudioCtrlTransport>(devId);
     EXPECT_EQ(DH_SUCCESS, sourceDevCtrl_->Release());
 }
 
@@ -155,13 +108,7 @@ HWTEST_F(DAudioSourceDevCtrlMgrTest, Release_002, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevCtrlMgrTest, IsOpened_001, TestSize.Level1)
 {
-    AudioEvent event;
-    sourceDevCtrl_->audioEventCallback_ = std::make_shared<MockIAudioEventCallback>();
-    sourceDevCtrl_->OnEventReceived(event);
-
-    sourceDevCtrl_->isOpened_ = true;
-    bool actual = sourceDevCtrl_->IsOpened();
-    EXPECT_EQ(true, actual);
+    EXPECT_EQ(true, sourceDevCtrl_->IsOpened());
 }
 
 /**
@@ -172,29 +119,7 @@ HWTEST_F(DAudioSourceDevCtrlMgrTest, IsOpened_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevCtrlMgrTest, SendAudioEvent_001, TestSize.Level1)
 {
-    int32_t type = static_cast<int32_t>(AudioEventType::CTRL_OPENED);
-    sourceDevCtrl_->OnStateChange(type);
-
     AudioEvent event;
-    sourceDevCtrl_->audioCtrlTrans_ = nullptr;
-    EXPECT_EQ(ERR_DH_AUDIO_SA_CTRL_TRANS_NULL, sourceDevCtrl_->SendAudioEvent(event));
-}
-
-/**
- * @tc.name: SendAudioEvent_002
- * @tc.desc: Verify the SendAudioEvent function.
- * @tc.type: FUNC
- * @tc.require: AR000H0E5F
- */
-HWTEST_F(DAudioSourceDevCtrlMgrTest, SendAudioEvent_002, TestSize.Level1)
-{
-    int32_t type = static_cast<int32_t>(AudioEventType::CTRL_OPENED);
-    sourceDevCtrl_->audioEventCallback_ = std::make_shared<MockIAudioEventCallback>();
-    sourceDevCtrl_->OnStateChange(type);
-
-    std::string devId = "devId";
-    AudioEvent event;
-    sourceDevCtrl_->audioCtrlTrans_ = std::make_shared<MockIAudioCtrlTransport>(devId);
     EXPECT_EQ(DH_SUCCESS, sourceDevCtrl_->SendAudioEvent(event));
 }
 } // namespace DistributedHardware

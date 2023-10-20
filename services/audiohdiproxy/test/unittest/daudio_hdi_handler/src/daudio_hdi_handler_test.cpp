@@ -76,8 +76,9 @@ HWTEST_F(DAudioHdiHandlerTest, RegisterAudioDevice_002, TestSize.Level1)
 {
     EXPECT_EQ(HDF_SUCCESS, hdiHandler_->InitHdiHandler());
     std::shared_ptr<IDAudioHdiCallback> callbackObjParam = std::make_shared<MockIDAudioHdiCallback>();
-    EXPECT_EQ(HDF_SUCCESS, hdiHandler_->RegisterAudioDevice(devId_, dhId_, capability_, callbackObjParam));
-    EXPECT_EQ(HDF_SUCCESS, hdiHandler_->UnRegisterAudioDevice(devId_, dhId_));
+    EXPECT_EQ(ERR_DH_AUDIO_HDI_CALL_FAILED,
+        hdiHandler_->RegisterAudioDevice(devId_, dhId_, capability_, callbackObjParam));
+    EXPECT_EQ(ERR_DH_AUDIO_HDI_CALL_FAILED, hdiHandler_->UnRegisterAudioDevice(devId_, dhId_));
 }
 
 /**

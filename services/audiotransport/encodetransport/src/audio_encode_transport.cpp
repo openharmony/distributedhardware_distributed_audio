@@ -136,7 +136,7 @@ int32_t AudioEncodeTransport::FeedAudioData(std::shared_ptr<AudioData> &audioDat
     DHLOGI("Feed audio data.");
     if (!processor_) {
         DHLOGE("Processor is null, setup first.");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+        return ERR_DH_AUDIO_NULLPTR;
     }
 
     int32_t ret = processor_->FeedAudioProcessor(audioData);

@@ -38,7 +38,7 @@ static int32_t InitDescriptorPort(const AudioAdapterDescriptor &desc, ::AudioAda
     ::AudioPort *audioPorts = (::AudioPort *)malloc(desc.ports.size() * sizeof(AudioPort));
     if (audioPorts == nullptr) {
         DHLOGE("Audio ports is nullptr.");
-        return ERR_DH_AUDIO_HDI_NULLPTR;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     descInternal.ports = audioPorts;
 
@@ -100,7 +100,7 @@ static int32_t InitAudioAdapterDescriptor(AudioManagerContext *context,
         char* adapterName = reinterpret_cast<char *>(calloc(desc.adapterName.length() + STR_TERM_LEN, sizeof(char)));
         if (adapterName == nullptr) {
             DHLOGE("Calloc failed.");
-            return ERR_DH_AUDIO_HDI_NULLPTR;
+            return ERR_DH_AUDIO_NULLPTR;
         }
         if (strcpy_s(adapterName, desc.adapterName.length() + STR_TERM_LEN, desc.adapterName.c_str()) != EOK) {
             DHLOGD("Strcpy_s adapter name failed.");
@@ -139,7 +139,7 @@ static int32_t GetAllAdaptersInternal(struct AudioManager *manager, struct ::Aud
     std::vector<AudioAdapterDescriptor> descriptors;
     if (context->proxy_ == nullptr) {
         DHLOGE("The context or proxy for the context is nullptr.");
-        return ERR_DH_AUDIO_HDI_NULLPTR;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     int32_t ret = context->proxy_->GetAllAdapters(descriptors);
     if (ret != DH_SUCCESS) {
@@ -183,7 +183,7 @@ static int32_t LoadAdapterInternal(struct AudioManager *manager, const struct ::
     sptr<IAudioAdapter> adapterProxy = nullptr;
     if (context->proxy_ == nullptr) {
         DHLOGE("The context or proxy for the context is nullptr.");
-        return ERR_DH_AUDIO_HDI_NULLPTR;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     int32_t ret = context->proxy_->LoadAdapter(descriptor, adapterProxy);
     if (ret != DH_SUCCESS) {

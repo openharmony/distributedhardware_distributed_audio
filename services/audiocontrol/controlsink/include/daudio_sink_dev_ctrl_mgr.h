@@ -13,25 +13,30 @@
  * limitations under the License.
  */
 
-#ifndef TASK_QUEUE_TEST_H
-#define TASK_QUEUE_TEST_H
+#ifndef OHOS_DAUDIO_SINK_DEV_CTRL_MANAGER_H
+#define OHOS_DAUDIO_SINK_DEV_CTRL_MANAGER_H
 
-#include <gtest/gtest.h>
-#include <gmock/gmock.h>
+#include <atomic>
+#include <map>
+#include <mutex>
 
-#define private public
-#include "task_queue.h"
-#undef private
+#include "audio_event.h"
+#include "iaudio_event_callback.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class TaskQueueTest : public testing::Test {
+class DAudioSinkDevCtrlMgr {
 public:
-    static void SetUpTestCase(void);
-    static void TearDownTestCase(void);
-    void SetUp();
-    void TearDown();
+    DAudioSinkDevCtrlMgr(const std::string &networkId, std::shared_ptr<IAudioEventCallback> audioEventCallback);
+    ~DAudioSinkDevCtrlMgr();
+
+    int32_t SetUp();
+    int32_t Start();
+    int32_t Stop();
+    int32_t Release();
+    bool IsOpened();
+    int32_t SendAudioEvent(const AudioEvent &event);
 };
-} // namespace DistributedHardware
-} // namespace OHOS
-#endif // OHOS_DMIC_CLIENT_TEST_H
+} // DistributedHardware
+} // OHOS
+#endif // OHOS_DAUDIO_SINK_DEV_CTRL_MANAGER_H

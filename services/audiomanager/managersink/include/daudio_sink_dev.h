@@ -24,7 +24,7 @@
 #include "event_handler.h"
 #include "nlohmann/json.hpp"
 
-#include "daudio_sink_dev_ctrl_manager.h"
+#include "daudio_sink_dev_ctrl_mgr.h"
 #include "dmic_client.h"
 #include "dspeaker_client.h"
 #include "iaudio_event_callback.h"
@@ -59,8 +59,6 @@ public:
     int32_t InitAVTransEngines(const ChannelState channelState, IAVEngineProvider *providerPtr);
 
 private:
-    int32_t TaskOpenCtrlChannel(const std::string &args);
-    int32_t TaskCloseCtrlChannel(const std::string &args);
     int32_t TaskOpenDSpeaker(const std::string &args);
     int32_t TaskCloseDSpeaker(const std::string &args);
     int32_t TaskStartRender(const std::string &args);
@@ -81,6 +79,7 @@ private:
     void JudgeDeviceStatus();
 
     int32_t ParseDhidFromEvent(std::string args);
+    int32_t ConvertString2Int(std::string val);
 
 private:
     std::mutex rpcWaitMutex_;
@@ -107,8 +106,6 @@ private:
         void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
 
     private:
-        void NotifyOpenCtrlChannel(const AppExecFwk::InnerEvent::Pointer &event);
-        void NotifyCloseCtrlChannel(const AppExecFwk::InnerEvent::Pointer &event);
         void NotifyCtrlOpened(const AppExecFwk::InnerEvent::Pointer &event);
         void NotifyCtrlClosed(const AppExecFwk::InnerEvent::Pointer &event);
         void NotifyOpenSpeaker(const AppExecFwk::InnerEvent::Pointer &event);

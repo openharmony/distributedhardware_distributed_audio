@@ -75,10 +75,10 @@ HWTEST_F(DAudioSourceHandlerTest, RegisterDistributedHardware_002, TestSize.Leve
     DAudioSourceHandler::GetInstance().dAudioIpcCallback_ = nullptr;
     DAudioSourceHandler::GetInstance().dAudioSourceProxy_ = new MockIDAudioSource();
     int32_t ret = DAudioSourceHandler::GetInstance().RegisterDistributedHardware(devId, dhId, param, callback);
-    EXPECT_EQ(ERR_DH_AUDIO_SA_IPCCALLBACK_NOT_INIT, ret);
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, ret);
     std::shared_ptr<UnregisterCallback> uncallback = std::make_shared<UnregisterCallbackTest>();
     ret = DAudioSourceHandler::GetInstance().UnregisterDistributedHardware(devId, dhId, uncallback);
-    EXPECT_EQ(ERR_DH_AUDIO_SA_IPCCALLBACK_NOT_INIT, ret);
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, ret);
 }
 
 /**

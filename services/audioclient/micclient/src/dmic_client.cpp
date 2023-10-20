@@ -68,7 +68,7 @@ int32_t DMicClient::InitSenderEngine(IAVEngineProvider *providerPtr)
     int32_t ret = micTrans_->InitEngine(providerPtr);
     if (ret != DH_SUCCESS) {
         DHLOGE("Mic client initialize av sender adapter failed.");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     return DH_SUCCESS;
 }
@@ -108,13 +108,13 @@ int32_t DMicClient::OnStateChange(const AudioEventType type)
         }
         default:
             DHLOGE("Invalid parameter type: %d.", type);
-            return ERR_DH_AUDIO_CLIENT_STATE_IS_INVALID;
+            return ERR_DH_AUDIO_NOT_SUPPORT;
     }
 
     std::shared_ptr<IAudioEventCallback> cbObj = eventCallback_.lock();
     if (cbObj == nullptr) {
         DHLOGE("Event callback is nullptr.");
-        return ERR_DH_AUDIO_CLIENT_EVENT_CALLBACK_IS_NULL;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     cbObj->NotifyEvent(event);
     return DH_SUCCESS;
@@ -138,13 +138,13 @@ int32_t DMicClient::AudioFwkClientSetUp()
     audioCapturer_ = AudioStandard::AudioCapturer::Create(capturerOptions);
     if (audioCapturer_ == nullptr) {
         DHLOGE("Audio capturer create failed.");
-        return ERR_DH_AUDIO_CLIENT_CREATE_CAPTURER_FAILED;
+        return ERR_DH_AUDIO_CLIENT_CAPTURER_CREATE_FAILED;
     }
     if (audioParam_.captureOpts.capturerFlags == MMAP_MODE) {
         int32_t ret = audioCapturer_->SetCapturerReadCallback(shared_from_this());
         if (ret != DH_SUCCESS) {
             DHLOGE("Client save read callback failed.");
-            return ERR_DH_AUDIO_CLIENT_CREATE_CAPTURER_FAILED;
+            return ERR_DH_AUDIO_CLIENT_CAPTURER_CREATE_FAILED;
         }
     }
     return TransSetUp();
@@ -230,7 +230,7 @@ int32_t DMicClient::StartCapture()
     }
     if (audioCapturer_ == nullptr) {
         DHLOGE("audio capturer is nullptr.");
-        return ERR_DH_AUDIO_CLIENT_CAPTURER_START_FAILED;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     if (!audioCapturer_->Start()) {
         DHLOGE("Audio capturer start failed.");
@@ -358,8 +358,8 @@ int32_t DMicClient::StopCapture()
     if (micTrans_ == nullptr) {
         DHLOGE("The capturer or mictrans is not instantiated.");
         DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_OPT_FAIL,
-            ERR_DH_AUDIO_CLIENT_CAPTURER_OR_MICTRANS_INSTANCE, "daudio capturer or mictrans is not instantiated.");
-        return ERR_DH_AUDIO_CLIENT_CAPTURER_OR_MICTRANS_INSTANCE;
+            ERR_DH_AUDIO_NULLPTR, "daudio capturer or mictrans is not instantiated.");
+        return ERR_DH_AUDIO_NULLPTR;
     }
 
     isBlocking_.store(false);

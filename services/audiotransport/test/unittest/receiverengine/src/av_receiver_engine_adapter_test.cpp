@@ -48,7 +48,7 @@ HWTEST_F(AVReceiverEngineAdapterTest, Initialize_001, TestSize.Level1)
 {
     IAVEngineProvider *providerPtr = nullptr;
     std::string peerDevId = "peerDevId";
-    EXPECT_EQ(ERR_DH_AV_TRANS_NULL_VALUE, receiverAdapter_->Initialize(providerPtr, peerDevId));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, receiverAdapter_->Initialize(providerPtr, peerDevId));
     receiverAdapter_->initialized_ = true;
     EXPECT_EQ(DH_SUCCESS, receiverAdapter_->Initialize(providerPtr, peerDevId));
 }
@@ -76,8 +76,8 @@ HWTEST_F(AVReceiverEngineAdapterTest, Initialize_002, TestSize.Level1)
  */
 HWTEST_F(AVReceiverEngineAdapterTest, Start_001, TestSize.Level1)
 {
-    EXPECT_EQ(ERR_DH_AV_TRANS_NULL_VALUE, receiverAdapter_->Start());
-    EXPECT_EQ(ERR_DH_AV_TRANS_NULL_VALUE, receiverAdapter_->Stop());
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, receiverAdapter_->Start());
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, receiverAdapter_->Stop());
 }
 
 /**
@@ -89,7 +89,7 @@ HWTEST_F(AVReceiverEngineAdapterTest, Start_001, TestSize.Level1)
 HWTEST_F(AVReceiverEngineAdapterTest, SetParameter_001, TestSize.Level1)
 {
     std::string param = "param";
-    EXPECT_EQ(ERR_DH_AV_TRANS_NULL_VALUE, receiverAdapter_->SetParameter(AVTransTag::AUDIO_SAMPLE_RATE, param));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, receiverAdapter_->SetParameter(AVTransTag::AUDIO_SAMPLE_RATE, param));
 }
 
 /**
@@ -114,7 +114,7 @@ HWTEST_F(AVReceiverEngineAdapterTest, SetParameter_002, TestSize.Level1)
 HWTEST_F(AVReceiverEngineAdapterTest, CreateControlChannel_001, TestSize.Level1)
 {
     std::string peerDevId = "peerDevId";
-    EXPECT_EQ(ERR_DH_AV_TRANS_NULL_VALUE, receiverAdapter_->CreateControlChannel(peerDevId));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, receiverAdapter_->CreateControlChannel(peerDevId));
     receiverAdapter_->chnCreateSuccess_ = true;
     EXPECT_EQ(DH_SUCCESS, receiverAdapter_->CreateControlChannel(peerDevId));
 }
@@ -128,7 +128,7 @@ HWTEST_F(AVReceiverEngineAdapterTest, CreateControlChannel_001, TestSize.Level1)
 HWTEST_F(AVReceiverEngineAdapterTest, CreateControlChannel_002, TestSize.Level1)
 {
     std::string peerDevId = "peerDevId";
-    EXPECT_EQ(ERR_DH_AV_TRANS_NULL_VALUE, receiverAdapter_->CreateControlChannel(peerDevId));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, receiverAdapter_->CreateControlChannel(peerDevId));
     receiverAdapter_->receiverEngine_ = std::make_shared<MockIAVReceiverEngine>();
     EXPECT_EQ(ERR_DH_AV_TRANS_CREATE_CHANNEL_FAILED, receiverAdapter_->CreateControlChannel(peerDevId));
 }
@@ -145,7 +145,7 @@ HWTEST_F(AVReceiverEngineAdapterTest, SendMessageToRemote_001, TestSize.Level1)
     std::string content = "content";
     std::string dstDevId = "dstDevId";
     auto message = std::make_shared<AVTransMessage>(type, content, dstDevId);
-    EXPECT_EQ(ERR_DH_AV_TRANS_NULL_VALUE, receiverAdapter_->SendMessageToRemote(message));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, receiverAdapter_->SendMessageToRemote(message));
     receiverAdapter_->receiverEngine_ = std::make_shared<MockIAVReceiverEngine>();
     EXPECT_EQ(DH_SUCCESS, receiverAdapter_->SendMessageToRemote(message));
 }
@@ -159,7 +159,7 @@ HWTEST_F(AVReceiverEngineAdapterTest, SendMessageToRemote_001, TestSize.Level1)
 HWTEST_F(AVReceiverEngineAdapterTest, RegisterAdapterCallback_001, TestSize.Level1)
 {
     std::shared_ptr<AVReceiverAdapterCallback> callback = nullptr;
-    EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE, receiverAdapter_->RegisterAdapterCallback(callback));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, receiverAdapter_->RegisterAdapterCallback(callback));
     callback = std::make_shared<MockAVReceiverAdapterCallback>();
     EXPECT_EQ(DH_SUCCESS, receiverAdapter_->RegisterAdapterCallback(callback));
 }

@@ -59,7 +59,6 @@ ohos_shared_library("distributed_audio_sink") {
     "${services_path}/common/audioeventcallback",
     "${services_path}/common/audiodata/include",
     "${services_path}/common/audioparam",
-    "${services_path}/common/taskProcessor/include",
     "${softbusadapter_path}/include",
   ]
 
@@ -93,7 +92,6 @@ ohos_shared_library("distributed_audio_sink") {
   }
 
   deps = [
-    "${audio_transport_path}/audioctrltransport:distributed_audio_control",
     "${audio_transport_path}/decodetransport:distributed_audio_decode_transport",
     "${audio_transport_path}/encodetransport:distributed_audio_encode_transport",
     "${services_path}/common:distributed_audio_utils",

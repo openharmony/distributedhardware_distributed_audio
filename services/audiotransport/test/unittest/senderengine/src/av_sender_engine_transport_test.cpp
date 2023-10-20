@@ -65,7 +65,7 @@ HWTEST_F(AVSenderEngineTransportTest, SetUp_001, TestSize.Level1)
 HWTEST_F(AVSenderEngineTransportTest, InitEngine_001, TestSize.Level1)
 {
     IAVEngineProvider *providerPtr = nullptr;
-    EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE, senderTrans_->InitEngine(providerPtr));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, senderTrans_->InitEngine(providerPtr));
     EXPECT_EQ(DH_SUCCESS, senderTrans_->Release());
 }
 
@@ -77,7 +77,7 @@ HWTEST_F(AVSenderEngineTransportTest, InitEngine_001, TestSize.Level1)
  */
 HWTEST_F(AVSenderEngineTransportTest, CreateCtrl_001, TestSize.Level1)
 {
-    EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE, senderTrans_->CreateCtrl());
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, senderTrans_->CreateCtrl());
     senderTrans_->senderAdapter_ = std::make_shared<AVTransSenderAdapter>();
     senderTrans_->senderAdapter_->chnCreateSuccess_ = true;
     EXPECT_EQ(DH_SUCCESS, senderTrans_->CreateCtrl());
@@ -91,9 +91,9 @@ HWTEST_F(AVSenderEngineTransportTest, CreateCtrl_001, TestSize.Level1)
  */
 HWTEST_F(AVSenderEngineTransportTest, Start_001, TestSize.Level1)
 {
-    EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE, senderTrans_->Start());
-    EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE, senderTrans_->Stop());
-    EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE, senderTrans_->Release());
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, senderTrans_->Start());
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, senderTrans_->Stop());
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, senderTrans_->Release());
     senderTrans_->senderAdapter_ = std::make_shared<AVTransSenderAdapter>();
     senderTrans_->senderAdapter_->senderEngine_ = std::make_shared<MockIAVSenderEngine>();
     EXPECT_EQ(DH_SUCCESS, senderTrans_->Start());
@@ -149,7 +149,7 @@ HWTEST_F(AVSenderEngineTransportTest, SendMessage_001, TestSize.Level1)
     uint32_t type = 0;
     std::string content = "content";
     std::string dstDevId = "dstDevId";
-    EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE, senderTrans_->SendMessage(type, content, dstDevId));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, senderTrans_->SendMessage(type, content, dstDevId));
     senderTrans_->senderAdapter_ = std::make_shared<AVTransSenderAdapter>();
     senderTrans_->senderAdapter_->senderEngine_ = std::make_shared<MockIAVSenderEngine>();
     EXPECT_EQ(DH_SUCCESS, senderTrans_->SendMessage(type, content, dstDevId));
@@ -165,7 +165,7 @@ HWTEST_F(AVSenderEngineTransportTest, FeedAudioData_001, TestSize.Level1)
 {
     size_t bufLen = 4096;
     std::shared_ptr<AudioData> audioData = std::make_shared<AudioData>(bufLen);
-    EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE, senderTrans_->FeedAudioData(audioData));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, senderTrans_->FeedAudioData(audioData));
     senderTrans_->senderAdapter_ = std::make_shared<AVTransSenderAdapter>();
     senderTrans_->senderAdapter_->senderEngine_ = std::make_shared<MockIAVSenderEngine>();
     EXPECT_EQ(DH_SUCCESS, senderTrans_->FeedAudioData(audioData));

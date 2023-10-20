@@ -30,7 +30,6 @@ group("unittest") {
     "${services_path}/audiomanager/test/unittest:daudio_manager_test",
     "${services_path}/audioprocessor/test/unittest:daudio_processor_test",
     "${services_path}/audiotransport/test/unittest:daudio_transport_test",
-    "${services_path}/common/taskProcessor/test/unittest:task_processor_test",
     "${services_path}/hdfaudioclient/test/unittest:audio_adapter_hdi_test",
     "${services_path}/softbusadapter/test/unittest:audio_soft_bus_adapter_test",
   ]

@@ -13,17 +13,30 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_TASK_IMPL_INTERFACE_H
-#define OHOS_TASK_IMPL_INTERFACE_H
+#ifndef OHOS_DAUDIO_SOURCE_DEV_CTRL_MANAGER_H
+#define OHOS_DAUDIO_SOURCE_DEV_CTRL_MANAGER_H
+
+#include <map>
+#include <mutex>
+#include <condition_variable>
+
+#include "audio_event.h"
+#include "iaudio_event_callback.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class TaskImplInterface {
+class DAudioSourceDevCtrlMgr {
 public:
-    TaskImplInterface() = default;
-    virtual ~TaskImplInterface() = default;
-    virtual void Run() = 0;
+    DAudioSourceDevCtrlMgr(const std::string &networkId, std::shared_ptr<IAudioEventCallback> audioEventCallback);
+    ~DAudioSourceDevCtrlMgr();
+
+    int32_t SetUp();
+    int32_t Start();
+    int32_t Stop();
+    int32_t Release();
+    bool IsOpened();
+    int32_t SendAudioEvent(const AudioEvent &event);
 };
 } // DistributedHardware
 } // OHOS
-#endif // OHOS_TASK_IMPL_INTERFACE_H
+#endif // OHOS_DAUDIO_SOURCE_DEV_CTRL_MANAGER_H

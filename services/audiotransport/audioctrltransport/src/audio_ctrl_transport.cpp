@@ -64,7 +64,7 @@ int32_t AudioCtrlTransport::Start()
     DHLOGI("Start audio control transport.");
     if (audioChannel_ == nullptr) {
         DHLOGE("Channel is null.");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+        return ERR_DH_AUDIO_NULLPTR;
     }
 
     int ret = audioChannel_->OpenSession();
@@ -100,7 +100,7 @@ int32_t AudioCtrlTransport::SendAudioEvent(const AudioEvent &event)
     DHLOGI("Send audio event.");
     if (audioChannel_ == nullptr) {
         DHLOGE("Channel is null.");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+        return ERR_DH_AUDIO_NULLPTR;
     }
 
     int32_t ret = audioChannel_->SendEvent(event);
@@ -170,7 +170,7 @@ int32_t AudioCtrlTransport::RegisterChannelListener()
     DHLOGI("Register channel listener.");
     if (audioChannel_ == nullptr) {
         DHLOGE("Channel is null.");
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+        return ERR_DH_AUDIO_NULLPTR;
     }
 
     int32_t ret = audioChannel_->CreateSession(shared_from_this(), CTRL_SESSION_NAME);

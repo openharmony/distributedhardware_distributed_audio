@@ -20,11 +20,10 @@
 #include <gmock/gmock.h>
 
 #include "audio_event.h"
-#include "iaudio_ctrl_trans_callback.h"
+#include "daudio_errorcode.h"
 #include "iaudio_event_callback.h"
-#include "audio_ctrl_transport.h"
 #define private public
-#include "daudio_sink_dev_ctrl_manager.h"
+#include "daudio_sink_dev_ctrl_mgr.h"
 #undef private
 
 namespace OHOS {

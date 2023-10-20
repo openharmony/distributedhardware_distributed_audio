@@ -72,7 +72,7 @@ HWTEST_F(SoftbusAdapterTest, OpenSoftbusSession_001, TestSize.Level1)
     std::string peerDevId;
     int32_t actual = softbusAdapter.OpenSoftbusSession(localSessionName, peerSessionName, peerDevId);
 
-    EXPECT_EQ(ERR_DH_AUDIO_ADAPTER_OPEN_SESSION_FAIL, actual);
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, actual);
     EXPECT_EQ(DH_SUCCESS, softbusAdapter.CloseSoftbusSession(actual));
 }
 
@@ -133,7 +133,7 @@ HWTEST_F(SoftbusAdapterTest, OnSoftbusSessionOpened_001, TestSize.Level1)
     int32_t sessionId = 1;
     int32_t result = -1;
 
-    EXPECT_EQ(ERR_DH_AUDIO_ADAPTER_OPEN_SESSION_FAIL, softbusAdapter.OnSoftbusSessionOpened(sessionId, result));
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, softbusAdapter.OnSoftbusSessionOpened(sessionId, result));
 }
 
 /**

@@ -13,12 +13,11 @@
  * limitations under the License.
  */
 
-#include "daudio_sink_dev_ctrl_manager.h"
+#include "daudio_sink_dev_ctrl_mgr.h"
 
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 
-#include "audio_ctrl_transport.h"
 #include "audio_param.h"
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
@@ -32,7 +31,6 @@ namespace OHOS {
 namespace DistributedHardware {
 DAudioSinkDevCtrlMgr::DAudioSinkDevCtrlMgr(const std::string &devId,
     std::shared_ptr<IAudioEventCallback> audioEventCallback)
-    : devId_(devId), audioEventCallback_(audioEventCallback)
 {
     DHLOGD("Control manager constructed.");
 }
@@ -42,42 +40,9 @@ DAudioSinkDevCtrlMgr::~DAudioSinkDevCtrlMgr()
     DHLOGD("Control manager deconstructed.");
 }
 
-void DAudioSinkDevCtrlMgr::OnStateChange(int32_t type)
-{
-    DHLOGD("Distributed audio sink device control manager state change, type: %d.", type);
-    switch (type) {
-        case AudioEventType::CTRL_OPENED:
-            isOpened_.store(true);
-            break;
-        case AudioEventType::CTRL_CLOSED:
-            isOpened_.store(false);
-            break;
-        default:
-            DHLOGE("Invalid parameter type, type: %d.", type);
-            return;
-    }
-
-    auto callback = audioEventCallback_.lock();
-    if (callback == nullptr) {
-        DHLOGE("Callback is nullptr.");
-        return;
-    }
-    AudioEvent event(static_cast<AudioEventType>(type), "");
-    callback->NotifyEvent(event);
-}
-
 int32_t DAudioSinkDevCtrlMgr::SetUp()
 {
     DHLOGI("Set up sink device control manager.");
-    if (audioCtrlTrans_ == nullptr) {
-        audioCtrlTrans_ = std::make_shared<AudioCtrlTransport>(devId_);
-    }
-
-    int32_t ret = audioCtrlTrans_->SetUp(shared_from_this());
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Ctrl trans setup failed, ret: %d.", ret);
-        return ret;
-    }
     return DH_SUCCESS;
 }
 
@@ -90,63 +55,23 @@ int32_t DAudioSinkDevCtrlMgr::Start()
 int32_t DAudioSinkDevCtrlMgr::Stop()
 {
     DHLOGI("Stop sink device control manager.");
-    isOpened_.store(false);
-    if (audioCtrlTrans_ == nullptr) {
-        DHLOGD("Ctrl trans already stop.");
-        return DH_SUCCESS;
-    }
-
-    int32_t ret = audioCtrlTrans_->Stop();
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Ctrl trans stop failed, ret: %d.", ret);
-        return ret;
-    }
     return DH_SUCCESS;
 }
 
 int32_t DAudioSinkDevCtrlMgr::Release()
 {
     DHLOGI("Release sink device control manager.");
-    if (audioCtrlTrans_ == nullptr) {
-        DHLOGD("Ctrl trans already release.");
-        return DH_SUCCESS;
-    }
-    int32_t ret = audioCtrlTrans_->Release();
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Ctrl trans release failed, ret: %d.", ret);
-        return ret;
-    }
-    audioCtrlTrans_ = nullptr;
     return DH_SUCCESS;
 }
 
 bool DAudioSinkDevCtrlMgr::IsOpened()
 {
-    return isOpened_.load();
-}
-
-void DAudioSinkDevCtrlMgr::OnEventReceived(const AudioEvent &event)
-{
-    DHLOGD("Received event type %d.", event.type);
-    auto callback = audioEventCallback_.lock();
-    if (callback == nullptr) {
-        DHLOGE("Callback is nullptr.");
-        return;
-    }
-    callback->NotifyEvent(event);
+    return true;
 }
 
 int32_t DAudioSinkDevCtrlMgr::SendAudioEvent(const AudioEvent &event)
 {
     DHLOGD("Send audio event.");
-    if (audioCtrlTrans_ == nullptr) {
-        return ERR_DH_AUDIO_SA_SINK_CTRL_TRANS_NULL;
-    }
-    int32_t ret = audioCtrlTrans_->SendAudioEvent(event);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Audio control transfer sending audio event error,ret: %d.", ret);
-        return ret;
-    }
     return DH_SUCCESS;
 }
 } // namespace DistributedHardware

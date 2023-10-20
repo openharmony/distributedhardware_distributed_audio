@@ -35,11 +35,11 @@ int32_t AVTransReceiverAdapter::Initialize(IAVEngineProvider *providerPtr, const
         return DH_SUCCESS;
     }
     if (providerPtr == nullptr) {
-        return ERR_DH_AV_TRANS_NULL_VALUE;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     receiverEngine_ = providerPtr->CreateAVReceiverEngine(peerDevId);
     if (receiverEngine_ == nullptr) {
-        return ERR_DH_AV_TRANS_NULL_VALUE;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     receiverEngine_->RegisterReceiverCallback(shared_from_this());
     initialized_ = true;
@@ -65,7 +65,7 @@ int32_t AVTransReceiverAdapter::Start()
     DHLOGI("Start enter");
     if (receiverEngine_ == nullptr) {
         DHLOGE("Av transport receiver engine is null.");
-        return ERR_DH_AV_TRANS_NULL_VALUE;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     return receiverEngine_->Start();
 }
@@ -74,14 +74,10 @@ int32_t AVTransReceiverAdapter::Stop()
 {
     DHLOGI("Stop!");
     if (receiverEngine_ == nullptr) {
-        return ERR_DH_AV_TRANS_NULL_VALUE;
+        DHLOGE("Av transport receiver engine is null.");
+        return ERR_DH_AUDIO_NULLPTR;
     }
-    int32_t ret = receiverEngine_->Stop();
-    if (ret != DH_SUCCESS) {
-        return ERR_DH_AV_TRANS_STOP_FAILED;
-    }
-    DHLOGI("Stop success!");
-    return DH_SUCCESS;
+    return receiverEngine_->Stop();
 }
 
 int32_t AVTransReceiverAdapter::SetParameter(const AVTransTag &tag, const std::string &param)
@@ -89,14 +85,13 @@ int32_t AVTransReceiverAdapter::SetParameter(const AVTransTag &tag, const std::s
     DHLOGI("SetParameter!");
     if (receiverEngine_ == nullptr) {
         DHLOGE("av transport receiver engine is null");
-        return ERR_DH_AV_TRANS_NULL_VALUE;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     int32_t ret = receiverEngine_->SetParameter(tag, param);
     if (ret != DH_SUCCESS) {
         DHLOGE("Set av transport receiver parameter failed, ret: %d.", ret);
-        return ERR_DH_AV_TRANS_SETUP_FAILED;
     }
-    return DH_SUCCESS;
+    return ret;
 }
 
 int32_t AVTransReceiverAdapter::CreateControlChannel(const std::string &peerDevId)
@@ -109,7 +104,7 @@ int32_t AVTransReceiverAdapter::CreateControlChannel(const std::string &peerDevI
 
     if (receiverEngine_ == nullptr) {
         DHLOGE("Av transport receiver engine is null");
-        return ERR_DH_AV_TRANS_NULL_VALUE;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     std::vector<std::string> dstDevIds = {peerDevId};
     int32_t ret = receiverEngine_->CreateControlChannel(dstDevIds,
@@ -130,12 +125,12 @@ int32_t AVTransReceiverAdapter::SendMessageToRemote(const std::shared_ptr<AVTran
 {
     DHLOGI("Send message to remote.");
     if (receiverEngine_ == nullptr) {
-        return ERR_DH_AV_TRANS_NULL_VALUE;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     int32_t ret = receiverEngine_->SendMessage(message);
     if (ret != DH_SUCCESS) {
         DHLOGE("Send meassage to remote sender engine failed, ret: %d.", ret);
-        return ERR_DH_AV_TRANS_SEND_MSG_FAILED;
+        return ret;
     }
     return DH_SUCCESS;
 }
@@ -143,7 +138,7 @@ int32_t AVTransReceiverAdapter::SendMessageToRemote(const std::shared_ptr<AVTran
 int32_t AVTransReceiverAdapter::RegisterAdapterCallback(const std::shared_ptr<AVReceiverAdapterCallback> &callback)
 {
     if (callback == nullptr) {
-        return ERR_DH_AUDIO_TRANS_NULL_VALUE;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     adapterCallback_ = callback;
     return DH_SUCCESS;
@@ -155,7 +150,7 @@ int32_t AVTransReceiverAdapter::WaitForChannelCreated()
     auto status = chnCreatedCondVar_.wait_for(lock, std::chrono::milliseconds(WAIT_TIMEOUT_MS));
     if (status == std::cv_status::timeout) {
         DHLOGI("Wait for av transport receiver channel created timeout");
-        return ERR_DH_AV_TRANS_TIMEOUT;
+        return ERR_DH_AUDIO_SA_WAIT_TIMEOUT;
     }
     if (!chnCreateSuccess_.load()) {
         DHLOGE("Create av transport receiver channel failed");

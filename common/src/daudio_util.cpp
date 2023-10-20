@@ -31,7 +31,7 @@
 #include "parameter.h"
 
 #undef DH_LOG_TAG
-#define DH_LOG_TAG "DAudioUtils"
+#define DH_LOG_TAG "DAudioUtil"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -123,6 +123,7 @@ std::string GetAnonyString(const std::string &value)
 
 int32_t GetDevTypeByDHId(int32_t dhId)
 {
+    DHLOGI("Get dev type by dhId: %d.", dhId);
     if (static_cast<uint32_t>(dhId) & 0x8000000) {
         return AUDIO_DEVICE_TYPE_MIC;
     } else if (static_cast<uint32_t>(dhId) & 0x7ffffff) {
@@ -188,7 +189,10 @@ int32_t GetAudioParamInt(const std::string &params, const std::string &key, int3
         DHLOGE("Get audio param string fail, error code %d.", ret);
         return ret;
     }
-
+    if (!CheckIsNum(val)) {
+        DHLOGE("String is not number. str:%s.", val.c_str());
+        return ERR_DH_AUDIO_NOT_SUPPORT;
+    }
     value = std::stoi(val);
     return DH_SUCCESS;
 }

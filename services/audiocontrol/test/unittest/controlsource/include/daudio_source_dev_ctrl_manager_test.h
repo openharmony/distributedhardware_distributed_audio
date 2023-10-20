@@ -21,13 +21,9 @@
 
 #include "audio_event.h"
 #include "daudio_errorcode.h"
-#include "iaudio_ctrl_trans_callback.h"
 #include "iaudio_event_callback.h"
-#include "iaudio_ctrl_transport.h"
-#include "audiocontrol_test_utils.h"
-#include "audio_ctrl_transport.h"
 #define private public
-#include "daudio_source_dev_ctrl_manager.h"
+#include "daudio_source_dev_ctrl_mgr.h"
 #undef private
 
 namespace OHOS {

@@ -25,7 +25,6 @@
 #include "daudio_log.h"
 #include "daudio_sink_manager.h"
 #include "daudio_util.h"
-#include "task_impl.h"
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DAudioSinkDev"
@@ -104,20 +103,6 @@ void DAudioSinkDev::NotifyEvent(const AudioEvent &audioEvent)
     }
 }
 
-int32_t DAudioSinkDev::TaskOpenCtrlChannel(const std::string &args)
-{
-    DHLOGI("Open ctrl channel.");
-    DHLOGI("Open ctrl channel success, notify open ctrl result.");
-    return DH_SUCCESS;
-}
-
-int32_t DAudioSinkDev::TaskCloseCtrlChannel(const std::string &args)
-{
-    (void)args;
-    DHLOGD("Close ctrl channel success.");
-    return DH_SUCCESS;
-}
-
 int32_t DAudioSinkDev::TaskOpenDSpeaker(const std::string &args)
 {
     DHLOGI("Open speaker device.");
@@ -128,7 +113,11 @@ int32_t DAudioSinkDev::TaskOpenDSpeaker(const std::string &args)
     if (!JsonParamCheck(jParam, { KEY_DH_ID, KEY_AUDIO_PARAM })) {
         return ERR_DH_AUDIO_FAILED;
     }
-    int32_t dhId = std::stoi(std::string(jParam[KEY_DH_ID]));
+    int32_t dhId = ConvertString2Int(std::string(jParam[KEY_DH_ID]));
+    if (dhId == -1) {
+        DHLOGE("Parse dhId error.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
     std::shared_ptr<ISpkClient> speakerClient = nullptr;
     {
         std::lock_guard<std::mutex> devLck(spkClientMutex_);
@@ -149,8 +138,8 @@ int32_t DAudioSinkDev::TaskOpenDSpeaker(const std::string &args)
     ret = speakerClient->SetUp(audioParam);
     if (ret != DH_SUCCESS) {
         DHLOGE("Setup speaker failed, ret: %d.", ret);
-        NotifySourceDev(NOTIFY_OPEN_SPEAKER_RESULT, spkDhId_, ERR_DH_AUDIO_FAILED);
-        return ERR_DH_AUDIO_FAILED;
+        NotifySourceDev(NOTIFY_OPEN_SPEAKER_RESULT, spkDhId_, ret);
+        return ret;
     }
 
     NotifySourceDev(NOTIFY_OPEN_SPEAKER_RESULT, std::to_string(dhId), ret);
@@ -208,7 +197,7 @@ int32_t DAudioSinkDev::ParseDhidFromEvent(std::string args)
         cJSON_Delete(jParam);
         return ERR_DH_AUDIO_FAILED;
     }
-    int32_t dhId = std::stoi(std::string(dhIdItem->valuestring));
+    int32_t dhId = ConvertString2Int(std::string(dhIdItem->valuestring));
     cJSON_Delete(jParam);
     DHLOGI("Parsed dhId is: %d.", dhId);
     return dhId;
@@ -255,7 +244,11 @@ int32_t DAudioSinkDev::TaskOpenDMic(const std::string &args)
         DHLOGE("Get audio param from json failed, error code %d.", ret);
         return ret;
     }
-    int32_t dhId = std::stoi(std::string(jParam[KEY_DH_ID]));
+    int32_t dhId = ConvertString2Int(std::string(jParam[KEY_DH_ID]));
+    if (dhId == -1) {
+        DHLOGE("Parse dhId error.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
     std::shared_ptr<IMicClient> micClient = nullptr;
     {
         std::lock_guard<std::mutex> devLck(micClientMutex_);
@@ -326,7 +319,7 @@ int32_t DAudioSinkDev::TaskSetParameter(const std::string &args)
         speakerClient = spkClientMap_[dhId];
     }
     if (speakerClient == nullptr) {
-        return ERR_DH_AUDIO_SA_SPEAKER_CLIENT_NOT_INIT;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     return speakerClient->SetAudioParameters(event);
 }
@@ -466,6 +459,15 @@ void DAudioSinkDev::JudgeDeviceStatus()
     DAudioSinkManager::GetInstance().OnSinkDevReleased(devId_);
 }
 
+int32_t DAudioSinkDev::ConvertString2Int(std::string val)
+{
+    if (!CheckIsNum(val)) {
+        DHLOGE("String is not number. str:%s.", val.c_str());
+        return -1;
+    }
+    return std::stoi(val);
+}
+
 void DAudioSinkDev::NotifySourceDev(const AudioEventType type, const std::string dhId, const int32_t result)
 {
     std::random_device rd;
@@ -481,10 +483,15 @@ void DAudioSinkDev::NotifySourceDev(const AudioEventType type, const std::string
         DHLOGE("In new engine mode, ctrl is not allowed.");
         return;
     }
+    int32_t dhIdInt = ConvertString2Int(dhId);
+    if (dhIdInt == -1) {
+        DHLOGE("Parse dhId error.");
+        return;
+    }
     std::shared_ptr<ISpkClient> speakerClient = nullptr;
     {
         std::lock_guard<std::mutex> devLck(spkClientMutex_);
-        speakerClient = spkClientMap_[std::stoi(dhId)];
+        speakerClient = spkClientMap_[dhIdInt];
     }
     if (speakerClient != nullptr) {
         speakerClient->SendMessage(static_cast<uint32_t>(type), jEvent.dump(), devId_);
@@ -492,7 +499,7 @@ void DAudioSinkDev::NotifySourceDev(const AudioEventType type, const std::string
     std::shared_ptr<IMicClient> micClient = nullptr;
     {
         std::lock_guard<std::mutex> devLck(micClientMutex_);
-        micClient = micClientMap_[std::stoi(dhId)];
+        micClient = micClientMap_[dhIdInt];
     }
     if (micClient != nullptr) {
         micClient->SendMessage(static_cast<uint32_t>(type), jEvent.dump(), devId_);
@@ -527,8 +534,6 @@ DAudioSinkDev::SinkEventHandler::SinkEventHandler(const std::shared_ptr<AppExecF
     const std::shared_ptr<DAudioSinkDev> &dev) : AppExecFwk::EventHandler(runner), sinkDev_(dev)
 {
     DHLOGD("Event handler is constructing.");
-    mapEventFuncs_[static_cast<uint32_t>(OPEN_CTRL)] = &DAudioSinkDev::SinkEventHandler::NotifyOpenCtrlChannel;
-    mapEventFuncs_[static_cast<uint32_t>(CLOSE_CTRL)] = &DAudioSinkDev::SinkEventHandler::NotifyCloseCtrlChannel;
     mapEventFuncs_[static_cast<uint32_t>(CTRL_OPENED)] = &DAudioSinkDev::SinkEventHandler::NotifyCtrlOpened;
     mapEventFuncs_[static_cast<uint32_t>(CTRL_CLOSED)] = &DAudioSinkDev::SinkEventHandler::NotifyCtrlClosed;
     mapEventFuncs_[static_cast<uint32_t>(OPEN_SPEAKER)] = &DAudioSinkDev::SinkEventHandler::NotifyOpenSpeaker;
@@ -563,44 +568,6 @@ void DAudioSinkDev::SinkEventHandler::ProcessEvent(const AppExecFwk::InnerEvent:
     (this->*func)(event);
 }
 
-void DAudioSinkDev::SinkEventHandler::NotifyOpenCtrlChannel(const AppExecFwk::InnerEvent::Pointer &event)
-{
-    DHLOGI("Notify open ctrl channel.");
-    std::string eventParam;
-    if (GetEventParam(event, eventParam) != DH_SUCCESS) {
-        DHLOGE("Failed to get event parameters.");
-        return;
-    }
-    auto sinkDevObj = sinkDev_.lock();
-    if (sinkDevObj == nullptr) {
-        DHLOGE("Sink dev is invalid.");
-        return;
-    }
-    if (sinkDevObj->TaskOpenCtrlChannel(eventParam) != DH_SUCCESS) {
-        DHLOGE("Open ctrl channel failed.");
-        return;
-    }
-}
-
-void DAudioSinkDev::SinkEventHandler::NotifyCloseCtrlChannel(const AppExecFwk::InnerEvent::Pointer &event)
-{
-    DHLOGI("Notify close ctrl channel.");
-    std::string eventParam;
-    if (GetEventParam(event, eventParam) != DH_SUCCESS) {
-        DHLOGE("Failed to get event parameters.");
-        return;
-    }
-    auto sinkDevObj = sinkDev_.lock();
-    if (sinkDevObj == nullptr) {
-        DHLOGE("Sink dev is invalid.");
-        return;
-    }
-    if (sinkDevObj->TaskCloseCtrlChannel(eventParam) != DH_SUCCESS) {
-        DHLOGE("Close ctrl channel falied.");
-        return;
-    }
-}
-
 void DAudioSinkDev::SinkEventHandler::NotifyCtrlOpened(const AppExecFwk::InnerEvent::Pointer &event)
 {
     DHLOGI("Ctrl channel is opened.");
@@ -618,10 +585,6 @@ void DAudioSinkDev::SinkEventHandler::NotifyCtrlClosed(const AppExecFwk::InnerEv
     auto sinkDevObj = sinkDev_.lock();
     if (sinkDevObj == nullptr) {
         DHLOGE("Sink dev is invalid.");
-        return;
-    }
-    if (sinkDevObj->TaskCloseCtrlChannel(eventParam) != DH_SUCCESS) {
-        DHLOGE("Close ctrl channel failed.");
         return;
     }
     if (sinkDevObj->TaskCloseDSpeaker(eventParam) != DH_SUCCESS) {

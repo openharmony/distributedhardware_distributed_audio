@@ -41,7 +41,7 @@ static int32_t InitAllPortsInternal(struct AudioAdapter *adapter)
     AudioAdapterContext *context = reinterpret_cast<AudioAdapterContext *>(adapter);
     if (context->proxy_ == nullptr) {
         DHLOGE("The context or proxy for the context is nullptr.");
-        return ERR_DH_AUDIO_HDI_NULLPTR;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     return context->proxy_->InitAllPorts();
 }
@@ -76,7 +76,7 @@ static int32_t CreateRenderInternal(struct AudioAdapter *adapter, const struct :
     AudioAdapterContext *context = reinterpret_cast<AudioAdapterContext *>(adapter);
     if (context->proxy_ == nullptr) {
         DHLOGE("The context or proxy for the context is nullptr.");
-        return ERR_DH_AUDIO_HDI_NULLPTR;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     AudioDeviceDescriptor descHal = {
         .portId = desc->portId,
@@ -117,7 +117,7 @@ static int32_t DestroyRenderInternal(struct AudioAdapter *adapter, struct AudioR
     AudioRenderContext *renderContext = reinterpret_cast<AudioRenderContext *>(render);
     if (adapterContext->proxy_ == nullptr) {
         DHLOGE("The adapter context or proxy for the adapter context is nullptr.");
-        return ERR_DH_AUDIO_HDI_NULLPTR;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     std::lock_guard<std::mutex> lock(adapterContext->mtx_);
 
@@ -146,7 +146,7 @@ static int32_t CreateCaptureInternal(struct AudioAdapter *adapter, const struct 
     AudioAdapterContext *context = reinterpret_cast<AudioAdapterContext *>(adapter);
     if (context->proxy_ == nullptr) {
         DHLOGE("The context or proxy for the context is nullptr.");
-        return ERR_DH_AUDIO_HDI_NULLPTR;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     AudioDeviceDescriptor descHal = {
         .portId = desc->portId,
@@ -187,7 +187,7 @@ static int32_t DestroyCaptureInternal(struct AudioAdapter *adapter, struct Audio
     AudioCaptureContext *captureContext = reinterpret_cast<AudioCaptureContext *>(capture);
     if (adapterContext->proxy_ == nullptr) {
         DHLOGE("The adapter context or proxy for the adapter context is nullptr.");
-        return ERR_DH_AUDIO_HDI_NULLPTR;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     std::lock_guard<std::mutex> lock(adapterContext->mtx_);
 
@@ -215,7 +215,7 @@ static int32_t GetPassthroughModeInternal(struct AudioAdapter *adapter, const st
     AudioAdapterContext *context = reinterpret_cast<AudioAdapterContext *>(adapter);
     if (context->proxy_ == nullptr) {
         DHLOGE("The context or proxy for the context is nullptr.");
-        return ERR_DH_AUDIO_HDI_NULLPTR;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     AudioPort portHal = {
         .dir = static_cast<AudioPortDirection>(port->dir),
@@ -269,7 +269,7 @@ static int32_t GetPortCapabilityInternal(struct AudioAdapter *adapter, const str
     AudioAdapterContext *context = reinterpret_cast<AudioAdapterContext *>(adapter);
     if (context->proxy_ == nullptr) {
         DHLOGE("The context or proxy for the context is nullptr.");
-        return ERR_DH_AUDIO_HDI_NULLPTR;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     {
         std::lock_guard<std::mutex> lock(context->mtx_);
@@ -314,7 +314,7 @@ static int32_t ReleaseAudioRouteInternal(struct AudioAdapter *adapter, int32_t r
     AudioAdapterContext *context = reinterpret_cast<AudioAdapterContext *>(adapter);
     if (context->proxy_ == nullptr) {
         DHLOGE("The context or proxy for the context is nullptr.");
-        return ERR_DH_AUDIO_HDI_NULLPTR;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     return context->proxy_->ReleaseAudioRoute(routeHandle);
 }
@@ -330,7 +330,7 @@ static int32_t SetPassthroughModeInternal(struct AudioAdapter *adapter, const st
     AudioAdapterContext *context = reinterpret_cast<AudioAdapterContext *>(adapter);
     if (context->proxy_ == nullptr) {
         DHLOGE("The context or proxy for the context is nullptr.");
-        return ERR_DH_AUDIO_HDI_NULLPTR;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     AudioPort portHal = {
         .dir = static_cast<AudioPortDirection>(port->dir),
@@ -405,7 +405,7 @@ static int32_t UpdateAudioRouteInternal(struct AudioAdapter *adapter, const stru
     AudioAdapterContext *context = reinterpret_cast<AudioAdapterContext *>(adapter);
     if (context->proxy_ == nullptr) {
         DHLOGE("The context or proxy for the context is nullptr.");
-        return ERR_DH_AUDIO_HDI_NULLPTR;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     int32_t ret = context->proxy_->UpdateAudioRoute(audioRoute, handle);
     *routeHandle = handle;
@@ -423,7 +423,7 @@ static int32_t SetExtraParamsInternal(struct AudioAdapter *adapter, enum ::Audio
     AudioAdapterContext *context = reinterpret_cast<AudioAdapterContext *>(adapter);
     if (context->proxy_ == nullptr) {
         DHLOGE("The context or proxy for the context is nullptr.");
-        return ERR_DH_AUDIO_HDI_NULLPTR;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     return context->proxy_->SetExtraParams(static_cast<AudioExtParamKey>(key),
         std::string(condition), std::string(value));
@@ -440,7 +440,7 @@ static int32_t GetExtraParamsInternal(struct AudioAdapter *adapter, enum ::Audio
     AudioAdapterContext *context = reinterpret_cast<AudioAdapterContext *>(adapter);
     if (context->proxy_ == nullptr) {
         DHLOGE("The context or proxy for the context is nullptr.");
-        return ERR_DH_AUDIO_HDI_NULLPTR;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     std::string valueHal;
     int32_t ret =
@@ -467,7 +467,7 @@ static int32_t RegExtraParamObserverInternal(struct AudioAdapter *adapter, Param
     AudioAdapterContext *context = reinterpret_cast<AudioAdapterContext *>(adapter);
     if (context->proxy_ == nullptr) {
         DHLOGE("The context or proxy for the context is nullptr.");
-        return ERR_DH_AUDIO_HDI_NULLPTR;
+        return ERR_DH_AUDIO_NULLPTR;
     }
     std::lock_guard<std::mutex> lock(context->mtx_);
     if (context->callbackInternal_ == nullptr || callback != context->callback_) {

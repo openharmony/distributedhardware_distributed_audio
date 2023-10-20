@@ -58,7 +58,7 @@ HWTEST_F(DMicDevTest, InitReceiverEngine_001, TestSize.Level1)
     size_t size = 4096;
     auto audioData = std::make_shared<AudioData>(size);
     mic_->OnEngineTransDataAvailable(audioData);
-    EXPECT_EQ(ERR_DH_AUDIO_TRANS_NULL_VALUE, mic_->InitReceiverEngine(providerPtr));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->InitReceiverEngine(providerPtr));
     mic_->micTrans_ = std::make_shared<MockIAudioDataTransport>();
     EXPECT_EQ(DH_SUCCESS, mic_->InitReceiverEngine(providerPtr));
 }
@@ -71,11 +71,11 @@ HWTEST_F(DMicDevTest, InitReceiverEngine_001, TestSize.Level1)
  */
 HWTEST_F(DMicDevTest, EnableDMic_001, TestSize.Level1)
 {
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, mic_->EnableDevice(DH_ID, CAP));
-    EXPECT_EQ(ERR_DH_AUDIO_HDI_PROXY_NOT_INIT, mic_->EnableDevice(DH_ID, CAP));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->EnableDevice(DH_ID, CAP));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->EnableDevice(DH_ID, CAP));
 
     mic_->enabledPorts_.insert(DH_ID_MIC);
-    EXPECT_EQ(ERR_DH_AUDIO_HDI_PROXY_NOT_INIT, mic_->EnableDevice(DH_ID_MIC, CAP));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->EnableDevice(DH_ID_MIC, CAP));
 }
 
 /**
@@ -87,12 +87,12 @@ HWTEST_F(DMicDevTest, EnableDMic_001, TestSize.Level1)
 HWTEST_F(DMicDevTest, DisableDMic_001, TestSize.Level1)
 {
     mic_->enabledPorts_.insert(DH_ID);
-    EXPECT_EQ(ERR_DH_AUDIO_HDI_PROXY_NOT_INIT, mic_->DisableDevice(DH_ID));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->DisableDevice(DH_ID));
 
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, mic_->DisableDevice(DH_ID));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->DisableDevice(DH_ID));
 
     mic_->curPort_ = DH_ID_MIC;
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, mic_->DisableDevice(DH_ID_MIC));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->DisableDevice(DH_ID_MIC));
     EXPECT_FALSE(mic_->IsOpened());
 }
 
@@ -107,7 +107,7 @@ HWTEST_F(DMicDevTest, OpenDevice_001, TestSize.Level1)
     EXPECT_EQ(DH_SUCCESS, mic_->OpenDevice(DEV_ID, DH_ID));
 
     eventCb_ = nullptr;
-    EXPECT_EQ(ERR_DH_AUDIO_SA_MICCALLBACK_NULL, mic_->OpenDevice(DEV_ID, DH_ID));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->OpenDevice(DEV_ID, DH_ID));
 }
 
 /**
@@ -121,7 +121,7 @@ HWTEST_F(DMicDevTest, CloseDevice_001, TestSize.Level1)
     EXPECT_EQ(DH_SUCCESS, mic_->CloseDevice(DEV_ID, DH_ID));
 
     eventCb_ = nullptr;
-    EXPECT_EQ(ERR_DH_AUDIO_SA_MICCALLBACK_NULL, mic_->CloseDevice(DEV_ID, DH_ID));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->CloseDevice(DEV_ID, DH_ID));
 }
 
 /**
@@ -160,7 +160,7 @@ HWTEST_F(DMicDevTest, NotifyEvent_001, TestSize.Level1)
     EXPECT_EQ(DH_SUCCESS, mic_->NotifyEvent(DEV_ID, DH_ID, event));
 
     eventCb_ = nullptr;
-    EXPECT_EQ(ERR_DH_AUDIO_SA_EVENT_CALLBACK_NULL, mic_->NotifyEvent(DEV_ID, DH_ID, event));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->NotifyEvent(DEV_ID, DH_ID, event));
 }
 
 /**
@@ -187,7 +187,7 @@ HWTEST_F(DMicDevTest, SetUp_001, TestSize.Level1)
 HWTEST_F(DMicDevTest, Start_001, TestSize.Level1)
 {
     mic_->micTrans_ = nullptr;
-    EXPECT_EQ(ERR_DH_AUDIO_SA_MIC_TRANS_NULL, mic_->Start());
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->Start());
 
     mic_->micTrans_ = std::make_shared<AudioDecodeTransport>(DEV_ID);
     EXPECT_NE(DH_SUCCESS, mic_->Start());
@@ -213,7 +213,7 @@ HWTEST_F(DMicDevTest, Start_002, TestSize.Level1)
 
     mic_->micTrans_ = std::make_shared<MockIAudioDataTransport>();
     EXPECT_EQ(DH_SUCCESS, mic_->SetUp());
-    EXPECT_EQ(ERR_DH_AUDIO_SA_MIC_CHANNEL_WAIT_TIMEOUT, mic_->Start());
+    EXPECT_EQ(ERR_DH_AUDIO_SA_WAIT_TIMEOUT, mic_->Start());
     EXPECT_FALSE(mic_->IsOpened());
 
     mic_->isTransReady_.store(true);
@@ -330,7 +330,7 @@ HWTEST_F(DMicDevTest, OnStateChange_001, TestSize.Level1)
     EXPECT_EQ(DH_SUCCESS, mic_->OnStateChange(event));
 
     eventCb_ = nullptr;
-    EXPECT_EQ(ERR_DH_AUDIO_SA_MICCALLBACK_NULL, mic_->OnStateChange(event));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->OnStateChange(event));
 }
 
 /**
