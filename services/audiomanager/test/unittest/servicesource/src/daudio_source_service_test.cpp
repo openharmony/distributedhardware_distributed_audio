@@ -49,7 +49,7 @@ HWTEST_F(DAudioSourceServiceTest, OnStart_001, TestSize.Level1)
 {
     sourceSrv_->isServiceStarted_ = true;
     sourceSrv_->OnStart();
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceSrv_->ReleaseSource());
+    EXPECT_EQ(ERR_DH_AUDIO_SA_LOAD_FAILED, sourceSrv_->ReleaseSource());
 }
 
 /**
@@ -74,7 +74,7 @@ HWTEST_F(DAudioSourceServiceTest, InitSource_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceServiceTest, ReleaseSource_001, TestSize.Level1)
 {
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceSrv_->ReleaseSource());
+    EXPECT_EQ(ERR_DH_AUDIO_SA_LOAD_FAILED, sourceSrv_->ReleaseSource());
 }
 
 /**

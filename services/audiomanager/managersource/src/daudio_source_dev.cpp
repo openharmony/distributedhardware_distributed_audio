@@ -1023,7 +1023,7 @@ int32_t DAudioSourceDev::TaskChangeVolume(const std::string &args)
         DHLOGE("Not found the keys of dhId.");
         cJSON_Delete(jParam);
         return ERR_DH_AUDIO_FAILED;
-    } 
+    }
     int32_t dhId = ConvertString2Int(std::string(dhIdItem->valuestring));
     cJSON_Delete(jParam);
     return NotifyHDF(AudioEventType::VOLUME_CHANGE, args, dhId);

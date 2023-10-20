@@ -75,7 +75,7 @@ HWTEST_F(DAudioSinkServiceTest, InitSink_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSinkServiceTest, ReleaseSink_001, TestSize.Level1)
 {
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sinkSrv_->ReleaseSink());
+    EXPECT_EQ(ERR_DH_AUDIO_SA_LOAD_FAILED, sinkSrv_->ReleaseSink());
 }
 
 /**

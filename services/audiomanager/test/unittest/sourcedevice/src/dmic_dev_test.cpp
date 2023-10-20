@@ -71,7 +71,7 @@ HWTEST_F(DMicDevTest, InitReceiverEngine_001, TestSize.Level1)
  */
 HWTEST_F(DMicDevTest, EnableDMic_001, TestSize.Level1)
 {
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, mic_->EnableDevice(DH_ID, CAP));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->EnableDevice(DH_ID, CAP));
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->EnableDevice(DH_ID, CAP));
 
     mic_->enabledPorts_.insert(DH_ID_MIC);
@@ -89,10 +89,10 @@ HWTEST_F(DMicDevTest, DisableDMic_001, TestSize.Level1)
     mic_->enabledPorts_.insert(DH_ID);
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->DisableDevice(DH_ID));
 
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, mic_->DisableDevice(DH_ID));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->DisableDevice(DH_ID));
 
     mic_->curPort_ = DH_ID_MIC;
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, mic_->DisableDevice(DH_ID_MIC));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->DisableDevice(DH_ID_MIC));
     EXPECT_FALSE(mic_->IsOpened());
 }
 

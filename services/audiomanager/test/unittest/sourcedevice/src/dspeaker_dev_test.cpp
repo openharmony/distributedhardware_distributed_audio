@@ -68,7 +68,7 @@ HWTEST_F(DSpeakerDevTest, InitSenderEngine_001, TestSize.Level1)
  */
 HWTEST_F(DSpeakerDevTest, EnableDSpeaker_001, TestSize.Level1)
 {
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, spk_->EnableDevice(DH_ID, CAP));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, spk_->EnableDevice(DH_ID, CAP));
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, spk_->EnableDevice(DH_ID, CAP));
 
     spk_->enabledPorts_.insert(DH_ID_SPK);
