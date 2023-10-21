@@ -104,9 +104,8 @@ void DAudioSourceDev::SleepAudioDev()
         DHLOGI("Event handler is already stoped.");
         return;
     }
-    while (!handler_->IsIdle()) {
-        DHLOGD("Event handler is proccesing.");
-    }
+    while (!handler_->IsIdle()) {};
+    DHLOGD("Sleep audio dev over.");
 }
 
 int32_t DAudioSourceDev::EnableDAudio(const std::string &dhId, const std::string &attrs)

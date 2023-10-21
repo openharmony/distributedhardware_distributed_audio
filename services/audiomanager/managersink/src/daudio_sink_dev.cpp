@@ -58,9 +58,8 @@ void DAudioSinkDev::SleepAudioDev()
         DHLOGI("Event handler is already stoped.");
         return;
     }
-    while (!handler_->IsIdle()) {
-        DHLOGD("Event handler is proccesing.");
-    }
+    while (!handler_->IsIdle()) {};
+    DHLOGD("Sleep audio dev over.");
 }
 
 int32_t DAudioSinkDev::InitAVTransEngines(const ChannelState channelState, IAVEngineProvider *providerPtr)
