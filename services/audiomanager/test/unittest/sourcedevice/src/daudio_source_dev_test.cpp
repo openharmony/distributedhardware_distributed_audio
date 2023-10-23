@@ -948,6 +948,7 @@ HWTEST_F(DAudioSourceDevTest, NotifyHDF_003, TestSize.Level1)
 HWTEST_F(DAudioSourceDevTest, NotifySinkDev_001, TestSize.Level1)
 {
     json jAudioParam;
+    int32_t dhId = 1;
     sourceDev_->isRpcOpen_.store(false);
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->NotifySinkDev(CLOSE_MIC, jAudioParam, DH_ID_SPK));
 
