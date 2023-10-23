@@ -1106,7 +1106,7 @@ HWTEST_F(AudioAdapterInterfaceImpTest, WaitForSANotify_001, TestSize.Level1)
     AudioDeviceEvent  event = EVENT_OPEN_SPK;
     AdapterTest_->isSpkOpened_ = true;
     EXPECT_EQ(DH_SUCCESS, AdapterTest_->WaitForSANotify(event));
-    AudioDeviceEvent  event1 = EVENT_CLOSE_SPK ;
+    AudioDeviceEvent event1 = EVENT_CLOSE_SPK ;
     AdapterTest_->isSpkOpened_ = false;
     EXPECT_EQ(DH_SUCCESS, AdapterTest_->WaitForSANotify(event1));
     flag = 0;
