@@ -16,8 +16,8 @@
 #include <thread>
 #include <chrono>
 
-#include "audio_adapter_interface_impl_test.h"
 #include "daudio_constants.h"
+#include "audio_adapter_interface_impl_test.h"
 
 using namespace testing::ext;
 using namespace OHOS::DistributedHardware;
@@ -1251,7 +1251,6 @@ HWTEST_F(AudioAdapterInterfaceImpTest, HandleDeviceClosed_003, TestSize.Level1)
     AdapterTest_->paramCallback_ = new MockRevertIAudioParamCallback();
     EXPECT_EQ(HDF_SUCCESS, AdapterTest_->HandleDeviceClosed(event));
 }
-
 } // V1_0
 } // Audio
 } // Distributedaudio
