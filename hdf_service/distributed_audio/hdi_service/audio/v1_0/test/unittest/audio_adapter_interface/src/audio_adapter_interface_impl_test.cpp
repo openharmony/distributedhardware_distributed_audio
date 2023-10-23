@@ -16,9 +16,8 @@
 #include <thread>
 #include <chrono>
 
-#include "daudio_constants.h"
-
 #include "audio_adapter_interface_impl_test.h"
+#include "daudio_constants.h"
 
 using namespace testing::ext;
 using namespace OHOS::DistributedHardware;
@@ -1157,11 +1156,11 @@ HWTEST_F(AudioAdapterInterfaceImpTest, WaitForSANotify_003, TestSize.Level1)
         }});
     AudioDeviceEvent  event = EVENT_OPEN_MIC;
     AdapterTest_->isMicOpened_ = true;
-    EXPECT_EQ(DH_SUCCESS, AdapterTest_->WaitForSANotify(event));
+    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->WaitForSANotify(event));
 
     AudioDeviceEvent  event1 = EVENT_CLOSE_MIC;
     AdapterTest_->isMicOpened_ = false;
-    EXPECT_EQ(DH_SUCCESS, AdapterTest_->WaitForSANotify(event1));
+    EXPECT_EQ(HDF_SUCCESS, AdapterTest_->WaitForSANotify(event1));
     flag = 0;
     if (th.joinable()) {
         th.join();

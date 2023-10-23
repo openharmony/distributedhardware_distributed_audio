@@ -744,13 +744,12 @@ HWTEST_F(DAudioSourceDevTest, TaskCloseDMic_002, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, TaskSetVolume_001, TestSize.Level1)
 {
-    sourceDev_->audioCtrlMgr_ = std::make_shared<DAudioSourceDevCtrlMgr>(DEV_ID, sourceDev_);
-    EXPECT_NE(DH_SUCCESS, sourceDev_->TaskSetVolume("args"));
-
-    json jParam = { { STREAM_MUTE_STATUS, 1 } };
-    EXPECT_NE(DH_SUCCESS, sourceDev_->TaskSetVolume(jParam.dump()));
-
-    sourceDev_->OnTaskResult(ERR_DH_AUDIO_NULLPTR, "", FUNC_NAME);
+    int32_t dhId = 3;
+    json jParam = { { STREAM_MUTE_STATUS, 3 }, { "dhId", "3" } };
+    auto speaker = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
+    sourceDev_->deviceMap_[dhId] = speaker;
+    speaker->speakerTrans_ = std::make_shared<AudioEncodeTransport>(DEV_ID);
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskSetVolume(jParam.dump()));
 }
 
 /**
