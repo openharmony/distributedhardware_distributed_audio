@@ -17,6 +17,7 @@
 #include <chrono>
 
 #include "daudio_constants.h"
+
 #include "audio_adapter_interface_impl_test.h"
 
 using namespace testing::ext;
