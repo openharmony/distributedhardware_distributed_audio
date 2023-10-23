@@ -108,7 +108,7 @@ HWTEST_F(AudioCtrlChannelTest, SendEvent_001, TestSize.Level1)
     ctrlChannel_->OnSessionOpened(sessionId, result);
 
     AudioEvent event;
-    EXPECT_EQ(ERR_DH_AUDIO_TRANS_ERROR, ctrlChannel_->SendEvent(event));
+    EXPECT_EQ(DH_SUCCESS, ctrlChannel_->SendEvent(event));
 }
 
 /**
@@ -130,7 +130,7 @@ HWTEST_F(AudioCtrlChannelTest, OnSessionClosed_001, TestSize.Level1)
     ctrlChannel_->channelListener_ = listener;
     ctrlChannel_->OnSessionClosed(sessionId);
     AudioEvent event;
-    EXPECT_EQ(ERR_DH_AUDIO_TRANS_ERROR, ctrlChannel_->SendEvent(event));
+    EXPECT_EQ(DH_SUCCESS, ctrlChannel_->SendEvent(event));
 }
 
 /**

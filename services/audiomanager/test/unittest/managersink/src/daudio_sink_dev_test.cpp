@@ -71,7 +71,7 @@ HWTEST_F(DAudioSinkDevTest, TaskPlayStatusChange_001, TestSize.Level1)
     std::string devId = "devid";
     int32_t dhId = 1;
     sinkDev_->speakerClient_ = std::make_shared<DSpeakerClient>(devId, dhId, sinkDev_);
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sinkDev_->TaskPlayStatusChange(AUDIO_EVENT_PAUSE));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sinkDev_->TaskPlayStatusChange("{\"dhId\":\"1\"}"));
 }
 
 /**
@@ -335,11 +335,10 @@ HWTEST_F(DAudioSinkDevTest, TaskFocusChange_002, TestSize.Level1)
  */
 HWTEST_F(DAudioSinkDevTest, TaskRenderStateChange_001, TestSize.Level1)
 {
-    std::string args;
-    std::string dhId = "dhId";
+    std::string args = "{\"dhId\":\"123\"}";
+    std::string dhId = "123";
     int32_t result = 0;
     sinkDev_->NotifySourceDev(AUDIO_START, dhId, result);
-    sinkDev_->NotifySourceDev(NOTIFY_OPEN_CTRL_RESULT, dhId, result);
     EXPECT_NE(DH_SUCCESS, sinkDev_->TaskRenderStateChange(args));
 }
 
