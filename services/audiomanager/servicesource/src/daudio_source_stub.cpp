@@ -65,7 +65,7 @@ int32_t DAudioSourceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Me
     return (this->*func)(data, reply, option);
 }
 
-bool DAudioSourceStub::VerifyPass()
+bool DAudioSourceStub::VerifyPermission()
 {
     Security::AccessToken::AccessTokenID callerToken = IPCSkeleton::GetCallingTokenID();
     int result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, AUDIO_PERMISSION_NAME);
@@ -77,10 +77,9 @@ bool DAudioSourceStub::VerifyPass()
 
 int32_t DAudioSourceStub::InitSourceInner(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    if (VerifyPass()) {
-        DHLOGI("Permission verification success.");
-    } else {
+    if (!VerifyPermission()) {
         DHLOGE("Permission verification fail.");
+        return ERR_DH_AUDIO_SA_PERMISSION_FAIED;
     }
     std::string param = data.ReadString();
     sptr<IRemoteObject> remoteObject = data.ReadRemoteObject();
@@ -97,10 +96,9 @@ int32_t DAudioSourceStub::InitSourceInner(MessageParcel &data, MessageParcel &re
 
 int32_t DAudioSourceStub::ReleaseSourceInner(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    if (VerifyPass()) {
-        DHLOGI("Permission verification success.");
-    } else {
+    if (!VerifyPermission()) {
         DHLOGE("Permission verification fail.");
+        return ERR_DH_AUDIO_SA_PERMISSION_FAIED;
     }
     int32_t ret = ReleaseSource();
     reply.WriteInt32(ret);
@@ -110,10 +108,9 @@ int32_t DAudioSourceStub::ReleaseSourceInner(MessageParcel &data, MessageParcel 
 int32_t DAudioSourceStub::RegisterDistributedHardwareInner(MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
-    if (VerifyPass()) {
-        DHLOGI("Permission verification success.");
-    } else {
+    if (!VerifyPermission()) {
         DHLOGE("Permission verification fail.");
+        return ERR_DH_AUDIO_SA_PERMISSION_FAIED;
     }
     std::string networkId = data.ReadString();
     std::string dhId = data.ReadString();
@@ -132,10 +129,9 @@ int32_t DAudioSourceStub::RegisterDistributedHardwareInner(MessageParcel &data, 
 int32_t DAudioSourceStub::UnregisterDistributedHardwareInner(MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
-    if (VerifyPass()) {
-        DHLOGI("Permission verification success.");
-    } else {
+    if (!VerifyPermission()) {
         DHLOGE("Permission verification fail.");
+        return ERR_DH_AUDIO_SA_PERMISSION_FAIED;
     }
     std::string networkId = data.ReadString();
     std::string dhId = data.ReadString();
