@@ -68,7 +68,7 @@ int32_t DAudioSinkStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Mess
     return (this->*func)(data, reply, option);
 }
 
-bool DAudioSinkStub::VerifyPass()
+bool DAudioSinkStub::VerifyPermission()
 {
     Security::AccessToken::AccessTokenID callerToken = IPCSkeleton::GetCallingTokenID();
     int result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, AUDIO_PERMISSION_NAME);
@@ -80,10 +80,9 @@ bool DAudioSinkStub::VerifyPass()
 
 int32_t DAudioSinkStub::InitSinkInner(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    if (VerifyPass()) {
-        DHLOGI("Permission verification success.");
-    } else {
+    if (!VerifyPermission()) {
         DHLOGE("Permission verification fail.");
+        return ERR_DH_AUDIO_SA_PERMISSION_FAIED;
     }
     std::string param = data.ReadString();
     int32_t ret = InitSink(param);
@@ -93,10 +92,9 @@ int32_t DAudioSinkStub::InitSinkInner(MessageParcel &data, MessageParcel &reply,
 
 int32_t DAudioSinkStub::ReleaseSinkInner(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    if (VerifyPass()) {
-        DHLOGI("Permission verification success.");
-    } else {
+    if (!VerifyPermission()) {
         DHLOGE("Permission verification fail.");
+        return ERR_DH_AUDIO_SA_PERMISSION_FAIED;
     }
     int32_t ret = ReleaseSink();
     reply.WriteInt32(ret);
