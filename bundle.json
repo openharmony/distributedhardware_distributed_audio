@@ -34,6 +34,7 @@
                 "c_utils",
                 "distributed_hardware_fwk",
                 "drivers_interface_audio",
+                "drivers_interface_distributed_audio",
                 "dsoftbus",
                 "eventhandler",
                 "hdf_core",

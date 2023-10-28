@@ -20,8 +20,6 @@ group("unittest") {
   deps = [
     "${common_path}/test/unittest:daudio_utils_test",
     "${distributedaudio_path}/audiohandler/test/unittest:audio_handler_test",
-    "${hdf_service_path}/hdi_service/audio/v1_0/test/unittest:hdi_service_audio_test",
-    "${hdf_service_path}/hdi_service/audio_ext/v1_0/test/unittest:hdi_service_audio_ext_test",
     "${interfaces_path}/inner_kits/native_cpp/test/unittest/audiosinktest:audio_sink_test",
     "${interfaces_path}/inner_kits/native_cpp/test/unittest/audiosourcetest:audio_source_test",
     "${services_path}/audioclient/test/unittest:daudio_client_test",
