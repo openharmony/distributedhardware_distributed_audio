@@ -36,6 +36,7 @@ config("daudio_common_private_config") {
 }
 
 ohos_shared_library("distributed_audio_utils") {
+  branch_protector_ret = "pac_ret"
   sanitize = {
     boundary_sanitize = true
     cfi = true
