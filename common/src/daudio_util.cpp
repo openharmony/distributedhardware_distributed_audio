@@ -373,6 +373,29 @@ bool IsOutDurationRange(int64_t startTime, int64_t endTime, int64_t lastStartTim
     return (currentInterval > MAX_TIME_INTERVAL_US || twiceInterval > MAX_TIME_INTERVAL_US) ? true : false;
 }
 
+std::string GetCJsonString(const char *key, const char *value)
+{
+    std::string result;
+    cJSON *jParam = cJSON_CreateObject();
+    if (jParam == nullptr) {
+        DHLOGE("Failed to create cJSON object.");
+        result = "Failed to create cJSON object.";
+        return result;
+    }
+    cJSON_AddStringToObject(jParam, key, value);
+    char *jsonData = cJSON_PrintUnformatted(jParam);
+    if (jsonData == nullptr) {
+        DHLOGE("Failed to create JSON data.");
+        result = "Failed to create JSON data.";
+        cJSON_Delete(jParam);
+        return result;
+    }
+    std::string content(jsonData);
+    cJSON_Delete(jParam);
+    cJSON_free(jsonData);
+    return content;
+}
+
 template <typename T>
 bool GetSysPara(const char *key, T &value)
 {

@@ -251,7 +251,7 @@ int32_t DAudioSourceDev::HandleDSpeakerOpened(const AudioEvent &event)
 
 int32_t DAudioSourceDev::HandleDSpeakerClosed(const AudioEvent &event)
 {
-    DHLOGI("Speaker device closed.");
+    DHLOGI("Speaker device closed, event.content = %s.", event.content.c_str());
     int32_t dhId = ParseDhidFromEvent(event.content);
     if (dhId < 0) {
         DHLOGE("Failed to parse dhardware id.");
@@ -325,7 +325,7 @@ int32_t DAudioSourceDev::HandleDMicOpened(const AudioEvent &event)
 
 int32_t DAudioSourceDev::HandleDMicClosed(const AudioEvent &event)
 {
-    DHLOGI("Mic device closed.");
+    DHLOGI("Mic device closed, event.content = %s.", event.content.c_str());
     int32_t dhId = ParseDhidFromEvent(event.content);
     if (dhId < 0) {
         DHLOGE("Failed to parse dhardware id.");

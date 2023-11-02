@@ -47,7 +47,7 @@ int32_t DSpeakerDev::EnableDevice(const int32_t dhId, const std::string &capabil
             "daudio register device failed.");
         return ret;
     }
-    enabledPorts_.insert(dhId);
+    dhId_ = dhId;
     return DH_SUCCESS;
 }
 
@@ -61,7 +61,6 @@ int32_t DSpeakerDev::DisableDevice(const int32_t dhId)
             "daudio unregister device failed.");
         return ret;
     }
-    enabledPorts_.erase(dhId);
     return DH_SUCCESS;
 }
 
@@ -488,6 +487,7 @@ int32_t DSpeakerDev::OnStateChange(const AudioEventType type)
         default:
             break;
     }
+    event.content = GetCJsonString(KEY_DH_ID, std::to_string(dhId_).c_str());
     std::shared_ptr<IAudioEventCallback> cbObj = audioEventCallback_.lock();
     if (cbObj == nullptr) {
         DHLOGE("Event callback is null");

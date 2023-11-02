@@ -109,7 +109,6 @@ private:
     std::atomic<bool> dumpFlag_ = false;
     std::shared_ptr<IAudioDataTransport> micTrans_ = nullptr;
     std::queue<std::shared_ptr<AudioData>> dataQueue_;
-    std::set<int32_t> enabledPorts_;
     AudioStatus curStatus_ = AudioStatus::STATUS_IDLE;
     // Mic capture parameters
     AudioParamHDF paramHDF_;
@@ -133,6 +132,7 @@ private:
     std::thread enqueueDataThread_;
     std::mutex writeAshmemMutex_;
     std::condition_variable dataQueueCond_;
+    int32_t dhId_ = -1;
 };
 } // DistributedHardware
 } // OHOS
