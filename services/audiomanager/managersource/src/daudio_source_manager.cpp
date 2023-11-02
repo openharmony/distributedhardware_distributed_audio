@@ -363,10 +363,12 @@ void DAudioSourceManager::ListenAudioDev()
         WATCHDOG_INTERVAL_TIME, WATCHDOG_DELAY_TIME);
 
     while (isHicollieRunning_.load()) {
-        std::lock_guard<std::mutex> lock(devMapMtx_);
-        if (!audioDevMap_.empty()) {
-            for (auto &iter : audioDevMap_) {
-                iter.second.dev->RestoreThreadStatus();
+        {
+            std::lock_guard<std::mutex> lock(devMapMtx_);
+            if (!audioDevMap_.empty()) {
+                for (auto &iter : audioDevMap_) {
+                    iter.second.dev->RestoreThreadStatus();
+                }
             }
         }
         usleep(SLEEP_TIME);
