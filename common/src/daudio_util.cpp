@@ -416,7 +416,7 @@ std::string ParseStringFromArgs(std::string args, const char *key)
     }
     std::string content(dhIdItem->valuestring);
     cJSON_Delete(jParam);
-    DHLOGI("Parsed string is: %s.", content.c_str());
+    DHLOGD("Parsed string is: %s.", content.c_str());
     return content;
 }
 
