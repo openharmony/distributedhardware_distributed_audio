@@ -179,6 +179,7 @@ int32_t DAudioSinkDev::TaskCloseDSpeaker(const std::string &args)
 
 int32_t DAudioSinkDev::ParseDhidFromEvent(std::string args)
 {
+    DHLOGI("ParseDhidFrom args : %s", args.c_str());
     cJSON *jParam = cJSON_Parse(args.c_str());
     if (jParam == nullptr) {
         DHLOGE("Failed to parse JSON: %s", cJSON_GetErrorPtr());

@@ -71,7 +71,6 @@ HWTEST_F(DSpeakerDevTest, EnableDSpeaker_001, TestSize.Level1)
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, spk_->EnableDevice(DH_ID, CAP));
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, spk_->EnableDevice(DH_ID, CAP));
 
-    spk_->enabledPorts_.insert(DH_ID_SPK);
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, spk_->EnableDevice(DH_ID_SPK, CAP));
 }
 
@@ -83,9 +82,6 @@ HWTEST_F(DSpeakerDevTest, EnableDSpeaker_001, TestSize.Level1)
  */
 HWTEST_F(DSpeakerDevTest, DisableDSpeaker_001, TestSize.Level1)
 {
-    spk_->enabledPorts_.insert(DH_ID);
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, spk_->DisableDevice(DH_ID));
-
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, spk_->DisableDevice(DH_ID));
 
     spk_->curPort_ = DH_ID_SPK;

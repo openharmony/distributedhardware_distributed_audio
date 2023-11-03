@@ -110,6 +110,7 @@ const std::string AUDIO_EVENT_PAUSE = "pause";
 const std::string AUDIO_ENGINE_FLAG = "persist.distributedhardware.distributedaudio.engine.enable";
 
 constexpr const char *KEY_TYPE = "type";
+constexpr const char *KEY_CHANGE_TYPE = "ChangeType";
 constexpr const char *KEY_EVENT_CONTENT = "content";
 constexpr const char *KEY_DH_ID = "dhId";
 constexpr const char *KEY_DEV_ID = "devId";

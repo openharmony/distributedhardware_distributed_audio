@@ -52,6 +52,8 @@ bool CheckIsNum(const std::string &jsonString);
 bool CheckDevIdIsLegal(const std::string &devId);
 bool IsOutDurationRange(int64_t startTime, int64_t endTime, int64_t lastStartTime);
 void SaveFile(std::string fileName, uint8_t *audioData, int32_t size);
+std::string GetCJsonString(const char *key, const char *value);
+std::string ParseStringFromArgs(std::string args, const char *key);
 
 template <typename T>
 bool GetSysPara(const char *key, T &value);

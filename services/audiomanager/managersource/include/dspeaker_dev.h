@@ -98,7 +98,6 @@ private:
     std::atomic<bool> dumpFlag_ = false;
     int32_t curPort_ = 0;
     std::shared_ptr<IAudioDataTransport> speakerTrans_ = nullptr;
-    std::set<int32_t> enabledPorts_;
 
     // Speaker render parameters
     AudioParamHDF paramHDF_;
@@ -117,6 +116,7 @@ private:
     int64_t readTvNSec_ = 0;
     std::thread enqueueDataThread_;
     int64_t lastwriteStartTime_ = 0;
+    int32_t dhId_ = -1;
 };
 } // DistributedHardware
 } // OHOS

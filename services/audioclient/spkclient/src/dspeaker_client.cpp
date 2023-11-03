@@ -381,6 +381,7 @@ int32_t DSpeakerClient::OnStateChange(const AudioEventType type)
         }
         case AudioEventType::DATA_CLOSED: {
             event.type = AudioEventType::SPEAKER_CLOSED;
+            event.content = GetCJsonString(KEY_DH_ID, std::to_string(dhId_).c_str());
             break;
         }
         default:

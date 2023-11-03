@@ -251,7 +251,7 @@ int32_t DAudioSourceDev::HandleDSpeakerOpened(const AudioEvent &event)
 
 int32_t DAudioSourceDev::HandleDSpeakerClosed(const AudioEvent &event)
 {
-    DHLOGI("Speaker device closed.");
+    DHLOGI("Speaker device closed, event.content = %s.", event.content.c_str());
     int32_t dhId = ParseDhidFromEvent(event.content);
     if (dhId < 0) {
         DHLOGE("Failed to parse dhardware id.");
@@ -325,7 +325,7 @@ int32_t DAudioSourceDev::HandleDMicOpened(const AudioEvent &event)
 
 int32_t DAudioSourceDev::HandleDMicClosed(const AudioEvent &event)
 {
-    DHLOGI("Mic device closed.");
+    DHLOGI("Mic device closed, event.content = %s.", event.content.c_str());
     int32_t dhId = ParseDhidFromEvent(event.content);
     if (dhId < 0) {
         DHLOGE("Failed to parse dhardware id.");
@@ -769,6 +769,7 @@ int32_t DAudioSourceDev::TaskOpenDSpeaker(const std::string &args)
 
 int32_t DAudioSourceDev::ParseDhidFromEvent(std::string args)
 {
+    DHLOGI("ParseDhidFrom args : %s", args.c_str());
     cJSON *jParam = cJSON_Parse(args.c_str());
     if (jParam == nullptr) {
         DHLOGE("Failed to parse JSON: %s", cJSON_GetErrorPtr());
@@ -1078,13 +1079,14 @@ int32_t DAudioSourceDev::TaskPlayStatusChange(const std::string &args)
         DHLOGE("The IO device is invaild.");
         return ERR_DH_AUDIO_NULLPTR;
     }
-    if (args == AUDIO_EVENT_RESTART) {
+    auto changetype = ParseStringFromArgs(args, KEY_CHANGE_TYPE);
+    if (changetype.c_str() == AUDIO_EVENT_RESTART) {
         ret = speaker->Restart();
         if (ret != DH_SUCCESS) {
             DHLOGE("Speaker restart failed.");
         }
         return ret;
-    } else if (args == AUDIO_EVENT_PAUSE) {
+    } else if (changetype.c_str() == AUDIO_EVENT_PAUSE) {
         ret = speaker->Pause();
         if (ret != DH_SUCCESS) {
             DHLOGE("Speaker Pause failed.");
