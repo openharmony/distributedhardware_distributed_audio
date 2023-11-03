@@ -375,24 +375,48 @@ bool IsOutDurationRange(int64_t startTime, int64_t endTime, int64_t lastStartTim
 
 std::string GetCJsonString(const char *key, const char *value)
 {
-    std::string result;
     cJSON *jParam = cJSON_CreateObject();
     if (jParam == nullptr) {
         DHLOGE("Failed to create cJSON object.");
-        result = "Failed to create cJSON object.";
-        return result;
+        return "Failed to create cJSON object.";
     }
     cJSON_AddStringToObject(jParam, key, value);
     char *jsonData = cJSON_PrintUnformatted(jParam);
     if (jsonData == nullptr) {
         DHLOGE("Failed to create JSON data.");
-        result = "Failed to create JSON data.";
         cJSON_Delete(jParam);
-        return result;
+        return "Failed to create JSON data.";
     }
     std::string content(jsonData);
     cJSON_Delete(jParam);
     cJSON_free(jsonData);
+    DHLOGD("create cJSON success : %s", content.c_str());
+    return content;
+}
+
+std::string ParseStringFromArgs(std::string args, const char *key)
+{
+    DHLOGD("ParseStringFrom Args : %s", args.c_str());
+    cJSON *jParam = cJSON_Parse(args.c_str());
+    if (jParam == nullptr) {
+        DHLOGE("Failed to parse JSON: %s", cJSON_GetErrorPtr());
+        cJSON_Delete(jParam);
+        return "Failed to parse JSON";
+    }
+    if (!CJsonParamCheck(jParam, { key })) {
+        DHLOGE("Not found the key : %s.", key);
+        cJSON_Delete(jParam);
+        return "Not found the key.";
+    }
+    cJSON *dhIdItem = cJSON_GetObjectItem(jParam, key);
+    if (dhIdItem == NULL || !cJSON_IsString(dhIdItem)) {
+        DHLOGE("Not found the value of the key : %s.", key);
+        cJSON_Delete(jParam);
+        return "Not found the value.";
+    }
+    std::string content(dhIdItem->valuestring);
+    cJSON_Delete(jParam);
+    DHLOGI("Parsed string is: %s.", content.c_str());
     return content;
 }
 
