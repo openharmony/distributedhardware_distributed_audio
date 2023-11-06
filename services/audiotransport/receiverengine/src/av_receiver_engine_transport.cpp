@@ -177,7 +177,7 @@ void AVTransReceiverTransport::OnEngineMessage(const std::shared_ptr<AVTransMess
 
 void AVTransReceiverTransport::OnEngineDataAvailable(const std::shared_ptr<AVTransBuffer> &buffer)
 {
-    DHLOGE("On Engine Data available");
+    DHLOGI("On Engine Data available");
     if (buffer == nullptr) {
         DHLOGE("The parameter is nullptr");
         return;

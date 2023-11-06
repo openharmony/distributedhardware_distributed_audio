@@ -25,6 +25,7 @@
 
 #include "softbus_bus_center.h"
 
+#include "audio_event.h"
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
 #include "daudio_log.h"
@@ -60,6 +61,69 @@ std::map<std::string, JsonTypeCheckFunc> typeCheckMap = {
     std::map<std::string, JsonTypeCheckFunc>::value_type(KEY_CONTENT_TYPE, &DistributedHardware::IsInt32),
     std::map<std::string, JsonTypeCheckFunc>::value_type(KEY_STREAM_USAGE, &DistributedHardware::IsInt32),
 };
+
+std::map<int32_t, std::string> eventNameMap = {
+    std::make_pair(EVENT_UNKNOWN, "EVENT_UNKNOWN"),
+    std::make_pair(OPEN_CTRL, "OPEN_CTRL"),
+    std::make_pair(CLOSE_CTRL, "CLOSE_CTRL"),
+    std::make_pair(CTRL_OPENED, "CTRL_OPENED"),
+    std::make_pair(CTRL_CLOSED, "CTRL_CLOSED"),
+    std::make_pair(NOTIFY_OPEN_CTRL_RESULT, "NOTIFY_OPEN_CTRL_RESULT"),
+    std::make_pair(NOTIFY_CLOSE_CTRL_RESULT, "NOTIFY_CLOSE_CTRL_RESULT"),
+    std::make_pair(DATA_OPENED, "DATA_OPENED"),
+    std::make_pair(DATA_CLOSED, "DATA_CLOSED"),
+
+    std::make_pair(OPEN_SPEAKER, "OPEN_SPEAKER"),
+    std::make_pair(CLOSE_SPEAKER, "CLOSE_SPEAKER"),
+    std::make_pair(SPEAKER_OPENED, "SPEAKER_OPENED"),
+    std::make_pair(SPEAKER_CLOSED, "SPEAKER_CLOSED"),
+    std::make_pair(NOTIFY_OPEN_SPEAKER_RESULT, "NOTIFY_OPEN_SPEAKER_RESULT"),
+    std::make_pair(NOTIFY_CLOSE_SPEAKER_RESULT, "NOTIFY_CLOSE_SPEAKER_RESULT"),
+    std::make_pair(NOTIFY_HDF_SPK_DUMP, "NOTIFY_HDF_SPK_DUMP"),
+    std::make_pair(NOTIFY_HDF_MIC_DUMP, "NOTIFY_HDF_MIC_DUMP"),
+
+    std::make_pair(OPEN_MIC, "OPEN_MIC"),
+    std::make_pair(CLOSE_MIC, "CLOSE_MIC"),
+    std::make_pair(MIC_OPENED, "MIC_OPENED"),
+    std::make_pair(MIC_CLOSED, "MIC_CLOSED"),
+    std::make_pair(NOTIFY_OPEN_MIC_RESULT, "NOTIFY_OPEN_MIC_RESULT"),
+    std::make_pair(NOTIFY_CLOSE_MIC_RESULT, "NOTIFY_CLOSE_MIC_RESULT"),
+
+    std::make_pair(VOLUME_SET, "VOLUME_SET"),
+    std::make_pair(VOLUME_GET, "VOLUME_GET"),
+    std::make_pair(VOLUME_CHANGE, "VOLUME_CHANGE"),
+    std::make_pair(VOLUME_MIN_GET, "VOLUME_MIN_GET"),
+    std::make_pair(VOLUME_MAX_GET, "VOLUME_MAX_GET"),
+    std::make_pair(VOLUME_MUTE_SET, "VOLUME_MUTE_SET"),
+
+    std::make_pair(AUDIO_FOCUS_CHANGE, "AUDIO_FOCUS_CHANGE"),
+    std::make_pair(AUDIO_RENDER_STATE_CHANGE, "AUDIO_RENDER_STATE_CHANGE"),
+
+    std::make_pair(SET_PARAM, "SET_PARAM"),
+    std::make_pair(SEND_PARAM, "SEND_PARAM"),
+
+    std::make_pair(AUDIO_ENCODER_ERR, "AUDIO_ENCODER_ERR"),
+    std::make_pair(AUDIO_DECODER_ERR, "AUDIO_DECODER_ERR"),
+
+    std::make_pair(CHANGE_PLAY_STATUS, "CHANGE_PLAY_STATUS"),
+
+    std::make_pair(MMAP_SPK_START, "MMAP_SPK_START"),
+    std::make_pair(MMAP_SPK_STOP, "MMAP_SPK_STOP"),
+    std::make_pair(MMAP_MIC_START, "MMAP_MIC_START"),
+    std::make_pair(MMAP_MIC_STOP, "MMAP_MIC_STOP"),
+    std::make_pair(AUDIO_START, "AUDIO_START"),
+    std::make_pair(AUDIO_STOP, "AUDIO_STOP")
+}
+
+std::string GetEventTypeName(const int32_t eventType)
+{
+    auto iter = eventNameMap.find(eventType);
+    if (iter == eventNameMap.end()) {
+            DHLOGE("Can't find matched typename");
+            return "EVENT_UNKNOWN";
+    }
+    return iter->second;
+}
 
 int32_t GetLocalDeviceNetworkId(std::string &networkId)
 {

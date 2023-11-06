@@ -436,7 +436,7 @@ int32_t DAudioSourceManager::LoadAVReceiverEngineProvider()
         return ERR_DH_AUDIO_NULLPTR;
     }
     rcvProviderPtr_ = getEngineFactoryFunc(OWNER_NAME_D_MIC);
-    DHLOGE("LoadAVReceiverEngineProvider success");
+    DHLOGI("LoadAVReceiverEngineProvider success");
     return DH_SUCCESS;
 }
 

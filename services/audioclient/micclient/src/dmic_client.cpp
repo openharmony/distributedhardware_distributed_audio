@@ -50,11 +50,11 @@ void DMicClient::OnEngineTransEvent(const AVTransEvent &event)
 
 void DMicClient::OnEngineTransMessage(const std::shared_ptr<AVTransMessage> &message)
 {
-    DHLOGI("On Engine message");
     if (message == nullptr) {
         DHLOGE("The parameter is nullptr");
         return;
     }
+    DHLOGI("On Engine message, type : %s.", GetEventTypeName(message->type_).c_str());
     DAudioSinkManager::GetInstance().HandleDAudioNotify(message->dstDevId_, message->dstDevId_,
         static_cast<int32_t>(message->type_), message->content_);
 }

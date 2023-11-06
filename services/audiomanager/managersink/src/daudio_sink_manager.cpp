@@ -293,7 +293,7 @@ int32_t DAudioSinkManager::LoadAVReceiverEngineProvider()
         return ERR_DH_AUDIO_NULLPTR;
     }
     rcvProviderPtr_ = getEngineFactoryFunc(OWNER_NAME_D_SPEAKER);
-    DHLOGE("LoadAVReceiverEngineProvider success.");
+    DHLOGI("LoadAVReceiverEngineProvider success.");
     return DH_SUCCESS;
 }
 

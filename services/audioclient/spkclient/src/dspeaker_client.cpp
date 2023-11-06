@@ -50,13 +50,14 @@ void DSpeakerClient::OnEngineTransMessage(const std::shared_ptr<AVTransMessage> 
         DHLOGE("The parameter is nullptr");
         return;
     }
+    DHLOGI("On Engine message, type : %s.", GetEventTypeName(message->type_).c_str());
     DAudioSinkManager::GetInstance().HandleDAudioNotify(message->dstDevId_, message->dstDevId_,
         static_cast<int32_t>(message->type_), message->content_);
 }
 
 void DSpeakerClient::OnEngineTransDataAvailable(const std::shared_ptr<AudioData> &audioData)
 {
-    DHLOGE("On Engine Data available");
+    DHLOGI("On Engine Data available");
     OnDecodeTransDataDone(audioData);
 }
 
@@ -417,7 +418,7 @@ string DSpeakerClient::GetVolumeLevel()
         return "";
     }
     cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId_).c_str());
-    cJSON_AddStringToObject(jParam, "ChangeType", "FIRST_VOLUME_CHANAGE");
+    cJSON_AddStringToObject(jParam, KEY_CHANGE_TYPE, "FIRST_VOLUME_CHANAGE");
     cJSON_AddStringToObject(jParam, "AUDIO_STREAM_TYPE", std::to_string(streamType).c_str());
     cJSON_AddStringToObject(jParam, "VOLUME_LEVEL", std::to_string(volumeLevel).c_str());
     cJSON_AddStringToObject(jParam, "IS_UPDATEUI", std::to_string(isUpdateUi).c_str());
@@ -450,7 +451,7 @@ void DSpeakerClient::OnVolumeKeyEvent(AudioStandard::VolumeEvent volumeEvent)
         return;
     }
     cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId_).c_str());
-    cJSON_AddStringToObject(jParam, "ChangeType", "VOLUME_CHANAGE");
+    cJSON_AddStringToObject(jParam, KEY_CHANGE_TYPE, "VOLUME_CHANAGE");
     cJSON_AddStringToObject(jParam, "AUDIO_STREAM_TYPE", std::to_string(volumeEvent.volumeType).c_str());
     cJSON_AddStringToObject(jParam, "VOLUME_LEVEL", std::to_string(volumeEvent.volume).c_str());
     cJSON_AddStringToObject(jParam, "IS_UPDATEUI", std::to_string(volumeEvent.updateUi).c_str());
@@ -484,7 +485,7 @@ void DSpeakerClient::OnInterrupt(const AudioStandard::InterruptEvent &interruptE
         return;
     }
     cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId_).c_str());
-    cJSON_AddStringToObject(jParam, "ChangeType", "INTERRUPT_EVENT");
+    cJSON_AddStringToObject(jParam, KEY_CHANGE_TYPE, "INTERRUPT_EVENT");
     cJSON_AddStringToObject(jParam, "EVENT_TYPE", std::to_string(interruptEvent.eventType).c_str());
     cJSON_AddStringToObject(jParam, "FORCE_TYPE", std::to_string(interruptEvent.forceType).c_str());
     cJSON_AddStringToObject(jParam, "HINT_TYPE", std::to_string(interruptEvent.hintType).c_str());
@@ -518,7 +519,7 @@ void DSpeakerClient::OnStateChange(const AudioStandard::RendererState state,
         return;
     }
     cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId_).c_str());
-    cJSON_AddStringToObject(jParam, "ChangeType", "RENDER_STATE_CHANGE_EVENT");
+    cJSON_AddStringToObject(jParam, KEY_CHANGE_TYPE, "RENDER_STATE_CHANGE_EVENT");
     cJSON_AddStringToObject(jParam, "STATE", std::to_string(state).c_str());
     char *jsonData = cJSON_PrintUnformatted(jParam);
     if (jsonData == nullptr) {
@@ -658,9 +659,16 @@ int32_t DSpeakerClient::SendMessage(uint32_t type, std::string content, std::str
 void DSpeakerClient::PlayStatusChange(const std::string &args)
 {
     DHLOGD("Play status change, args: %s.", args.c_str());
-    if (args == AUDIO_EVENT_RESTART) {
+    cJSON *jParam = cJSON_Parse(args.c_str());
+    if (jParam == nullptr) {
+        DHLOGE("Failed to parse JSON: %s", cJSON_GetErrorPtr());
+        cJSON_Delete(jParam);
+        return;
+    }
+    auto changetype = ParseStringFromArgs(args, KEY_CHANGE_TYPE);
+    if (changetype.c_str() == AUDIO_EVENT_RESTART) {
         ReStart();
-    } else if (args == AUDIO_EVENT_PAUSE) {
+    } else if (changetype.c_str() == AUDIO_EVENT_PAUSE) {
         Pause();
     } else {
         DHLOGE("Play status error.");
