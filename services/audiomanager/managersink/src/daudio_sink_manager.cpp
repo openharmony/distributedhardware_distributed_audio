@@ -241,6 +241,16 @@ int32_t DAudioSinkManager::DAudioNotify(const std::string &devId, const std::str
 void DAudioSinkManager::NotifyEvent(const std::string &devId, const int32_t eventType, const std::string &eventContent)
 {
     AudioEvent audioEvent(eventType, eventContent);
+    std::lock_guard<std::mutex> lock(devMapMutex_);
+    DHLOGI("Notify event, devId: %s.", GetAnonyString(devId).c_str());
+    if (audioDevMap_.find(devId) == audioDevMap_.end()) {
+        DHLOGE("Notify event error, dev not exist.");
+        return;
+    }
+    if (audioDevMap_[devId] == nullptr) {
+        DHLOGE("Notify event error, dev is nullptr.");
+        return;
+    }
     audioDevMap_[devId]->NotifyEvent(audioEvent);
 }
 
