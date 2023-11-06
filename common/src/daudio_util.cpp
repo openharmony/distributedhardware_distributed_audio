@@ -113,14 +113,14 @@ std::map<int32_t, std::string> eventNameMap = {
     std::make_pair(MMAP_MIC_STOP, "MMAP_MIC_STOP"),
     std::make_pair(AUDIO_START, "AUDIO_START"),
     std::make_pair(AUDIO_STOP, "AUDIO_STOP")
-}
+};
 
 std::string GetEventTypeName(const int32_t eventType)
 {
     auto iter = eventNameMap.find(eventType);
     if (iter == eventNameMap.end()) {
-            DHLOGE("Can't find matched typename");
-            return "EVENT_UNKNOWN";
+        DHLOGE("Can't find matched typename");
+        return "EVENT_UNKNOWN";
     }
     return iter->second;
 }

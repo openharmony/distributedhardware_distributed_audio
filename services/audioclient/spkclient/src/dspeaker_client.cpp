@@ -658,7 +658,7 @@ int32_t DSpeakerClient::SendMessage(uint32_t type, std::string content, std::str
 
 void DSpeakerClient::PlayStatusChange(const std::string &args)
 {
-    DHLOGD("Play status change, args: %s.", args.c_str());
+    DHLOGI("Play status change, args: %s.", args.c_str());
     cJSON *jParam = cJSON_Parse(args.c_str());
     if (jParam == nullptr) {
         DHLOGE("Failed to parse JSON: %s", cJSON_GetErrorPtr());
