@@ -628,7 +628,7 @@ void DAudioSinkDev::SinkEventHandler::NotifyCloseSpeaker(const AppExecFwk::Inner
         DHLOGE("Sink dev is invalid.");
         return;
     }
-    if (sinkDevObj->TaskOpenDSpeaker(eventParam) != DH_SUCCESS) {
+    if (sinkDevObj->TaskCloseDSpeaker(eventParam) != DH_SUCCESS) {
         DHLOGE("Open speaker failed.");
         return;
     }

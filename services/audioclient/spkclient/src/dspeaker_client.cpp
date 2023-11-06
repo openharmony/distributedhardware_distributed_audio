@@ -240,7 +240,7 @@ int32_t DSpeakerClient::StopRender()
 {
     DHLOGI("Stop spk client.");
     std::lock_guard<std::mutex> lck(devMtx_);
-    if (clientStatus_ != AudioStatus::STATUS_START || !isRenderReady_.load()) {
+    if (clientStatus_ != AudioStatus::STATUS_START) {
         DHLOGE("Renderer is not start or spk status wrong, status: %d.", (int32_t)clientStatus_);
         DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_OPT_FAIL, ERR_DH_AUDIO_SA_STATUS_ERR,
             "daudio renderer is not start or spk status wrong.");
@@ -253,12 +253,16 @@ int32_t DSpeakerClient::StopRender()
         return ERR_DH_AUDIO_NULLPTR;
     }
 
-    FlushJitterQueue();
     if (audioParam_.renderOpts.renderFlags != MMAP_MODE) {
-        isRenderReady_.store(false);
-        if (renderDataThread_.joinable()) {
-            renderDataThread_.join();
+        if (isRenderReady_.load()) {
+            FlushJitterQueue();
+            isRenderReady_.store(false);
+            if (renderDataThread_.joinable()) {
+                renderDataThread_.join();
+            }
         }
+    } else {
+        FlushJitterQueue();
     }
 
     if (!audioRenderer_->Stop()) {
