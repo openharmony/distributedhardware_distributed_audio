@@ -130,6 +130,20 @@ constexpr const char *KEY_STREAM_USAGE = "streamUsage";
 constexpr const char *KEY_RENDER_FLAGS = "renderFlags";
 constexpr const char *KEY_CAPTURE_FLAGS = "capturerFlags";
 
+constexpr const char *AUDIO_STREAM_TYPE = "AUDIO_STREAM_TYPE";
+constexpr const char *IS_UPDATEUI = "IS_UPDATEUI";
+constexpr const char *VOLUME_CHANAGE = "VOLUME_CHANAGE";
+constexpr const char *FIRST_VOLUME_CHANAGE = "FIRST_VOLUME_CHANAGE";
+constexpr const char *INTERRUPT_EVENT = "INTERRUPT_EVENT";
+constexpr const char *FORCE_TYPE = "FORCE_TYPE";
+constexpr const char *HINT_TYPE = "HINT_TYPE";
+constexpr const char *RENDER_STATE_CHANGE_EVENT = "RENDER_STATE_CHANGE_EVENT";
+constexpr const char *KEY_STATE = "STATE";
+constexpr const char *MAX_VOLUME_LEVEL = "MAX_VOLUME_LEVEL";
+constexpr const char *MIN_VOLUME_LEVEL = "MIN_VOLUME_LEVEL";
+constexpr const char *VOLUME_GROUP_ID = "VOLUME_GROUP_ID";
+constexpr const char *VOLUME_EVENT_TYPE = "EVENT_TYPE";
+
 const std::string DUMP_FILE_PATH = "/data/data/daudio";
 const std::string AUDIO_PERMISSION_NAME = "ohos.permission.ENABLE_DISTRIBUTED_HARDWARE";
 } // namespace DistributedHardware

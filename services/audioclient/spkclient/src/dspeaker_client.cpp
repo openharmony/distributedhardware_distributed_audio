@@ -418,12 +418,12 @@ string DSpeakerClient::GetVolumeLevel()
         return "";
     }
     cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId_).c_str());
-    cJSON_AddStringToObject(jParam, KEY_CHANGE_TYPE, "FIRST_VOLUME_CHANAGE");
-    cJSON_AddStringToObject(jParam, "AUDIO_STREAM_TYPE", std::to_string(streamType).c_str());
-    cJSON_AddStringToObject(jParam, "VOLUME_LEVEL", std::to_string(volumeLevel).c_str());
-    cJSON_AddStringToObject(jParam, "IS_UPDATEUI", std::to_string(isUpdateUi).c_str());
-    cJSON_AddStringToObject(jParam, "MAX_VOLUME_LEVEL", std::to_string(maxVolumeLevel).c_str());
-    cJSON_AddStringToObject(jParam, "MIN_VOLUME_LEVEL", std::to_string(minVolumeLevel).c_str());
+    cJSON_AddStringToObject(jParam, KEY_CHANGE_TYPE, FIRST_VOLUME_CHANAGE);
+    cJSON_AddStringToObject(jParam, AUDIO_STREAM_TYPE, std::to_string(streamType).c_str());
+    cJSON_AddStringToObject(jParam, VOLUME_LEVEL.c_str(), std::to_string(volumeLevel).c_str());
+    cJSON_AddStringToObject(jParam, IS_UPDATEUI, std::to_string(isUpdateUi).c_str());
+    cJSON_AddStringToObject(jParam, MAX_VOLUME_LEVEL, std::to_string(maxVolumeLevel).c_str());
+    cJSON_AddStringToObject(jParam, MIN_VOLUME_LEVEL, std::to_string(minVolumeLevel).c_str());
     char *jsonData = cJSON_PrintUnformatted(jParam);
     if (jsonData == nullptr) {
         DHLOGE("Failed to create JSON data.");
@@ -451,11 +451,11 @@ void DSpeakerClient::OnVolumeKeyEvent(AudioStandard::VolumeEvent volumeEvent)
         return;
     }
     cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId_).c_str());
-    cJSON_AddStringToObject(jParam, KEY_CHANGE_TYPE, "VOLUME_CHANAGE");
-    cJSON_AddStringToObject(jParam, "AUDIO_STREAM_TYPE", std::to_string(volumeEvent.volumeType).c_str());
-    cJSON_AddStringToObject(jParam, "VOLUME_LEVEL", std::to_string(volumeEvent.volume).c_str());
-    cJSON_AddStringToObject(jParam, "IS_UPDATEUI", std::to_string(volumeEvent.updateUi).c_str());
-    cJSON_AddStringToObject(jParam, "VOLUME_GROUP_ID", std::to_string(volumeEvent.volumeGroupId).c_str());
+    cJSON_AddStringToObject(jParam, KEY_CHANGE_TYPE, VOLUME_CHANAGE);
+    cJSON_AddStringToObject(jParam, AUDIO_STREAM_TYPE, std::to_string(volumeEvent.volumeType).c_str());
+    cJSON_AddStringToObject(jParam, VOLUME_LEVEL.c_str(), std::to_string(volumeEvent.volume).c_str());
+    cJSON_AddStringToObject(jParam, IS_UPDATEUI, std::to_string(volumeEvent.updateUi).c_str());
+    cJSON_AddStringToObject(jParam, VOLUME_GROUP_ID, std::to_string(volumeEvent.volumeGroupId).c_str());
     char *jsonData = cJSON_PrintUnformatted(jParam);
     if (jsonData == nullptr) {
         DHLOGE("Failed to create JSON data.");
@@ -485,10 +485,10 @@ void DSpeakerClient::OnInterrupt(const AudioStandard::InterruptEvent &interruptE
         return;
     }
     cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId_).c_str());
-    cJSON_AddStringToObject(jParam, KEY_CHANGE_TYPE, "INTERRUPT_EVENT");
-    cJSON_AddStringToObject(jParam, "EVENT_TYPE", std::to_string(interruptEvent.eventType).c_str());
-    cJSON_AddStringToObject(jParam, "FORCE_TYPE", std::to_string(interruptEvent.forceType).c_str());
-    cJSON_AddStringToObject(jParam, "HINT_TYPE", std::to_string(interruptEvent.hintType).c_str());
+    cJSON_AddStringToObject(jParam, KEY_CHANGE_TYPE, INTERRUPT_EVENT);
+    cJSON_AddStringToObject(jParam, VOLUME_EVENT_TYPE, std::to_string(interruptEvent.eventType).c_str());
+    cJSON_AddStringToObject(jParam, FORCE_TYPE, std::to_string(interruptEvent.forceType).c_str());
+    cJSON_AddStringToObject(jParam, HINT_TYPE, std::to_string(interruptEvent.hintType).c_str());
     char *jsonData = cJSON_PrintUnformatted(jParam);
     if (jsonData == nullptr) {
         DHLOGE("Failed to create JSON data.");
@@ -519,8 +519,8 @@ void DSpeakerClient::OnStateChange(const AudioStandard::RendererState state,
         return;
     }
     cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId_).c_str());
-    cJSON_AddStringToObject(jParam, KEY_CHANGE_TYPE, "RENDER_STATE_CHANGE_EVENT");
-    cJSON_AddStringToObject(jParam, "STATE", std::to_string(state).c_str());
+    cJSON_AddStringToObject(jParam, KEY_CHANGE_TYPE, RENDER_STATE_CHANGE_EVENT);
+    cJSON_AddStringToObject(jParam, KEY_STATE, std::to_string(state).c_str());
     char *jsonData = cJSON_PrintUnformatted(jParam);
     if (jsonData == nullptr) {
         DHLOGE("Failed to create JSON data.");
