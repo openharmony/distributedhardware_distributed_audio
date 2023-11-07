@@ -50,7 +50,7 @@ void DSpeakerClient::OnEngineTransMessage(const std::shared_ptr<AVTransMessage> 
         DHLOGE("The parameter is nullptr");
         return;
     }
-    DHLOGI("On Engine message, type : %s.", GetEventTypeName(message->type_).c_str());
+    DHLOGI("On Engine message, type : %s.", GetEventNameByType(message->type_).c_str());
     DAudioSinkManager::GetInstance().HandleDAudioNotify(message->dstDevId_, message->dstDevId_,
         static_cast<int32_t>(message->type_), message->content_);
 }
@@ -665,7 +665,7 @@ void DSpeakerClient::PlayStatusChange(const std::string &args)
         cJSON_Delete(jParam);
         return;
     }
-    auto changetype = ParseStringFromArgs(args, KEY_CHANGE_TYPE);
+    std::string changetype = ParseStringFromArgs(args, KEY_CHANGE_TYPE);
     if (changetype.c_str() == AUDIO_EVENT_RESTART) {
         ReStart();
     } else if (changetype.c_str() == AUDIO_EVENT_PAUSE) {
