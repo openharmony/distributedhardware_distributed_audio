@@ -83,12 +83,15 @@ std::vector<DHItem> DAudioHandler::Query()
         auto dhId = audioSrv->GetPinValueFromType(dev->deviceType_, dev->deviceRole_);
 
         json infoJson;
+        DHItem dhItem;
         int32_t deviceType = GetDevTypeByDHId(dhId);
         if (deviceType == AUDIO_DEVICE_TYPE_MIC) {
+            dhItem.subtype = "mic";
             infoJson["SampleRates"] = micInfos_.sampleRates;
             infoJson["ChannelMasks"] = micInfos_.channels;
             infoJson["Formats"] = micInfos_.formats;
         } else if (deviceType == AUDIO_DEVICE_TYPE_SPEAKER) {
+            dhItem.subtype = "speaker";
             infoJson["SampleRates"] = spkInfos_.sampleRates;
             infoJson["ChannelMasks"] = spkInfos_.channels;
             infoJson["Formats"] = spkInfos_.formats;
@@ -106,11 +109,11 @@ std::vector<DHItem> DAudioHandler::Query()
         DHLOGI("DScreen QueryAudioDecoderAbility info: %s", audioDecoders.c_str());
         infoJson[KEY_HISTREAMER_AUDIO_DECODER] = audioDecoders;
 
-        DHItem dhItem;
         dhItem.dhId = std::to_string(dhId);
         dhItem.attrs = infoJson.dump();
         dhItemVec.push_back(dhItem);
-        DHLOGD("Query result: dhId: %d, attrs: %s.", dhId, infoJson.dump().c_str());
+        DHLOGD("Query result: dhId: %d, subtype: %s, attrs: %s.", dhId, dhItem.subtype.c_str(),
+            infoJson.dump().c_str());
         if (dhId == DEFAULT_RENDER_ID) {
             dhItem.dhId = std::to_string(LOW_LATENCY_RENDER_ID);
             dhItemVec.push_back(dhItem);
