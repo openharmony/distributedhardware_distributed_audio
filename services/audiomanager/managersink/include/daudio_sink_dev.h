@@ -33,11 +33,6 @@
 #include "i_av_engine_provider.h"
 #include "i_av_receiver_engine_callback.h"
 
-#ifdef DAUDIO_SUPPORT_DIRECT
-#include "direct_dmic_client.h"
-#include "direct_dspeaker_client.h"
-#endif
-
 using json = nlohmann::json;
 
 namespace OHOS {
