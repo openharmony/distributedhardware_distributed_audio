@@ -367,6 +367,10 @@ void DAudioSourceManager::ListenAudioDev()
             std::lock_guard<std::mutex> lock(devMapMtx_);
             if (!audioDevMap_.empty()) {
                 for (auto &iter : audioDevMap_) {
+                    if (iter.second.dev == nullptr) {
+                        DHLOGE("Listen audioDev error, dev is nullptr.");
+                        continue;
+                    }
                     iter.second.dev->RestoreThreadStatus();
                 }
             }
