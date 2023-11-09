@@ -105,7 +105,7 @@ void DSpeakerDev::OnEngineTransMessage(const std::shared_ptr<AVTransMessage> &me
         DHLOGE("The parameter is nullptr");
         return;
     }
-    DHLOGI("On Engine message, type:%d.", message->type_);
+    DHLOGI("On Engine message, type : %s.", GetEventNameByType(message->type_).c_str());
     DAudioSourceManager::GetInstance().HandleDAudioNotify(message->dstDevId_, message->dstDevId_,
         message->type_, message->content_);
 }

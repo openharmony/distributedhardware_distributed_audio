@@ -100,7 +100,7 @@ void DAudioSinkDev::NotifyEvent(const AudioEvent &audioEvent)
 
 int32_t DAudioSinkDev::TaskOpenDSpeaker(const std::string &args)
 {
-    DHLOGI("Open speaker device.");
+    DHLOGI("Open speaker device, args = %s.", args.c_str());
     if (args.length() > DAUDIO_MAX_JSON_LEN || args.empty()) {
         return ERR_DH_AUDIO_SA_PARAM_INVALID;
     }

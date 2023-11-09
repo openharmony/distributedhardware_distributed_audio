@@ -49,18 +49,18 @@ void DMicDev::OnEngineTransEvent(const AVTransEvent &event)
 
 void DMicDev::OnEngineTransMessage(const std::shared_ptr<AVTransMessage> &message)
 {
-    DHLOGI("On Engine message");
     if (message == nullptr) {
         DHLOGE("The parameter is nullptr");
         return;
     }
+    DHLOGI("On Engine message, type : %s.", GetEventNameByType(message->type_).c_str());
     DAudioSourceManager::GetInstance().HandleDAudioNotify(message->dstDevId_, message->dstDevId_,
         message->type_, message->content_);
 }
 
 void DMicDev::OnEngineTransDataAvailable(const std::shared_ptr<AudioData> &audioData)
 {
-    DHLOGE("On Engine Data available");
+    DHLOGI("On Engine Data available");
     OnDecodeTransDataDone(audioData);
 }
 

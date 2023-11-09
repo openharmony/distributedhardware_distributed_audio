@@ -50,11 +50,11 @@ void DMicClient::OnEngineTransEvent(const AVTransEvent &event)
 
 void DMicClient::OnEngineTransMessage(const std::shared_ptr<AVTransMessage> &message)
 {
-    DHLOGI("On Engine message");
     if (message == nullptr) {
         DHLOGE("The parameter is nullptr");
         return;
     }
+    DHLOGI("On Engine message, type : %s.", GetEventNameByType(message->type_).c_str());
     DAudioSinkManager::GetInstance().HandleDAudioNotify(message->dstDevId_, message->dstDevId_,
         static_cast<int32_t>(message->type_), message->content_);
 }
@@ -349,7 +349,7 @@ int32_t DMicClient::StopCapture()
 {
     DHLOGI("Stop capturer.");
     std::lock_guard<std::mutex> lck(devMtx_);
-    if (clientStatus_ != AudioStatus::STATUS_START || !isCaptureReady_.load()) {
+    if (clientStatus_ != AudioStatus::STATUS_START) {
         DHLOGE("Capturee is not start or mic status wrong, status: %d.", (int32_t)clientStatus_);
         DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_OPT_FAIL, ERR_DH_AUDIO_SA_STATUS_ERR,
             "daudio capturer is not start or mic status wrong.");
@@ -363,7 +363,7 @@ int32_t DMicClient::StopCapture()
     }
 
     isBlocking_.store(false);
-    if (audioParam_.captureOpts.capturerFlags != MMAP_MODE) {
+    if (audioParam_.captureOpts.capturerFlags != MMAP_MODE && isCaptureReady_.load()) {
         isCaptureReady_.store(false);
         if (captureDataThread_.joinable()) {
             captureDataThread_.join();
