@@ -662,6 +662,7 @@ int32_t DAudioSourceDev::TaskDisableDAudio(const std::string &args)
         DHLOGE("Parse dhId error.");
         return ERR_DH_AUDIO_NOT_SUPPORT;
     }
+    DHLOGI("Parsed dhId = %d", dhId);
     switch (GetDevTypeByDHId(dhId)) {
         case AUDIO_DEVICE_TYPE_SPEAKER:
             return DisableDSpeaker(dhId);
@@ -1079,14 +1080,14 @@ int32_t DAudioSourceDev::TaskPlayStatusChange(const std::string &args)
         DHLOGE("The IO device is invaild.");
         return ERR_DH_AUDIO_NULLPTR;
     }
-    auto changetype = ParseStringFromArgs(args, KEY_CHANGE_TYPE);
-    if (changetype.c_str() == AUDIO_EVENT_RESTART) {
+    std::string changeType = ParseStringFromArgs(args, KEY_CHANGE_TYPE);
+    if (changeType == AUDIO_EVENT_RESTART) {
         ret = speaker->Restart();
         if (ret != DH_SUCCESS) {
             DHLOGE("Speaker restart failed.");
         }
         return ret;
-    } else if (changetype.c_str() == AUDIO_EVENT_PAUSE) {
+    } else if (changeType == AUDIO_EVENT_PAUSE) {
         ret = speaker->Pause();
         if (ret != DH_SUCCESS) {
             DHLOGE("Speaker Pause failed.");

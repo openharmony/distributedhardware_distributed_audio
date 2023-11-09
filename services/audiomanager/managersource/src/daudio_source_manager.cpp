@@ -306,15 +306,17 @@ int32_t DAudioSourceManager::CreateAudioDevice(const std::string &devId)
 
 void DAudioSourceManager::DeleteAudioDevice(const std::string &devId, const std::string &dhId)
 {
-    DHLOGI("Delete audio device.");
+    DHLOGI("Delete audio device, devId = %s, dhId = %s.", devId.c_str(), dhId.c_str());
     std::lock_guard<std::mutex> lock(devMapMtx_);
     audioDevMap_[devId].ports.erase(dhId);
     if (!audioDevMap_[devId].ports.empty()) {
+        DHLOGI("audioDevMap_[devId].ports is not empty");
         return;
     }
     if (devClearThread_.joinable()) {
         devClearThread_.join();
     }
+    DHLOGI("audioDevMap_[devId].ports is empty");
     devClearThread_ = std::thread(&DAudioSourceManager::ClearAudioDev, this, devId);
     if (pthread_setname_np(devClearThread_.native_handle(), DEVCLEAR_THREAD) != DH_SUCCESS) {
         DHLOGE("Dev clear thread setname failed.");
@@ -339,9 +341,12 @@ std::string DAudioSourceManager::GetRequestId(const std::string &devId, const st
 
 void DAudioSourceManager::ClearAudioDev(const std::string &devId)
 {
+    DHLOGI("ClearAudioDev, devId = %s.", devId.c_str());
     std::lock_guard<std::mutex> lock(devMapMtx_);
     if (audioDevMap_[devId].ports.empty()) {
+        DHLOGI("audioDevMap_[devId].ports is empty.");
         audioDevMap_[devId].dev->SleepAudioDev();
+        DHLOGI("back from SleepAudioDev.");
         audioDevMap_.erase(devId);
     }
 }

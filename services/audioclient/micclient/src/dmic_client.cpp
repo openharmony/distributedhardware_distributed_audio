@@ -349,7 +349,7 @@ int32_t DMicClient::StopCapture()
 {
     DHLOGI("Stop capturer.");
     std::lock_guard<std::mutex> lck(devMtx_);
-    if (clientStatus_ != AudioStatus::STATUS_START || !isCaptureReady_.load()) {
+    if (clientStatus_ != AudioStatus::STATUS_START) {
         DHLOGE("Capturee is not start or mic status wrong, status: %d.", (int32_t)clientStatus_);
         DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_OPT_FAIL, ERR_DH_AUDIO_SA_STATUS_ERR,
             "daudio capturer is not start or mic status wrong.");
@@ -363,7 +363,7 @@ int32_t DMicClient::StopCapture()
     }
 
     isBlocking_.store(false);
-    if (audioParam_.captureOpts.capturerFlags != MMAP_MODE) {
+    if (audioParam_.captureOpts.capturerFlags != MMAP_MODE && isCaptureReady_.load()) {
         isCaptureReady_.store(false);
         if (captureDataThread_.joinable()) {
             captureDataThread_.join();

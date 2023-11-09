@@ -665,10 +665,10 @@ void DSpeakerClient::PlayStatusChange(const std::string &args)
         cJSON_Delete(jParam);
         return;
     }
-    std::string changetype = ParseStringFromArgs(args, KEY_CHANGE_TYPE);
-    if (changetype.c_str() == AUDIO_EVENT_RESTART) {
+    std::string changeType = ParseStringFromArgs(args, KEY_CHANGE_TYPE);
+    if (changeType == AUDIO_EVENT_RESTART) {
         ReStart();
-    } else if (changetype.c_str() == AUDIO_EVENT_PAUSE) {
+    } else if (changeType == AUDIO_EVENT_PAUSE) {
         Pause();
     } else {
         DHLOGE("Play status error.");
