@@ -332,7 +332,7 @@ int32_t DMicDev::ReadStreamData(const std::string &devId, const int32_t dhId, st
 #endif
     int64_t endTime = GetNowTimeUs();
     if (IsOutDurationRange(startTime, endTime, lastReadStartTime_)) {
-        DHLOGE("This time read data spend: %lld, The interval of read data this time and the last time: %lld",
+        DHLOGE("This time read data spend: %lld us, The interval of read data this time and the last time: %lld us",
             endTime - startTime, startTime - lastReadStartTime_);
     }
     lastReadStartTime_ = startTime;

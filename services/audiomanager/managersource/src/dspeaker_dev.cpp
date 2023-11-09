@@ -330,7 +330,7 @@ int32_t DSpeakerDev::WriteStreamData(const std::string &devId, const int32_t dhI
     }
     int64_t endTime = GetNowTimeUs();
     if (IsOutDurationRange(startTime, endTime, lastwriteStartTime_)) {
-        DHLOGE("This time write data spend: %lld, The interval of write data this time and the last time: %lld",
+        DHLOGE("This time write data spend: %lld us, The interval of write data this time and the last time: %lld us",
             endTime - startTime, startTime - lastwriteStartTime_);
     }
     lastwriteStartTime_ = startTime;

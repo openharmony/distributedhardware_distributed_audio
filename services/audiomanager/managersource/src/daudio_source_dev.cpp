@@ -100,11 +100,7 @@ int32_t DAudioSourceDev::AwakeAudioDev()
 
 void DAudioSourceDev::SleepAudioDev()
 {
-    if (handler_ == nullptr) {
-        DHLOGI("Event handler is already stoped.");
-        return;
-    }
-    while (!handler_->IsIdle()) {};
+    handler_ = nullptr;
     DHLOGD("Sleep audio dev over.");
 }
 

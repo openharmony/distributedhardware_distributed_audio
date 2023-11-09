@@ -70,7 +70,7 @@ private:
     static constexpr const char* LISTEN_THREAD = "sourceListenTh";
     static constexpr int32_t WATCHDOG_INTERVAL_TIME = 20000;
     static constexpr int32_t WATCHDOG_DELAY_TIME = 5000;
-    static constexpr size_t SLEEP_TIME = 5000;
+    static constexpr size_t SLEEP_TIME = 1000000;
 
     std::string localDevId_;
     std::mutex devMapMtx_;
