@@ -63,13 +63,6 @@ ohos_shared_library("distributed_audio_sink") {
     "${softbusadapter_path}/include",
   ]
 
-  if (distributed_audio_extension) {
-    include_dirs += [
-      "${distributedaudio_ext_path}/services/audioclient/directmicclient/include",
-      "${distributedaudio_ext_path}/services/audioclient/directspkclient/include",
-    ]
-  }
-
   sources = [
     "${audio_client_path}/micclient/src/dmic_client.cpp",
     "${audio_client_path}/spkclient/src/dspeaker_client.cpp",
@@ -84,13 +77,6 @@ ohos_shared_library("distributed_audio_sink") {
     "src/daudio_sink_service.cpp",
     "src/daudio_sink_stub.cpp",
   ]
-
-  if (distributed_audio_extension) {
-    sources += [
-      "${distributedaudio_ext_path}/services/audioclient/directmicclient/src/direct_dmic_client.cpp",
-      "${distributedaudio_ext_path}/services/audioclient/directspkclient/src/direct_dspeaker_client.cpp",
-    ]
-  }
 
   deps = [
     "${audio_transport_path}/decodetransport:distributed_audio_decode_transport",
@@ -120,10 +106,6 @@ ohos_shared_library("distributed_audio_sink") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
-
-  if (distributed_audio_extension) {
-    cflags = [ "-DDAUDIO_SUPPORT_DIRECT" ]
-  }
 
   defines = [
     "HI_LOG_ENABLE",
