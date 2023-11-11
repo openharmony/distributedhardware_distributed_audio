@@ -58,6 +58,7 @@ private:
     std::string GetRequestId(const std::string &devId, const std::string &dhId);
     void ClearAudioDev(const std::string &devId);
     void ListenAudioDev();
+    void RestoreThreadStatus();
 
     typedef struct {
         std::string devId;
