@@ -71,6 +71,7 @@ private:
     int32_t TaskSetVolume(const std::string &args);
     int32_t TaskSetMute(const std::string &args);
     int32_t TaskPlayStatusChange(const std::string &args);
+    int32_t TaskDisableDevice(const std::string &args);
 
     void NotifySourceDev(const AudioEventType type, const std::string dhId, const int32_t result);
     int32_t from_json(const json &j, AudioParam &audioParam);
@@ -94,6 +95,7 @@ private:
     std::mutex micClientMutex_;
     std::map<int32_t, std::shared_ptr<IMicClient>> micClientMap_;
     std::shared_ptr<DAudioSinkDevCtrlMgr> audioCtrlMgr_ = nullptr;
+    static constexpr size_t WAIT_HANDLER_IDLE_TIME_US = 10000;
 
     std::atomic<bool> isSpkInUse_ = false;
     std::atomic<bool> isMicInUse_ = false;

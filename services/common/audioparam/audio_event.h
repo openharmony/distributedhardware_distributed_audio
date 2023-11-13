@@ -46,6 +46,7 @@ typedef enum {
     MIC_CLOSED = 24,
     NOTIFY_OPEN_MIC_RESULT = 25,
     NOTIFY_CLOSE_MIC_RESULT = 26,
+    DISABLE_DEVICE = 27,
 
     VOLUME_SET = 31,
     VOLUME_GET = 32,

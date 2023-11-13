@@ -50,7 +50,8 @@ int32_t AVTransReceiverAdapter::Release()
 {
     DHLOGI("Release!");
     if (receiverEngine_ != nullptr) {
-        if (!receiverEngine_->Release()) {
+        int32_t ret = receiverEngine_->Release();
+        if (ret != DH_SUCCESS) {
             DHLOGE("Release av transport receiver engine failed");
         }
     }
