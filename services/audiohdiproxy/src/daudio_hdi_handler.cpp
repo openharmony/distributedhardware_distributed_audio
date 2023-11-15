@@ -79,6 +79,11 @@ int32_t DAudioHdiHandler::InitHdiHandler()
 int32_t DAudioHdiHandler::UninitHdiHandler()
 {
     DHLOGI("Unload hdf driver start.");
+    if (remote_ == nullptr) {
+        DHLOGE("Remote is nullptr.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    remote_->RemoveDeathRecipient(audioHdiRecipient_);
     if (audioSrvHdf_ == nullptr) {
         DHLOGI("Audio hdi proxy not init. Do not need to uninit.");
         return DH_SUCCESS;
@@ -88,7 +93,6 @@ int32_t DAudioHdiHandler::UninitHdiHandler()
         DHLOGE("Unload hdf driver failed, ret: %d", ret);
         return ret;
     }
-    remote_->RemoveDeathRecipient(audioHdiRecipient_);
     DHLOGI("Uninit hdi handler success.");
     return DH_SUCCESS;
 }

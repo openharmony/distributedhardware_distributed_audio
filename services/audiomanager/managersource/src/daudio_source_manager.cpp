@@ -351,6 +351,19 @@ void DAudioSourceManager::ClearAudioDev(const std::string &devId)
     }
 }
 
+void DAudioSourceManager::RestoreThreadStatus()
+{
+    if (!audioDevMap_.empty()) {
+        for (auto &iter : audioDevMap_) {
+            if (iter.second.dev == nullptr) {
+                DHLOGE("Listen audioDev error, dev is nullptr.");
+                continue;
+            }
+            iter.second.dev->RestoreThreadStatus();
+        }
+    }
+}
+
 void DAudioSourceManager::ListenAudioDev()
 {
     auto taskFunc = [this]() {
@@ -370,11 +383,7 @@ void DAudioSourceManager::ListenAudioDev()
     while (isHicollieRunning_.load()) {
         {
             std::lock_guard<std::mutex> lock(devMapMtx_);
-            if (!audioDevMap_.empty()) {
-                for (auto &iter : audioDevMap_) {
-                    iter.second.dev->RestoreThreadStatus();
-                }
-            }
+            RestoreThreadStatus();
         }
         usleep(SLEEP_TIME);
     }
