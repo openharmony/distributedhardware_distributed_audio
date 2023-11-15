@@ -54,7 +54,15 @@ int32_t DAudioSinkDev::AwakeAudioDev()
 
 void DAudioSinkDev::SleepAudioDev()
 {
-    handler_ = nullptr;
+    DHLOGD("Sleep audio dev.");
+    if (handler_ == nullptr) {
+        DHLOGI("Event handler is already stoped.");
+        return;
+    }
+    while (!handler_->IsIdle()) {
+        DHLOGI("handler is running, wait for idle.");
+        usleep(WAIT_HANDLER_IDLE_TIME_US);
+    }
     DHLOGD("Sleep audio dev over.");
 }
 
@@ -87,6 +95,10 @@ int32_t DAudioSinkDev::InitAVTransEngines(const ChannelState channelState, IAVEn
 void DAudioSinkDev::NotifyEvent(const AudioEvent &audioEvent)
 {
     DHLOGD("Notify event, eventType: %d.", (int32_t)audioEvent.type);
+    if ((int32_t)audioEvent.type == DISABLE_DEVICE) {
+        TaskDisableDevice(audioEvent.content);
+        return;
+    }
     auto eventParam = std::make_shared<AudioEvent>(audioEvent);
     auto msgEvent = AppExecFwk::InnerEvent::Get(static_cast<uint32_t>(audioEvent.type), eventParam, 0);
     if (handler_ == nullptr) {
@@ -96,6 +108,18 @@ void DAudioSinkDev::NotifyEvent(const AudioEvent &audioEvent)
     if (handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
         DHLOGD("Send event success.");
     }
+}
+
+int32_t DAudioSinkDev::TaskDisableDevice(const std::string &args)
+{
+    if (args.find(OWNER_NAME_D_SPEAKER) != args.npos) {
+        isSpkInUse_.store(false);
+    }
+    if (args.find(OWNER_NAME_D_MIC) != args.npos) {
+        isMicInUse_.store(false);
+    }
+    JudgeDeviceStatus();
+    return DH_SUCCESS;
 }
 
 int32_t DAudioSinkDev::TaskOpenDSpeaker(const std::string &args)
@@ -167,8 +191,6 @@ int32_t DAudioSinkDev::TaskCloseDSpeaker(const std::string &args)
         DHLOGE("Release speaker client failed, ret: %d.", ret);
     }
     spkClientMap_.erase(dhId);
-    isSpkInUse_.store(false);
-    JudgeDeviceStatus();
     DHLOGI("Close speaker device task excute success.");
     return DH_SUCCESS;
 }
@@ -294,8 +316,6 @@ int32_t DAudioSinkDev::TaskCloseDMic(const std::string &args)
         DHLOGE("Release mic client failed, ret: %d.", ret);
     }
     micClientMap_.erase(dhId);
-    isMicInUse_.store(false);
-    JudgeDeviceStatus();
     DHLOGI("Close mic device task excute success.");
     return DH_SUCCESS;
 }

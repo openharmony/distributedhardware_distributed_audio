@@ -364,15 +364,8 @@ int32_t EngineProviderListener::OnProviderEvent(const AVTransEvent &event)
     } else if (event.type == EventType::EVENT_CHANNEL_CLOSED) {
         DHLOGI("Received control channel closed event, clear audio device for peerDevId=%s",
             GetAnonyString(event.peerDevId).c_str());
-        if (event.content.find(OWNER_NAME_D_SPEAKER) != event.content.npos) {
-            DHLOGD("Notify audio event, event type: %d, event content: %s.", CLOSE_SPEAKER,
-                PARAM_CLOSE_SPEAKER.c_str());
-            DAudioSinkManager::GetInstance().NotifyEvent(event.peerDevId, CLOSE_SPEAKER, PARAM_CLOSE_SPEAKER);
-        }
-        if (event.content.find(OWNER_NAME_D_MIC) != event.content.npos) {
-            DHLOGD("Notify audio event, event type: %d, event content: %s.", CLOSE_MIC, PARAM_CLOSE_MIC.c_str());
-            DAudioSinkManager::GetInstance().NotifyEvent(event.peerDevId, CLOSE_MIC, PARAM_CLOSE_MIC);
-        }
+        std::string eventStr = event.content;
+        DAudioSinkManager::GetInstance().NotifyEvent(event.peerDevId, DISABLE_DEVICE, eventStr);
     } else {
         DHLOGE("Invaild event type.");
     }
