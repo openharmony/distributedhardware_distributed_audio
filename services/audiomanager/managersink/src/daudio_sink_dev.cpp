@@ -31,7 +31,8 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-DAudioSinkDev::DAudioSinkDev(const std::string &devId) : devId_(devId)
+DAudioSinkDev::DAudioSinkDev(const std::string &devId, const sptr<IDAudioSinkIpcCallback> &sinkCallback)
+    : devId_(devId), ipcSinkCallback_(sinkCallback)
 {
     DHLOGD("Distributed audio sink device constructed, devId: %s.", GetAnonyString(devId).c_str());
 }
@@ -69,6 +70,7 @@ void DAudioSinkDev::SleepAudioDev()
 int32_t DAudioSinkDev::InitAVTransEngines(const ChannelState channelState, IAVEngineProvider *providerPtr)
 {
     DHLOGI("Init InitAVTransEngines");
+
     if (channelState == ChannelState::UNKNOWN || providerPtr == nullptr) {
         DHLOGE("The channel type is invalid.");
         return ERR_DH_AUDIO_FAILED;
@@ -262,12 +264,13 @@ int32_t DAudioSinkDev::TaskOpenDMic(const std::string &args)
         DHLOGE("Get audio param from json failed, error code %d.", ret);
         return ret;
     }
+    micDhId_ = std::string(jParam[KEY_DH_ID]);
     int32_t dhId = ConvertString2Int(std::string(jParam[KEY_DH_ID]));
     if (dhId == -1) {
         DHLOGE("Parse dhId error.");
         return ERR_DH_AUDIO_NULLPTR;
     }
-    std::shared_ptr<IMicClient> micClient = nullptr;
+    std::shared_ptr<DMicClient> micClient = nullptr;
     {
         std::lock_guard<std::mutex> devLck(micClientMutex_);
         micClient = micClientMap_[dhId];
@@ -286,6 +289,12 @@ int32_t DAudioSinkDev::TaskOpenDMic(const std::string &args)
         DHLOGE("Start capture failed, ret: %d.", ret);
         return ERR_DH_AUDIO_FAILED;
     }
+    std::string subType = "mic";
+    bool isSensitive = false;
+    bool isSameAccout = false;
+    ipcSinkCallback_->OnNotifyResourceInfo(ResourceEventType::EVENT_TYPE_PULL_UP_PAGE, subType, devId_,
+        isSensitive, isSameAccout);
+    isPageStatus_.store(true);
     NotifySourceDev(NOTIFY_OPEN_MIC_RESULT, jParam[KEY_DH_ID], ret);
     DHLOGI("Open mic device task end, notify source ret %d.", ret);
     isMicInUse_.store(true);
@@ -301,7 +310,7 @@ int32_t DAudioSinkDev::TaskCloseDMic(const std::string &args)
         return ERR_DH_AUDIO_FAILED;
     }
     std::lock_guard<std::mutex> devLck(micClientMutex_);
-    std::shared_ptr<IMicClient> micClient = micClientMap_[dhId];
+    std::shared_ptr<DMicClient> micClient = micClientMap_[dhId];
     if (micClient == nullptr) {
         DHLOGE("Mic client is null or already closed.");
         return DH_SUCCESS;
@@ -316,6 +325,14 @@ int32_t DAudioSinkDev::TaskCloseDMic(const std::string &args)
         DHLOGE("Release mic client failed, ret: %d.", ret);
     }
     micClientMap_.erase(dhId);
+    if (isPageStatus_.load()) {
+        std::string subType = "mic";
+        bool isSensitive = false;
+        bool isSameAccout = false;
+        ipcSinkCallback_->OnNotifyResourceInfo(ResourceEventType::EVENT_TYPE_CLOSE_PAGE, subType, devId_,
+            isSensitive, isSameAccout);
+    }
+    isPageStatus_.store(false);
     DHLOGI("Close mic device task excute success.");
     return DH_SUCCESS;
 }
@@ -512,7 +529,7 @@ void DAudioSinkDev::NotifySourceDev(const AudioEventType type, const std::string
     if (speakerClient != nullptr) {
         speakerClient->SendMessage(static_cast<uint32_t>(type), jEvent.dump(), devId_);
     }
-    std::shared_ptr<IMicClient> micClient = nullptr;
+    std::shared_ptr<DMicClient> micClient = nullptr;
     {
         std::lock_guard<std::mutex> devLck(micClientMutex_);
         micClient = micClientMap_[dhIdInt];
@@ -890,6 +907,54 @@ int32_t DAudioSinkDev::SinkEventHandler::GetEventParam(const AppExecFwk::InnerEv
         return ERR_DH_AUDIO_NULLPTR;
     }
     eventParam = paramObj->content;
+    return DH_SUCCESS;
+}
+
+int32_t DAudioSinkDev::PauseDistributedHardware(const std::string &networkId)
+{
+    DHLOGI("DAudioSinkDev PauseDistributedHardware.");
+    int32_t dhId = ConvertString2Int(micDhId_);
+    std::shared_ptr<DMicClient> micClient = nullptr;
+    {
+        std::lock_guard<std::mutex> devLck(micClientMutex_);
+        micClient = micClientMap_[dhId];
+    }
+    if (micClient == nullptr) {
+        DHLOGE("Mic client should be init by dev.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    int32_t ret = micClient->PauseCapture();
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Pause mic client failed, ret: %d.", ret);
+    }
+    return ret;
+}
+
+int32_t DAudioSinkDev::ResumeDistributedHardware(const std::string &networkId)
+{
+    DHLOGI("DAudioSinkDev ResumeDistributedHardware.");
+    int32_t dhId = ConvertString2Int(micDhId_);
+    std::shared_ptr<DMicClient> micClient = nullptr;
+    {
+        std::lock_guard<std::mutex> devLck(micClientMutex_);
+        micClient = micClientMap_[dhId];
+    }
+    if (micClient == nullptr) {
+        DHLOGE("Mic client should be init by dev.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    int32_t ret = micClient->ResumeCapture();
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Resume mic client failed, ret: %d.", ret);
+    }
+    return ret;
+}
+
+int32_t DAudioSinkDev::StopDistributedHardware(const std::string &networkId)
+{
+    DHLOGI("DAudioSinkDev StopDistributedHardware.");
+    isPageStatus_.store(false);
+    NotifySourceDev(CLOSE_MIC, micDhId_, DH_SUCCESS);
     return DH_SUCCESS;
 }
 } // namespace DistributedHardware

@@ -16,6 +16,7 @@
 #ifndef OHOS_IDAUDIO_SINK_H
 #define OHOS_IDAUDIO_SINK_H
 
+#include "idaudio_sink_ipc_callback.h"
 #include "iremote_broker.h"
 
 namespace OHOS {
@@ -25,12 +26,15 @@ public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.distributedhardware.distributedaudiosink");
 
     ~IDAudioSink() override = default;
-    virtual int32_t InitSink(const std::string &params) = 0;
+    virtual int32_t InitSink(const std::string &params, const sptr<IDAudioSinkIpcCallback> &sinkCallback) = 0;
     virtual int32_t ReleaseSink() = 0;
     virtual int32_t SubscribeLocalHardware(const std::string &dhId, const std::string &param) = 0;
     virtual int32_t UnsubscribeLocalHardware(const std::string &dhId) = 0;
     virtual void DAudioNotify(const std::string &devId, const std::string &dhId, const int32_t eventType,
         const std::string &eventContent) = 0;
+    virtual int32_t PauseDistributedHardware(const std::string &networkId) = 0;
+    virtual int32_t ResumeDistributedHardware(const std::string &networkId) = 0;
+    virtual int32_t StopDistributedHardware(const std::string &networkId) = 0;
 };
 } // DistributedHardware
 } // OHOS

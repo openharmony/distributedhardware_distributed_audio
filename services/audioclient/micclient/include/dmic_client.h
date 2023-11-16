@@ -64,6 +64,8 @@ public:
     int32_t SendMessage(uint32_t type, std::string content, std::string dstDevId) override;
 
     void OnReadData(size_t length) override;
+    int32_t PauseCapture();
+    int32_t ResumeCapture();
 private:
     void CaptureThreadRunning();
 
@@ -89,6 +91,7 @@ private:
     std::shared_ptr<IAudioDataTransport> micTrans_ = nullptr;
     int64_t lastCaptureStartTime_ = 0;
     int64_t lastTransStartTime_ = 0;
+    std::atomic<bool> isPauseStatus_ = false;
 };
 } // DistributedHardware
 } // OHOS

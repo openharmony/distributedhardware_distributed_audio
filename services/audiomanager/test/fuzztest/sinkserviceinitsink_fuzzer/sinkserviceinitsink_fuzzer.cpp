@@ -19,6 +19,7 @@
 #include <cstdint>
 
 #include "daudio_sink_service.h"
+#include "daudio_sink_ipc_callback.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 
@@ -35,8 +36,9 @@ void SinkServiceInitSinkFuzzTest(const uint8_t* data, size_t size)
     bool runOnCreate = *(reinterpret_cast<const bool*>(data));
     
     auto dAudioSinkService = std::make_shared<DAudioSinkService>(saId, runOnCreate);
+    sptr<DAudioSinkIpcCallback> dAudioSinkIpcCallback = new DAudioSinkIpcCallback();
 
-    dAudioSinkService->InitSink(params);
+    dAudioSinkService->InitSink(params, dAudioSinkIpcCallback);
 }
 }
 }

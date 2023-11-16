@@ -20,6 +20,7 @@
 
 #include "daudio_constants.h"
 #include "daudio_sink_proxy.h"
+#include "daudio_sink_ipc_callback.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 
@@ -40,8 +41,8 @@ void SinkProxyInitSinkFuzzTest(const uint8_t* data, size_t size)
         return;
     }
     std::shared_ptr<DAudioSinkProxy> dAudioProxy = std::make_shared<DAudioSinkProxy>(remoteObject);
-
-    dAudioProxy->InitSink(params);
+    sptr<DAudioSinkIpcCallback> dAudioSinkIpcCallback = new DAudioSinkIpcCallback();
+    dAudioProxy->InitSink(params, dAudioSinkIpcCallback);
 }
 }
 }

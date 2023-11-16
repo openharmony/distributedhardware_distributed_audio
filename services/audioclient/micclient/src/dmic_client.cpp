@@ -178,11 +178,6 @@ int32_t DMicClient::SetUp(const AudioParam &param)
 int32_t DMicClient::SendMessage(uint32_t type, std::string content, std::string dstDevId)
 {
     DHLOGI("Send message to remote.");
-    if (type != static_cast<uint32_t>(NOTIFY_OPEN_MIC_RESULT) &&
-        type != static_cast<uint32_t>(NOTIFY_CLOSE_MIC_RESULT)) {
-        DHLOGE("event type is not NOTIFY_OPEN_MIC or NOTIFY_CLOSE_MIC. type: %u", type);
-        return ERR_DH_AUDIO_NULLPTR;
-    }
     if (micTrans_ == nullptr) {
         DHLOGE("mic trans is null.");
         return ERR_DH_AUDIO_NULLPTR;
@@ -279,6 +274,9 @@ void DMicClient::AudioFwkCaptureData()
     if (errorFlag) {
         DHLOGE("Bytes read failed.");
         return;
+    }
+    if (isPauseStatus_.load()) {
+        memset_s(audioData->Data(), audioData->Size(), 0, audioData->Size());
     }
 #ifdef DUMP_DMICCLIENT_FILE
     if (DaudioSinkHidumper::GetInstance().QueryDumpDataFlag()) {
@@ -390,6 +388,20 @@ int32_t DMicClient::StopCapture()
 void DMicClient::SetAttrs(const std::string &devId, const std::shared_ptr<IAudioEventCallback> &callback)
 {
     DHLOGE("Set attrs, not support yet.");
+}
+
+int32_t DMicClient::PauseCapture()
+{
+    DHLOGI("Pause capture.");
+    isPauseStatus_.store(true);
+    return DH_SUCCESS;
+}
+
+int32_t DMicClient::ResumeCapture()
+{
+    DHLOGI("Resume capture.");
+    isPauseStatus_.store(false);
+    return DH_SUCCESS;
 }
 } // DistributedHardware
 } // OHOS

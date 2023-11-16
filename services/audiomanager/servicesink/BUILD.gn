@@ -74,6 +74,7 @@ ohos_shared_library("distributed_audio_sink") {
     "${services_path}/audiomanager/managersink/src/daudio_sink_dev.cpp",
     "${services_path}/audiomanager/managersink/src/daudio_sink_manager.cpp",
     "src/daudio_sink_hidumper.cpp",
+    "src/daudio_sink_ipc_callback_proxy.cpp",
     "src/daudio_sink_service.cpp",
     "src/daudio_sink_stub.cpp",
   ]
@@ -81,6 +82,7 @@ ohos_shared_library("distributed_audio_sink") {
   deps = [
     "${audio_transport_path}/decodetransport:distributed_audio_decode_transport",
     "${audio_transport_path}/encodetransport:distributed_audio_encode_transport",
+    "${innerkits_path}/native_cpp/audio_sink:distributed_audio_sink_sdk",
     "${services_path}/common:distributed_audio_utils",
     "//third_party/cJSON:cjson",
   ]

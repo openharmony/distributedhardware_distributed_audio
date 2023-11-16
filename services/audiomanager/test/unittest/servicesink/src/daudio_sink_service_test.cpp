@@ -16,7 +16,11 @@
 #include "daudio_sink_service_test.h"
 
 #include "audio_event.h"
+#include "daudio_constants.h"
 #include "daudio_errorcode.h"
+#include "if_system_ability_manager.h"
+#include "iservice_registry.h"
+#include "daudio_sink_ipc_callback_proxy.h"
 
 using namespace testing::ext;
 
@@ -30,6 +34,14 @@ void DAudioSinkServiceTest::SetUp()
 {
     uint32_t saId = 6666;
     bool runOnCreate = true;
+    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgr == nullptr) {
+        return;
+    }
+    remoteObject_ = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID);
+    if (remoteObject_ == nullptr) {
+        return;
+    }
 
     sinkSrv_ = std::make_shared<DAudioSinkService>(saId, runOnCreate);
 }
@@ -64,7 +76,8 @@ HWTEST_F(DAudioSinkServiceTest, OnStart_001, TestSize.Level1)
 HWTEST_F(DAudioSinkServiceTest, InitSink_001, TestSize.Level1)
 {
     std::string param = "sink";
-    EXPECT_EQ(DH_SUCCESS, sinkSrv_->InitSink(param));
+    sptr<DAudioSinkIpcCallbackProxy> dAudioSinkIpcCallbackProxy(new DAudioSinkIpcCallbackProxy(remoteObject_));
+    EXPECT_EQ(DH_SUCCESS, sinkSrv_->InitSink(param, dAudioSinkIpcCallbackProxy));
 }
 
 /**
@@ -107,12 +120,26 @@ HWTEST_F(DAudioSinkServiceTest, UnsubscribeLocalHardware_001, TestSize.Level1)
     int32_t eventType = 2;
     std::string eventContent = "OPEN_MIC";
     std::string param = "sink";
+    sptr<DAudioSinkIpcCallbackProxy> dAudioSinkIpcCallbackProxy(new DAudioSinkIpcCallbackProxy(remoteObject_));
 
-    sinkSrv_->InitSink(param);
+    sinkSrv_->InitSink(param, dAudioSinkIpcCallbackProxy);
     sinkSrv_->DAudioNotify(devId, dhId, eventType, eventContent);
     EXPECT_EQ(DH_SUCCESS, sinkSrv_->UnsubscribeLocalHardware(dhId));
     sinkSrv_->ReleaseSink();
 }
 
+/**
+ * @tc.name: PauseDistributedHardware_001
+ * @tc.desc: Verify the PauseDistributedHardware function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkServiceTest, PauseDistributedHardware_001, TestSize.Level1)
+{
+    std::string networkId = "networkId";
+    EXPECT_EQ(DH_SUCCESS, sinkSrv_->PauseDistributedHardware(networkId));
+    EXPECT_EQ(DH_SUCCESS, sinkSrv_->ResumeDistributedHardware(networkId));
+    EXPECT_EQ(DH_SUCCESS, sinkSrv_->StopDistributedHardware(networkId));
+}
 } // DistributedHardware
 } // OHOS

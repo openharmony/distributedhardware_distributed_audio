@@ -44,7 +44,10 @@ ohos_fuzztest("SinkServiceInitSinkFuzzTest") {
     "${services_path}/audiomanager/servicesink/include",
   ]
 
-  deps = [ "${services_path}/audiomanager/servicesink:distributed_audio_sink" ]
+  deps = [
+    "${innerkits_path}/native_cpp/audio_sink:distributed_audio_sink_sdk",
+    "${services_path}/audiomanager/servicesink:distributed_audio_sink",
+  ]
 
   defines = [
     "HI_LOG_ENABLE",

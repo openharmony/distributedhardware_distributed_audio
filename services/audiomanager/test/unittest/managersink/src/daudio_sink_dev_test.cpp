@@ -18,6 +18,9 @@
 #include "audio_event.h"
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
+#include "if_system_ability_manager.h"
+#include "iservice_registry.h"
+#include "daudio_sink_ipc_callback_proxy.h"
 
 using namespace testing::ext;
 
@@ -30,7 +33,16 @@ void DAudioSinkDevTest::TearDownTestCase(void) {}
 void DAudioSinkDevTest::SetUp()
 {
     std::string networkId = "networkId";
-    sinkDev_ = std::make_shared<DAudioSinkDev>(networkId);
+    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgr == nullptr) {
+        return;
+    }
+    sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID);
+    if (remoteObject == nullptr) {
+        return;
+    }
+    sptr<DAudioSinkIpcCallbackProxy> dAudioSinkIpcCallbackProxy(new DAudioSinkIpcCallbackProxy(remoteObject));
+    sinkDev_ = std::make_shared<DAudioSinkDev>(networkId, dAudioSinkIpcCallbackProxy);
 }
 
 void DAudioSinkDevTest::TearDown()
@@ -190,7 +202,8 @@ HWTEST_F(DAudioSinkDevTest, TaskCloseDMic_002, TestSize.Level1)
     std::string args = "{\"dhId\":\"123\"}";
     std::string devId;
     int32_t dhId = 1 << 27 | 1 << 0;
-    sinkDev_->micClient_ = std::make_shared<DMicClient>(devId, dhId, sinkDev_);
+    auto micClient = std::make_shared<DMicClient>(devId, dhId, sinkDev_);
+    sinkDev_->micClientMap_.insert(std::make_pair(DEFAULT_CAPTURE_ID, micClient));
     EXPECT_EQ(DH_SUCCESS, sinkDev_->TaskCloseDMic(args));
 }
 
