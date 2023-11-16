@@ -122,7 +122,6 @@ private:
     static constexpr uint8_t EVENT_NOTIFY_CLOSE_MIC = 0x08;
     static constexpr uint8_t EVENT_NOTIFY_OPEN_CTRL = 0x10;
     static constexpr uint8_t EVENT_NOTIFY_CLOSE_CTRL = 0x20;
-    static constexpr size_t WAIT_HANDLER_IDLE_TIME_US = 10000;
 
     std::string devId_;
     std::shared_ptr<DAudioSourceMgrCallback> mgrCallback_;
@@ -147,6 +146,8 @@ private:
         void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
 
     private:
+        void EnableDAudioCallback(const AppExecFwk::InnerEvent::Pointer &event);
+        void DisableDAudioCallback(const AppExecFwk::InnerEvent::Pointer &event);
         void OpenDSpeakerCallback(const AppExecFwk::InnerEvent::Pointer &event);
         void CloseDSpeakerCallback(const AppExecFwk::InnerEvent::Pointer &event);
         void OpenDMicCallback(const AppExecFwk::InnerEvent::Pointer &event);
