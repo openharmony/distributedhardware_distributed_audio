@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,6 +32,10 @@ public:
     int32_t UnsubscribeLocalHardware(const std::string &dhId) override;
     void OnRemoteSinkSvrDied(const wptr<IRemoteObject> &remote);
     void FinishStartSA(const std::string &param, const sptr<IRemoteObject> &remoteObject);
+    int32_t RegisterPrivacyResources(std::shared_ptr<PrivacyResourcesListener> listener) override;
+    int32_t PauseDistributedHardware(const std::string &networkId) override;
+    int32_t ResumeDistributedHardware(const std::string &networkId) override;
+    int32_t StopDistributedHardware(const std::string &networkId) override;
 
 private:
     class DAudioSinkSvrRecipient : public IRemoteObject::DeathRecipient {

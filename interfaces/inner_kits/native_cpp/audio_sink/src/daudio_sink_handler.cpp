@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -156,6 +156,26 @@ void DAudioSinkHandler::FinishStartSA(const std::string &param, const sptr<IRemo
 void DAudioSinkHandler::DAudioSinkSvrRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     DAudioSinkHandler::GetInstance().OnRemoteSinkSvrDied(remote);
+}
+
+int32_t DAudioSinkHandler::RegisterPrivacyResources(std::shared_ptr<PrivacyResourcesListener> listener)
+{
+    return DH_SUCCESS;
+}
+
+int32_t DAudioSinkHandler::PauseDistributedHardware(const std::string &networkId)
+{
+    return DH_SUCCESS;
+}
+
+int32_t DAudioSinkHandler::ResumeDistributedHardware(const std::string &networkId)
+{
+    return DH_SUCCESS;
+}
+
+int32_t DAudioSinkHandler::StopDistributedHardware(const std::string &networkId)
+{
+    return DH_SUCCESS;
 }
 
 IDistributedHardwareSink *GetSinkHardwareHandler()
