@@ -33,6 +33,8 @@ namespace DistributedHardware {
 namespace {
 constexpr uint32_t MAX_DEVICE_ID_LENGTH = 200;
 constexpr uint32_t MAX_DISTRIBUTED_HARDWARE_ID_LENGTH = 100;
+constexpr uint32_t EVENT_MANAGER_ENABLE_DAUDIO = 11;
+constexpr uint32_t EVENT_MANAGER_DISABLE_DAUDIO = 12;
 }
 IMPLEMENT_SINGLE_INSTANCE(DAudioSourceManager);
 using AVTransProviderClass = IAVEngineProvider *(*)(const std::string &);
@@ -98,6 +100,14 @@ int32_t DAudioSourceManager::Init(const sptr<IDAudioIpcCallback> &callback)
     if (pthread_setname_np(listenThread_.native_handle(), LISTEN_THREAD) != DH_SUCCESS) {
         DHLOGE("Dev clear thread setname failed.");
     }
+    // init event handler
+    auto runner = AppExecFwk::EventRunner::Create(true);
+    if (runner == nullptr) {
+        DHLOGE("Create runner failed.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    handler_ = std::make_shared<DAudioSourceManager::SourceManagerHandler>(runner);
+    DHLOGI("Init DAudioManager successfuly.");
     return DH_SUCCESS;
 }
 
@@ -115,6 +125,7 @@ int32_t DAudioSourceManager::UnInit()
             iter->second.dev->SleepAudioDev();
         }
         audioDevMap_.clear();
+        DHLOGI("Audio dev map cleared.");
     }
     if (devClearThread_.joinable()) {
         devClearThread_.join();
@@ -131,6 +142,16 @@ int32_t DAudioSourceManager::UnInit()
         DHLOGE("Uninit Hdi handler failed.");
         return ERR_DH_AUDIO_FAILED;
     }
+    // uninit event handler
+    if (handler_ == nullptr) {
+        DHLOGI("Uninit audio source manager exit. handler is null");
+        return DH_SUCCESS;
+    }
+    while (!handler_->IsIdle()) {
+        DHLOGD("manager handler is running, wait for idle.");
+        usleep(WAIT_HANDLER_IDLE_TIME_US);
+    }
+    DHLOGI("Uninit audio source manager exit.");
     return DH_SUCCESS;
 }
 
@@ -149,6 +170,31 @@ int32_t DAudioSourceManager::EnableDAudio(const std::string &devId, const std::s
 {
     DHLOGI("Enable distributed audio, devId: %s, dhId: %s, version: %s, reqId: %s.", GetAnonyString(devId).c_str(),
         dhId.c_str(), version.c_str(), reqId.c_str());
+    if (handler_ == nullptr) {
+        DHLOGE("Event handler is null.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    json jParam = { { KEY_DEV_ID, devId }, { KEY_DH_ID, dhId }, { KEY_VERSION, version },
+        { KEY_ATTRS, attrs }, { KEY_REQID, reqId } };
+    auto eventParam = std::make_shared<json>(jParam);
+    auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_MANAGER_ENABLE_DAUDIO, eventParam, 0);
+    if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
+        DHLOGE("Send event failed.");
+        return ERR_DH_AUDIO_FAILED;
+    }
+    DHLOGI("Enable audio task generate successfully.");
+    return DH_SUCCESS;
+}
+
+int32_t DAudioSourceManager::DoEnableDAudio(const std::string &args)
+{
+    std::string devId = ParseStringFromArgs(args, KEY_DEV_ID);
+    std::string dhId = ParseStringFromArgs(args, KEY_DH_ID);
+    std::string version = ParseStringFromArgs(args, KEY_VERSION);
+    std::string attrs = ParseStringFromArgs(args, KEY_ATTRS);
+    std::string reqId = ParseStringFromArgs(args, KEY_REQID);
+    DHLOGI("Do Enable distributed audio, devId: %s, dhId: %s, version:%s, reqId:%s.",
+        GetAnonyString(devId).c_str(), dhId.c_str(), version.c_str(), reqId.c_str());
     if (!CheckParams(devId, dhId) || attrs.empty()) {
         DHLOGE("Enable params are incorrect.");
         return ERR_DH_AUDIO_FAILED;
@@ -161,13 +207,37 @@ int32_t DAudioSourceManager::EnableDAudio(const std::string &devId, const std::s
         }
     }
     audioDevMap_[devId].ports[dhId] = reqId;
-    return audioDevMap_[devId].dev->EnableDAudio(dhId, attrs);
+    DHLOGI("Call source dev to enable daudio.");
+    int32_t result = audioDevMap_[devId].dev->EnableDAudio(dhId, attrs);
+    return OnEnableDAudio(devId, dhId, result);
 }
 
 int32_t DAudioSourceManager::DisableDAudio(const std::string &devId, const std::string &dhId, const std::string &reqId)
 {
     DHLOGI("Disable distributed audio, devId: %s, dhId: %s, reqId: %s.", GetAnonyString(devId).c_str(), dhId.c_str(),
         reqId.c_str());
+    if (handler_ == nullptr) {
+        DHLOGE("Event handler is null.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    json jParam = { { KEY_DEV_ID, devId }, { KEY_DH_ID, dhId }, { KEY_REQID, reqId } };
+    auto eventParam = std::make_shared<json>(jParam);
+    auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_MANAGER_DISABLE_DAUDIO, eventParam, 0);
+    if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
+        DHLOGE("Send event failed.");
+        return ERR_DH_AUDIO_FAILED;
+    }
+    DHLOGI("Disable audio task generate successfully.");
+    return DH_SUCCESS;
+}
+
+int32_t DAudioSourceManager::DoDisableDAudio(const std::string &args)
+{
+    std::string devId = ParseStringFromArgs(args, KEY_DEV_ID);
+    std::string dhId = ParseStringFromArgs(args, KEY_DH_ID);
+    std::string reqId = ParseStringFromArgs(args, KEY_REQID);
+    DHLOGI("Do Enable distributed audio, devId: %s, dhId: %s, reqId:%s.",
+        GetAnonyString(devId).c_str(), dhId.c_str(), reqId.c_str());
     if (!CheckParams(devId, dhId)) {
         DHLOGE("Enable params are incorrect.");
         return ERR_DH_AUDIO_FAILED;
@@ -183,7 +253,9 @@ int32_t DAudioSourceManager::DisableDAudio(const std::string &devId, const std::
         return DH_SUCCESS;
     }
     audioDevMap_[devId].ports[dhId] = reqId;
-    return audioDevMap_[devId].dev->DisableDAudio(dhId);
+    DHLOGI("Call source dev to enable daudio.");
+    int32_t result = audioDevMap_[devId].dev->DisableDAudio(dhId);
+    return OnDisableDAudio(devId, dhId, result);
 }
 
 int32_t DAudioSourceManager::HandleDAudioNotify(const std::string &devId, const std::string &dhId,
@@ -341,7 +413,7 @@ std::string DAudioSourceManager::GetRequestId(const std::string &devId, const st
 
 void DAudioSourceManager::ClearAudioDev(const std::string &devId)
 {
-    DHLOGI("ClearAudioDev, devId = %s.", devId.c_str());
+    DHLOGI("ClearAudioDev, devId = %s.", GetAnonyString(devId).c_str());
     std::lock_guard<std::mutex> lock(devMapMtx_);
     if (audioDevMap_[devId].ports.empty()) {
         DHLOGI("audioDevMap_[devId].ports is empty.");
@@ -472,6 +544,73 @@ IAVEngineProvider *DAudioSourceManager::getSenderProvider()
 IAVEngineProvider *DAudioSourceManager::getReceiverProvider()
 {
     return rcvProviderPtr_;
+}
+
+DAudioSourceManager::SourceManagerHandler::SourceManagerHandler(const std::shared_ptr<AppExecFwk::EventRunner>
+    &runner) : AppExecFwk::EventHandler(runner)
+{
+    DHLOGD("Event handler is constructing.");
+    mapEventFuncs_[EVENT_MANAGER_ENABLE_DAUDIO] = &DAudioSourceManager::SourceManagerHandler::EnableDAudioCallback;
+    mapEventFuncs_[EVENT_MANAGER_DISABLE_DAUDIO] = &DAudioSourceManager::SourceManagerHandler::DisableDAudioCallback;
+}
+
+DAudioSourceManager::SourceManagerHandler::~SourceManagerHandler() {}
+
+void DAudioSourceManager::SourceManagerHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    auto iter = mapEventFuncs_.find(event->GetInnerEventId());
+    if (iter == mapEventFuncs_.end()) {
+        DHLOGE("Event Id is invalid. %d.", event->GetInnerEventId());
+        return;
+    }
+    SourceManagerFunc &func = iter->second;
+    (this->*func)(event);
+}
+
+void DAudioSourceManager::SourceManagerHandler::EnableDAudioCallback(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        DHLOGE("The input event is null.");
+        return;
+    }
+    std::string eventParam;
+    if (GetEventParam(event, eventParam) != DH_SUCCESS) {
+        DHLOGE("Failed to get event parameters.");
+        return;
+    }
+    DHLOGI("Enable audio device, param:%s.", eventParam.c_str());
+    DAudioSourceManager::GetInstance().DoEnableDAudio(eventParam);
+}
+
+void DAudioSourceManager::SourceManagerHandler::DisableDAudioCallback(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        DHLOGE("The input event is null.");
+        return;
+    }
+    std::string eventParam;
+    if (GetEventParam(event, eventParam) != DH_SUCCESS) {
+        DHLOGE("Failed to get event parameters.");
+        return;
+    }
+    DHLOGI("Disable audio device, param:%s.", eventParam.c_str());
+    DAudioSourceManager::GetInstance().DoDisableDAudio(eventParam);
+}
+
+int32_t DAudioSourceManager::SourceManagerHandler::GetEventParam(const AppExecFwk::InnerEvent::Pointer &event,
+    std::string &eventParam)
+{
+    if (event == nullptr) {
+        DHLOGE("The input event id null.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    std::shared_ptr<json> paramObj = event->GetSharedObject<json>();
+    if (paramObj == nullptr) {
+        DHLOGE("The event parameter object is nullptr.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    eventParam = paramObj->dump();
+    return DH_SUCCESS;
 }
 } // DistributedHardware
 } // OHOS

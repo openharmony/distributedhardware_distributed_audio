@@ -100,8 +100,16 @@ int32_t DAudioSourceDev::AwakeAudioDev()
 
 void DAudioSourceDev::SleepAudioDev()
 {
-    handler_ = nullptr;
-    DHLOGD("Sleep audio dev over.");
+    DHLOGD("Sleep audio dev.");
+    if (handler_ == nullptr) {
+        DHLOGI("Event handler is already stopped.");
+        return;
+    }
+    while (!handler_->IsIdle()) {
+        DHLOGD("handler is running, wait for idle.");
+        usleep(WAIT_HANDLER_IDLE_TIME_US);
+    }
+    DHLOGI("Sleep audio dev over.");
 }
 
 int32_t DAudioSourceDev::EnableDAudio(const std::string &dhId, const std::string &attrs)
@@ -119,7 +127,7 @@ int32_t DAudioSourceDev::EnableDAudio(const std::string &dhId, const std::string
         DHLOGE("Send event failed.");
         return ERR_DH_AUDIO_FAILED;
     }
-    DHLOGD("Enable audio task generate successfully.");
+    DHLOGI("Enable audio task generate successfully.");
     return DH_SUCCESS;
 }
 
@@ -160,7 +168,7 @@ int32_t DAudioSourceDev::DisableDAudio(const std::string &dhId)
         DHLOGE("Send event failed.");
         return ERR_DH_AUDIO_FAILED;
     }
-    DHLOGD("Disable audio task generate successfully.");
+    DHLOGI("Disable audio task generate successfully.");
     return DH_SUCCESS;
 }
 
@@ -308,7 +316,7 @@ int32_t DAudioSourceDev::HandleCloseDMic(const AudioEvent &event)
         DHLOGE("Send event failed.");
         return ERR_DH_AUDIO_FAILED;
     }
-    DHLOGD("Closing DSpeaker event is sent successfully.");
+    DHLOGD("Closing DMic event is sent successfully.");
     return DH_SUCCESS;
 }
 
@@ -1296,7 +1304,7 @@ void DAudioSourceDev::SourceEventHandler::ProcessEvent(const AppExecFwk::InnerEv
 {
     auto iter = mapEventFuncs_.find(event->GetInnerEventId());
     if (iter == mapEventFuncs_.end()) {
-        DHLOGE("Event Id is invaild.", event->GetInnerEventId());
+        DHLOGE("Event Id is invaild. %d", event->GetInnerEventId());
         return;
     }
     SourceEventFunc &func = iter->second;
@@ -1323,7 +1331,6 @@ void DAudioSourceDev::SourceEventHandler::EnableDAudioCallback(const AppExecFwk:
     if (ret != DH_SUCCESS) {
         DHLOGE("Open ctrl channel failed.");
     }
-    sourceDevObj->OnEnableTaskResult(ret, jParam->dump(), "");
 }
 
 void DAudioSourceDev::SourceEventHandler::DisableDAudioCallback(const AppExecFwk::InnerEvent::Pointer &event)
@@ -1346,7 +1353,6 @@ void DAudioSourceDev::SourceEventHandler::DisableDAudioCallback(const AppExecFwk
     if (ret != DH_SUCCESS) {
         DHLOGE("Disable distributed audio failed.");
     }
-    sourceDevObj->OnDisableTaskResult(ret, jParam->dump(), "");
 }
 
 void DAudioSourceDev::SourceEventHandler::OpenDSpeakerCallback(const AppExecFwk::InnerEvent::Pointer &event)

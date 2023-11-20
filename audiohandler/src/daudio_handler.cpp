@@ -101,12 +101,12 @@ std::vector<DHItem> DAudioHandler::Query()
 
         std::string audioEncoders =
             HiStreamerQueryTool::GetInstance().QueryHiStreamerPluginInfo(HISTREAM_PLUGIN_TYPE::AUDIO_ENCODER);
-        DHLOGI("DScreen QueryAudioEncoderAbility info: %s", audioEncoders.c_str());
+        DHLOGI("DAudio QueryAudioEncoderAbility info: %s", audioEncoders.c_str());
         infoJson[KEY_HISTREAMER_AUDIO_ENCODER] = audioEncoders;
 
         std::string audioDecoders =
             HiStreamerQueryTool::GetInstance().QueryHiStreamerPluginInfo(HISTREAM_PLUGIN_TYPE::AUDIO_DECODER);
-        DHLOGI("DScreen QueryAudioDecoderAbility info: %s", audioDecoders.c_str());
+        DHLOGI("DAudio QueryAudioDecoderAbility info: %s", audioDecoders.c_str());
         infoJson[KEY_HISTREAMER_AUDIO_DECODER] = audioDecoders;
 
         dhItem.dhId = std::to_string(dhId);

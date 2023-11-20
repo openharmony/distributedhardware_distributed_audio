@@ -20,6 +20,8 @@
 #include <mutex>
 #include <thread>
 
+#include "event_handler.h"
+
 #include "daudio_hdi_handler.h"
 #include "daudio_source_dev.h"
 #include "daudio_source_mgr_callback.h"
@@ -59,6 +61,8 @@ private:
     void ClearAudioDev(const std::string &devId);
     void ListenAudioDev();
     void RestoreThreadStatus();
+    int32_t DoEnableDAudio(const std::string &args);
+    int32_t DoDisableDAudio(const std::string &args);
 
     typedef struct {
         std::string devId;
@@ -72,6 +76,7 @@ private:
     static constexpr int32_t WATCHDOG_INTERVAL_TIME = 20000;
     static constexpr int32_t WATCHDOG_DELAY_TIME = 5000;
     static constexpr size_t SLEEP_TIME = 1000000;
+    static constexpr size_t WAIT_HANDLER_IDLE_TIME_US = 10000;
 
     std::string localDevId_;
     std::mutex devMapMtx_;
@@ -87,6 +92,23 @@ private:
     void *pSHandler_ = nullptr;
     void *pRHandler_ = nullptr;
     std::atomic<bool> isHicollieRunning_ = false;
+
+    class SourceManagerHandler : public AppExecFwk::EventHandler {
+    public:
+        SourceManagerHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
+        ~SourceManagerHandler() override;
+        void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
+    
+    private:
+        void EnableDAudioCallback(const AppExecFwk::InnerEvent::Pointer &event);
+        void DisableDAudioCallback(const AppExecFwk::InnerEvent::Pointer &event);
+        int32_t GetEventParam(const AppExecFwk::InnerEvent::Pointer &event, std::string &eventParam);
+    
+    private:
+        using SourceManagerFunc = void (SourceManagerHandler::*)(const AppExecFwk::InnerEvent::Pointer &event);
+        std::map<uint32_t, SourceManagerFunc> mapEventFuncs_;
+    };
+    std::shared_ptr<SourceManagerHandler> handler_;
 };
 } // DistributedHardware
 } // OHOS

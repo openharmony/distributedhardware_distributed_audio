@@ -60,10 +60,10 @@ void DAudioSinkDev::SleepAudioDev()
         return;
     }
     while (!handler_->IsIdle()) {
-        DHLOGI("handler is running, wait for idle.");
+        DHLOGD("handler is running, wait for idle.");
         usleep(WAIT_HANDLER_IDLE_TIME_US);
     }
-    DHLOGD("Sleep audio dev over.");
+    DHLOGI("Sleep audio dev over.");
 }
 
 int32_t DAudioSinkDev::InitAVTransEngines(const ChannelState channelState, IAVEngineProvider *providerPtr)
@@ -577,7 +577,7 @@ void DAudioSinkDev::SinkEventHandler::ProcessEvent(const AppExecFwk::InnerEvent:
 {
     auto iter = mapEventFuncs_.find(event->GetInnerEventId());
     if (iter == mapEventFuncs_.end()) {
-        DHLOGE("Event Id is invaild.", event->GetInnerEventId());
+        DHLOGE("Event Id is invaild. %d", event->GetInnerEventId());
         return;
     }
     SinkEventFunc &func = iter->second;
