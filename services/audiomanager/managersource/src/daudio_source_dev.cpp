@@ -203,7 +203,7 @@ void DAudioSourceDev::NotifyEvent(const AudioEvent &event)
     DHLOGD("Notify event, eventType: %d.", event.type);
     std::map<AudioEventType, DAudioSourceDevFunc>::iterator iter = memberFuncMap_.find(event.type);
     if (iter == memberFuncMap_.end()) {
-        DHLOGE("Invalid eventType.");
+        DHLOGE("Invalid eventType: %d.", event.type);
         return;
     }
     DAudioSourceDevFunc &func = iter->second;

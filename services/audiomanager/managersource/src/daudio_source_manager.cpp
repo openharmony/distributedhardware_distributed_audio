@@ -95,10 +95,12 @@ int32_t DAudioSourceManager::Init(const sptr<IDAudioIpcCallback> &callback)
         DHLOGE("load av transport receiver engine provider failed.");
         return ERR_DH_AUDIO_FAILED;
     }
-    isHicollieRunning_.store(true);
-    listenThread_ = std::thread(&DAudioSourceManager::ListenAudioDev, this);
-    if (pthread_setname_np(listenThread_.native_handle(), LISTEN_THREAD) != DH_SUCCESS) {
-        DHLOGE("Dev clear thread setname failed.");
+    if (!isHicollieRunning_.load()) {
+        isHicollieRunning_.store(true);
+        listenThread_ = std::thread(&DAudioSourceManager::ListenAudioDev, this);
+        if (pthread_setname_np(listenThread_.native_handle(), LISTEN_THREAD) != DH_SUCCESS) {
+            DHLOGE("Dev clear thread setname failed.");
+        }
     }
     // init event handler
     auto runner = AppExecFwk::EventRunner::Create(true);
