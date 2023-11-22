@@ -61,10 +61,10 @@ void DAudioSinkDev::SleepAudioDev()
         return;
     }
     while (!handler_->IsIdle()) {
-        DHLOGI("handler is running, wait for idle.");
+        DHLOGD("handler is running, wait for idle.");
         usleep(WAIT_HANDLER_IDLE_TIME_US);
     }
-    DHLOGD("Sleep audio dev over.");
+    DHLOGI("Sleep audio dev over.");
 }
 
 int32_t DAudioSinkDev::InitAVTransEngines(const ChannelState channelState, IAVEngineProvider *providerPtr)
@@ -291,9 +291,9 @@ int32_t DAudioSinkDev::TaskOpenDMic(const std::string &args)
     }
     std::string subType = "mic";
     bool isSensitive = false;
-    bool isSameAccout = false;
+    bool isSameAccount = false;
     ipcSinkCallback_->OnNotifyResourceInfo(ResourceEventType::EVENT_TYPE_PULL_UP_PAGE, subType, devId_,
-        isSensitive, isSameAccout);
+        isSensitive, isSameAccount);
     isPageStatus_.store(true);
     NotifySourceDev(NOTIFY_OPEN_MIC_RESULT, jParam[KEY_DH_ID], ret);
     DHLOGI("Open mic device task end, notify source ret %d.", ret);
@@ -328,9 +328,9 @@ int32_t DAudioSinkDev::TaskCloseDMic(const std::string &args)
     if (isPageStatus_.load()) {
         std::string subType = "mic";
         bool isSensitive = false;
-        bool isSameAccout = false;
+        bool isSameAccount = false;
         ipcSinkCallback_->OnNotifyResourceInfo(ResourceEventType::EVENT_TYPE_CLOSE_PAGE, subType, devId_,
-            isSensitive, isSameAccout);
+            isSensitive, isSameAccount);
     }
     isPageStatus_.store(false);
     DHLOGI("Close mic device task excute success.");
@@ -594,7 +594,7 @@ void DAudioSinkDev::SinkEventHandler::ProcessEvent(const AppExecFwk::InnerEvent:
 {
     auto iter = mapEventFuncs_.find(event->GetInnerEventId());
     if (iter == mapEventFuncs_.end()) {
-        DHLOGE("Event Id is invaild.", event->GetInnerEventId());
+        DHLOGE("Event Id is invaild. %d", event->GetInnerEventId());
         return;
     }
     SinkEventFunc &func = iter->second;

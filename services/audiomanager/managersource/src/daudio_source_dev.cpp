@@ -45,6 +45,8 @@ constexpr uint32_t EVENT_MMAP_SPK_START = 81;
 constexpr uint32_t EVENT_MMAP_SPK_STOP = 82;
 constexpr uint32_t EVENT_MMAP_MIC_START = 83;
 constexpr uint32_t EVENT_MMAP_MIC_STOP = 84;
+constexpr uint32_t EVENT_DAUDIO_ENABLE = 88;
+constexpr uint32_t EVENT_DAUDIO_DISABLE = 89;
 constexpr uint32_t EVENT_SET_THREAD_STATUS = 90;
 }
 
@@ -100,14 +102,14 @@ void DAudioSourceDev::SleepAudioDev()
 {
     DHLOGD("Sleep audio dev.");
     if (handler_ == nullptr) {
-        DHLOGI("Event handler is already stoped.");
+        DHLOGI("Event handler is already stopped.");
         return;
     }
     while (!handler_->IsIdle()) {
-        DHLOGI("handler is running, wait for idle.");
+        DHLOGD("handler is running, wait for idle.");
         usleep(WAIT_HANDLER_IDLE_TIME_US);
     }
-    DHLOGD("Sleep audio dev over.");
+    DHLOGI("Sleep audio dev over.");
 }
 
 int32_t DAudioSourceDev::EnableDAudio(const std::string &dhId, const std::string &attrs)
@@ -119,12 +121,13 @@ int32_t DAudioSourceDev::EnableDAudio(const std::string &dhId, const std::string
         return ERR_DH_AUDIO_NULLPTR;
     }
     json jParam = { { KEY_DEV_ID, devId_ }, { KEY_DH_ID, dhId }, { KEY_ATTRS, attrs } };
-    int32_t ret = TaskEnableDAudio(jParam.dump());
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Enable daudio failed.");
+    auto eventParam = std::make_shared<json>(jParam);
+    auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_DAUDIO_ENABLE, eventParam, 0);
+    if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
+        DHLOGE("Send event failed.");
+        return ERR_DH_AUDIO_FAILED;
     }
-    OnEnableTaskResult(ret, jParam.dump(), "");
-    DHLOGD("Enable audio task generate successfully.");
+    DHLOGI("Enable audio task generate successfully.");
     return DH_SUCCESS;
 }
 
@@ -147,11 +150,11 @@ int32_t DAudioSourceDev::DisableDAudio(const std::string &dhId)
     switch (GetDevTypeByDHId(dhIdNum)) {
         case AUDIO_DEVICE_TYPE_SPEAKER:
             event.type = CLOSE_SPEAKER;
-            TaskCloseDSpeaker(event.content);
+            HandleCloseDSpeaker(event);
             break;
         case AUDIO_DEVICE_TYPE_MIC:
             event.type = CLOSE_MIC;
-            TaskCloseDMic(event.content);
+            HandleCloseDMic(event);
             break;
         default:
             DHLOGE("Unknown audio device. dhId: %d.", dhIdNum);
@@ -159,12 +162,13 @@ int32_t DAudioSourceDev::DisableDAudio(const std::string &dhId)
     }
 
     json jParam = { { KEY_DEV_ID, devId_ }, { KEY_DH_ID, dhId } };
-    int32_t ret = TaskDisableDAudio(jParam.dump());
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Disable distributed audio failed.");
+    auto eventParam = std::make_shared<json>(jParam);
+    auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_DAUDIO_DISABLE, eventParam, 0);
+    if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
+        DHLOGE("Send event failed.");
+        return ERR_DH_AUDIO_FAILED;
     }
-    OnDisableTaskResult(ret, jParam.dump(), "");
-    DHLOGD("Disable audio task generate successfully.");
+    DHLOGI("Disable audio task generate successfully.");
     return DH_SUCCESS;
 }
 
@@ -199,7 +203,7 @@ void DAudioSourceDev::NotifyEvent(const AudioEvent &event)
     DHLOGD("Notify event, eventType: %d.", event.type);
     std::map<AudioEventType, DAudioSourceDevFunc>::iterator iter = memberFuncMap_.find(event.type);
     if (iter == memberFuncMap_.end()) {
-        DHLOGE("Invalid eventType.");
+        DHLOGE("Invalid eventType: %d.", event.type);
         return;
     }
     DAudioSourceDevFunc &func = iter->second;
@@ -312,7 +316,7 @@ int32_t DAudioSourceDev::HandleCloseDMic(const AudioEvent &event)
         DHLOGE("Send event failed.");
         return ERR_DH_AUDIO_FAILED;
     }
-    DHLOGD("Closing DSpeaker event is sent successfully.");
+    DHLOGD("Closing DMic event is sent successfully.");
     return DH_SUCCESS;
 }
 
@@ -1276,6 +1280,8 @@ DAudioSourceDev::SourceEventHandler::SourceEventHandler(const std::shared_ptr<Ap
     const std::shared_ptr<DAudioSourceDev> &dev) : AppExecFwk::EventHandler(runner), sourceDev_(dev)
 {
     DHLOGD("Event handler is constructing.");
+    mapEventFuncs_[EVENT_DAUDIO_ENABLE] = &DAudioSourceDev::SourceEventHandler::EnableDAudioCallback;
+    mapEventFuncs_[EVENT_DAUDIO_DISABLE] = &DAudioSourceDev::SourceEventHandler::DisableDAudioCallback;
     mapEventFuncs_[EVENT_OPEN_SPEAKER] = &DAudioSourceDev::SourceEventHandler::OpenDSpeakerCallback;
     mapEventFuncs_[EVENT_CLOSE_SPEAKER] = &DAudioSourceDev::SourceEventHandler::CloseDSpeakerCallback;
     mapEventFuncs_[EVENT_OPEN_MIC] = &DAudioSourceDev::SourceEventHandler::OpenDMicCallback;
@@ -1298,11 +1304,55 @@ void DAudioSourceDev::SourceEventHandler::ProcessEvent(const AppExecFwk::InnerEv
 {
     auto iter = mapEventFuncs_.find(event->GetInnerEventId());
     if (iter == mapEventFuncs_.end()) {
-        DHLOGE("Event Id is invaild.", event->GetInnerEventId());
+        DHLOGE("Event Id is invaild. %d", event->GetInnerEventId());
         return;
     }
     SourceEventFunc &func = iter->second;
     (this->*func)(event);
+}
+
+void DAudioSourceDev::SourceEventHandler::EnableDAudioCallback(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        DHLOGE("The input event is null.");
+        return;
+    }
+    std::shared_ptr<json> jParam = event->GetSharedObject<json>();
+    if (jParam == nullptr) {
+        DHLOGE("The json parameter is null.");
+        return;
+    }
+    auto sourceDevObj = sourceDev_.lock();
+    if (sourceDevObj == nullptr) {
+        DHLOGE("Source dev is invalid.");
+        return;
+    }
+    int32_t ret = sourceDevObj->TaskEnableDAudio(jParam->dump());
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Open ctrl channel failed.");
+    }
+}
+
+void DAudioSourceDev::SourceEventHandler::DisableDAudioCallback(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        DHLOGE("The input event is null.");
+        return;
+    }
+    std::shared_ptr<json> jParam = event->GetSharedObject<json>();
+    if (jParam == nullptr) {
+        DHLOGE("The json parameter is null.");
+        return;
+    }
+    auto sourceDevObj = sourceDev_.lock();
+    if (sourceDevObj == nullptr) {
+        DHLOGE("Source dev is invalid.");
+        return;
+    }
+    int32_t ret = sourceDevObj->TaskDisableDAudio(jParam->dump());
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Disable distributed audio failed.");
+    }
 }
 
 void DAudioSourceDev::SourceEventHandler::OpenDSpeakerCallback(const AppExecFwk::InnerEvent::Pointer &event)

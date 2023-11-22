@@ -87,7 +87,6 @@ private:
     std::string devId_;
     std::string spkDhId_;
     std::string micDhId_;
-    std::shared_ptr<ISpkClient> speakerClient_ = nullptr;
     std::mutex spkClientMutex_;
     std::map<int32_t, std::shared_ptr<ISpkClient>> spkClientMap_;
     std::mutex micClientMutex_;

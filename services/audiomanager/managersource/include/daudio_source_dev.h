@@ -147,6 +147,8 @@ private:
         void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
 
     private:
+        void EnableDAudioCallback(const AppExecFwk::InnerEvent::Pointer &event);
+        void DisableDAudioCallback(const AppExecFwk::InnerEvent::Pointer &event);
         void OpenDSpeakerCallback(const AppExecFwk::InnerEvent::Pointer &event);
         void CloseDSpeakerCallback(const AppExecFwk::InnerEvent::Pointer &event);
         void OpenDMicCallback(const AppExecFwk::InnerEvent::Pointer &event);

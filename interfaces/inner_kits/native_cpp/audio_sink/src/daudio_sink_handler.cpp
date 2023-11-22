@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -171,7 +171,7 @@ int32_t DAudioSinkHandler::RegisterPrivacyResources(std::shared_ptr<PrivacyResou
 {
     DHLOGI("RegisterPrivacyResources start.");
     if (dAudioSinkIpcCallback_ == nullptr) {
-        DHLOGE("Daudio sink ipc callback not is nullptr.");
+        DHLOGE("Daudio sink ipc callback is nullptr.");
         return ERR_DH_AUDIO_SA_PROXY_NOT_INIT;
     }
     dAudioSinkIpcCallback_->PushPrivacyResCallback(listener);

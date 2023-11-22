@@ -56,8 +56,7 @@ int32_t DAudioSinkIpcCallbackStub::OnNotifyResourceInfoInner(MessageParcel &data
     std::string networkId = data.ReadString();
     bool isSensitive = data.ReadBool();
     bool isSameAccout = data.ReadBool();
-    int32_t ret = OnNotifyResourceInfo(type, subType, networkId, isSensitive, isSameAccout);
-    return ret;
+    return OnNotifyResourceInfo(type, subType, networkId, isSensitive, isSameAccout);
 }
 } // DistributedHardware
 } // OHOS

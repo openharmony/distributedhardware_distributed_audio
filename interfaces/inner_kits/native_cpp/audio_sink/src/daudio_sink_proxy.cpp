@@ -134,8 +134,7 @@ int32_t DAudioSinkProxy::PauseDistributedHardware(const std::string &networkId)
 
     Remote()->SendRequest(static_cast<uint32_t>(IDAudioSinkInterfaceCode::PAUSE_DISTRIBUTED_HARDWARE),
         data, reply, option);
-    int32_t ret = reply.ReadInt32();
-    return ret;
+    return reply.ReadInt32();
 }
 
 int32_t DAudioSinkProxy::ResumeDistributedHardware(const std::string &networkId)
@@ -153,8 +152,7 @@ int32_t DAudioSinkProxy::ResumeDistributedHardware(const std::string &networkId)
 
     Remote()->SendRequest(static_cast<uint32_t>(IDAudioSinkInterfaceCode::RESUME_DISTRIBUTED_HARDWARE),
         data, reply, option);
-    int32_t ret = reply.ReadInt32();
-    return ret;
+    return reply.ReadInt32();
 }
 
 int32_t DAudioSinkProxy::StopDistributedHardware(const std::string &networkId)
@@ -172,8 +170,7 @@ int32_t DAudioSinkProxy::StopDistributedHardware(const std::string &networkId)
 
     Remote()->SendRequest(static_cast<uint32_t>(IDAudioSinkInterfaceCode::STOP_DISTRIBUTED_HARDWARE),
         data, reply, option);
-    int32_t ret = reply.ReadInt32();
-    return ret;
+    return reply.ReadInt32();
 }
 } // namespace DistributedHardware
 } // namespace OHOS
