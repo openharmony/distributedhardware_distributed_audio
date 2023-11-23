@@ -25,7 +25,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-int32_t DAudioSinkProxy::InitSink(const std::string &params)
+int32_t DAudioSinkProxy::InitSink(const std::string &params, const sptr<IDAudioSinkIpcCallback> &sinkCallback)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -34,7 +34,7 @@ int32_t DAudioSinkProxy::InitSink(const std::string &params)
         return ERR_DH_AUDIO_SA_WRITE_INTERFACE_TOKEN_FAILED;
     }
 
-    if (!data.WriteString(params)) {
+    if (!data.WriteString(params) || !data.WriteRemoteObject(sinkCallback->AsObject())) {
         return ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED;
     }
 
@@ -117,6 +117,60 @@ void DAudioSinkProxy::DAudioNotify(const std::string &devId, const std::string &
     }
 
     Remote()->SendRequest(static_cast<uint32_t>(IDAudioSinkInterfaceCode::DAUDIO_NOTIFY), data, reply, option);
+}
+
+int32_t DAudioSinkProxy::PauseDistributedHardware(const std::string &networkId)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        return ERR_DH_AUDIO_SA_WRITE_INTERFACE_TOKEN_FAILED;
+    }
+
+    if (!data.WriteString(networkId)) {
+        return ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED;
+    }
+
+    Remote()->SendRequest(static_cast<uint32_t>(IDAudioSinkInterfaceCode::PAUSE_DISTRIBUTED_HARDWARE),
+        data, reply, option);
+    return reply.ReadInt32();
+}
+
+int32_t DAudioSinkProxy::ResumeDistributedHardware(const std::string &networkId)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        return ERR_DH_AUDIO_SA_WRITE_INTERFACE_TOKEN_FAILED;
+    }
+
+    if (!data.WriteString(networkId)) {
+        return ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED;
+    }
+
+    Remote()->SendRequest(static_cast<uint32_t>(IDAudioSinkInterfaceCode::RESUME_DISTRIBUTED_HARDWARE),
+        data, reply, option);
+    return reply.ReadInt32();
+}
+
+int32_t DAudioSinkProxy::StopDistributedHardware(const std::string &networkId)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        return ERR_DH_AUDIO_SA_WRITE_INTERFACE_TOKEN_FAILED;
+    }
+
+    if (!data.WriteString(networkId)) {
+        return ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED;
+    }
+
+    Remote()->SendRequest(static_cast<uint32_t>(IDAudioSinkInterfaceCode::STOP_DISTRIBUTED_HARDWARE),
+        data, reply, option);
+    return reply.ReadInt32();
 }
 } // namespace DistributedHardware
 } // namespace OHOS

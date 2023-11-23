@@ -17,6 +17,9 @@
 
 #include "audio_event.h"
 #include "daudio_errorcode.h"
+#include "if_system_ability_manager.h"
+#include "iservice_registry.h"
+#include "daudio_sink_ipc_callback_proxy.h"
 
 using namespace testing::ext;
 
@@ -26,7 +29,17 @@ void DAudioSinkManagerTest::SetUpTestCase(void) {}
 
 void DAudioSinkManagerTest::TearDownTestCase(void) {}
 
-void DAudioSinkManagerTest::SetUp() {}
+void DAudioSinkManagerTest::SetUp()
+{
+    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgr == nullptr) {
+        return;
+    }
+    remoteObject_ = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID);
+    if (remoteObject_ == nullptr) {
+        return;
+    }
+}
 
 void DAudioSinkManagerTest::TearDown() {}
 
@@ -38,7 +51,8 @@ void DAudioSinkManagerTest::TearDown() {}
  */
 HWTEST_F(DAudioSinkManagerTest, Init_001, TestSize.Level1)
 {
-    EXPECT_NE(DH_SUCCESS, daudioSinkManager.Init());
+    sptr<DAudioSinkIpcCallbackProxy> dAudioSinkIpcCallbackProxy(new DAudioSinkIpcCallbackProxy(remoteObject_));
+    EXPECT_NE(DH_SUCCESS, daudioSinkManager.Init(dAudioSinkIpcCallbackProxy));
     EXPECT_EQ(DH_SUCCESS, daudioSinkManager.UnInit());
 }
 
@@ -58,7 +72,8 @@ HWTEST_F(DAudioSinkManagerTest, CreateAudioDevice_001, TestSize.Level1)
     daudioSinkManager.channelState_ = ChannelState::MIC_CONTROL_OPENED;
     daudioSinkManager.LoadAVSenderEngineProvider();
     EXPECT_EQ(DH_SUCCESS, daudioSinkManager.CreateAudioDevice(devId));
-    auto dev = std::make_shared<DAudioSinkDev>(devId);
+    sptr<DAudioSinkIpcCallbackProxy> dAudioSinkIpcCallbackProxy(new DAudioSinkIpcCallbackProxy(remoteObject_));
+    auto dev = std::make_shared<DAudioSinkDev>(devId, dAudioSinkIpcCallbackProxy);
     daudioSinkManager.audioDevMap_.emplace(devId, dev);
     EXPECT_EQ(DH_SUCCESS, daudioSinkManager.CreateAudioDevice(devId));
     daudioSinkManager.channelState_ = ChannelState::MIC_CONTROL_OPENED;
@@ -96,6 +111,20 @@ HWTEST_F(DAudioSinkManagerTest, LoadAVSenderEngineProvider_001, TestSize.Level1)
     EXPECT_EQ(DH_SUCCESS, daudioSinkManager.UnloadAVSenderEngineProvider());
     EXPECT_EQ(DH_SUCCESS, daudioSinkManager.LoadAVReceiverEngineProvider());
     EXPECT_EQ(DH_SUCCESS, daudioSinkManager.UnloadAVReceiverEngineProvider());
+}
+
+/**
+ * @tc.name: PauseDistributedHardware_001
+ * @tc.desc: Verify the PauseDistributedHardware function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkManagerTest, PauseDistributedHardware_001, TestSize.Level1)
+{
+    std::string networkId = "networkId";
+    EXPECT_EQ(DH_SUCCESS, daudioSinkManager.PauseDistributedHardware(networkId));
+    EXPECT_EQ(DH_SUCCESS, daudioSinkManager.ResumeDistributedHardware(networkId));
+    EXPECT_EQ(DH_SUCCESS, daudioSinkManager.StopDistributedHardware(networkId));
 }
 } // DistributedHardware
 } // OHOS

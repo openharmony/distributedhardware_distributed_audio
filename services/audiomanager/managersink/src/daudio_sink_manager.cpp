@@ -59,9 +59,10 @@ DAudioSinkManager::~DAudioSinkManager()
     DHLOGD("Distributed audio sink manager deconstructed.");
 }
 
-int32_t DAudioSinkManager::Init()
+int32_t DAudioSinkManager::Init(const sptr<IDAudioSinkIpcCallback> &sinkCallback)
 {
     DHLOGI("Init audio sink manager.");
+    ipcSinkCallback_ = sinkCallback;
     int32_t ret = GetLocalDeviceNetworkId(localNetworkId_);
     if (ret != DH_SUCCESS) {
         DHLOGE("Get local network id failed, ret: %d.", ret);
@@ -116,6 +117,7 @@ int32_t DAudioSinkManager::UnInit()
     if (devClearThread_.joinable()) {
         devClearThread_.join();
     }
+    ipcSinkCallback_ = nullptr;
     return DH_SUCCESS;
 }
 
@@ -170,7 +172,7 @@ int32_t DAudioSinkManager::CreateAudioDevice(const std::string &devId)
             DHLOGI("Audio sink dev in map. devId: %s.", GetAnonyString(devId).c_str());
             dev = audioDevMap_[devId];
         } else {
-            dev = std::make_shared<DAudioSinkDev>(devId);
+            dev = std::make_shared<DAudioSinkDev>(devId, ipcSinkCallback_);
             if (dev->AwakeAudioDev() != DH_SUCCESS) {
                 DHLOGE("Awake audio dev failed.");
                 return ERR_DH_AUDIO_FAILED;
@@ -368,6 +370,36 @@ int32_t EngineProviderListener::OnProviderEvent(const AVTransEvent &event)
         DAudioSinkManager::GetInstance().NotifyEvent(event.peerDevId, DISABLE_DEVICE, eventStr);
     } else {
         DHLOGE("Invaild event type.");
+    }
+    return DH_SUCCESS;
+}
+
+int32_t DAudioSinkManager::PauseDistributedHardware(const std::string &networkId)
+{
+    std::lock_guard<std::mutex> lock(devMapMutex_);
+    if (audioDevMap_.find(networkId) != audioDevMap_.end()) {
+        DHLOGI("Audio sink dev in map. devId: %s.", GetAnonyString(networkId).c_str());
+        audioDevMap_[networkId]->PauseDistributedHardware(networkId);
+    }
+    return DH_SUCCESS;
+}
+
+int32_t DAudioSinkManager::ResumeDistributedHardware(const std::string &networkId)
+{
+    std::lock_guard<std::mutex> lock(devMapMutex_);
+    if (audioDevMap_.find(networkId) != audioDevMap_.end()) {
+        DHLOGI("Audio sink dev in map. devId: %s.", GetAnonyString(networkId).c_str());
+        audioDevMap_[networkId]->ResumeDistributedHardware(networkId);
+    }
+    return DH_SUCCESS;
+}
+
+int32_t DAudioSinkManager::StopDistributedHardware(const std::string &networkId)
+{
+    std::lock_guard<std::mutex> lock(devMapMutex_);
+    if (audioDevMap_.find(networkId) != audioDevMap_.end()) {
+        DHLOGI("Audio sink dev in map. devId: %s.", GetAnonyString(networkId).c_str());
+        audioDevMap_[networkId]->StopDistributedHardware(networkId);
     }
     return DH_SUCCESS;
 }

@@ -23,6 +23,7 @@
 #include "daudio_errorcode.h"
 #include "daudio_ipc_interface_code.h"
 #include "daudio_log.h"
+#include "daudio_sink_ipc_callback_proxy.h"
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DAudioSinkStub"
@@ -42,6 +43,12 @@ DAudioSinkStub::DAudioSinkStub()
         &DAudioSinkStub::UnsubscribeLocalHardwareInner;
     memberFuncMap_[static_cast<uint32_t>(IDAudioSinkInterfaceCode::DAUDIO_NOTIFY)] =
         &DAudioSinkStub::DAudioNotifyInner;
+    memberFuncMap_[static_cast<uint32_t>(IDAudioSinkInterfaceCode::PAUSE_DISTRIBUTED_HARDWARE)] =
+        &DAudioSinkStub::PauseDistributedHardwareInner;
+    memberFuncMap_[static_cast<uint32_t>(IDAudioSinkInterfaceCode::RESUME_DISTRIBUTED_HARDWARE)] =
+        &DAudioSinkStub::ResumeDistributedHardwareInner;
+    memberFuncMap_[static_cast<uint32_t>(IDAudioSinkInterfaceCode::STOP_DISTRIBUTED_HARDWARE)] =
+        &DAudioSinkStub::StopDistributedHardwareInner;
 }
 
 DAudioSinkStub::~DAudioSinkStub()
@@ -85,7 +92,14 @@ int32_t DAudioSinkStub::InitSinkInner(MessageParcel &data, MessageParcel &reply,
         return ERR_DH_AUDIO_SA_PERMISSION_FAIED;
     }
     std::string param = data.ReadString();
-    int32_t ret = InitSink(param);
+    sptr<IRemoteObject> remoteObject = data.ReadRemoteObject();
+    if (remoteObject == nullptr) {
+        DHLOGE("Read ReadRemoteObject failed.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+
+    sptr<DAudioSinkIpcCallbackProxy> dAudioSinkIpcCallbackProxy(new DAudioSinkIpcCallbackProxy(remoteObject));
+    int32_t ret = InitSink(param, dAudioSinkIpcCallbackProxy);
     reply.WriteInt32(ret);
     return DH_SUCCESS;
 }
@@ -127,6 +141,50 @@ int32_t DAudioSinkStub::DAudioNotifyInner(MessageParcel &data, MessageParcel &re
 
     DAudioNotify(networkId, dhId, eventType, eventContent);
     return DH_SUCCESS;
+}
+
+int32_t DAudioSinkStub::PauseDistributedHardwareInner(MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    if (!HasAccessDHPermission()) {
+        DHLOGE("The caller has no ACCESS_DISTRIBUTED_HARDWARE permission.");
+        return ERR_DH_AUDIO_ACCESS_PERMISSION_CHECK_FAIL;
+    }
+    std::string networkId = data.ReadString();
+    int32_t ret = PauseDistributedHardware(networkId);
+    reply.WriteInt32(ret);
+    return DH_SUCCESS;
+}
+
+int32_t DAudioSinkStub::ResumeDistributedHardwareInner(MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    if (!HasAccessDHPermission()) {
+        DHLOGE("The caller has no ACCESS_DISTRIBUTED_HARDWARE permission.");
+        return ERR_DH_AUDIO_ACCESS_PERMISSION_CHECK_FAIL;
+    }
+    std::string networkId = data.ReadString();
+    int32_t ret = ResumeDistributedHardware(networkId);
+    reply.WriteInt32(ret);
+    return DH_SUCCESS;
+}
+
+int32_t DAudioSinkStub::StopDistributedHardwareInner(MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    if (!HasAccessDHPermission()) {
+        DHLOGE("The caller has no ACCESS_DISTRIBUTED_HARDWARE permission.");
+        return ERR_DH_AUDIO_ACCESS_PERMISSION_CHECK_FAIL;
+    }
+    std::string networkId = data.ReadString();
+    int32_t ret = StopDistributedHardware(networkId);
+    reply.WriteInt32(ret);
+    return DH_SUCCESS;
+}
+
+bool DAudioSinkStub::HasAccessDHPermission()
+{
+    Security::AccessToken::AccessTokenID callerToken = IPCSkeleton::GetCallingTokenID();
+    const std::string permissionName = "ohos.permission.ACCESS_DISTRIBUTED_HARDWARE";
+    int32_t result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
+    return (result == Security::AccessToken::PERMISSION_GRANTED);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

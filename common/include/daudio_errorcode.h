@@ -69,6 +69,7 @@ enum DAudioErrorCode {
     ERR_DH_AUDIO_HDI_CALL_FAILED = -44000,
     ERR_DH_AUDIO_HDI_INVALID_PARAM = -44001,
     ERR_DH_AV_TRANS_CREATE_CHANNEL_FAILED = -44002,
+    ERR_DH_AUDIO_ACCESS_PERMISSION_CHECK_FAIL = -44003,
 };
 } // namespace DistributedHardware
 } // namespace OHOS

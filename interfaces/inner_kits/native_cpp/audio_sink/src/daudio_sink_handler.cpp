@@ -35,6 +35,9 @@ IMPLEMENT_SINGLE_INSTANCE(DAudioSinkHandler);
 DAudioSinkHandler::DAudioSinkHandler()
 {
     DHLOGD("DAudio sink handler constructed.");
+    if (!dAudioSinkIpcCallback_) {
+        dAudioSinkIpcCallback_ = new DAudioSinkIpcCallback();
+    }
 }
 
 DAudioSinkHandler::~DAudioSinkHandler()
@@ -148,7 +151,7 @@ void DAudioSinkHandler::FinishStartSA(const std::string &param, const sptr<IRemo
             ERR_DH_AUDIO_SA_PROXY_NOT_INIT, "daudio sink get proxy failed.");
         return;
     }
-    dAudioSinkProxy_->InitSink(param);
+    dAudioSinkProxy_->InitSink(param, dAudioSinkIpcCallback_);
     sinkProxyConVar_.notify_one();
     DAudioHisysevent::GetInstance().SysEventWriteBehavior(DAUDIO_INIT, "daudio sink sa load success.");
 }
@@ -158,30 +161,54 @@ void DAudioSinkHandler::DAudioSinkSvrRecipient::OnRemoteDied(const wptr<IRemoteO
     DAudioSinkHandler::GetInstance().OnRemoteSinkSvrDied(remote);
 }
 
+IDistributedHardwareSink *GetSinkHardwareHandler()
+{
+    DHLOGD("Get sink hardware handler.");
+    return &DAudioSinkHandler::GetInstance();
+}
+
 int32_t DAudioSinkHandler::RegisterPrivacyResources(std::shared_ptr<PrivacyResourcesListener> listener)
 {
+    DHLOGI("RegisterPrivacyResources start.");
+    if (dAudioSinkIpcCallback_ == nullptr) {
+        DHLOGE("Daudio sink ipc callback is nullptr.");
+        return ERR_DH_AUDIO_SA_PROXY_NOT_INIT;
+    }
+    dAudioSinkIpcCallback_->PushPrivacyResCallback(listener);
     return DH_SUCCESS;
 }
 
 int32_t DAudioSinkHandler::PauseDistributedHardware(const std::string &networkId)
 {
-    return DH_SUCCESS;
+    DHLOGI("pause distributed hardware.");
+    std::lock_guard<std::mutex> lock(sinkProxyMutex_);
+    if (dAudioSinkProxy_ == nullptr) {
+        DHLOGE("daudio sink proxy not init.");
+        return ERR_DH_AUDIO_SA_PROXY_NOT_INIT;
+    }
+    return dAudioSinkProxy_->PauseDistributedHardware(networkId);
 }
 
 int32_t DAudioSinkHandler::ResumeDistributedHardware(const std::string &networkId)
 {
-    return DH_SUCCESS;
+    DHLOGI("resume distributed hardware.");
+    std::lock_guard<std::mutex> lock(sinkProxyMutex_);
+    if (dAudioSinkProxy_ == nullptr) {
+        DHLOGE("daudio sink proxy not init.");
+        return ERR_DH_AUDIO_SA_PROXY_NOT_INIT;
+    }
+    return dAudioSinkProxy_->ResumeDistributedHardware(networkId);
 }
 
 int32_t DAudioSinkHandler::StopDistributedHardware(const std::string &networkId)
 {
-    return DH_SUCCESS;
-}
-
-IDistributedHardwareSink *GetSinkHardwareHandler()
-{
-    DHLOGD("Get sink hardware handler.");
-    return &DAudioSinkHandler::GetInstance();
+    DHLOGI("stop distributed hardware.");
+    std::lock_guard<std::mutex> lock(sinkProxyMutex_);
+    if (dAudioSinkProxy_ == nullptr) {
+        DHLOGE("daudio sink proxy not init.");
+        return ERR_DH_AUDIO_SA_PROXY_NOT_INIT;
+    }
+    return dAudioSinkProxy_->StopDistributedHardware(networkId);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

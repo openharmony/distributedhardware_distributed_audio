@@ -33,6 +33,7 @@ public:
     void SetUp();
     void TearDown();
     std::shared_ptr<DAudioSinkService> sinkSrv_ = nullptr;
+    sptr<IRemoteObject> remoteObject_ = nullptr;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

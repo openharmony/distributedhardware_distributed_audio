@@ -23,6 +23,7 @@
 
 #include "daudio_sink_dev.h"
 #include "idaudio_source.h"
+#include "idaudio_sink_ipc_callback.h"
 #include "i_av_engine_provider_callback.h"
 
 namespace OHOS {
@@ -38,7 +39,7 @@ public:
 class DAudioSinkManager {
 DECLARE_SINGLE_INSTANCE_BASE(DAudioSinkManager);
 public:
-    int32_t Init();
+    int32_t Init(const sptr<IDAudioSinkIpcCallback> &sinkCallback);
     int32_t UnInit();
     int32_t HandleDAudioNotify(const std::string &devId, const std::string &dhId, const int32_t eventType,
         const std::string &eventContent);
@@ -49,6 +50,9 @@ public:
     void ClearAudioDev(const std::string &devId);
     int32_t CreateAudioDevice(const std::string &devId);
     void SetChannelState(const std::string &content);
+    int32_t PauseDistributedHardware(const std::string &networkId);
+    int32_t ResumeDistributedHardware(const std::string &networkId);
+    int32_t StopDistributedHardware(const std::string &networkId);
 
 private:
     DAudioSinkManager();
@@ -73,6 +77,7 @@ private:
     IAVEngineProvider *rcvProviderPtr_ = nullptr;
     void *pSHandler_ = nullptr;
     void *pRHandler_ = nullptr;
+    sptr<IDAudioSinkIpcCallback> ipcSinkCallback_ = nullptr;
 };
 } // DistributedHardware
 } // OHOS

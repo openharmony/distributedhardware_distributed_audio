@@ -32,6 +32,7 @@ public:
     void TearDown();
 
     DAudioSinkManager daudioSinkManager;
+    sptr<IRemoteObject> remoteObject_ = nullptr;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

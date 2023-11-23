@@ -32,6 +32,7 @@
 #include "ispk_client.h"
 #include "i_av_engine_provider.h"
 #include "i_av_receiver_engine_callback.h"
+#include "idaudio_sink_ipc_callback.h"
 
 using json = nlohmann::json;
 
@@ -45,13 +46,16 @@ enum class ChannelState {
 
 class DAudioSinkDev : public IAudioEventCallback, public std::enable_shared_from_this<DAudioSinkDev> {
 public:
-    explicit DAudioSinkDev(const std::string &networkId);
+    explicit DAudioSinkDev(const std::string &networkId, const sptr<IDAudioSinkIpcCallback> &sinkCallback);
     ~DAudioSinkDev() override;
 
     int32_t AwakeAudioDev();
     void SleepAudioDev();
     void NotifyEvent(const AudioEvent &audioEvent) override;
     int32_t InitAVTransEngines(const ChannelState channelState, IAVEngineProvider *providerPtr);
+    int32_t PauseDistributedHardware(const std::string &networkId);
+    int32_t ResumeDistributedHardware(const std::string &networkId);
+    int32_t StopDistributedHardware(const std::string &networkId);
 
 private:
     int32_t TaskOpenDSpeaker(const std::string &args);
@@ -83,14 +87,14 @@ private:
     std::string devId_;
     std::string spkDhId_;
     std::string micDhId_;
-    std::shared_ptr<ISpkClient> speakerClient_ = nullptr;
     std::mutex spkClientMutex_;
     std::map<int32_t, std::shared_ptr<ISpkClient>> spkClientMap_;
-    std::shared_ptr<IMicClient> micClient_ = nullptr;
     std::mutex micClientMutex_;
-    std::map<int32_t, std::shared_ptr<IMicClient>> micClientMap_;
+    std::map<int32_t, std::shared_ptr<DMicClient>> micClientMap_;
     std::shared_ptr<DAudioSinkDevCtrlMgr> audioCtrlMgr_ = nullptr;
     static constexpr size_t WAIT_HANDLER_IDLE_TIME_US = 10000;
+    sptr<IDAudioSinkIpcCallback> ipcSinkCallback_ = nullptr;
+    std::atomic<bool> isPageStatus_ = false;
 
     std::atomic<bool> isSpkInUse_ = false;
     std::atomic<bool> isMicInUse_ = false;

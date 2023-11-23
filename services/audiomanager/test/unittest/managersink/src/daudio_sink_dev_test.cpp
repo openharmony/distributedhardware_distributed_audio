@@ -18,6 +18,9 @@
 #include "audio_event.h"
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
+#include "if_system_ability_manager.h"
+#include "iservice_registry.h"
+#include "daudio_sink_ipc_callback_proxy.h"
 
 using namespace testing::ext;
 
@@ -30,7 +33,16 @@ void DAudioSinkDevTest::TearDownTestCase(void) {}
 void DAudioSinkDevTest::SetUp()
 {
     std::string networkId = "networkId";
-    sinkDev_ = std::make_shared<DAudioSinkDev>(networkId);
+    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgr == nullptr) {
+        return;
+    }
+    sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID);
+    if (remoteObject == nullptr) {
+        return;
+    }
+    sptr<DAudioSinkIpcCallbackProxy> dAudioSinkIpcCallbackProxy(new DAudioSinkIpcCallbackProxy(remoteObject));
+    sinkDev_ = std::make_shared<DAudioSinkDev>(networkId, dAudioSinkIpcCallbackProxy);
 }
 
 void DAudioSinkDevTest::TearDown()
@@ -65,12 +77,12 @@ HWTEST_F(DAudioSinkDevTest, InitAVTransEngines_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSinkDevTest, TaskPlayStatusChange_001, TestSize.Level1)
 {
-    sinkDev_->speakerClient_ = nullptr;
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, sinkDev_->TaskPlayStatusChange(""));
 
     std::string devId = "devid";
     int32_t dhId = 1;
-    sinkDev_->speakerClient_ = std::make_shared<DSpeakerClient>(devId, dhId, sinkDev_);
+    auto spkClient = std::make_shared<DSpeakerClient>(devId, dhId, sinkDev_);
+    sinkDev_->spkClientMap_.insert(std::make_pair(DEFAULT_RENDER_ID, spkClient));
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sinkDev_->TaskPlayStatusChange("{\"dhId\":\"1\"}"));
 }
 
@@ -107,7 +119,6 @@ HWTEST_F(DAudioSinkDevTest, TaskOpenDSpeaker_002, TestSize.Level1)
 HWTEST_F(DAudioSinkDevTest, TaskCloseDSpeaker_001, TestSize.Level1)
 {
     std::string args = "{\"dhId\":\"1\"}";
-    sinkDev_->speakerClient_ = nullptr;
     EXPECT_EQ(DH_SUCCESS, sinkDev_->TaskCloseDSpeaker(args));
 }
 
@@ -122,7 +133,8 @@ HWTEST_F(DAudioSinkDevTest, TaskCloseDSpeaker_002, TestSize.Level1)
     std::string args = "{\"dhId\":\"1\"}";
     std::string devId = "devId";
     int32_t dhId = 1;
-    sinkDev_->speakerClient_ = std::make_shared<DSpeakerClient>(devId, dhId, sinkDev_);
+    auto spkClient = std::make_shared<DSpeakerClient>(devId, dhId, sinkDev_);
+    sinkDev_->spkClientMap_.insert(std::make_pair(DEFAULT_RENDER_ID, spkClient));
     EXPECT_EQ(DH_SUCCESS, sinkDev_->TaskCloseDSpeaker(args));
 }
 
@@ -137,9 +149,9 @@ HWTEST_F(DAudioSinkDevTest, TaskStartRender_001, TestSize.Level1)
     std::string devId = "devId";
     int32_t dhId = 1;
     std::string args = "{\"dhId\":\"1\"}";
-    sinkDev_->speakerClient_ = nullptr;
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sinkDev_->TaskStartRender(args));
-    sinkDev_->speakerClient_ = std::make_shared<DSpeakerClient>(devId, dhId, sinkDev_);
+    auto spkClient = std::make_shared<DSpeakerClient>(devId, dhId, sinkDev_);
+    sinkDev_->spkClientMap_.insert(std::make_pair(DEFAULT_RENDER_ID, spkClient));
     EXPECT_NE(DH_SUCCESS, sinkDev_->TaskStartRender(args));
 }
 
@@ -190,7 +202,8 @@ HWTEST_F(DAudioSinkDevTest, TaskCloseDMic_002, TestSize.Level1)
     std::string args = "{\"dhId\":\"123\"}";
     std::string devId;
     int32_t dhId = 1 << 27 | 1 << 0;
-    sinkDev_->micClient_ = std::make_shared<DMicClient>(devId, dhId, sinkDev_);
+    auto micClient = std::make_shared<DMicClient>(devId, dhId, sinkDev_);
+    sinkDev_->micClientMap_.insert(std::make_pair(DEFAULT_CAPTURE_ID, micClient));
     EXPECT_EQ(DH_SUCCESS, sinkDev_->TaskCloseDMic(args));
 }
 
@@ -217,7 +230,8 @@ HWTEST_F(DAudioSinkDevTest, TaskSetParameter_002, TestSize.Level1)
     std::string args;
     std::string devId;
     int32_t dhId = 1;
-    sinkDev_->speakerClient_ = std::make_shared<DSpeakerClient>(devId, dhId, sinkDev_);
+    auto spkClient = std::make_shared<DSpeakerClient>(devId, dhId, sinkDev_);
+    sinkDev_->spkClientMap_.insert(std::make_pair(DEFAULT_RENDER_ID, spkClient));
     EXPECT_NE(DH_SUCCESS, sinkDev_->TaskSetParameter(args));
 }
 
@@ -244,7 +258,8 @@ HWTEST_F(DAudioSinkDevTest, TaskSetVolume_002, TestSize.Level1)
     std::string args;
     std::string devId;
     int32_t dhId = 1;
-    sinkDev_->speakerClient_ = std::make_shared<DSpeakerClient>(devId, dhId, sinkDev_);
+    auto spkClient = std::make_shared<DSpeakerClient>(devId, dhId, sinkDev_);
+    sinkDev_->spkClientMap_.insert(std::make_pair(DEFAULT_RENDER_ID, spkClient));
     EXPECT_NE(DH_SUCCESS, sinkDev_->TaskSetVolume(args));
 }
 
@@ -271,7 +286,8 @@ HWTEST_F(DAudioSinkDevTest, TaskSetMute_002, TestSize.Level1)
     std::string args;
     std::string devId;
     int32_t dhId = 1;
-    sinkDev_->speakerClient_ = std::make_shared<DSpeakerClient>(devId, dhId, sinkDev_);
+    auto spkClient = std::make_shared<DSpeakerClient>(devId, dhId, sinkDev_);
+    sinkDev_->spkClientMap_.insert(std::make_pair(DEFAULT_RENDER_ID, spkClient));
     EXPECT_NE(DH_SUCCESS, sinkDev_->TaskSetMute(args));
 }
 
@@ -371,9 +387,9 @@ HWTEST_F(DAudioSinkDevTest, SendAudioEventToRemote_002, TestSize.Level1)
     int32_t dhId = 1;
     AudioEvent event;
     event.content = "{\"dhId\":\"123\"}";
-    sinkDev_->speakerClient_ = nullptr;
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sinkDev_->SendAudioEventToRemote(event));
-    sinkDev_->speakerClient_ = std::make_shared<DSpeakerClient>(devId, dhId, sinkDev_);
+    auto spkClient = std::make_shared<DSpeakerClient>(devId, dhId, sinkDev_);
+    sinkDev_->spkClientMap_.insert(std::make_pair(DEFAULT_RENDER_ID, spkClient));
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sinkDev_->SendAudioEventToRemote(event));
 }
 } // DistributedHardware

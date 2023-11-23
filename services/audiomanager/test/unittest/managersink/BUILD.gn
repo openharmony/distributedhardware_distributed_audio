@@ -54,8 +54,11 @@ config("module_private_config") {
     "${audio_transport_path}/senderengine/include",
     "${common_path}/include",
     "${innerkits_path}/native_cpp/audio_source/include",
+    "${innerkits_path}/native_cpp/audio_sink/include",
     "${services_path}/audiomanager/managersink/include",
     "${services_path}/audiomanager/test/unittest/managersink/include",
+    "${services_path}/audiomanager/test/unittest/audiomanagertestutils/include",
+    "${services_path}/audiomanager/servicesink/include",
     "${services_path}/common/audiodata/include",
     "${services_path}/common/audioeventcallback",
     "${services_path}/common/audioparam",
@@ -71,6 +74,7 @@ ohos_unittest("DaudioSinkDevTest") {
   configs = [ ":module_private_config" ]
 
   deps = [
+    "${innerkits_path}/native_cpp/audio_sink:distributed_audio_sink_sdk",
     "${services_path}/audiomanager/servicesink:distributed_audio_sink",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
@@ -81,6 +85,8 @@ ohos_unittest("DaudioSinkDevTest") {
     "audio_framework:audio_client",
     "audio_framework:audio_renderer",
     "c_utils:utils",
+    "device_manager:devicemanagersdk",
+    "device_security_level:dslm_sdk",
     "distributed_hardware_fwk:distributed_av_receiver",
     "distributed_hardware_fwk:distributed_av_sender",
     "drivers_interface_audio:libaudio_proxy_1.0",
@@ -103,6 +109,7 @@ ohos_unittest("DAudioSinkManagerTest") {
   configs = [ ":module_private_config" ]
 
   deps = [
+    "${innerkits_path}/native_cpp/audio_sink:distributed_audio_sink_sdk",
     "${services_path}/audiomanager/servicesink:distributed_audio_sink",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
@@ -113,6 +120,8 @@ ohos_unittest("DAudioSinkManagerTest") {
     "audio_framework:audio_client",
     "audio_framework:audio_renderer",
     "c_utils:utils",
+    "device_manager:devicemanagersdk",
+    "device_security_level:dslm_sdk",
     "distributed_hardware_fwk:distributed_av_receiver",
     "distributed_hardware_fwk:distributed_av_sender",
     "drivers_interface_audio:libaudio_proxy_1.0",

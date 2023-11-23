@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -72,9 +72,9 @@ bool DAudioSinkService::Init()
     return true;
 }
 
-int32_t DAudioSinkService::InitSink(const std::string &params)
+int32_t DAudioSinkService::InitSink(const std::string &params, const sptr<IDAudioSinkIpcCallback> &sinkCallback)
 {
-    DAudioSinkManager::GetInstance().Init();
+    DAudioSinkManager::GetInstance().Init(sinkCallback);
     return DH_SUCCESS;
 }
 
@@ -137,6 +137,27 @@ int DAudioSinkService::Dump(int32_t fd, const std::vector<std::u16string> &args)
         return ERR_DH_AUDIO_BAD_VALUE;
     }
 
+    return DH_SUCCESS;
+}
+
+int32_t DAudioSinkService::PauseDistributedHardware(const std::string &networkId)
+{
+    DHLOGI("PauseDistributedHardware networkId:%s.", GetAnonyString(networkId).c_str());
+    DAudioSinkManager::GetInstance().PauseDistributedHardware(networkId);
+    return DH_SUCCESS;
+}
+
+int32_t DAudioSinkService::ResumeDistributedHardware(const std::string &networkId)
+{
+    DHLOGI("ResumeDistributedHardware networkId:%s.", GetAnonyString(networkId).c_str());
+    DAudioSinkManager::GetInstance().ResumeDistributedHardware(networkId);
+    return DH_SUCCESS;
+}
+
+int32_t DAudioSinkService::StopDistributedHardware(const std::string &networkId)
+{
+    DHLOGI("StopDistributedHardware networkId:%s.", GetAnonyString(networkId).c_str());
+    DAudioSinkManager::GetInstance().StopDistributedHardware(networkId);
     return DH_SUCCESS;
 }
 } // namespace DistributedHardware

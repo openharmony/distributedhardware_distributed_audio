@@ -17,6 +17,7 @@
 #define OHOS_DAUDIO_SINK_HANDLER_H
 
 #include "idistributed_hardware_sink.h"
+#include "daudio_sink_ipc_callback.h"
 #include "single_instance.h"
 
 #include "idaudio_sink.h"
@@ -50,6 +51,7 @@ private:
     std::condition_variable sinkProxyConVar_;
     sptr<IDAudioSink> dAudioSinkProxy_ = nullptr;
     sptr<DAudioSinkSvrRecipient> sinkSvrRecipient_ = nullptr;
+    sptr<DAudioSinkIpcCallback> dAudioSinkIpcCallback_ = nullptr;
 };
 
 #ifdef __cplusplus

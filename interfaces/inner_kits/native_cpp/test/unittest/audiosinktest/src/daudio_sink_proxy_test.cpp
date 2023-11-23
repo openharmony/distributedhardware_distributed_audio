@@ -20,6 +20,7 @@
 #include "daudio_constants.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
+#include "daudio_sink_ipc_callback.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -92,7 +93,8 @@ HWTEST_F(DAudioSinkProxyTest, SubscribeLocalHardware_002, TestSize.Level1)
 HWTEST_F(DAudioSinkProxyTest, InitSink_001, TestSize.Level1)
 {
     const std::string params = "params";
-    int32_t ret = dAudioProxy->InitSink(params);
+    auto dAudioSinkIpcCallback = new DAudioSinkIpcCallback();
+    int32_t ret = dAudioProxy->InitSink(params, dAudioSinkIpcCallback);
     EXPECT_EQ(DH_SUCCESS, ret);
     ret = dAudioProxy->ReleaseSink();
     EXPECT_EQ(DH_SUCCESS, ret);
