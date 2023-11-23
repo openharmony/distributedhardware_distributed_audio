@@ -28,7 +28,7 @@ public:
 
     ~DAudioSinkIpcCallbackProxy() {}
     int32_t OnNotifyResourceInfo(const ResourceEventType &type, const std::string &subType,
-        const std::string &networkId, bool &isSensitive, bool &isSameAccout) override;
+        const std::string &networkId, bool &isSensitive, bool &isSameAccount) override;
 
 private:
     static inline BrokerDelegator<DAudioSinkIpcCallbackProxy> delegator_;

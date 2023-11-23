@@ -20,6 +20,10 @@
 #include <mutex>
 
 #include "single_instance.h"
+#include "device_manager.h"
+#include "device_manager_callback.h"
+#include "device_security_defines.h"
+#include "device_security_info.h"
 
 #include "daudio_sink_dev.h"
 #include "idaudio_source.h"
@@ -34,6 +38,10 @@ public:
     ~EngineProviderListener() override {};
 
     int32_t OnProviderEvent(const AVTransEvent &event) override;
+};
+
+class DeviceInitCallback : public DmInitCallback {
+    void OnRemoteDied() override;
 };
 
 class DAudioSinkManager {
@@ -61,6 +69,10 @@ private:
     int32_t UnloadAVSenderEngineProvider();
     int32_t LoadAVReceiverEngineProvider();
     int32_t UnloadAVReceiverEngineProvider();
+    bool CheckDeviceSecurityLevel(const std::string &srcDeviceId, const std::string &dstDeviceId);
+    int32_t GetDeviceSecurityLevel(const std::string &udid);
+    std::string GetUdidByNetworkId(const std::string &networkId);
+    int32_t VerifySecurityLevel(const std::string &devId);
 
 private:
     static constexpr const char* DEVCLEAR_THREAD = "sinkClearTh";
@@ -77,7 +89,10 @@ private:
     IAVEngineProvider *rcvProviderPtr_ = nullptr;
     void *pSHandler_ = nullptr;
     void *pRHandler_ = nullptr;
+    bool isSensitive_;
+    bool isSameAccount_;
     sptr<IDAudioSinkIpcCallback> ipcSinkCallback_ = nullptr;
+    std::shared_ptr<DmInitCallback> initCallback_;
 };
 } // DistributedHardware
 } // OHOS

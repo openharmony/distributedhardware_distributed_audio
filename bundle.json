@@ -32,6 +32,8 @@
                 "accessibility",
                 "audio_framework",
                 "c_utils",
+                "device_security_level",
+                "device_manager",
                 "distributed_hardware_fwk",
                 "drivers_interface_audio",
                 "drivers_interface_distributed_audio",

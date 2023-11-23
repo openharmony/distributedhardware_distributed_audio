@@ -56,6 +56,7 @@ public:
     int32_t PauseDistributedHardware(const std::string &networkId);
     int32_t ResumeDistributedHardware(const std::string &networkId);
     int32_t StopDistributedHardware(const std::string &networkId);
+    void JudgeDeviceStatus();
 
 private:
     int32_t TaskOpenDSpeaker(const std::string &args);
@@ -76,7 +77,6 @@ private:
     int32_t from_json(const json &j, AudioParam &audioParam);
     int32_t HandleEngineMessage(uint32_t type, std::string content, std::string devId);
     int32_t SendAudioEventToRemote(const AudioEvent &event);
-    void JudgeDeviceStatus();
 
     int32_t ParseDhidFromEvent(std::string args);
     int32_t ConvertString2Int(std::string val);

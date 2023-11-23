@@ -33,6 +33,7 @@ static const std::string PARAM_CLOSE_SPEAKER = "{\"audioParam\":null,\"dhId\":\"
     std::to_string(PIN_OUT_SPEAKER) + "\",\"eventType\":12}";
 static const std::string PARAM_CLOSE_MIC = "{\"audioParam\":null,\"dhId\":\"" +
     std::to_string(PIN_IN_MIC) + "\",\"eventType\":22}";
+const int DEFAULT_DEVICE_SECURITY_LEVEL = -1;
 
 IMPLEMENT_SINGLE_INSTANCE(DAudioSinkManager);
 using AVTransProviderClass = IAVEngineProvider *(*)(const std::string &);
@@ -62,6 +63,7 @@ DAudioSinkManager::~DAudioSinkManager()
 int32_t DAudioSinkManager::Init(const sptr<IDAudioSinkIpcCallback> &sinkCallback)
 {
     DHLOGI("Init audio sink manager.");
+    initCallback_ = std::make_shared<DeviceInitCallback>();
     ipcSinkCallback_ = sinkCallback;
     int32_t ret = GetLocalDeviceNetworkId(localNetworkId_);
     if (ret != DH_SUCCESS) {
@@ -183,18 +185,18 @@ int32_t DAudioSinkManager::CreateAudioDevice(const std::string &devId)
 
     int32_t ret = ERR_DH_AUDIO_FAILED;
     if (channelState_ == ChannelState::SPK_CONTROL_OPENED) {
+        std::string subType = "speaker";
         ret = dev->InitAVTransEngines(ChannelState::SPK_CONTROL_OPENED, rcvProviderPtr_);
     }
     if (channelState_ == ChannelState::MIC_CONTROL_OPENED) {
         ret = dev->InitAVTransEngines(ChannelState::MIC_CONTROL_OPENED, sendProviderPtr_);
+        if (!ret) {
+            ret = VerifySecurityLevel(devId);
+        }
     }
     if (ret != DH_SUCCESS) {
         DHLOGE("Init av transport sender engine failed.");
-        dev->SleepAudioDev();
-        {
-            std::lock_guard<std::mutex> lock(devMapMutex_);
-            audioDevMap_.erase(devId);
-        }
+        dev->JudgeDeviceStatus();
         return ERR_DH_AUDIO_FAILED;
     }
     return DH_SUCCESS;
@@ -402,6 +404,113 @@ int32_t DAudioSinkManager::StopDistributedHardware(const std::string &networkId)
         audioDevMap_[networkId]->StopDistributedHardware(networkId);
     }
     return DH_SUCCESS;
+}
+
+bool DAudioSinkManager::CheckDeviceSecurityLevel(const std::string &srcDeviceId, const std::string &dstDeviceId)
+{
+    DHLOGI("CheckDeviceSecurityLevel srcDeviceId %s, dstDeviceId %s.", srcDeviceId.c_str(), dstDeviceId.c_str());
+    std::string srcUdid = GetUdidByNetworkId(srcDeviceId);
+    if (srcUdid.empty()) {
+        DHLOGE("src udid is empty");
+        return false;
+    }
+    std::string dstUdid = GetUdidByNetworkId(dstDeviceId);
+    if (dstUdid.empty()) {
+        DHLOGE("dst udid is empty");
+        return false;
+    }
+    DHLOGI("CheckDeviceSecurityLevel srcUdid %s, dstUdid %s.", srcUdid.c_str(), dstUdid.c_str());
+    int32_t srcDeviceSecurityLevel = GetDeviceSecurityLevel(srcUdid);
+    int32_t dstDeviceSecurityLevel = GetDeviceSecurityLevel(dstUdid);
+    DHLOGI("SrcDeviceSecurityLevel, level is %d", srcDeviceSecurityLevel);
+    DHLOGI("dstDeviceSecurityLevel, level is %d", dstDeviceSecurityLevel);
+    if (srcDeviceSecurityLevel == DEFAULT_DEVICE_SECURITY_LEVEL ||
+        srcDeviceSecurityLevel < dstDeviceSecurityLevel) {
+        DHLOGE("The device security of source device is lower.");
+        return false;
+    }
+    return true;
+}
+
+int32_t DAudioSinkManager::GetDeviceSecurityLevel(const std::string &udid)
+{
+    DeviceIdentify devIdentify;
+    devIdentify.length = DEVICE_ID_MAX_LEN;
+    int32_t ret = memcpy_s(devIdentify.identity, DEVICE_ID_MAX_LEN, udid.c_str(), DEVICE_ID_MAX_LEN);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Str copy failed %d", ret);
+        return DEFAULT_DEVICE_SECURITY_LEVEL;
+    }
+    DeviceSecurityInfo *info = nullptr;
+    ret = RequestDeviceSecurityInfo(&devIdentify, nullptr, &info);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Request device security info failed %d", ret);
+        FreeDeviceSecurityInfo(info);
+        info = nullptr;
+        return DEFAULT_DEVICE_SECURITY_LEVEL;
+    }
+    int32_t level = 0;
+    ret = GetDeviceSecurityLevelValue(info, &level);
+    DHLOGE("Get device security level, level is %d", level);
+    FreeDeviceSecurityInfo(info);
+    info = nullptr;
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Get device security level failed %d", ret);
+        return DEFAULT_DEVICE_SECURITY_LEVEL;
+    }
+    return level;
+}
+
+std::string DAudioSinkManager::GetUdidByNetworkId(const std::string &networkId)
+{
+    if (networkId.empty()) {
+        DHLOGE("networkId is empty!");
+        return "";
+    }
+    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(PKG_NAME, initCallback_);
+    if (ret != ERR_OK) {
+        DHLOGE("InitDeviceManager failed ret = %d", ret);
+    }
+    std::string udid = "";
+    ret = DeviceManager::GetInstance().GetUdidByNetworkId(PKG_NAME, networkId, udid);
+    if (ret != ERR_OK) {
+        DHLOGE("GetUdidByNetworkId failed ret = %d", ret);
+        return "";
+    }
+    return udid;
+}
+
+int32_t DAudioSinkManager::VerifySecurityLevel(const std::string &devId)
+{
+    std::string subType = "mic";
+    int32_t ret = ipcSinkCallback_->OnNotifyResourceInfo(ResourceEventType::EVENT_TYPE_QUERY_RESOURCE, subType, devId,
+        isSensitive_, isSameAccount_);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Query resource failed, ret: %d", ret);
+        return ret;
+    }
+    DHLOGI("VerifySecurityLevel isSensitive: %d, isSameAccount: %d", isSensitive_, isSameAccount_);
+    if (isSensitive_ && !isSameAccount_) {
+        DHLOGE("Privacy resource must be logged in with same account.");
+        return ERR_DH_AUDIO_FAILED;
+    }
+
+    std::string sinkDevId = "";
+    ret = GetLocalDeviceNetworkId(sinkDevId);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("GetLocalDeviceNetworkId failed, ret: %d", ret);
+        return ret;
+    }
+    if (isSensitive_ && !CheckDeviceSecurityLevel(devId, sinkDevId)) {
+        DHLOGE("Check device security level failed!");
+        return ERR_DH_AUDIO_FAILED;
+    }
+    return DH_SUCCESS;
+}
+
+void DeviceInitCallback::OnRemoteDied()
+{
+    DHLOGI("DeviceInitCallback OnRemoteDied");
 }
 } // namespace DistributedHardware
 } // namespace OHOS

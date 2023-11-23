@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 int32_t DAudioSinkIpcCallbackProxy::OnNotifyResourceInfo(const ResourceEventType &type, const std::string &subType,
-    const std::string &networkId, bool &isSensitive, bool &isSameAccout)
+    const std::string &networkId, bool &isSensitive, bool &isSameAccount)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -33,13 +33,14 @@ int32_t DAudioSinkIpcCallbackProxy::OnNotifyResourceInfo(const ResourceEventType
     }
 
     int32_t resType = static_cast<int32_t>(type);
-    if (!data.WriteInt32(resType) || !data.WriteString(subType) || !data.WriteString(networkId) ||
-        !data.WriteBool(isSensitive) || !data.WriteBool(isSameAccout)) {
+    if (!data.WriteInt32(resType) || !data.WriteString(subType) || !data.WriteString(networkId)) {
         return ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED;
     }
 
     Remote()->SendRequest(NOTIFY_RESOURCEINFO, data, reply, option);
     int32_t ret = reply.ReadInt32();
+    isSensitive = reply.ReadBool();
+    isSameAccount = reply.ReadBool();
     return ret;
 }
 } // namespace DistributedHardware
