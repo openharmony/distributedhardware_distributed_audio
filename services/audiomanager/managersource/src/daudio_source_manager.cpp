@@ -201,16 +201,20 @@ int32_t DAudioSourceManager::DoEnableDAudio(const std::string &args)
         DHLOGE("Enable params are incorrect.");
         return ERR_DH_AUDIO_FAILED;
     }
-    std::lock_guard<std::mutex> lock(devMapMtx_);
-    auto dev = audioDevMap_.find(devId);
-    if (dev == audioDevMap_.end()) {
-        if (CreateAudioDevice(devId) != DH_SUCCESS) {
-            return ERR_DH_AUDIO_FAILED;
+    std::shared_ptr<DAudioSourceDev> sourceDev = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(devMapMtx_);
+        auto device = audioDevMap_.find(devId);
+        if (device == audioDevMap_.end()) {
+            if (CreateAudioDevice(devId) != DH_SUCCESS) {
+                return ERR_DH_AUDIO_FAILED;
+            }
         }
+        audioDevMap_[devId].ports[dhId] = reqId;
+        sourceDev = audioDevMap_[devId].dev;
     }
-    audioDevMap_[devId].ports[dhId] = reqId;
     DHLOGI("Call source dev to enable daudio.");
-    int32_t result = audioDevMap_[devId].dev->EnableDAudio(dhId, attrs);
+    int32_t result = sourceDev->EnableDAudio(dhId, attrs);
     return OnEnableDAudio(devId, dhId, result);
 }
 
@@ -238,25 +242,28 @@ int32_t DAudioSourceManager::DoDisableDAudio(const std::string &args)
     std::string devId = ParseStringFromArgs(args, KEY_DEV_ID);
     std::string dhId = ParseStringFromArgs(args, KEY_DH_ID);
     std::string reqId = ParseStringFromArgs(args, KEY_REQID);
-    DHLOGI("Do Enable distributed audio, devId: %s, dhId: %s, reqId:%s.",
+    DHLOGI("Do Disable distributed audio, devId: %s, dhId: %s, reqId:%s.",
         GetAnonyString(devId).c_str(), dhId.c_str(), reqId.c_str());
     if (!CheckParams(devId, dhId)) {
-        DHLOGE("Enable params are incorrect.");
+        DHLOGE("Disable params are incorrect.");
         return ERR_DH_AUDIO_FAILED;
     }
-    std::lock_guard<std::mutex> lock(devMapMtx_);
-    auto dev = audioDevMap_.find(devId);
-    if (dev == audioDevMap_.end()) {
-        DHLOGE("Audio device not exist.");
-        return ERR_DH_AUDIO_SA_DEVICE_NOT_EXIST;
+    std::shared_ptr<DAudioSourceDev> sourceDev = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(devMapMtx_);
+        auto device = audioDevMap_.find(devId);
+        if (device == audioDevMap_.end()) {
+            DHLOGE("Audio device not exist.");
+            return ERR_DH_AUDIO_SA_DEVICE_NOT_EXIST;
+        }
+        if (audioDevMap_[devId].dev == nullptr) {
+            DHLOGE("Audio device is null.");
+            return DH_SUCCESS;
+        }
+        sourceDev = audioDevMap_[devId].dev;
     }
-    if (audioDevMap_[devId].dev == nullptr) {
-        DHLOGE("Audio device is null.");
-        return DH_SUCCESS;
-    }
-    audioDevMap_[devId].ports[dhId] = reqId;
-    DHLOGI("Call source dev to enable daudio.");
-    int32_t result = audioDevMap_[devId].dev->DisableDAudio(dhId);
+    DHLOGI("Call source dev to disable daudio.");
+    int32_t result = sourceDev->DisableDAudio(dhId);
     return OnDisableDAudio(devId, dhId, result);
 }
 
@@ -276,15 +283,19 @@ int32_t DAudioSourceManager::HandleDAudioNotify(const std::string &devId, const 
             ((std::string)jParam[KEY_RANDOM_TASK_CODE]).c_str());
     }
 
-    std::lock_guard<std::mutex> lock(devMapMtx_);
-    auto dev = audioDevMap_.find(devId);
-    if (dev == audioDevMap_.end()) {
-        DHLOGE("Audio device not exist.");
-        return ERR_DH_AUDIO_SA_DEVICE_NOT_EXIST;
+    std::shared_ptr<DAudioSourceDev> sourceDev = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(devMapMtx_);
+        auto device = audioDevMap_.find(devId);
+        if (device == audioDevMap_.end()) {
+            DHLOGE("Audio device not exist.");
+            return ERR_DH_AUDIO_SA_DEVICE_NOT_EXIST;
+        }
+        sourceDev = audioDevMap_[devId].dev;
     }
 
     AudioEvent audioEvent(eventType, eventContent);
-    audioDevMap_[devId].dev->NotifyEvent(audioEvent);
+    sourceDev->NotifyEvent(audioEvent);
     return DH_SUCCESS;
 }
 
@@ -381,11 +392,13 @@ int32_t DAudioSourceManager::CreateAudioDevice(const std::string &devId)
 void DAudioSourceManager::DeleteAudioDevice(const std::string &devId, const std::string &dhId)
 {
     DHLOGI("Delete audio device, devId = %s, dhId = %s.", devId.c_str(), dhId.c_str());
-    std::lock_guard<std::mutex> lock(devMapMtx_);
-    audioDevMap_[devId].ports.erase(dhId);
-    if (!audioDevMap_[devId].ports.empty()) {
-        DHLOGI("audioDevMap_[devId].ports is not empty");
-        return;
+    {
+        std::lock_guard<std::mutex> lock(devMapMtx_);
+        audioDevMap_[devId].ports.erase(dhId);
+        if (!audioDevMap_[devId].ports.empty()) {
+            DHLOGI("audioDevMap_[devId].ports is not empty");
+            return;
+        }
     }
     if (devClearThread_.joinable()) {
         devClearThread_.join();
