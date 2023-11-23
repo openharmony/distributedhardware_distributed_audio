@@ -260,6 +260,7 @@ int32_t DAudioSourceManager::DoDisableDAudio(const std::string &args)
             DHLOGE("Audio device is null.");
             return DH_SUCCESS;
         }
+        audioDevMap_[devId].ports[dhId] = reqId;
         sourceDev = audioDevMap_[devId].dev;
     }
     DHLOGI("Call source dev to disable daudio.");
