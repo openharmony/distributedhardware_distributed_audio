@@ -51,12 +51,19 @@ int32_t DAudioSinkIpcCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel 
 int32_t DAudioSinkIpcCallbackStub::OnNotifyResourceInfoInner(MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
-    ResourceEventType type = static_cast<ResourceEventType>(data.ReadInt32());
-    std::string subType = data.ReadString();
-    std::string networkId = data.ReadString();
-    bool isSensitive = data.ReadBool();
-    bool isSameAccout = data.ReadBool();
-    return OnNotifyResourceInfo(type, subType, networkId, isSensitive, isSameAccout);
+    int32_t ret = DH_SUCCESS;
+    bool isSensitive;
+    bool isSameAccount;
+    do {
+        ResourceEventType type = static_cast<ResourceEventType>(data.ReadInt32());
+        std::string subType = data.ReadString();
+        std::string networkId = data.ReadString();
+        ret = OnNotifyResourceInfo(type, subType, networkId, isSensitive, isSameAccount);
+    } while (0);
+    reply.WriteInt32(ret);
+    reply.WriteBool(isSensitive);
+    reply.WriteBool(isSameAccount);
+    return DH_SUCCESS;
 }
 } // DistributedHardware
 } // OHOS

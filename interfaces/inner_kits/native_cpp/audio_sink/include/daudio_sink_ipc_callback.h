@@ -30,7 +30,7 @@ public:
     ~DAudioSinkIpcCallback() override = default;
 
     int32_t OnNotifyResourceInfo(const ResourceEventType &type, const std::string &subType,
-        const std::string &networkId, bool &isSensitive, bool &isSameAccout) override;
+        const std::string &networkId, bool &isSensitive, bool &isSameAccount) override;
     void PushPrivacyResCallback(const std::shared_ptr<PrivacyResourcesListener> &listener);
 
 private:

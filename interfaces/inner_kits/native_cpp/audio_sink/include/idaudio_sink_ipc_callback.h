@@ -30,7 +30,7 @@ public:
 
     ~IDAudioSinkIpcCallback() override {}
     virtual int32_t OnNotifyResourceInfo(const ResourceEventType &type, const std::string &subType,
-        const std::string &networkId, bool &isSensitive, bool &isSameAccout) = 0;
+        const std::string &networkId, bool &isSensitive, bool &isSameAccount) = 0;
 };
 } // DistributedHardware
 } // OHOS
