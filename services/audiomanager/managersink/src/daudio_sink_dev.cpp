@@ -162,7 +162,6 @@ int32_t DAudioSinkDev::TaskOpenDSpeaker(const std::string &args)
         NotifySourceDev(NOTIFY_OPEN_SPEAKER_RESULT, spkDhId_, ret);
         return ret;
     }
-
     NotifySourceDev(NOTIFY_OPEN_SPEAKER_RESULT, std::to_string(dhId), ret);
     DHLOGI("Open speaker device task end, notify source ret %d.", ret);
     isSpkInUse_.store(true);
@@ -289,12 +288,7 @@ int32_t DAudioSinkDev::TaskOpenDMic(const std::string &args)
         DHLOGE("Start capture failed, ret: %d.", ret);
         return ERR_DH_AUDIO_FAILED;
     }
-    std::string subType = "mic";
-    bool isSensitive = false;
-    bool isSameAccount = false;
-    ipcSinkCallback_->OnNotifyResourceInfo(ResourceEventType::EVENT_TYPE_PULL_UP_PAGE, subType, devId_,
-        isSensitive, isSameAccount);
-    isPageStatus_.store(true);
+    PullUpPage();
     NotifySourceDev(NOTIFY_OPEN_MIC_RESULT, jParam[KEY_DH_ID], ret);
     DHLOGI("Open mic device task end, notify source ret %d.", ret);
     isMicInUse_.store(true);
@@ -326,10 +320,9 @@ int32_t DAudioSinkDev::TaskCloseDMic(const std::string &args)
     }
     micClientMap_.erase(dhId);
     if (isPageStatus_.load()) {
-        std::string subType = "mic";
         bool isSensitive = false;
         bool isSameAccount = false;
-        ipcSinkCallback_->OnNotifyResourceInfo(ResourceEventType::EVENT_TYPE_CLOSE_PAGE, subType, devId_,
+        ipcSinkCallback_->OnNotifyResourceInfo(ResourceEventType::EVENT_TYPE_CLOSE_PAGE, SUBTYPE, devId_,
             isSensitive, isSameAccount);
     }
     isPageStatus_.store(false);
@@ -499,6 +492,15 @@ int32_t DAudioSinkDev::ConvertString2Int(std::string val)
         return -1;
     }
     return std::stoi(val);
+}
+
+void DAudioSinkDev::PullUpPage()
+{
+    bool isSensitive = false;
+    bool isSameAccount = false;
+    ipcSinkCallback_->OnNotifyResourceInfo(ResourceEventType::EVENT_TYPE_PULL_UP_PAGE, SUBTYPE, devId_,
+        isSensitive, isSameAccount);
+    isPageStatus_.store(true);
 }
 
 void DAudioSinkDev::NotifySourceDev(const AudioEventType type, const std::string dhId, const int32_t result)

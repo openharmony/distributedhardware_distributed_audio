@@ -77,6 +77,7 @@ private:
     int32_t from_json(const json &j, AudioParam &audioParam);
     int32_t HandleEngineMessage(uint32_t type, std::string content, std::string devId);
     int32_t SendAudioEventToRemote(const AudioEvent &event);
+    void PullUpPage();
 
     int32_t ParseDhidFromEvent(std::string args);
     int32_t ConvertString2Int(std::string val);
@@ -93,6 +94,7 @@ private:
     std::map<int32_t, std::shared_ptr<DMicClient>> micClientMap_;
     std::shared_ptr<DAudioSinkDevCtrlMgr> audioCtrlMgr_ = nullptr;
     static constexpr size_t WAIT_HANDLER_IDLE_TIME_US = 10000;
+    const std::string SUBTYPE = "mic";
     sptr<IDAudioSinkIpcCallback> ipcSinkCallback_ = nullptr;
     std::atomic<bool> isPageStatus_ = false;
 
