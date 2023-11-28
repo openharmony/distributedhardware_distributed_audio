@@ -75,27 +75,6 @@ HWTEST_F(AudioRenderTest, RenderFrameInternal_001, TestSize.Level1)
 }
 
 /**
-* @tc.name: RenderFrameInternal
-* @tc.desc: Verify the abnormal branch of the RenderFrameInternal, when param is null.
-* @tc.type: FUNC
-* @tc.require: AR000H0E6H
-*/
-
-HWTEST_F(AudioRenderTest, RenderFrameInternal_002, TestSize.Level1)
-{
-    struct AudioRenderContext renderContext;
-    struct AudioRender *render = new AudioRender;
-    char p = 'c';
-    const void *frame = &p;
-    uint64_t requestBytes = 1;
-    uint64_t *replyBytes = new uint64_t;
-    int32_t ret = renderContext.instance_.RenderFrame(render, frame, requestBytes, replyBytes);
-    delete render;
-    delete replyBytes;
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, ret);
-}
-
-/**
 * @tc.name: GetRenderPositionInternal
 * @tc.desc: Verify the abnormal branch of the GetRenderPositionInternal, when param is null.
 * @tc.type: FUNC

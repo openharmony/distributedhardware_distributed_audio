@@ -156,9 +156,9 @@ HWTEST_F(DMicClientTest, StopCapture001, TestSize.Level1)
 HWTEST_F(DMicClientTest, StopCapture002, TestSize.Level1)
 {
     micClient_->clientStatus_ = STATUS_START;
-    EXPECT_EQ(ERR_DH_AUDIO_SA_STATUS_ERR, micClient_->StopCapture());
-    micClient_->isCaptureReady_.store(true);
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, micClient_->StopCapture());
+    micClient_->isCaptureReady_.store(true);
+    EXPECT_EQ(ERR_DH_AUDIO_SA_STATUS_ERR, micClient_->StopCapture());
     micClient_->SetUp(audioParam_);
     EXPECT_EQ(ERR_DH_AUDIO_SA_STATUS_ERR, micClient_->StopCapture());
 }

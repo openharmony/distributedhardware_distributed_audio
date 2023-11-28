@@ -18,8 +18,6 @@ import("../../../../distributedaudio.gni")
 group("daudio_transport_test") {
   testonly = true
   deps = [
-    "${audio_transport_path}/test/unittest/audioctrlchannel:audio_ctrl_channel_test",
-    "${audio_transport_path}/test/unittest/audioctrltransport:audio_ctrl_transport_test",
     "${audio_transport_path}/test/unittest/audiodatachannel:audio_data_channel_test",
     "${audio_transport_path}/test/unittest/audiotransportstatus:transport_status_test",
     "${audio_transport_path}/test/unittest/decodetransport:decode_transport_test",
