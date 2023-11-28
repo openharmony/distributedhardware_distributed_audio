@@ -114,7 +114,6 @@ int32_t AVTransSenderAdapter::CreateControlChannel(const std::string &peerDevId)
 
 int32_t AVTransSenderAdapter::SetParameter(const AVTransTag &tag, const std::string &param)
 {
-    DHLOGI("SetParameter!");
     if (senderEngine_ == nullptr) {
         DHLOGE("av transport sender engine is null");
         return ERR_DH_AUDIO_NULLPTR;

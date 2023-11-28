@@ -83,7 +83,6 @@ int32_t AVTransReceiverAdapter::Stop()
 
 int32_t AVTransReceiverAdapter::SetParameter(const AVTransTag &tag, const std::string &param)
 {
-    DHLOGI("SetParameter!");
     if (receiverEngine_ == nullptr) {
         DHLOGE("av transport receiver engine is null");
         return ERR_DH_AUDIO_NULLPTR;
