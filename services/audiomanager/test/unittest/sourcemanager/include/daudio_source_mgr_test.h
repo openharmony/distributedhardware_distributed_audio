@@ -23,6 +23,7 @@
 #include "daudio_ipc_callback.h"
 #include "daudio_ipc_callback_proxy.h"
 #include "daudio_util.h"
+#include "event_handler.h"
 #define private public
 #include "daudio_source_manager.h"
 #undef private

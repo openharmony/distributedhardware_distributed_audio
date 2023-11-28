@@ -17,7 +17,6 @@
 #define OHOS_AUDIO_TRANS_TEST_UTILS_H
 
 #include "iaudio_channel_listener.h"
-#include "iaudio_ctrl_trans_callback.h"
 #include "iaudio_channel.h"
 
 namespace OHOS {
@@ -31,14 +30,6 @@ public:
     void OnSessionOpened() override {};
     void OnSessionClosed() override {};
     void OnDataReceived(const std::shared_ptr<AudioData> &data) override {};
-    void OnEventReceived(const AudioEvent &event) override {};
-};
-
-class MockIAudioCtrlTransCallback : public IAudioCtrlTransCallback {
-public:
-    MockIAudioCtrlTransCallback() {}
-    ~MockIAudioCtrlTransCallback() {}
-    void OnStateChange(int32_t state) override {};
     void OnEventReceived(const AudioEvent &event) override {};
 };
 

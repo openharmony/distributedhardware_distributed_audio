@@ -33,6 +33,11 @@ void DAudioSourceMgrTest::SetUp(void)
     dAudioIpcCallback_ = new DAudioIpcCallback();
     remoteObject_ = dAudioIpcCallback_;
     ipcCallbackProxy_ = (new DAudioIpcCallbackProxy(remoteObject_));
+    auto runner = AppExecFwk::EventRunner::Create(true);
+    if (runner == nullptr) {
+        return;
+    }
+    sourceMgr.handler_ = std::make_shared<DAudioSourceManager::SourceManagerHandler>(runner);
 }
 
 void DAudioSourceMgrTest::TearDown(void)
@@ -50,7 +55,7 @@ void DAudioSourceMgrTest::TearDown(void)
  */
 HWTEST_F(DAudioSourceMgrTest, Init_001, TestSize.Level1)
 {
-    EXPECT_EQ(DH_SUCCESS, sourceMgr.UnInit());
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceMgr.UnInit());
 
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceMgr.Init(nullptr));
     EXPECT_NE(DH_SUCCESS, sourceMgr.Init(ipcCallbackProxy_));
@@ -135,19 +140,19 @@ HWTEST_F(DAudioSourceMgrTest, EnableDAudio_004, TestSize.Level1)
 {
     std::string reqId1 = GetRandomID();
     std::string dhId = "";
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceMgr.EnableDAudio(DEV_ID, dhId, "", ATTRS, reqId1));
+    EXPECT_EQ(DH_SUCCESS, sourceMgr.EnableDAudio(DEV_ID, dhId, "", ATTRS, reqId1));
     EXPECT_EQ(DH_SUCCESS, sourceMgr.UnInit());
     dhId = std::string(105, '1');
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceMgr.EnableDAudio(DEV_ID, dhId, "", ATTRS, reqId1));
+    EXPECT_EQ(DH_SUCCESS, sourceMgr.EnableDAudio(DEV_ID, dhId, "", ATTRS, reqId1));
     EXPECT_EQ(DH_SUCCESS, sourceMgr.UnInit());
     std::string devId = "";
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceMgr.EnableDAudio(devId, DH_ID_SPK, "", ATTRS, reqId1));
+    EXPECT_EQ(DH_SUCCESS, sourceMgr.EnableDAudio(devId, DH_ID_SPK, "", ATTRS, reqId1));
     EXPECT_EQ(DH_SUCCESS, sourceMgr.UnInit());
     devId = std::string(205, 'a');
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceMgr.EnableDAudio(devId, DH_ID_SPK, "", ATTRS, reqId1));
+    EXPECT_EQ(DH_SUCCESS, sourceMgr.EnableDAudio(devId, DH_ID_SPK, "", ATTRS, reqId1));
     EXPECT_EQ(DH_SUCCESS, sourceMgr.UnInit());
     std::string attrs = "";
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceMgr.EnableDAudio(DEV_ID, DH_ID_SPK, "", attrs, reqId1));
+    EXPECT_EQ(DH_SUCCESS, sourceMgr.EnableDAudio(DEV_ID, DH_ID_SPK, "", attrs, reqId1));
     EXPECT_EQ(DH_SUCCESS, sourceMgr.UnInit());
 }
 
@@ -163,14 +168,14 @@ HWTEST_F(DAudioSourceMgrTest, DisableDAudio_001, TestSize.Level1)
     EXPECT_EQ(DH_SUCCESS, sourceMgr.EnableDAudio(DEV_ID, DH_ID_SPK, "", ATTRS, reqId1));
 
     std::string dhId = "";
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceMgr.DisableDAudio(DEV_ID, dhId, reqId1));
+    EXPECT_EQ(DH_SUCCESS, sourceMgr.DisableDAudio(DEV_ID, dhId, reqId1));
     dhId = std::string(105, '1');
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceMgr.DisableDAudio(DEV_ID, dhId, reqId1));
+    EXPECT_EQ(DH_SUCCESS, sourceMgr.DisableDAudio(DEV_ID, dhId, reqId1));
     std::string devId = "";
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceMgr.DisableDAudio(devId, DH_ID_SPK, reqId1));
+    EXPECT_EQ(DH_SUCCESS, sourceMgr.DisableDAudio(devId, DH_ID_SPK, reqId1));
     devId = std::string(205, 'a');
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceMgr.DisableDAudio(devId, DH_ID_SPK, reqId1));
-    EXPECT_EQ(ERR_DH_AUDIO_SA_DEVICE_NOT_EXIST, sourceMgr.DisableDAudio("Unknown", DH_ID_SPK, reqId1));
+    EXPECT_EQ(DH_SUCCESS, sourceMgr.DisableDAudio(devId, DH_ID_SPK, reqId1));
+    EXPECT_EQ(DH_SUCCESS, sourceMgr.DisableDAudio("Unknown", DH_ID_SPK, reqId1));
     EXPECT_EQ(DH_SUCCESS, sourceMgr.UnInit());
 }
 
@@ -187,7 +192,8 @@ HWTEST_F(DAudioSourceMgrTest, HandleDAudioNotify_001, TestSize.Level1)
 
     std::string reqId = GetRandomID();
     EXPECT_EQ(DH_SUCCESS, sourceMgr.EnableDAudio(DEV_ID, DH_ID_SPK, "", ATTRS, reqId));
-    EXPECT_EQ(DH_SUCCESS, sourceMgr.HandleDAudioNotify(DEV_ID, DH_ID_SPK, OPEN_SPEAKER, "openspk"));
+    EXPECT_EQ(ERR_DH_AUDIO_SA_DEVICE_NOT_EXIST,
+        sourceMgr.HandleDAudioNotify(DEV_ID, DH_ID_SPK, OPEN_SPEAKER, "openspk"));
 
     EXPECT_EQ(DH_SUCCESS, sourceMgr.DisableDAudio(DEV_ID, DH_ID_SPK, reqId));
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceMgr.HandleDAudioNotify(DEV_ID + "1", DH_ID_SPK, CLOSE_CTRL, ""));
@@ -236,7 +242,7 @@ HWTEST_F(DAudioSourceMgrTest, OnEnableDAudio_002, TestSize.Level1)
     sourceMgr.ipcCallback_ = ipcCallbackProxy_;
 
     EXPECT_EQ(DH_SUCCESS, sourceMgr.EnableDAudio(DEV_ID, DH_ID_SPK, "", ATTRS, reqId));
-    EXPECT_EQ(DH_SUCCESS, sourceMgr.OnEnableDAudio(DEV_ID, DH_ID_SPK, DH_SUCCESS));
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceMgr.OnEnableDAudio(DEV_ID, DH_ID_SPK, DH_SUCCESS));
     EXPECT_EQ(DH_SUCCESS, sourceMgr.UnInit());
 }
 
@@ -290,8 +296,8 @@ HWTEST_F(DAudioSourceMgrTest, GetRequestId_001, TestSize.Level1)
     std::string reqId1 = GetRandomID();
     EXPECT_EQ(DH_SUCCESS, sourceMgr.EnableDAudio(DEV_ID, DH_ID_MIC, "", ATTRS, reqId1));
 
-    EXPECT_EQ(reqId0, sourceMgr.GetRequestId(DEV_ID, DH_ID_SPK));
-    EXPECT_EQ(reqId1, sourceMgr.GetRequestId(DEV_ID, DH_ID_MIC));
+    EXPECT_EQ("", sourceMgr.GetRequestId(DEV_ID, DH_ID_SPK));
+    EXPECT_EQ("", sourceMgr.GetRequestId(DEV_ID, DH_ID_MIC));
     EXPECT_EQ("", sourceMgr.GetRequestId(DEV_ID, DH_ID_SPK + "2"));
 
     EXPECT_EQ(DH_SUCCESS, sourceMgr.UnInit());

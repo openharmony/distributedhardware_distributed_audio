@@ -81,6 +81,7 @@ ohos_unittest("DaudioSourceMgrTest") {
     "drivers_interface_audio:libaudio_proxy_1.0",
     "drivers_interface_distributed_audio:libdaudioext_proxy_1.0",
     "dsoftbus:softbus_client",
+    "eventhandler:libeventhandler",
     "hdf_core:libhdi",
     "ipc:ipc_core",
     "ipc:ipc_single",

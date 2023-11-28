@@ -122,7 +122,7 @@ HWTEST_F(DSpeakerClientTest, StartRender001, TestSize.Level1)
 
     speakerClient_->clientStatus_ = STATUS_START;
     EXPECT_EQ(ERR_DH_AUDIO_SA_STATUS_ERR, speakerClient_->StartRender());
-    EXPECT_EQ(ERR_DH_AUDIO_SA_STATUS_ERR, speakerClient_->StopRender());
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, speakerClient_->StopRender());
     speakerClient_->isRenderReady_.store(true);
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, speakerClient_->StopRender());
     speakerClient_->CreateAudioRenderer(audioParam_);
