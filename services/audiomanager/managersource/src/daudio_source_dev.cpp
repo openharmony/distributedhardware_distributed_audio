@@ -298,7 +298,7 @@ int32_t DAudioSourceDev::HandleOpenDMic(const AudioEvent &event)
         DHLOGE("Send event failed.");
         return ERR_DH_AUDIO_FAILED;
     }
-    DHLOGD("Speaker Mmap Start event is sent successfully.");
+    DHLOGD("Opening DMic event is sent successfully.");
     return DH_SUCCESS;
 }
 

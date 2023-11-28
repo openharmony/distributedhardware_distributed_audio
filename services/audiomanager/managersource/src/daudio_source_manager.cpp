@@ -433,6 +433,10 @@ void DAudioSourceManager::ClearAudioDev(const std::string &devId)
     std::lock_guard<std::mutex> lock(devMapMtx_);
     if (audioDevMap_[devId].ports.empty()) {
         DHLOGI("audioDevMap_[devId].ports is empty.");
+        if (audioDevMap_[devId].dev == nullptr) {
+            DHLOGE("audioDevMap_[devId].dev is nullptr.");
+            return;
+        }
         audioDevMap_[devId].dev->SleepAudioDev();
         DHLOGI("back from SleepAudioDev.");
         audioDevMap_.erase(devId);
