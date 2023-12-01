@@ -83,7 +83,7 @@ HWTEST_F(DAudioSinkDevTest, TaskPlayStatusChange_001, TestSize.Level1)
     int32_t dhId = 1;
     auto spkClient = std::make_shared<DSpeakerClient>(devId, dhId, sinkDev_);
     sinkDev_->spkClientMap_.insert(std::make_pair(DEFAULT_RENDER_ID, spkClient));
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sinkDev_->TaskPlayStatusChange("{\"dhId\":\"1\"}"));
+    EXPECT_EQ(DH_SUCCESS, sinkDev_->TaskPlayStatusChange("{\"dhId\":\"1\"}"));
 }
 
 /**

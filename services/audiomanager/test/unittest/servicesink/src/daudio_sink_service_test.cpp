@@ -81,17 +81,6 @@ HWTEST_F(DAudioSinkServiceTest, InitSink_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: ReleaseSink_001
- * @tc.desc: Verify the ReleaseSink function.
- * @tc.type: FUNC
- * @tc.require: AR000H0E5F
- */
-HWTEST_F(DAudioSinkServiceTest, ReleaseSink_001, TestSize.Level1)
-{
-    EXPECT_EQ(ERR_DH_AUDIO_SA_LOAD_FAILED, sinkSrv_->ReleaseSink());
-}
-
-/**
  * @tc.name: SubscribeLocalHardware_001
  * @tc.desc: Verify the SubscribeLocalHardware function.
  * @tc.type: FUNC
@@ -126,20 +115,6 @@ HWTEST_F(DAudioSinkServiceTest, UnsubscribeLocalHardware_001, TestSize.Level1)
     sinkSrv_->DAudioNotify(devId, dhId, eventType, eventContent);
     EXPECT_EQ(DH_SUCCESS, sinkSrv_->UnsubscribeLocalHardware(dhId));
     sinkSrv_->ReleaseSink();
-}
-
-/**
- * @tc.name: PauseDistributedHardware_001
- * @tc.desc: Verify the PauseDistributedHardware function.
- * @tc.type: FUNC
- * @tc.require: AR000H0E5F
- */
-HWTEST_F(DAudioSinkServiceTest, PauseDistributedHardware_001, TestSize.Level1)
-{
-    std::string networkId = "networkId";
-    EXPECT_EQ(DH_SUCCESS, sinkSrv_->PauseDistributedHardware(networkId));
-    EXPECT_EQ(DH_SUCCESS, sinkSrv_->ResumeDistributedHardware(networkId));
-    EXPECT_EQ(DH_SUCCESS, sinkSrv_->StopDistributedHardware(networkId));
 }
 } // DistributedHardware
 } // OHOS

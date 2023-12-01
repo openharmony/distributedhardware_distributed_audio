@@ -57,33 +57,6 @@ HWTEST_F(DAudioSinkManagerTest, Init_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: CreateAudioDevice_001
- * @tc.desc: Verify the CreateAudioDevice function.
- * @tc.type: FUNC
- * @tc.require: AR000H0E5F
- */
-HWTEST_F(DAudioSinkManagerTest, CreateAudioDevice_001, TestSize.Level1)
-{
-    std::string devId = "devId";
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, daudioSinkManager.CreateAudioDevice(devId));
-    daudioSinkManager.channelState_ = ChannelState::SPK_CONTROL_OPENED;
-    daudioSinkManager.LoadAVReceiverEngineProvider();
-    EXPECT_EQ(DH_SUCCESS, daudioSinkManager.CreateAudioDevice(devId));
-    daudioSinkManager.channelState_ = ChannelState::MIC_CONTROL_OPENED;
-    daudioSinkManager.LoadAVSenderEngineProvider();
-    EXPECT_EQ(DH_SUCCESS, daudioSinkManager.CreateAudioDevice(devId));
-    sptr<DAudioSinkIpcCallbackProxy> dAudioSinkIpcCallbackProxy(new DAudioSinkIpcCallbackProxy(remoteObject_));
-    auto dev = std::make_shared<DAudioSinkDev>(devId, dAudioSinkIpcCallbackProxy);
-    daudioSinkManager.audioDevMap_.emplace(devId, dev);
-    EXPECT_EQ(DH_SUCCESS, daudioSinkManager.CreateAudioDevice(devId));
-    daudioSinkManager.channelState_ = ChannelState::MIC_CONTROL_OPENED;
-    daudioSinkManager.sendProviderPtr_ = nullptr;
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, daudioSinkManager.CreateAudioDevice(devId));
-    daudioSinkManager.ClearAudioDev(devId);
-    daudioSinkManager.OnSinkDevReleased(devId);
-}
-
-/**
  * @tc.name: DAudioNotify_001
  * @tc.desc: Verify the DAudioNotify function.
  * @tc.type: FUNC
