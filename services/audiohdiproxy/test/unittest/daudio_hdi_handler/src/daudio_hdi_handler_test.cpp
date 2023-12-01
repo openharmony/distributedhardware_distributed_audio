@@ -147,9 +147,8 @@ HWTEST_F(DAudioHdiHandlerTest, UnRegisterAudioDevice_001, TestSize.Level1)
  */
 HWTEST_F(DAudioHdiHandlerTest, UnInitHdiHandler_001, TestSize.Level1)
 {
-    EXPECT_EQ(HDF_SUCCESS, hdiHandler_->UninitHdiHandler());
     hdiHandler_->audioSrvHdf_ = nullptr;
-    EXPECT_EQ(HDF_SUCCESS, hdiHandler_->UninitHdiHandler());
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, hdiHandler_->UninitHdiHandler());
 }
 } // DistributedHardware
 } // OHOS

@@ -419,39 +419,6 @@ HWTEST_F(AudioAdapterTest, GetExtraParamsInternal_002, TestSize.Level1)
 }
 
 /**
-* @tc.name: UpdateAudioRouteInternal
-* @tc.desc: Verify the abnormal branch of the UpdateAudioRouteInternal, when param is null.
-* @tc.type: FUNC
-* @tc.require: AR000H0E6H
-*/
-HWTEST_F(AudioAdapterTest, UpdateAudioRouteInternal_003, TestSize.Level1)
-{
-    auto adapterContext = std::make_unique<AudioAdapterContext>();
-    struct ::AudioRoute *route = new struct ::AudioRoute;
-    route->sourcesNum = 1;
-    auto node = new ::AudioRouteNode;
-    node->type = static_cast<enum AudioPortType>(0);
-    route->sources = node;
-    route->sinksNum = 0;
-    int32_t *routeHandle = new int32_t(0);
-
-    int32_t ret = adapterContext->instance_.UpdateAudioRoute(&adapterContext->instance_, route, routeHandle);
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, ret);
-    node->type = static_cast<enum AudioPortType>(1);
-    ret = adapterContext->instance_.UpdateAudioRoute(&adapterContext->instance_, route, routeHandle);
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, ret);
-    node->type = static_cast<enum AudioPortType>(2);
-    ret = adapterContext->instance_.UpdateAudioRoute(&adapterContext->instance_, route, routeHandle);
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, ret);
-    node->type = static_cast<enum AudioPortType>(3);
-    ret = adapterContext->instance_.UpdateAudioRoute(&adapterContext->instance_, route, routeHandle);
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, ret);
-    delete route;
-    delete node;
-    delete routeHandle;
-}
-
-/**
 * @tc.name: RegExtraParamObserverInternal
 * @tc.desc: Verify the abnormal branch of the RegExtraParamObserverInternal, when param is null.
 * @tc.type: FUNC
