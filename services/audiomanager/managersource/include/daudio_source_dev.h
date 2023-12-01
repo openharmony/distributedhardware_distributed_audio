@@ -67,6 +67,7 @@ private:
     int32_t TaskCloseDSpeaker(const std::string &args);
     int32_t TaskOpenDMic(const std::string &args);
     int32_t TaskCloseDMic(const std::string &args);
+    int32_t TaskDMicClosed(const std::string &args);
     int32_t TaskSetVolume(const std::string &args);
     int32_t TaskChangeVolume(const std::string &args);
     int32_t TaskChangeFocus(const std::string &args);
@@ -153,6 +154,7 @@ private:
         void CloseDSpeakerCallback(const AppExecFwk::InnerEvent::Pointer &event);
         void OpenDMicCallback(const AppExecFwk::InnerEvent::Pointer &event);
         void CloseDMicCallback(const AppExecFwk::InnerEvent::Pointer &event);
+        void DMicClosedCallback(const AppExecFwk::InnerEvent::Pointer &event);
         void SetVolumeCallback(const AppExecFwk::InnerEvent::Pointer &event);
         void ChangeVolumeCallback(const AppExecFwk::InnerEvent::Pointer &event);
         void ChangeFocusCallback(const AppExecFwk::InnerEvent::Pointer &event);

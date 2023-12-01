@@ -36,6 +36,7 @@ constexpr uint32_t EVENT_OPEN_SPEAKER = 11;
 constexpr uint32_t EVENT_CLOSE_SPEAKER = 12;
 constexpr uint32_t EVENT_OPEN_MIC = 21;
 constexpr uint32_t EVENT_CLOSE_MIC = 22;
+constexpr uint32_t EVENT_DMIC_CLOSED = 24;
 constexpr uint32_t EVENT_VOLUME_SET = 31;
 constexpr uint32_t EVENT_VOLUME_CHANGE = 33;
 constexpr uint32_t EVENT_AUDIO_FOCUS_CHANGE = 41;
@@ -329,18 +330,20 @@ int32_t DAudioSourceDev::HandleDMicOpened(const AudioEvent &event)
 
 int32_t DAudioSourceDev::HandleDMicClosed(const AudioEvent &event)
 {
-    DHLOGI("Mic device closed, event.content = %s.", event.content.c_str());
-    int32_t dhId = ParseDhidFromEvent(event.content);
-    if (dhId < 0) {
-        DHLOGE("Failed to parse dhardware id.");
+    DHLOGI("Dmic device closed, event.content = %s.", event.content.c_str());
+    if (handler_ == nullptr) {
+        DHLOGE("Event handler is null.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+
+    auto eventParam = std::make_shared<AudioEvent>(event);
+    auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_DMIC_CLOSED, eventParam, 0);
+    if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
+        DHLOGE("Send event failed.");
         return ERR_DH_AUDIO_FAILED;
     }
-    auto mic = FindIoDevImpl(event.content);
-    if (mic == nullptr) {
-        DHLOGE("Mic already closed.");
-        return DH_SUCCESS;
-    }
-    return mic->NotifyHdfAudioEvent(event, dhId);
+    DHLOGD("Dmic closed event is sent successfully.");
+    return DH_SUCCESS;
 }
 
 int32_t DAudioSourceDev::HandleCtrlTransClosed(const AudioEvent &event)
@@ -1002,6 +1005,27 @@ int32_t DAudioSourceDev::TaskCloseDMic(const std::string &args)
     return DH_SUCCESS;
 }
 
+int32_t DAudioSourceDev::TaskDMicClosed(const std::string &args)
+{
+    DHLOGI("Task dmic closed, args: %s.", args.c_str());
+    if (args.length() > DAUDIO_MAX_JSON_LEN || args.empty()) {
+        DHLOGE("Args length err. 0 or max.");
+        return ERR_DH_AUDIO_SA_PARAM_INVALID;
+    }
+    int32_t dhId = ParseDhidFromEvent(args);
+    if (dhId < 0) {
+        DHLOGE("Failed to parse dhardware id.");
+        return ERR_DH_AUDIO_FAILED;
+    }
+    auto mic = FindIoDevImpl(args);
+    if (mic == nullptr) {
+        DHLOGE("Mic already clear.");
+        return DH_SUCCESS;
+    }
+    AudioEvent event(MIC_CLOSED, args);
+    return mic->NotifyHdfAudioEvent(event, dhId);
+}
+
 int32_t DAudioSourceDev::TaskSetVolume(const std::string &args)
 {
     DHLOGD("Task set volume, args: %s.", args.c_str());
@@ -1286,6 +1310,7 @@ DAudioSourceDev::SourceEventHandler::SourceEventHandler(const std::shared_ptr<Ap
     mapEventFuncs_[EVENT_CLOSE_SPEAKER] = &DAudioSourceDev::SourceEventHandler::CloseDSpeakerCallback;
     mapEventFuncs_[EVENT_OPEN_MIC] = &DAudioSourceDev::SourceEventHandler::OpenDMicCallback;
     mapEventFuncs_[EVENT_CLOSE_MIC] = &DAudioSourceDev::SourceEventHandler::CloseDMicCallback;
+    mapEventFuncs_[EVENT_DMIC_CLOSED] = &DAudioSourceDev::SourceEventHandler::DMicClosedCallback;
     mapEventFuncs_[EVENT_VOLUME_SET] = &DAudioSourceDev::SourceEventHandler::SetVolumeCallback;
     mapEventFuncs_[EVENT_VOLUME_CHANGE] = &DAudioSourceDev::SourceEventHandler::ChangeVolumeCallback;
     mapEventFuncs_[EVENT_AUDIO_FOCUS_CHANGE] = &DAudioSourceDev::SourceEventHandler::ChangeFocusCallback;
@@ -1429,6 +1454,25 @@ void DAudioSourceDev::SourceEventHandler::CloseDMicCallback(const AppExecFwk::In
         return;
     }
     DHLOGI("Close mic successfully.");
+}
+
+void DAudioSourceDev::SourceEventHandler::DMicClosedCallback(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    std::string eventParam;
+    if (GetEventParam(event, eventParam) != DH_SUCCESS) {
+        DHLOGE("Failed to get event parameters.");
+        return;
+    }
+    auto sourceDevObj = sourceDev_.lock();
+    if (sourceDevObj == nullptr) {
+        DHLOGE("Source dev is invalid.");
+        return;
+    }
+    if (sourceDevObj->TaskDMicClosed(eventParam) != DH_SUCCESS) {
+        DHLOGE("Deal dmic closed failed.");
+        return;
+    }
+    DHLOGI("Deal dmic closed successfully.");
 }
 
 void DAudioSourceDev::SourceEventHandler::SetVolumeCallback(const AppExecFwk::InnerEvent::Pointer &event)
