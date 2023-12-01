@@ -673,6 +673,7 @@ void DSpeakerClient::PlayStatusChange(const std::string &args)
     } else {
         DHLOGE("Play status error.");
     }
+    cJSON_Delete(jParam);
 }
 
 void DSpeakerClient::SetAttrs(const std::string &devId, const std::shared_ptr<IAudioEventCallback> &callback)
