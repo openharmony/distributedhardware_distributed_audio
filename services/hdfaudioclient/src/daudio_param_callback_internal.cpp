@@ -41,6 +41,7 @@ private:
     ::ParamCallback callback_ = nullptr;
     void *cookie_ = nullptr;
 };
+
 AudioParamCallbackContext::AudioParamCallbackContext(::ParamCallback callback, void *cookie)
 {
     callbackStub_ = new AudioParamCallbackImpl(callback, cookie);

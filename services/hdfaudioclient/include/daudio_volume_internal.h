@@ -36,6 +36,7 @@ public:
     static int32_t SetGain(AudioHandle handle, float gain);
     static int32_t GetGain(AudioHandle handle, float *gain);
 };
+
 template<typename T>
 int32_t AudioVolumeInternal<T>::SetMute(AudioHandle handle, bool mute)
 {
