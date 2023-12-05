@@ -129,7 +129,7 @@ HWTEST_F(DAudioSourceDevTest, CreatTasks_002, TestSize.Level1)
     event.type = CLOSE_MIC;
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->HandleCloseDMic(event));
     event.type = MIC_CLOSED;
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleDMicClosed(event));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->HandleDMicClosed(event));
 
     event.type = CTRL_CLOSED;
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleCtrlTransClosed(event));
@@ -257,34 +257,6 @@ HWTEST_F(DAudioSourceDevTest, WaitForRPC_002, TestSize.Level1)
 }
 
 /**
- * @tc.name: HandleDMicClosed_001
- * @tc.desc: Verify the HandleDMicClosed function.
- * @tc.type: FUNC
- * @tc.require: AR000H0E5F
- */
-HWTEST_F(DAudioSourceDevTest, HandleDMicClosed_001, TestSize.Level1)
-{
-    AudioEvent event;
-    event.content = "{\"dhId\":\"1\"}";
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleDMicClosed(event));
-    sourceDev_->SleepAudioDev();
-}
-
-/**
- * @tc.name: HandleDMicClosed_002
- * @tc.desc: Verify the HandleDMicClosed function.
- * @tc.type: FUNC
- * @tc.require: AR000H0E5F
- */
-HWTEST_F(DAudioSourceDevTest, HandleDMicClosed_002, TestSize.Level1)
-{
-    AudioEvent event;
-    event.content = "{\"dhId\":\"1\"}";
-    sourceDev_->mic_ = std::make_shared<DMicDev>(DEV_ID, sourceDev_);
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleDMicClosed(event));
-}
-
-/**
  * @tc.name: HandleCtrlTransClosed_001
  * @tc.desc: Verify the HandleCtrlTransClosed function.
  * @tc.type: FUNC
@@ -325,7 +297,6 @@ HWTEST_F(DAudioSourceDevTest, HandleNotifyRPC_001, TestSize.Level1)
     event.content = tempLongStr;
     EXPECT_EQ(ERR_DH_AUDIO_SA_PARAM_INVALID, sourceDev_->HandleNotifyRPC(event));
 }
-
 
 /**
  * @tc.name: HandleNotifyRPC_002
@@ -734,6 +705,34 @@ HWTEST_F(DAudioSourceDevTest, TaskCloseDMic_002, TestSize.Level1)
 
     json jParam_mic = { { KEY_DH_ID, DH_ID_MIC } };
     EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskCloseDMic(jParam_mic.dump()));
+}
+
+/**
+ * @tc.name: TaskDMicClosed_001
+ * @tc.desc: Verify the TaskDMicClosed function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, TaskDMicClosed_001, TestSize.Level1)
+{
+    AudioEvent event;
+    event.content = "{\"dhId\":\"1\"}";
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskDMicClosed(event.content));
+    sourceDev_->SleepAudioDev();
+}
+
+/**
+ * @tc.name: TaskDMicClosed_002
+ * @tc.desc: Verify the TaskDMicClosed function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, TaskDMicClosed_002, TestSize.Level1)
+{
+    AudioEvent event;
+    event.content = "{\"dhId\":\"1\"}";
+    sourceDev_->mic_ = std::make_shared<DMicDev>(DEV_ID, sourceDev_);
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskDMicClosed(event.content));
 }
 
 /**
