@@ -781,7 +781,6 @@ int32_t DAudioSourceDev::ParseDhidFromEvent(std::string args)
     cJSON *jParam = cJSON_Parse(args.c_str());
     if (jParam == nullptr) {
         DHLOGE("Failed to parse JSON: %s", cJSON_GetErrorPtr());
-        cJSON_Delete(jParam);
         return -1;
     }
     if (!CJsonParamCheck(jParam, { KEY_DH_ID })) {
@@ -1039,7 +1038,6 @@ int32_t DAudioSourceDev::TaskChangeVolume(const std::string &args)
     cJSON *jParam = cJSON_Parse(args.c_str());
     if (jParam == nullptr) {
         DHLOGE("Failed to parse JSON: %s", cJSON_GetErrorPtr());
-        cJSON_Delete(jParam);
         return ERR_DH_AUDIO_NULLPTR;
     }
     if (!CJsonParamCheck(jParam, { KEY_DH_ID })) {
@@ -1075,7 +1073,6 @@ int32_t DAudioSourceDev::TaskChangeRenderState(const std::string &args)
     cJSON *jParam = cJSON_Parse(args.c_str());
     if (jParam == nullptr) {
         DHLOGE("Failed to parse JSON: %s", cJSON_GetErrorPtr());
-        cJSON_Delete(jParam);
         return ERR_DH_AUDIO_NULLPTR;
     }
     if (!CJsonParamCheck(jParam, { KEY_DH_ID })) {

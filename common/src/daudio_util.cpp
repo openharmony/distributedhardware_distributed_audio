@@ -464,7 +464,6 @@ std::string ParseStringFromArgs(std::string args, const char *key)
     cJSON *jParam = cJSON_Parse(args.c_str());
     if (jParam == nullptr) {
         DHLOGE("Failed to parse JSON: %s", cJSON_GetErrorPtr());
-        cJSON_Delete(jParam);
         return "Failed to parse JSON";
     }
     if (!CJsonParamCheck(jParam, { key })) {

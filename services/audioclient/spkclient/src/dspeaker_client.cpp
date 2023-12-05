@@ -659,12 +659,6 @@ int32_t DSpeakerClient::SendMessage(uint32_t type, std::string content, std::str
 void DSpeakerClient::PlayStatusChange(const std::string &args)
 {
     DHLOGI("Play status change, args: %s.", args.c_str());
-    cJSON *jParam = cJSON_Parse(args.c_str());
-    if (jParam == nullptr) {
-        DHLOGE("Failed to parse JSON: %s", cJSON_GetErrorPtr());
-        cJSON_Delete(jParam);
-        return;
-    }
     std::string changeType = ParseStringFromArgs(args, KEY_CHANGE_TYPE);
     if (changeType == AUDIO_EVENT_RESTART) {
         ReStart();
@@ -673,7 +667,6 @@ void DSpeakerClient::PlayStatusChange(const std::string &args)
     } else {
         DHLOGE("Play status error.");
     }
-    cJSON_Delete(jParam);
 }
 
 void DSpeakerClient::SetAttrs(const std::string &devId, const std::shared_ptr<IAudioEventCallback> &callback)
