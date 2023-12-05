@@ -202,7 +202,6 @@ int32_t DAudioSinkDev::ParseDhidFromEvent(std::string args)
     cJSON *jParam = cJSON_Parse(args.c_str());
     if (jParam == nullptr) {
         DHLOGE("Failed to parse JSON: %s", cJSON_GetErrorPtr());
-        cJSON_Delete(jParam);
         return -1;
     }
     if (!CJsonParamCheck(jParam, { KEY_DH_ID })) {
