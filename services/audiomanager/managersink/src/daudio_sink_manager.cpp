@@ -185,7 +185,6 @@ int32_t DAudioSinkManager::CreateAudioDevice(const std::string &devId)
 
     int32_t ret = ERR_DH_AUDIO_FAILED;
     if (channelState_ == ChannelState::SPK_CONTROL_OPENED) {
-        std::string subType = "speaker";
         ret = dev->InitAVTransEngines(ChannelState::SPK_CONTROL_OPENED, rcvProviderPtr_);
     }
     if (channelState_ == ChannelState::MIC_CONTROL_OPENED) {
