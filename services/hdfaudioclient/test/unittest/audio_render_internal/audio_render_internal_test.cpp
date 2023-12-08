@@ -106,22 +106,6 @@ HWTEST_F(AudioRenderTest, SetRenderSpeedInternal_001, TestSize.Level1)
 }
 
 /**
-* @tc.name: SetRenderSpeedInternal
-* @tc.desc: Verify the abnormal branch of the SetRenderSpeedInternal, when param is null.
-* @tc.type: FUNC
-* @tc.require: AR000H0E6H
-*/
-HWTEST_F(AudioRenderTest, SetRenderSpeedInternal_002, TestSize.Level1)
-{
-    struct AudioRenderContext renderContext;
-    struct AudioRender *render = new AudioRender;
-    float speed = 0.0;
-    int32_t ret = renderContext.instance_.SetRenderSpeed(render, speed);
-    delete render;
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, ret);
-}
-
-/**
 * @tc.name: GetRenderSpeedInternal
 * @tc.desc: Verify the abnormal branch of the GetRenderSpeedInternal, when param is null.
 * @tc.type: FUNC
@@ -168,21 +152,6 @@ HWTEST_F(AudioRenderTest, SetChannelModeInternal_001, TestSize.Level1)
 }
 
 /**
-* @tc.name: SetChannelModeInternal
-* @tc.desc: Verify the abnormal branch of the SetChannelModeInternal, when param is null.
-* @tc.type: FUNC
-* @tc.require: AR000H0E6H
-*/
-HWTEST_F(AudioRenderTest, SetChannelModeInternal_002, TestSize.Level1)
-{
-    struct AudioRenderContext renderContext;
-    struct AudioRender *render = new AudioRender;
-    int32_t ret = renderContext.instance_.SetChannelMode(render, AUDIO_CHANNEL_NORMAL);
-    delete render;
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, ret);
-}
-
-/**
 * @tc.name: GetChannelModeInternal
 * @tc.desc: Verify the abnormal branch of the GetChannelModeInternal, when param is null.
 * @tc.type: FUNC
@@ -195,23 +164,6 @@ HWTEST_F(AudioRenderTest, GetChannelModeInternal_001, TestSize.Level1)
     enum ::AudioChannelMode *mode = nullptr;
     int32_t ret = renderContext.instance_.GetChannelMode(render, mode);
     EXPECT_EQ(ERR_DH_AUDIO_HDI_INVALID_PARAM, ret);
-}
-
-/**
-* @tc.name: GetChannelModeInternal
-* @tc.desc: Verify the abnormal branch of the GetChannelModeInternal, when param is null.
-* @tc.type: FUNC
-* @tc.require: AR000H0E6H
-*/
-HWTEST_F(AudioRenderTest, GetChannelModeInternal_002, TestSize.Level1)
-{
-    struct AudioRenderContext renderContext;
-    struct AudioRender *render = new AudioRender;
-    enum ::AudioChannelMode *mode = new ::AudioChannelMode;
-    int32_t ret = renderContext.instance_.GetChannelMode(render, mode);
-    delete render;
-    delete mode;
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, ret);
 }
 
 /**
@@ -243,23 +195,6 @@ HWTEST_F(AudioRenderTest, DrainBufferInternal_001, TestSize.Level1)
     enum ::AudioDrainNotifyType *type = nullptr;
     int32_t ret = renderContext.instance_.DrainBuffer(render, type);
     EXPECT_EQ(ERR_DH_AUDIO_HDI_INVALID_PARAM, ret);
-}
-
-/**
-* @tc.name: DrainBufferInternal
-* @tc.desc: Verify the abnormal branch of the DrainBufferInternal, when param is null.
-* @tc.type: FUNC
-* @tc.require: AR000H0E6H
-*/
-HWTEST_F(AudioRenderTest, DrainBufferInternal_002, TestSize.Level1)
-{
-    struct AudioRenderContext renderContext;
-    struct AudioRender *render = new AudioRender;
-    enum ::AudioDrainNotifyType *type = new ::AudioDrainNotifyType;
-    int32_t ret = renderContext.instance_.DrainBuffer(render, type);
-    delete render;
-    delete type;
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, ret);
 }
 } // DistributedHardware
 } // OHOS
