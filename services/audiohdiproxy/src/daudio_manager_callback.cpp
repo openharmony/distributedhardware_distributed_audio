@@ -91,7 +91,7 @@ int32_t DAudioManagerCallback::GetAudioParamHDF(const AudioParameter& param, Aud
             paramHDF.streamUsage = StreamUsage::STREAM_USAGE_NOTIFICATION_RINGTONE;
             break;
         case AUDIO_MMAP_NOIRQ:
-            paramHDF.streamUsage = StreamUsage::STREAM_USAGE_MMAP;
+            paramHDF.streamUsage = StreamUsage::STREAM_USAGE_MEDIA;
             break;
         default:
             DHLOGE("Stream usage [%zu] does not support conversion.", param.streamUsage);
