@@ -157,7 +157,9 @@ int32_t DAudioSinkManager::HandleDAudioNotify(const std::string &devId, const st
         std::lock_guard<std::mutex> lock(devMapMutex_);
         isDevExisted = audioDevMap_.find(devId) != audioDevMap_.end();
     }
-    if (!isDevExisted && CreateAudioDevice(devId) != DH_SUCCESS) {
+    if (!isDevExisted) {
+        DHLOGE("Device is not exist, devId: %s, dhId: %s.", GetAnonyString(devId).c_str(),
+            GetAnonyString(dhId).c_str());
         return ERR_DH_AUDIO_FAILED;
     }
     NotifyEvent(devId, eventType, eventContent);

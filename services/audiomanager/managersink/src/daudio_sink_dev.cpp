@@ -159,11 +159,8 @@ int32_t DAudioSinkDev::TaskOpenDSpeaker(const std::string &args)
     ret = speakerClient->SetUp(audioParam);
     if (ret != DH_SUCCESS) {
         DHLOGE("Setup speaker failed, ret: %d.", ret);
-        NotifySourceDev(NOTIFY_OPEN_SPEAKER_RESULT, spkDhId_, ret);
         return ret;
     }
-    NotifySourceDev(NOTIFY_OPEN_SPEAKER_RESULT, std::to_string(dhId), ret);
-    DHLOGI("Open speaker device task end, notify source ret %d.", ret);
     isSpkInUse_.store(true);
     return ret;
 }
@@ -288,8 +285,6 @@ int32_t DAudioSinkDev::TaskOpenDMic(const std::string &args)
         return ERR_DH_AUDIO_FAILED;
     }
     PullUpPage();
-    NotifySourceDev(NOTIFY_OPEN_MIC_RESULT, jParam[KEY_DH_ID], ret);
-    DHLOGI("Open mic device task end, notify source ret %d.", ret);
     isMicInUse_.store(true);
     return ret;
 }
@@ -644,7 +639,15 @@ void DAudioSinkDev::SinkEventHandler::NotifyOpenSpeaker(const AppExecFwk::InnerE
         DHLOGE("Sink dev is invalid.");
         return;
     }
-    if (sinkDevObj->TaskOpenDSpeaker(eventParam) != DH_SUCCESS) {
+    json jParam = json::parse(eventParam, nullptr, false);
+    if (!JsonParamCheck(jParam, { KEY_DH_ID, KEY_AUDIO_PARAM })) {
+        DHLOGE("Json param check failed.");
+        return;
+    }
+    int32_t ret = sinkDevObj->TaskOpenDSpeaker(eventParam);
+    sinkDevObj->NotifySourceDev(NOTIFY_OPEN_SPEAKER_RESULT, jParam[KEY_DH_ID], ret);
+    DHLOGI("Open speaker device task end, notify source ret %d.", ret);
+    if (ret != DH_SUCCESS) {
         DHLOGE("Open speaker failed.");
         return;
     }
@@ -721,7 +724,15 @@ void DAudioSinkDev::SinkEventHandler::NotifyOpenMic(const AppExecFwk::InnerEvent
         DHLOGE("Sink dev is invalid.");
         return;
     }
-    if (sinkDevObj->TaskOpenDMic(eventParam) != DH_SUCCESS) {
+    json jParam = json::parse(eventParam, nullptr, false);
+    if (!JsonParamCheck(jParam, { KEY_DH_ID, KEY_AUDIO_PARAM })) {
+        DHLOGE("Json param check failed.");
+        return;
+    }
+    int32_t ret = sinkDevObj->TaskOpenDMic(eventParam);
+    sinkDevObj->NotifySourceDev(NOTIFY_OPEN_MIC_RESULT, jParam[KEY_DH_ID], ret);
+    DHLOGI("Open mic device task end, notify source ret %d.", ret);
+    if (ret != DH_SUCCESS) {
         DHLOGE("Open mic failed.");
         return;
     }
