@@ -18,6 +18,8 @@
 
 #include <gtest/gtest.h>
 
+#include "if_system_ability_manager.h"
+
 #define private public
 #include "daudio_sink_dev.h"
 #undef private
@@ -32,6 +34,7 @@ public:
     void TearDown();
 
     std::shared_ptr<DAudioSinkDev> sinkDev_ = nullptr;
+    sptr<ISystemAbilityManager> samgr_ = nullptr;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
