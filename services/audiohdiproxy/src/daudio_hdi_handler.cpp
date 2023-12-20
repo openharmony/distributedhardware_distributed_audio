@@ -55,7 +55,6 @@ int32_t DAudioHdiHandler::InitHdiHandler()
         return DH_SUCCESS;
     }
 
-    DAUDIO_SYNC_TRACE(DAUDIO_LOAD_HDF_DRIVER);
     DHLOGD("Load hdf driver start.");
     int32_t ret = DaudioHdfOperate::GetInstance().LoadDaudioHDFImpl();
     if (ret != DH_SUCCESS) {

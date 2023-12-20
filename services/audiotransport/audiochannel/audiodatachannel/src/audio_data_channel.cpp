@@ -33,7 +33,6 @@ int32_t AudioDataChannel::CreateSession(const std::shared_ptr<IAudioChannelListe
         return ERR_DH_AUDIO_NULLPTR;
     }
 
-    DAUDIO_SYNC_TRACE(DAUDIO_CREATE_DATA_SESSION);
     int32_t ret =
         SoftbusAdapter::GetInstance().CreateSoftbusSessionServer(PKG_NAME, sessionName, peerDevId_);
     if (ret != DH_SUCCESS) {
@@ -56,7 +55,6 @@ int32_t AudioDataChannel::CreateSession(const std::shared_ptr<IAudioChannelListe
 int32_t AudioDataChannel::ReleaseSession()
 {
     DHLOGI("Release session, peerDevId: %s.", GetAnonyString(peerDevId_).c_str());
-    DAUDIO_SYNC_TRACE(DAUDIO_RELEASE_DATA_SESSION);
     int32_t ret = SoftbusAdapter::GetInstance().RemoveSoftbusSessionServer(PKG_NAME, sessionName_, peerDevId_);
     if (ret != DH_SUCCESS) {
         DHLOGE("Release softbus session failed ret: %d.", ret);
@@ -73,7 +71,6 @@ int32_t AudioDataChannel::ReleaseSession()
 int32_t AudioDataChannel::OpenSession()
 {
     DHLOGI("Open session, peerDevId: %s.", GetAnonyString(peerDevId_).c_str());
-    DaudioStartAsyncTrace(DAUDIO_OPEN_DATA_SESSION, DAUDIO_OPEN_DATA_SESSION_TASKID);
     int32_t sessionId =
         SoftbusAdapter::GetInstance().OpenSoftbusSession(sessionName_, sessionName_, peerDevId_);
     if (sessionId < 0) {
@@ -94,7 +91,6 @@ int32_t AudioDataChannel::CloseSession()
         return DH_SUCCESS;
     }
 
-    DAUDIO_SYNC_TRACE(DAUDIO_CLOSE_DATA_SESSION);
     SoftbusAdapter::GetInstance().CloseSoftbusSession(sessionId_);
     sessionId_ = 0;
 
@@ -130,7 +126,6 @@ void AudioDataChannel::OnSessionOpened(int32_t sessionId, int32_t result)
 
     listener->OnSessionOpened();
     sessionId_ = sessionId;
-    DaudioFinishAsyncTrace(DAUDIO_OPEN_DATA_SESSION, DAUDIO_OPEN_DATA_SESSION_TASKID);
 }
 
 void AudioDataChannel::OnSessionClosed(int32_t sessionId)

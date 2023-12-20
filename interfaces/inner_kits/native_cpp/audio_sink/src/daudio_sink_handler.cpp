@@ -48,7 +48,6 @@ DAudioSinkHandler::~DAudioSinkHandler()
 int32_t DAudioSinkHandler::InitSink(const std::string &params)
 {
     DHLOGI("Init sink handler.");
-    DAUDIO_SYNC_TRACE(DAUDIO_SOURCE_LOAD_SYSTEM_ABILITY);
     if (dAudioSinkProxy_ == nullptr) {
         sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
         if (samgr == nullptr) {
