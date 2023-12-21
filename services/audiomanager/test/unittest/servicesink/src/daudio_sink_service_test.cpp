@@ -18,9 +18,9 @@
 #include "audio_event.h"
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
-#include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "daudio_sink_ipc_callback_proxy.h"
+#include "daudio_sink_load_callback.h"
 
 using namespace testing::ext;
 
@@ -34,11 +34,14 @@ void DAudioSinkServiceTest::SetUp()
 {
     uint32_t saId = 6666;
     bool runOnCreate = true;
-    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (samgr == nullptr) {
+    std::string params = "params";
+    samgr_ = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgr_ == nullptr) {
         return;
     }
-    remoteObject_ = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID);
+    sptr<DAudioSinkLoadCallback> loadCallback(new DAudioSinkLoadCallback(params));
+    samgr_->LoadSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID, loadCallback);
+    remoteObject_ = samgr_->GetSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID);
     if (remoteObject_ == nullptr) {
         return;
     }
@@ -48,6 +51,9 @@ void DAudioSinkServiceTest::SetUp()
 
 void DAudioSinkServiceTest::TearDown()
 {
+    if (samgr_ != nullptr) {
+        samgr_->UnloadSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID);
+    }
     sinkSrv_ = nullptr;
 }
 

@@ -18,6 +18,8 @@
 
 #include <gtest/gtest.h>
 
+#include "if_system_ability_manager.h"
+
 #define private public
 #define protected public
 #include "daudio_sink_service.h"
@@ -34,6 +36,7 @@ public:
     void TearDown();
     std::shared_ptr<DAudioSinkService> sinkSrv_ = nullptr;
     sptr<IRemoteObject> remoteObject_ = nullptr;
+    sptr<ISystemAbilityManager> samgr_ = nullptr;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
