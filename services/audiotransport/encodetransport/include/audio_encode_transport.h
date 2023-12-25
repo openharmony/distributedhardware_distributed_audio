@@ -24,6 +24,7 @@
 
 #include "audio_event.h"
 #include "audio_transport_context.h"
+#include "daudio_constants.h"
 #include "iaudio_channel.h"
 #include "iaudio_datatrans_callback.h"
 #include "iaudio_data_transport.h"

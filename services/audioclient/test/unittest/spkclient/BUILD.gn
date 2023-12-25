@@ -48,7 +48,6 @@ config("module_private_config") {
     "${services_path}/common/audioeventcallback",
     "${services_path}/common/audiodata/include",
     "${services_path}/common/audioparam",
-    "${softbusadapter_path}/include",
   ]
 }
 

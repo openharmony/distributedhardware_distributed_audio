@@ -17,8 +17,5 @@ import("../../../../distributedaudio.gni")
 
 group("daudio_processor_test") {
   testonly = true
-  deps = [
-    "${audio_processor_path}/test/unittest/common/decodeprocessor:decode_processor_test",
-    "${audio_processor_path}/test/unittest/common/encodeprocessor:encode_processor_test",
-  ]
+  deps = [ "${audio_processor_path}/test/unittest/common/decodeprocessor:decode_processor_test" ]
 }

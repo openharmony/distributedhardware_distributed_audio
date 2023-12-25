@@ -70,7 +70,6 @@ config("module_private_config") {
     "${services_path}/common/audioeventcallback",
     "${services_path}/common/audioparam",
     "${services_path}/hdfaudioclient/include",
-    "${softbusadapter_path}/include",
   ]
 }
 

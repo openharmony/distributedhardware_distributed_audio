@@ -60,7 +60,6 @@ ohos_shared_library("distributed_audio_sink") {
     "${services_path}/common/audioeventcallback",
     "${services_path}/common/audiodata/include",
     "${services_path}/common/audioparam",
-    "${softbusadapter_path}/include",
   ]
 
   sources = [

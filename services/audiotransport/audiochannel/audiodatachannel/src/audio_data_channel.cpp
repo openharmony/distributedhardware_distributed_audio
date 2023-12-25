@@ -34,18 +34,6 @@ int32_t AudioDataChannel::CreateSession(const std::shared_ptr<IAudioChannelListe
     }
 
     DAUDIO_SYNC_TRACE(DAUDIO_CREATE_DATA_SESSION);
-    int32_t ret =
-        SoftbusAdapter::GetInstance().CreateSoftbusSessionServer(PKG_NAME, sessionName, peerDevId_);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Create softbus session failed ret.");
-        return ret;
-    }
-
-    ret = SoftbusAdapter::GetInstance().RegisterSoftbusListener(shared_from_this(), sessionName, peerDevId_);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Register softbus adapter listener failed ret: %d.", ret);
-        return ret;
-    }
 
     channelListener_ = listener;
     sessionName_ = sessionName;
@@ -57,13 +45,6 @@ int32_t AudioDataChannel::ReleaseSession()
 {
     DHLOGI("Release session, peerDevId: %s.", GetAnonyString(peerDevId_).c_str());
     DAUDIO_SYNC_TRACE(DAUDIO_RELEASE_DATA_SESSION);
-    int32_t ret = SoftbusAdapter::GetInstance().RemoveSoftbusSessionServer(PKG_NAME, sessionName_, peerDevId_);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Release softbus session failed ret: %d.", ret);
-        return ret;
-    }
-
-    SoftbusAdapter::GetInstance().UnRegisterSoftbusListener(sessionName_, peerDevId_);
     channelListener_.reset();
 
     DHLOGI("Release softbus session success.");
@@ -74,13 +55,6 @@ int32_t AudioDataChannel::OpenSession()
 {
     DHLOGI("Open session, peerDevId: %s.", GetAnonyString(peerDevId_).c_str());
     DaudioStartAsyncTrace(DAUDIO_OPEN_DATA_SESSION, DAUDIO_OPEN_DATA_SESSION_TASKID);
-    int32_t sessionId =
-        SoftbusAdapter::GetInstance().OpenSoftbusSession(sessionName_, sessionName_, peerDevId_);
-    if (sessionId < 0) {
-        DHLOGE("Open audio session failed, ret: %d.", sessionId);
-        return ERR_DH_AUDIO_TRANS_ERROR;
-    }
-    sessionId_ = sessionId;
 
     DHLOGI("Open audio session success, sessionId: %d.", sessionId_);
     return DH_SUCCESS;
@@ -95,8 +69,6 @@ int32_t AudioDataChannel::CloseSession()
     }
 
     DAUDIO_SYNC_TRACE(DAUDIO_CLOSE_DATA_SESSION);
-    SoftbusAdapter::GetInstance().CloseSoftbusSession(sessionId_);
-    sessionId_ = 0;
 
     DHLOGI("Close audio session success.");
     return DH_SUCCESS;
@@ -111,76 +83,7 @@ int32_t AudioDataChannel::SendEvent(const AudioEvent &audioEvent)
 int32_t AudioDataChannel::SendData(const std::shared_ptr<AudioData> &audioData)
 {
     DHLOGD("Send data, sessionId: %d.", sessionId_);
-    return SoftbusAdapter::GetInstance().SendSoftbusStream(sessionId_, audioData);
-}
-
-void AudioDataChannel::OnSessionOpened(int32_t sessionId, int32_t result)
-{
-    DHLOGD("On audio session opened, sessionId: %d, result: %d.", sessionId, result);
-    if (result != 0) {
-        DHLOGE("Session open failed.");
-        return;
-    }
-
-    auto listener = channelListener_.lock();
-    if (listener == nullptr) {
-        DHLOGE("Channel listener is null.");
-        return;
-    }
-
-    listener->OnSessionOpened();
-    sessionId_ = sessionId;
-    DaudioFinishAsyncTrace(DAUDIO_OPEN_DATA_SESSION, DAUDIO_OPEN_DATA_SESSION_TASKID);
-}
-
-void AudioDataChannel::OnSessionClosed(int32_t sessionId)
-{
-    DHLOGI("On audio session closed, sessionId: %d.", sessionId);
-    if (sessionId_ == 0) {
-        DHLOGD("Session already closed.");
-        return;
-    }
-    auto listener = channelListener_.lock();
-    if (listener == nullptr) {
-        DHLOGE("Channel listener is null.");
-        return;
-    }
-    listener->OnSessionClosed();
-}
-
-void AudioDataChannel::OnBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen)
-{
-    (void) sessionId;
-    (void) data;
-    (void) dataLen;
-
-    DHLOGI("Data channel not support yet.");
-}
-
-void AudioDataChannel::OnStreamReceived(int32_t sessionId, const StreamData *data, const StreamData *ext,
-    const StreamFrameInfo *streamFrameInfo)
-{
-    (void) ext;
-    (void) streamFrameInfo;
-
-    auto listener = channelListener_.lock();
-    if (listener == nullptr) {
-        DHLOGE("Channel listener is null.");
-        return;
-    }
-
-    if (data == nullptr) {
-        DHLOGE("Received stream data is nullptr.");
-        return;
-    }
-    DHLOGI("On audio stream received, sessionId: %d dataSize: %zu.", sessionId, data->bufLen);
-    auto audioData = std::make_shared<AudioData>(data->bufLen);
-    if (memcpy_s(audioData->Data(), audioData->Capacity(), reinterpret_cast<uint8_t *>(data->buf), data->bufLen)
-        != EOK) {
-        DHLOGE("Received stream data copy failed.");
-        return;
-    }
-    listener->OnDataReceived(audioData);
+    return DH_SUCCESS;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

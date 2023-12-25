@@ -182,7 +182,8 @@ int32_t DSpeakerDev::SetUp()
 {
     DHLOGI("Set up speaker device.");
     if (speakerTrans_ == nullptr) {
-        speakerTrans_ = std::make_shared<AudioEncodeTransport>(devId_);
+        DHLOGE("Spk trans should be init by dev.");
+        return ERR_DH_AUDIO_NULLPTR;
     }
 
     int32_t ret = speakerTrans_->SetUp(param_, param_, shared_from_this(), CAP_SPK);
