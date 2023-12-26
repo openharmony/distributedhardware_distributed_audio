@@ -80,7 +80,6 @@ ohos_unittest("DAudioDfxTest") {
   external_deps = [
     "audio_framework:audio_capturer",
     "c_utils:utils",
-    "drivers_interface_audio:libaudio_proxy_1.0",
     "dsoftbus:softbus_client",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",

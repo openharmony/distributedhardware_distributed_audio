@@ -15,16 +15,43 @@
 
 #include "daudio_hitrace.h"
 
+#undef DH_LOG_TAG
+#define DH_LOG_TAG "DAudioHitrace"
+
 namespace OHOS {
 namespace DistributedHardware {
-void DaudioStartAsyncTrace(const std::string& str, int32_t taskId)
+void DAudioHitrace::Count(const std::string &value, int64_t count, bool isEnable)
 {
-    StartAsyncTrace(DAUDIO_HITRACE_LABEL, str, taskId);
+    CountTraceDebug(isEnable, HITRACE_TAG_ZAUDIO, value, count);
 }
 
-void DaudioFinishAsyncTrace(const std::string& str, int32_t taskId)
+DAudioHitrace::DAudioHitrace(const std::string &value, bool isShowLog, bool isEnable)
 {
-    FinishAsyncTrace(DAUDIO_HITRACE_LABEL, str, taskId);
+    value_ = value;
+    isShowLog_ = isShowLog;
+    isEnable_ = isEnable;
+    isFinished_ = false;
+    if (isShowLog) {
+        isShowLog_ = true;
+        DHLOGI("%{public}s start.", value_.c_str());
+    }
+    StartTraceDebug(isEnable_, HITRACE_TAG_ZAUDIO, value);
+}
+
+void DAudioHitrace::End()
+{
+    if (!isFinished_) {
+        FinishTraceDebug(isEnable_, HITRACE_TAG_ZAUDIO);
+        isFinished_ = true;
+        if (isShowLog_) {
+            DHLOGI("%{public}s end.", value_.c_str());
+        }
+    }
+}
+
+DAudioHitrace::~DAudioHitrace()
+{
+    End();
 }
 } // namespace DistributedHardware
 } // namespace OHOS

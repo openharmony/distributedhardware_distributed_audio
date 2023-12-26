@@ -65,7 +65,6 @@ int32_t AudioEncoderProcessor::ReleaseAudioProcessor()
         return DH_SUCCESS;
     }
 
-    DAUDIO_SYNC_TRACE(DAUDIO_RELEASE_ENCODER_PROCESSOR);
     int32_t ret = audioEncoder_->ReleaseAudioCodec();
     if (ret != DH_SUCCESS) {
         DHLOGE("Release encoder fail. Error code: %d.", ret);
@@ -85,7 +84,6 @@ int32_t AudioEncoderProcessor::StartAudioProcessor()
         return ERR_DH_AUDIO_BAD_VALUE;
     }
 
-    DAUDIO_SYNC_TRACE(DAUDIO_START_ENCODER_PROCESSOR);
     int32_t ret = audioEncoder_->StartAudioCodec();
     if (ret != DH_SUCCESS) {
         DHLOGE("Start encoder fail. Error code: %d.", ret);
@@ -107,7 +105,6 @@ int32_t AudioEncoderProcessor::StopAudioProcessor()
         return DH_SUCCESS;
     }
 
-    DAUDIO_SYNC_TRACE(DAUDIO_STOP_ENCODER_PROCESSOR);
     int32_t ret = audioEncoder_->StopAudioCodec();
     if (ret != DH_SUCCESS) {
         DHLOGE("Stop encoder fail. Error code: %d.", ret);

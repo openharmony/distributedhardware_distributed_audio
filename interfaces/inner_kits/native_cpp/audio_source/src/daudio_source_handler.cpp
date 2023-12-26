@@ -52,7 +52,6 @@ DAudioSourceHandler::~DAudioSourceHandler()
 int32_t DAudioSourceHandler::InitSource(const std::string &params)
 {
     DHLOGI("Init source handler.");
-    DAUDIO_SYNC_TRACE(DAUDIO_SOURCE_LOAD_SYSTEM_ABILITY);
     if (dAudioSourceProxy_ == nullptr) {
         sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
         if (samgr == nullptr) {
@@ -115,7 +114,6 @@ int32_t DAudioSourceHandler::RegisterDistributedHardware(const std::string &devI
         return ERR_DH_AUDIO_SA_DEVID_ILLEGAL;
     }
 
-    DaudioStartAsyncTrace(DAUDIO_REGISTER_AUDIO, DAUDIO_REGISTER_AUDIO_TASKID);
     std::string reqId = GetRandomID();
     dAudioIpcCallback_->PushRegisterCallback(reqId, callback);
     return dAudioSourceProxy_->RegisterDistributedHardware(devId, dhId, param, reqId);
@@ -138,7 +136,6 @@ int32_t DAudioSourceHandler::UnregisterDistributedHardware(const std::string &de
         return ERR_DH_AUDIO_SA_DEVID_ILLEGAL;
     }
 
-    DaudioStartAsyncTrace(DAUDIO_UNREGISTER_AUDIO, DAUDIO_UNREGISTER_AUDIO_TASKID);
     std::string reqId = GetRandomID();
     dAudioIpcCallback_->PushUnregisterCallback(reqId, callback);
     return dAudioSourceProxy_->UnregisterDistributedHardware(devId, dhId, reqId);
