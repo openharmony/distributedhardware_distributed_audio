@@ -33,8 +33,6 @@ int32_t AudioDataChannel::CreateSession(const std::shared_ptr<IAudioChannelListe
         return ERR_DH_AUDIO_NULLPTR;
     }
 
-    DAUDIO_SYNC_TRACE(DAUDIO_CREATE_DATA_SESSION);
-
     channelListener_ = listener;
     sessionName_ = sessionName;
     DHLOGI("Create softbus session success.");
@@ -44,7 +42,6 @@ int32_t AudioDataChannel::CreateSession(const std::shared_ptr<IAudioChannelListe
 int32_t AudioDataChannel::ReleaseSession()
 {
     DHLOGI("Release session, peerDevId: %s.", GetAnonyString(peerDevId_).c_str());
-    DAUDIO_SYNC_TRACE(DAUDIO_RELEASE_DATA_SESSION);
     channelListener_.reset();
 
     DHLOGI("Release softbus session success.");
@@ -54,7 +51,6 @@ int32_t AudioDataChannel::ReleaseSession()
 int32_t AudioDataChannel::OpenSession()
 {
     DHLOGI("Open session, peerDevId: %s.", GetAnonyString(peerDevId_).c_str());
-    DaudioStartAsyncTrace(DAUDIO_OPEN_DATA_SESSION, DAUDIO_OPEN_DATA_SESSION_TASKID);
 
     DHLOGI("Open audio session success, sessionId: %d.", sessionId_);
     return DH_SUCCESS;
@@ -67,8 +63,6 @@ int32_t AudioDataChannel::CloseSession()
         DHLOGD("Session is already close.");
         return DH_SUCCESS;
     }
-
-    DAUDIO_SYNC_TRACE(DAUDIO_CLOSE_DATA_SESSION);
 
     DHLOGI("Close audio session success.");
     return DH_SUCCESS;

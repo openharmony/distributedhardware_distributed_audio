@@ -607,7 +607,6 @@ int32_t DAudioSourceDev::EnableDSpeaker(const int32_t dhId, const std::string &a
         DHLOGI("The speaker device is already enabled.");
         return DH_SUCCESS;
     }
-    DAUDIO_SYNC_TRACE(DAUDIO_ENABLE_SPK);
     auto speaker = std::make_shared<DSpeakerDev>(devId_, shared_from_this());
     if (speaker->EnableDevice(dhId, attrs) != DH_SUCCESS) {
         DHLOGI("Failed to enable speaker device.");
@@ -624,7 +623,6 @@ int32_t DAudioSourceDev::EnableDMic(const int32_t dhId, const std::string &attrs
         DHLOGI("The mic device is already enabled.");
         return DH_SUCCESS;
     }
-    DAUDIO_SYNC_TRACE(DAUDIO_ENABLE_MIC);
     auto mic = std::make_shared<DMicDev>(devId_, shared_from_this());
     if (mic->EnableDevice(dhId, attrs) != DH_SUCCESS) {
         DHLOGI("Failed to enable mic device.");
@@ -693,7 +691,6 @@ int32_t DAudioSourceDev::DisableDSpeaker(const int32_t dhId)
         DHLOGE("Speaker device is null.");
         return ERR_DH_AUDIO_NULLPTR;
     }
-    DAUDIO_SYNC_TRACE(DAUDIO_DISABLE_SPK);
     return ioDev->DisableDevice(dhId);
 }
 
@@ -709,7 +706,6 @@ int32_t DAudioSourceDev::DisableDMic(const int32_t dhId)
         DHLOGE("Mic device is null.");
         return ERR_DH_AUDIO_NULLPTR;
     }
-    DAUDIO_SYNC_TRACE(DAUDIO_DISABLE_MIC);
     return ioDev->DisableDevice(dhId);
 }
 
@@ -735,6 +731,7 @@ void DAudioSourceDev::OnDisableTaskResult(int32_t resultCode, const std::string 
 
 int32_t DAudioSourceDev::TaskOpenDSpeaker(const std::string &args)
 {
+    DAudioHitrace trace("DAudioSourceDev::TaskOpenDSpeaker");
     DHLOGI("Task open speaker args: %s.", args.c_str());
     if (args.length() > DAUDIO_MAX_JSON_LEN || args.empty()) {
         DHLOGE("args length error. 0 or max.");

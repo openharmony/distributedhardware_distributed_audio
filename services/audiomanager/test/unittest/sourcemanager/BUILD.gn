@@ -77,7 +77,6 @@ ohos_unittest("DaudioSourceMgrTest") {
     "c_utils:utils",
     "distributed_hardware_fwk:distributed_av_receiver",
     "distributed_hardware_fwk:distributed_av_sender",
-    "drivers_interface_audio:libaudio_proxy_1.0",
     "drivers_interface_distributed_audio:libdaudioext_proxy_1.0",
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
