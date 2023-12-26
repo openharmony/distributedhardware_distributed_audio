@@ -50,10 +50,7 @@ void DMicClient::OnEngineTransEvent(const AVTransEvent &event)
 
 void DMicClient::OnEngineTransMessage(const std::shared_ptr<AVTransMessage> &message)
 {
-    if (message == nullptr) {
-        DHLOGE("The parameter is nullptr");
-        return;
-    }
+    CHECK_NULL_VOID(message);
     DHLOGI("On Engine message, type : %s.", GetEventNameByType(message->type_).c_str());
     DAudioSinkManager::GetInstance().HandleDAudioNotify(message->dstDevId_, message->dstDevId_,
         static_cast<int32_t>(message->type_), message->content_);
@@ -78,10 +75,8 @@ int32_t DMicClient::OnStateChange(const AudioEventType type)
     DHLOGD("On state change type: %d.", type);
     AudioEvent event;
     cJSON *jParam = cJSON_CreateObject();
-    if (jParam == nullptr) {
-        DHLOGE("Failed to create cJSON object.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
+
     cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId_).c_str());
     char *jsonData = cJSON_PrintUnformatted(jParam);
     if (jsonData == nullptr) {
@@ -112,10 +107,7 @@ int32_t DMicClient::OnStateChange(const AudioEventType type)
     }
 
     std::shared_ptr<IAudioEventCallback> cbObj = eventCallback_.lock();
-    if (cbObj == nullptr) {
-        DHLOGE("Event callback is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(cbObj, ERR_DH_AUDIO_NULLPTR);
     cbObj->NotifyEvent(event);
     return DH_SUCCESS;
 }
@@ -136,10 +128,7 @@ int32_t DMicClient::AudioFwkClientSetUp()
     };
     std::lock_guard<std::mutex> lck(devMtx_);
     audioCapturer_ = AudioStandard::AudioCapturer::Create(capturerOptions);
-    if (audioCapturer_ == nullptr) {
-        DHLOGE("Audio capturer create failed.");
-        return ERR_DH_AUDIO_CLIENT_CAPTURER_CREATE_FAILED;
-    }
+    CHECK_NULL_RETURN(audioCapturer_, ERR_DH_AUDIO_CLIENT_CAPTURER_CREATE_FAILED);
     if (audioParam_.captureOpts.capturerFlags == MMAP_MODE) {
         int32_t ret = audioCapturer_->SetCapturerReadCallback(shared_from_this());
         if (ret != DH_SUCCESS) {
@@ -152,10 +141,7 @@ int32_t DMicClient::AudioFwkClientSetUp()
 
 int32_t DMicClient::TransSetUp()
 {
-    if (micTrans_ == nullptr) {
-        DHLOGE("mic trans in engine should be init by dev.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(micTrans_, ERR_DH_AUDIO_NULLPTR);
     int32_t ret = micTrans_->SetUp(audioParam_, audioParam_, shared_from_this(), CAP_MIC);
     if (ret != DH_SUCCESS) {
         DHLOGE("Mic trans setup failed.");
@@ -184,10 +170,7 @@ int32_t DMicClient::SendMessage(uint32_t type, std::string content, std::string 
         DHLOGE("event type is not NOTIFY_OPEN_MIC or NOTIFY_CLOSE_MIC or CLOSE_MIC. type: %u", type);
         return ERR_DH_AUDIO_NULLPTR;
     }
-    if (micTrans_ == nullptr) {
-        DHLOGE("mic trans is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(micTrans_, ERR_DH_AUDIO_NULLPTR);
     micTrans_->SendMessage(type, content, dstDevId);
     return DH_SUCCESS;
 }
@@ -196,9 +179,9 @@ int32_t DMicClient::Release()
 {
     DHLOGI("Release mic client.");
     std::lock_guard<std::mutex> lck(devMtx_);
-    if ((clientStatus_ != AudioStatus::STATUS_READY && clientStatus_ != AudioStatus::STATUS_STOP) ||
-        micTrans_ == nullptr) {
-        DHLOGE("Mic status is wrong or mic trans is null, %d.", (int32_t)clientStatus_);
+    CHECK_NULL_RETURN(micTrans_, ERR_DH_AUDIO_SA_STATUS_ERR);
+    if (clientStatus_ != AudioStatus::STATUS_READY && clientStatus_ != AudioStatus::STATUS_STOP) {
+        DHLOGE("Mic status is wrong, %d.", (int32_t)clientStatus_);
         return ERR_DH_AUDIO_SA_STATUS_ERR;
     }
     bool isReleaseError = false;
@@ -223,15 +206,14 @@ int32_t DMicClient::StartCapture()
 {
     DHLOGI("Start capturer.");
     std::lock_guard<std::mutex> lck(devMtx_);
-    if (micTrans_ == nullptr || clientStatus_ != AudioStatus::STATUS_READY) {
+    CHECK_NULL_RETURN(micTrans_, ERR_DH_AUDIO_SA_STATUS_ERR);
+    CHECK_NULL_RETURN(audioCapturer_, ERR_DH_AUDIO_NULLPTR);
+
+    if (clientStatus_ != AudioStatus::STATUS_READY) {
         DHLOGE("Audio capturer init failed or mic status wrong, status: %d.", (int32_t)clientStatus_);
         DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_OPT_FAIL, ERR_DH_AUDIO_SA_STATUS_ERR,
             "daudio init failed or mic status wrong.");
         return ERR_DH_AUDIO_SA_STATUS_ERR;
-    }
-    if (audioCapturer_ == nullptr) {
-        DHLOGE("audio capturer is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
     }
     if (!audioCapturer_->Start()) {
         DHLOGE("Audio capturer start failed.");
@@ -257,10 +239,8 @@ void DMicClient::AudioFwkCaptureData()
     size_t bytesRead = 0;
     bool errorFlag = false;
     int64_t startTime = GetNowTimeUs();
-    if (audioCapturer_ == nullptr) {
-        DHLOGE("audio capturer is nullptr");
-        return;
-    }
+    CHECK_NULL_VOID(audioCapturer_);
+
     while (bytesRead < audioParam_.comParam.frameSize) {
         int32_t len = audioCapturer_->Read(*(audioData->Data() + bytesRead),
             audioParam_.comParam.frameSize - bytesRead, isBlocking_.load());
@@ -322,15 +302,14 @@ int32_t DMicClient::OnDecodeTransDataDone(const std::shared_ptr<AudioData> &audi
 void DMicClient::OnReadData(size_t length)
 {
     AudioStandard::BufferDesc bufDesc;
-    if (audioCapturer_ == nullptr) {
-        DHLOGE("audioCapturer is nullptr.");
+    CHECK_NULL_VOID(audioCapturer_);
+    
+    if (audioCapturer_->GetBufferDesc(bufDesc) != DH_SUCCESS || bufDesc.bufLength == 0) {
+        DHLOGE("Get buffer desc failed.");
         return;
     }
-    int32_t ret = audioCapturer_->GetBufferDesc(bufDesc);
-    if (ret != DH_SUCCESS || bufDesc.buffer == nullptr || bufDesc.bufLength == 0) {
-        DHLOGE("Get buffer desc failed. On read data.");
-        return;
-    }
+    CHECK_NULL_VOID(bufDesc.buffer);
+
     std::shared_ptr<AudioData> audioData = std::make_shared<AudioData>(audioParam_.comParam.frameSize);
     if (audioData->Capacity() != bufDesc.bufLength) {
         DHLOGE("Audio data length is not equal to buflength. datalength: %d, bufLength: %d",
@@ -340,10 +319,8 @@ void DMicClient::OnReadData(size_t length)
         DHLOGE("Copy audio data failed.");
     }
     audioCapturer_->Enqueue(bufDesc);
-    if (micTrans_ == nullptr) {
-        DHLOGE("Mic trans is nullptr.");
-        return;
-    }
+
+    CHECK_NULL_VOID(micTrans_);
     if (micTrans_->FeedAudioData(audioData) != DH_SUCCESS) {
         DHLOGE("Failed to send data.");
     }
@@ -359,12 +336,7 @@ int32_t DMicClient::StopCapture()
             "daudio capturer is not start or mic status wrong.");
         return ERR_DH_AUDIO_SA_STATUS_ERR;
     }
-    if (micTrans_ == nullptr) {
-        DHLOGE("The capturer or mictrans is not instantiated.");
-        DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_OPT_FAIL,
-            ERR_DH_AUDIO_NULLPTR, "daudio capturer or mictrans is not instantiated.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(micTrans_, ERR_DH_AUDIO_NULLPTR);
 
     isBlocking_.store(false);
     if (audioParam_.captureOpts.capturerFlags != MMAP_MODE && isCaptureReady_.load()) {

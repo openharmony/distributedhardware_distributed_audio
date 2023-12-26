@@ -65,36 +65,33 @@ int32_t DAudioSinkManager::Init(const sptr<IDAudioSinkIpcCallback> &sinkCallback
     DHLOGI("Init audio sink manager.");
     initCallback_ = std::make_shared<DeviceInitCallback>();
     ipcSinkCallback_ = sinkCallback;
-    int32_t ret = GetLocalDeviceNetworkId(localNetworkId_);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Get local network id failed, ret: %d.", ret);
-        return ret;
-    }
-
-    ret = LoadAVReceiverEngineProvider();
-    if (ret != DH_SUCCESS || rcvProviderPtr_ == nullptr) {
-        DHLOGE("Load av transport receiver engine provider failed.");
+    if (GetLocalDeviceNetworkId(localNetworkId_) != DH_SUCCESS) {
+        DHLOGE("Get local network id failed.");
         return ERR_DH_AUDIO_FAILED;
     }
+
+    if (LoadAVReceiverEngineProvider() != DH_SUCCESS) {
+        DHLOGE("Load av receiver engine failed.");
+        return ERR_DH_AUDIO_FAILED;
+    }
+    CHECK_NULL_RETURN(rcvProviderPtr_, ERR_DH_AUDIO_FAILED);
     providerListener_ = std::make_shared<EngineProviderListener>();
-    ret = rcvProviderPtr_->RegisterProviderCallback(providerListener_);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Register av transport receiver Provider Callback failed.");
+    if (rcvProviderPtr_->RegisterProviderCallback(providerListener_) != DH_SUCCESS) {
+        DHLOGE("Register av receiver engine callback failed.");
         return ERR_DH_AUDIO_FAILED;
     }
-    DHLOGI("LoadAVReceiverEngineProvider success.");
+    DHLOGI("Load av receiver engine success.");
 
-    ret = LoadAVSenderEngineProvider();
-    if (ret != DH_SUCCESS || sendProviderPtr_ == nullptr) {
-        DHLOGI("Load av transport sender engine provider failed.");
+    if (LoadAVSenderEngineProvider() != DH_SUCCESS) {
+        DHLOGI("Load av sender engine provider failed.");
         return ERR_DH_AUDIO_FAILED;
     }
-    ret = sendProviderPtr_->RegisterProviderCallback(providerListener_);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Register av transport sender Provider Callback failed.");
+    CHECK_NULL_RETURN(sendProviderPtr_, ERR_DH_AUDIO_FAILED);
+    if (sendProviderPtr_->RegisterProviderCallback(providerListener_) != DH_SUCCESS) {
+        DHLOGE("Register av sender engine callback failed.");
         return ERR_DH_AUDIO_FAILED;
     }
-    DHLOGI("LoadAVSenderEngineProvider success.");
+    DHLOGI("Load av sender engine success.");
     return DH_SUCCESS;
 }
 
@@ -221,20 +218,13 @@ int32_t DAudioSinkManager::DAudioNotify(const std::string &devId, const std::str
     }
 
     auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (samgr == nullptr) {
-        DHLOGE("Failed to get system ability mgr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(samgr, ERR_DH_AUDIO_NULLPTR);
+
     auto remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SOURCE_SA_ID, devId);
-    if (remoteObject == nullptr) {
-        DHLOGE("remoteObject is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(remoteObject, ERR_DH_AUDIO_NULLPTR);
+
     sptr<IDAudioSource> remoteSvrProxy = iface_cast<IDAudioSource>(remoteObject);
-    if (remoteSvrProxy == nullptr) {
-        DHLOGE("Failed to get remote daudio sink SA.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(remoteSvrProxy, ERR_DH_AUDIO_NULLPTR);
     {
         std::lock_guard<std::mutex> lck(remoteSvrMutex_);
         sourceServiceMap_[devId] = remoteSvrProxy;
@@ -252,10 +242,7 @@ void DAudioSinkManager::NotifyEvent(const std::string &devId, const int32_t even
         DHLOGE("Notify event error, dev not exist.");
         return;
     }
-    if (audioDevMap_[devId] == nullptr) {
-        DHLOGE("Notify event error, dev is nullptr.");
-        return;
-    }
+    CHECK_NULL_VOID(audioDevMap_[devId]);
     audioDevMap_[devId]->NotifyEvent(audioEvent);
 }
 
@@ -267,10 +254,7 @@ void DAudioSinkManager::ClearAudioDev(const std::string &devId)
         DHLOGD("Device not register.");
         return;
     }
-    if (dev->second == nullptr) {
-        DHLOGD("Device already released.");
-        return;
-    }
+    CHECK_NULL_VOID(dev->second);
     dev->second->SleepAudioDev();
     audioDevMap_.erase(devId);
 }
@@ -285,10 +269,8 @@ int32_t DAudioSinkManager::LoadAVReceiverEngineProvider()
         return ERR_DH_AUDIO_NULLPTR;
     }
     pRHandler_ = dlopen(path, RTLD_LAZY | RTLD_NODELETE);
-    if (pRHandler_ == nullptr) {
-        DHLOGE("%s handler load failed, failed reason : %s", path, dlerror());
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(pRHandler_, ERR_DH_AUDIO_NULLPTR);
+
     AVTransProviderClass getEngineFactoryFunc = (AVTransProviderClass)dlsym(pRHandler_,
         GET_RECEIVER_PROVIDER_FUNC.c_str());
     if (getEngineFactoryFunc == nullptr) {
@@ -322,10 +304,8 @@ int32_t DAudioSinkManager::LoadAVSenderEngineProvider()
         return ERR_DH_AUDIO_NULLPTR;
     }
     pSHandler_ = dlopen(path, RTLD_LAZY | RTLD_NODELETE);
-    if (pSHandler_ == nullptr) {
-        DHLOGE("%s handler load failed, failed reason : %s", path, dlerror());
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(pSHandler_, ERR_DH_AUDIO_NULLPTR);
+
     AVTransProviderClass getEngineFactoryFunc = (AVTransProviderClass)dlsym(pSHandler_,
         GET_SENDER_PROVIDER_FUNC.c_str());
     if (getEngineFactoryFunc == nullptr) {

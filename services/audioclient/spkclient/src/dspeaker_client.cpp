@@ -46,10 +46,7 @@ void DSpeakerClient::OnEngineTransEvent(const AVTransEvent &event)
 
 void DSpeakerClient::OnEngineTransMessage(const std::shared_ptr<AVTransMessage> &message)
 {
-    if (message == nullptr) {
-        DHLOGE("The parameter is nullptr");
-        return;
-    }
+    CHECK_NULL_VOID(message);
     DHLOGI("On Engine message, type : %s.", GetEventNameByType(message->type_).c_str());
     DAudioSinkManager::GetInstance().HandleDAudioNotify(message->dstDevId_, message->dstDevId_,
         static_cast<int32_t>(message->type_), message->content_);
@@ -97,10 +94,8 @@ int32_t DSpeakerClient::CreateAudioRenderer(const AudioParam &param)
     };
     std::lock_guard<std::mutex> lck(devMtx_);
     audioRenderer_ = AudioStandard::AudioRenderer::Create(rendererOptions);
-    if (audioRenderer_ == nullptr) {
-        DHLOGE("Audio renderer create failed.");
-        return ERR_DH_AUDIO_CLIENT_RENDER_CREATE_FAILED;
-    }
+    CHECK_NULL_RETURN(audioRenderer_, ERR_DH_AUDIO_CLIENT_RENDER_CREATE_FAILED);
+
     audioRenderer_ ->SetRendererCallback(shared_from_this());
     if (audioParam_.renderOpts.renderFlags != MMAP_MODE) {
         return DH_SUCCESS;
@@ -116,15 +111,13 @@ int32_t DSpeakerClient::CreateAudioRenderer(const AudioParam &param)
 void DSpeakerClient::OnWriteData(size_t length)
 {
     AudioStandard::BufferDesc bufDesc;
-    if (audioRenderer_ == nullptr) {
-        DHLOGE("AudioRenderer is nullptr.");
-        return;
-    }
-    int32_t ret = audioRenderer_->GetBufferDesc(bufDesc);
-    if (ret != DH_SUCCESS || bufDesc.buffer == nullptr || bufDesc.bufLength == 0) {
+    CHECK_NULL_VOID(audioRenderer_);
+    if (audioRenderer_->GetBufferDesc(bufDesc) != DH_SUCCESS || bufDesc.bufLength == 0) {
         DHLOGE("Get buffer desc failed.");
         return;
     }
+    CHECK_NULL_VOID(bufDesc.buffer);
+
     std::shared_ptr<AudioData> audioData = nullptr;
     {
         std::unique_lock<std::mutex> spkLck(dataQueueMtx_);
@@ -154,10 +147,8 @@ int32_t DSpeakerClient::SetUp(const AudioParam &param)
         DHLOGE("Set up failed, Create Audio renderer failed.");
         return ret;
     }
-    if (speakerTrans_ == nullptr) {
-        DHLOGE("Speaker trans should be init by dev.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(speakerTrans_, ERR_DH_AUDIO_NULLPTR);
+
     ret = speakerTrans_->SetUp(audioParam_, audioParam_, shared_from_this(), CAP_SPK);
     if (ret != DH_SUCCESS) {
         DHLOGE("Speaker trans setup failed.");
@@ -217,12 +208,8 @@ int32_t DSpeakerClient::StartRender()
 {
     DHLOGI("Start spk client.");
     std::lock_guard<std::mutex> lck(devMtx_);
-    if (audioRenderer_ == nullptr || clientStatus_ != AudioStatus::STATUS_READY) {
-        DHLOGE("Audio renderer init failed or spk status wrong, status: %d.", (int32_t)clientStatus_);
-        DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_OPT_FAIL, ERR_DH_AUDIO_SA_STATUS_ERR,
-            "daudio renderer init failed or spk status wrong.");
-        return ERR_DH_AUDIO_SA_STATUS_ERR;
-    }
+    CHECK_NULL_RETURN(audioRenderer_, ERR_DH_AUDIO_SA_STATUS_ERR);
+
     if (!audioRenderer_->Start()) {
         DHLOGE("Audio renderer start failed.");
         DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_OPT_FAIL, ERR_DH_AUDIO_CLIENT_RENDER_STARTUP_FAILURE,
@@ -353,10 +340,8 @@ int32_t DSpeakerClient::OnDecodeTransDataDone(const std::shared_ptr<AudioData> &
 {
     DHLOGI("Write stream buffer.");
     int64_t startTime = GetNowTimeUs();
-    if (audioData == nullptr) {
-        DHLOGE("The parameter is empty.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(audioData, ERR_DH_AUDIO_NULLPTR);
+
     std::lock_guard<std::mutex> lock(dataQueueMtx_);
     while (dataQueue_.size() > DATA_QUEUE_MAX_SIZE) {
         DHLOGD("Data queue overflow.");
@@ -395,10 +380,7 @@ int32_t DSpeakerClient::OnStateChange(const AudioEventType type)
     }
 
     std::shared_ptr<IAudioEventCallback> cbObj = eventCallback_.lock();
-    if (cbObj == nullptr) {
-        DHLOGE("Event callback is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(cbObj, ERR_DH_AUDIO_NULLPTR);
     cbObj->NotifyEvent(event);
     return DH_SUCCESS;
 }
@@ -413,10 +395,8 @@ string DSpeakerClient::GetVolumeLevel()
     int32_t minVolumeLevel = AudioStandard::AudioSystemManager::GetInstance()->GetMinVolume(volumeType);
     bool isUpdateUi = false;
     cJSON *jParam = cJSON_CreateObject();
-    if (jParam == nullptr) {
-        DHLOGE("Failed to create cJSON object.");
-        return "";
-    }
+    CHECK_NULL_RETURN(jParam, "");
+
     cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId_).c_str());
     cJSON_AddStringToObject(jParam, KEY_CHANGE_TYPE, FIRST_VOLUME_CHANAGE);
     cJSON_AddStringToObject(jParam, AUDIO_STREAM_TYPE, std::to_string(streamType).c_str());
@@ -441,15 +421,11 @@ void DSpeakerClient::OnVolumeKeyEvent(AudioStandard::VolumeEvent volumeEvent)
 {
     DHLOGD("Volume change event.");
     std::shared_ptr<IAudioEventCallback> cbObj = eventCallback_.lock();
-    if (cbObj == nullptr) {
-        DHLOGE("Event callback is nullptr.");
-        return;
-    }
+    CHECK_NULL_VOID(cbObj);
+
     cJSON *jParam = cJSON_CreateObject();
-    if (jParam == nullptr) {
-        DHLOGE("Failed to create cJSON object.");
-        return;
-    }
+    CHECK_NULL_VOID(jParam);
+ 
     cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId_).c_str());
     cJSON_AddStringToObject(jParam, KEY_CHANGE_TYPE, VOLUME_CHANAGE);
     cJSON_AddStringToObject(jParam, AUDIO_STREAM_TYPE, std::to_string(volumeEvent.volumeType).c_str());
@@ -475,15 +451,11 @@ void DSpeakerClient::OnInterrupt(const AudioStandard::InterruptEvent &interruptE
 {
     DHLOGD("Audio focus interrupt event.");
     std::shared_ptr<IAudioEventCallback> cbObj = eventCallback_.lock();
-    if (cbObj == nullptr) {
-        DHLOGE("Event callback is nullptr.");
-        return;
-    }
+    CHECK_NULL_VOID(cbObj);
+
     cJSON *jParam = cJSON_CreateObject();
-    if (jParam == nullptr) {
-        DHLOGE("Failed to create cJSON object.");
-        return;
-    }
+    CHECK_NULL_VOID(jParam);
+
     cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId_).c_str());
     cJSON_AddStringToObject(jParam, KEY_CHANGE_TYPE, INTERRUPT_EVENT);
     cJSON_AddStringToObject(jParam, VOLUME_EVENT_TYPE, std::to_string(interruptEvent.eventType).c_str());
@@ -509,15 +481,11 @@ void DSpeakerClient::OnStateChange(const AudioStandard::RendererState state,
 {
     DHLOGD("On render state change. state: %d", state);
     std::shared_ptr<IAudioEventCallback> cbObj = eventCallback_.lock();
-    if (cbObj == nullptr) {
-        DHLOGE("Event callback is nullptr.");
-        return;
-    }
+    CHECK_NULL_VOID(cbObj);
+
     cJSON *jParam = cJSON_CreateObject();
-    if (jParam == nullptr) {
-        DHLOGE("Failed to create cJSON object.");
-        return;
-    }
+    CHECK_NULL_VOID(jParam);
+
     cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId_).c_str());
     cJSON_AddStringToObject(jParam, KEY_CHANGE_TYPE, RENDER_STATE_CHANGE_EVENT);
     cJSON_AddStringToObject(jParam, KEY_STATE, std::to_string(state).c_str());
@@ -648,10 +616,7 @@ int32_t DSpeakerClient::SendMessage(uint32_t type, std::string content, std::str
         DHLOGE("event type is not NOTIFY_OPEN_SPK or NOTIFY_CLOSE_SPK. type:%u", type);
         return ERR_DH_AUDIO_NULLPTR;
     }
-    if (speakerTrans_ == nullptr) {
-        DHLOGE("speaker trans is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(speakerTrans_, ERR_DH_AUDIO_NULLPTR);
     speakerTrans_->SendMessage(type, content, dstDevId);
     return DH_SUCCESS;
 }
