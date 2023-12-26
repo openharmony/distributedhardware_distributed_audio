@@ -46,8 +46,6 @@ ohos_shared_library("distributed_audio_encode_transport") {
   include_dirs += [
     "include",
     "${audio_processor_path}/directprocessor/include",
-    "${audio_processor_path}/encodeprocessor/include",
-    "${audio_processor_path}/encoder/include",
     "${audio_processor_path}/interface",
     "${audio_transport_path}/audiochannel/interface",
     "${audio_transport_path}/audiochannel/audiodatachannel/include",
@@ -59,16 +57,12 @@ ohos_shared_library("distributed_audio_encode_transport") {
     "${common_path}/include",
     "${services_path}/common/audiodata/include",
     "${services_path}/common/audioparam",
-    "${softbusadapter_path}/include",
   ]
 
   public_configs = [ ":encode_transport_pub_config" ]
 
   sources = [
     "${audio_processor_path}/directprocessor/src/audio_direct_processor.cpp",
-    "${audio_processor_path}/encodeprocessor/src/audio_encoder_processor.cpp",
-    "${audio_processor_path}/encoder/src/audio_encoder.cpp",
-    "${audio_processor_path}/encoder/src/audio_encoder_callback.cpp",
     "${audio_transport_path}/senderengine/src/av_sender_engine_adapter.cpp",
     "${audio_transport_path}/senderengine/src/av_sender_engine_transport.cpp",
     "${services_path}/common/audiodata/src/audio_data.cpp",

@@ -165,7 +165,7 @@ HWTEST_F(DSpeakerDevTest, NotifyEvent_001, TestSize.Level1)
 HWTEST_F(DSpeakerDevTest, SetUp_001, TestSize.Level1)
 {
     spk_->speakerTrans_ = nullptr;
-    EXPECT_EQ(ERR_DH_AUDIO_TRANS_ERROR, spk_->SetUp());
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, spk_->SetUp());
 
     spk_->speakerTrans_ = std::make_shared<MockIAudioDataTransport>();
     EXPECT_EQ(DH_SUCCESS, spk_->SetUp());
@@ -196,7 +196,7 @@ HWTEST_F(DSpeakerDevTest, Start_001, TestSize.Level1)
 HWTEST_F(DSpeakerDevTest, Start_002, TestSize.Level1)
 {
     spk_->speakerTrans_ = nullptr;
-    EXPECT_EQ(ERR_DH_AUDIO_TRANS_ERROR, spk_->SetUp());
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, spk_->SetUp());
     EXPECT_NE(DH_SUCCESS, spk_->Start());
     EXPECT_FALSE(spk_->IsOpened());
 }
@@ -228,7 +228,7 @@ HWTEST_F(DSpeakerDevTest, Stop_001, TestSize.Level1)
 {
     spk_->speakerTrans_ = nullptr;
     EXPECT_EQ(DH_SUCCESS, spk_->Stop());
-    EXPECT_EQ(ERR_DH_AUDIO_TRANS_ERROR, spk_->SetUp());
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, spk_->SetUp());
     EXPECT_EQ(DH_SUCCESS, spk_->Stop());
 
     spk_->speakerTrans_ = std::make_shared<MockIAudioDataTransport>();
@@ -245,7 +245,7 @@ HWTEST_F(DSpeakerDevTest, Stop_001, TestSize.Level1)
 HWTEST_F(DSpeakerDevTest, Stop_002, TestSize.Level1)
 {
     spk_->speakerTrans_ = nullptr;
-    EXPECT_EQ(ERR_DH_AUDIO_TRANS_ERROR, spk_->SetUp());
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, spk_->SetUp());
     EXPECT_NE(DH_SUCCESS, spk_->Start());
     EXPECT_EQ(DH_SUCCESS, spk_->Stop());
     EXPECT_FALSE(spk_->IsOpened());

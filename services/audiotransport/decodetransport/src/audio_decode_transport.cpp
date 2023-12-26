@@ -16,7 +16,6 @@
 #include "audio_decode_transport.h"
 
 #include "audio_data_channel.h"
-#include "audio_decoder_processor.h"
 #include "audio_direct_processor.h"
 #include "audio_param.h"
 #include "daudio_errorcode.h"
@@ -263,8 +262,6 @@ int32_t AudioDecodeTransport::RegisterProcessorListener(const AudioParam &localP
         DHLOGI("Use direct processor, renderFlags: %d, capturerFlags: %d.",
             localParam.renderOpts.renderFlags, localParam.captureOpts.capturerFlags);
         processor_ = std::make_shared<AudioDirectProcessor>();
-    } else {
-        processor_ = std::make_shared<AudioDecoderProcessor>();
     }
     int32_t ret = processor_->ConfigureAudioProcessor(localParam.comParam, remoteParam.comParam, shared_from_this());
     if (ret != DH_SUCCESS) {

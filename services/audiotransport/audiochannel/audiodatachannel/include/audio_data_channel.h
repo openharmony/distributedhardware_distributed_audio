@@ -21,12 +21,13 @@
 
 #include "iaudio_channel_listener.h"
 #include "iaudio_channel.h"
-#include "softbus_adapter.h"
+#include "daudio_errorcode.h"
+#include "daudio_log.h"
+#include "daudio_util.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 class AudioDataChannel : public IAudioChannel,
-    public ISoftbusListener,
     public std::enable_shared_from_this<AudioDataChannel> {
 public:
     explicit AudioDataChannel(const std::string &peerDevId) : peerDevId_(peerDevId) {};
@@ -39,12 +40,6 @@ public:
     int32_t CloseSession() override;
     int32_t SendData(const std::shared_ptr<AudioData> &audioData) override;
     int32_t SendEvent(const AudioEvent &audioEvent) override;
-
-    void OnSessionOpened(int32_t sessionId, int32_t result) override;
-    void OnSessionClosed(int32_t sessionId) override;
-    void OnBytesReceived(int32_t sessionId, const void *data, uint32_t dataLen) override;
-    void OnStreamReceived(int32_t sessionId, const StreamData *data, const StreamData *ext,
-        const StreamFrameInfo *streamFrameInfo) override;
 
 private:
     const std::string peerDevId_;
