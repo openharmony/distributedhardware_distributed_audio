@@ -54,10 +54,7 @@ int32_t DAudioSourceHandler::InitSource(const std::string &params)
     DHLOGI("Init source handler.");
     if (dAudioSourceProxy_ == nullptr) {
         sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-        if (samgr == nullptr) {
-            DHLOGE("Failed to get system ability mgr.");
-            return ERR_DH_AUDIO_NULLPTR;
-        }
+        CHECK_NULL_RETURN(samgr, ERR_DH_AUDIO_NULLPTR);
         sptr<DAudioSourceLoadCallback> loadCallback = new DAudioSourceLoadCallback(params);
         int32_t ret = samgr->LoadSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SOURCE_SA_ID, loadCallback);
         if (ret != ERR_OK) {
@@ -102,14 +99,8 @@ int32_t DAudioSourceHandler::RegisterDistributedHardware(const std::string &devI
 {
     DHLOGI("Register distributed hardware, devId: %s, dhId: %s.", GetAnonyString(devId).c_str(), dhId.c_str());
     std::lock_guard<std::mutex> lock(sourceProxyMutex_);
-    if (dAudioSourceProxy_ == nullptr) {
-        DHLOGE("Daudio source proxy not init.");
-        return ERR_DH_AUDIO_SA_PROXY_NOT_INIT;
-    }
-    if (dAudioIpcCallback_ == nullptr) {
-        DHLOGE("Daudio ipc callback is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(dAudioSourceProxy_, ERR_DH_AUDIO_SA_PROXY_NOT_INIT);
+    CHECK_NULL_RETURN(dAudioIpcCallback_, ERR_DH_AUDIO_NULLPTR);
     if (devId.length() > DAUDIO_MAX_DEVICE_ID_LEN || dhId.length() > DAUDIO_MAX_DEVICE_ID_LEN) {
         return ERR_DH_AUDIO_SA_DEVID_ILLEGAL;
     }
@@ -124,14 +115,8 @@ int32_t DAudioSourceHandler::UnregisterDistributedHardware(const std::string &de
 {
     DHLOGI("Unregister distributed hardware, devId: %s, dhId: %s.", GetAnonyString(devId).c_str(), dhId.c_str());
     std::lock_guard<std::mutex> lock(sourceProxyMutex_);
-    if (dAudioSourceProxy_ == nullptr) {
-        DHLOGE("Daudio source proxy not init.");
-        return ERR_DH_AUDIO_SA_PROXY_NOT_INIT;
-    }
-    if (dAudioIpcCallback_ == nullptr) {
-        DHLOGE("Daudio ipc callback is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(dAudioSourceProxy_, ERR_DH_AUDIO_SA_PROXY_NOT_INIT);
+    CHECK_NULL_RETURN(dAudioIpcCallback_, ERR_DH_AUDIO_NULLPTR);
     if (devId.length() > DAUDIO_MAX_DEVICE_ID_LEN || dhId.length() > DAUDIO_MAX_DEVICE_ID_LEN) {
         return ERR_DH_AUDIO_SA_DEVID_ILLEGAL;
     }
@@ -146,10 +131,7 @@ int32_t DAudioSourceHandler::ConfigDistributedHardware(const std::string &devId,
 {
     DHLOGI("Config distributed hardware, devId: %s, dhId: %s.", GetAnonyString(devId).c_str(), dhId.c_str());
     std::lock_guard<std::mutex> lock(sourceProxyMutex_);
-    if (dAudioSourceProxy_ == nullptr) {
-        DHLOGE("Daudio source proxy not init.");
-        return ERR_DH_AUDIO_SA_PROXY_NOT_INIT;
-    }
+    CHECK_NULL_RETURN(dAudioSourceProxy_, ERR_DH_AUDIO_SA_PROXY_NOT_INIT);
     if (devId.length() > DAUDIO_MAX_DEVICE_ID_LEN || dhId.length() > DAUDIO_MAX_DEVICE_ID_LEN) {
         return ERR_DH_AUDIO_SA_DEVID_ILLEGAL;
     }

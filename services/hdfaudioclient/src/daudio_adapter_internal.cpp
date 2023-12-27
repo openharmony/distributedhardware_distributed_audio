@@ -34,15 +34,9 @@ using namespace OHOS::HDI::DistributedAudio::Audio::V1_0;
 
 static int32_t InitAllPortsInternal(struct AudioAdapter *adapter)
 {
-    if (adapter == nullptr) {
-        DHLOGE("The parameter is empty.");
-        return ERR_DH_AUDIO_HDI_INVALID_PARAM;
-    }
+    CHECK_NULL_RETURN(adapter, ERR_DH_AUDIO_HDI_INVALID_PARAM);
     AudioAdapterContext *context = reinterpret_cast<AudioAdapterContext *>(adapter);
-    if (context->proxy_ == nullptr) {
-        DHLOGE("The context or proxy for the context is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(context->proxy_, ERR_DH_AUDIO_NULLPTR);
     return context->proxy_->InitAllPorts();
 }
 
@@ -68,16 +62,13 @@ static int32_t CreateRenderInternal(struct AudioAdapter *adapter, const struct :
     const struct ::AudioSampleAttributes *attrs, struct AudioRender **render)
 {
     DHLOGI("Create distributed audio render.");
-    if (adapter == nullptr || desc == nullptr || attrs == nullptr || render == nullptr) {
-        DHLOGE("The parameter is empty.");
-        return ERR_DH_AUDIO_HDI_INVALID_PARAM;
-    }
+    CHECK_NULL_RETURN(adapter, ERR_DH_AUDIO_HDI_INVALID_PARAM);
+    CHECK_NULL_RETURN(desc, ERR_DH_AUDIO_HDI_INVALID_PARAM);
+    CHECK_NULL_RETURN(attrs, ERR_DH_AUDIO_HDI_INVALID_PARAM);
+    CHECK_NULL_RETURN(render, ERR_DH_AUDIO_HDI_INVALID_PARAM);
 
     AudioAdapterContext *context = reinterpret_cast<AudioAdapterContext *>(adapter);
-    if (context->proxy_ == nullptr) {
-        DHLOGE("The context or proxy for the context is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(context->proxy_, ERR_DH_AUDIO_NULLPTR);
     AudioDeviceDescriptor descHal = {
         .portId = desc->portId,
         .pins = static_cast<AudioPortPin>(desc->pins),
@@ -108,19 +99,13 @@ static int32_t CreateRenderInternal(struct AudioAdapter *adapter, const struct :
 static int32_t DestroyRenderInternal(struct AudioAdapter *adapter, struct AudioRender *render)
 {
     DHLOGI("Destroy distributed audio render.");
-    if (adapter == nullptr || render == nullptr) {
-        DHLOGE("The parameter is empty.");
-        return ERR_DH_AUDIO_HDI_INVALID_PARAM;
-    }
-
+    CHECK_NULL_RETURN(adapter, ERR_DH_AUDIO_HDI_INVALID_PARAM);
+    CHECK_NULL_RETURN(render, ERR_DH_AUDIO_HDI_INVALID_PARAM);
     AudioAdapterContext *adapterContext = reinterpret_cast<AudioAdapterContext *>(adapter);
     AudioRenderContext *renderContext = reinterpret_cast<AudioRenderContext *>(render);
-    if (adapterContext->proxy_ == nullptr) {
-        DHLOGE("The adapter context or proxy for the adapter context is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
-    std::lock_guard<std::mutex> lock(adapterContext->mtx_);
+    CHECK_NULL_RETURN(adapterContext->proxy_, ERR_DH_AUDIO_NULLPTR);
 
+    std::lock_guard<std::mutex> lock(adapterContext->mtx_);
     for (auto it = adapterContext->renders_.begin(); it != adapterContext->renders_.end(); ++it) {
         if ((it->second).get() == renderContext) {
             int32_t ret = adapterContext->proxy_->DestroyRender(it->first);
@@ -138,16 +123,13 @@ static int32_t CreateCaptureInternal(struct AudioAdapter *adapter, const struct 
     const struct ::AudioSampleAttributes *attrs, struct AudioCapture **capture)
 {
     DHLOGI("Create distributed audio capture.");
-    if (adapter == nullptr || desc == nullptr || attrs == nullptr || capture == nullptr) {
-        DHLOGE("The parameter is empty.");
-        return ERR_DH_AUDIO_HDI_INVALID_PARAM;
-    }
-
+    CHECK_NULL_RETURN(adapter, ERR_DH_AUDIO_HDI_INVALID_PARAM);
+    CHECK_NULL_RETURN(desc, ERR_DH_AUDIO_HDI_INVALID_PARAM);
+    CHECK_NULL_RETURN(attrs, ERR_DH_AUDIO_HDI_INVALID_PARAM);
+    CHECK_NULL_RETURN(capture, ERR_DH_AUDIO_HDI_INVALID_PARAM);
     AudioAdapterContext *context = reinterpret_cast<AudioAdapterContext *>(adapter);
-    if (context->proxy_ == nullptr) {
-        DHLOGE("The context or proxy for the context is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(context->proxy_, ERR_DH_AUDIO_NULLPTR);
+
     AudioDeviceDescriptor descHal = {
         .portId = desc->portId,
         .pins = static_cast<AudioPortPin>(desc->pins),
@@ -178,19 +160,13 @@ static int32_t CreateCaptureInternal(struct AudioAdapter *adapter, const struct 
 static int32_t DestroyCaptureInternal(struct AudioAdapter *adapter, struct AudioCapture *capture)
 {
     DHLOGI("Destroy distributed audio capture.");
-    if (adapter == nullptr || capture == nullptr) {
-        DHLOGE("The parameter is empty.");
-        return ERR_DH_AUDIO_HDI_INVALID_PARAM;
-    }
-
+    CHECK_NULL_RETURN(adapter, ERR_DH_AUDIO_HDI_INVALID_PARAM);
+    CHECK_NULL_RETURN(capture, ERR_DH_AUDIO_HDI_INVALID_PARAM);
     AudioAdapterContext *adapterContext = reinterpret_cast<AudioAdapterContext *>(adapter);
     AudioCaptureContext *captureContext = reinterpret_cast<AudioCaptureContext *>(capture);
-    if (adapterContext->proxy_ == nullptr) {
-        DHLOGE("The adapter context or proxy for the adapter context is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
-    std::lock_guard<std::mutex> lock(adapterContext->mtx_);
+    CHECK_NULL_RETURN(adapterContext->proxy_, ERR_DH_AUDIO_NULLPTR);
 
+    std::lock_guard<std::mutex> lock(adapterContext->mtx_);
     for (auto it = adapterContext->captures_.begin(); it != adapterContext->captures_.end(); ++it) {
         if ((it->second).get() == captureContext) {
             int32_t ret = adapterContext->proxy_->DestroyCapture(it->first);
@@ -207,16 +183,12 @@ static int32_t DestroyCaptureInternal(struct AudioAdapter *adapter, struct Audio
 static int32_t GetPassthroughModeInternal(struct AudioAdapter *adapter, const struct ::AudioPort *port,
     enum ::AudioPortPassthroughMode *mode)
 {
-    if (adapter == nullptr || port == nullptr || mode == nullptr) {
-        DHLOGE("The parameter is empty.");
-        return ERR_DH_AUDIO_HDI_INVALID_PARAM;
-    }
-
+    CHECK_NULL_RETURN(adapter, ERR_DH_AUDIO_HDI_INVALID_PARAM);
+    CHECK_NULL_RETURN(port, ERR_DH_AUDIO_HDI_INVALID_PARAM);
+    CHECK_NULL_RETURN(mode, ERR_DH_AUDIO_HDI_INVALID_PARAM);
     AudioAdapterContext *context = reinterpret_cast<AudioAdapterContext *>(adapter);
-    if (context->proxy_ == nullptr) {
-        DHLOGE("The context or proxy for the context is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(context->proxy_, ERR_DH_AUDIO_NULLPTR);
+
     AudioPort portHal = {
         .dir = static_cast<AudioPortDirection>(port->dir),
         .portId = port->portId,
@@ -236,10 +208,7 @@ static int32_t InitAudioPortCapability(std::unique_ptr<::AudioPortCapability> &c
         return ERR_DH_AUDIO_HDI_INVALID_PARAM;
     }
     ::AudioFormat *audioFormats = (::AudioFormat *)malloc(capabilityHal.formatNum * sizeof(::AudioFormat));
-    if (audioFormats == nullptr) {
-        DHLOGE("Malloc failed.");
-        return ERR_DH_AUDIO_HDI_CALL_FAILED;
-    }
+    CHECK_NULL_RETURN(audioFormats, ERR_DH_AUDIO_HDI_CALL_FAILED);
 
     capInternal->deviceType = capabilityHal.deviceType;
     capInternal->deviceId = capabilityHal.deviceId;
@@ -261,16 +230,13 @@ static int32_t InitAudioPortCapability(std::unique_ptr<::AudioPortCapability> &c
 static int32_t GetPortCapabilityInternal(struct AudioAdapter *adapter, const struct ::AudioPort *port,
     struct ::AudioPortCapability *capability)
 {
-    if (adapter == nullptr || port == nullptr || port->portName == nullptr || capability == nullptr) {
-        DHLOGE("The parameter is empty.");
-        return ERR_DH_AUDIO_HDI_INVALID_PARAM;
-    }
-
+    CHECK_NULL_RETURN(adapter, ERR_DH_AUDIO_HDI_INVALID_PARAM);
+    CHECK_NULL_RETURN(port, ERR_DH_AUDIO_HDI_INVALID_PARAM);
+    CHECK_NULL_RETURN(port->portName, ERR_DH_AUDIO_HDI_INVALID_PARAM);
+    CHECK_NULL_RETURN(capability, ERR_DH_AUDIO_HDI_INVALID_PARAM);
     AudioAdapterContext *context = reinterpret_cast<AudioAdapterContext *>(adapter);
-    if (context->proxy_ == nullptr) {
-        DHLOGE("The context or proxy for the context is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(context->proxy_, ERR_DH_AUDIO_NULLPTR);
+
     {
         std::lock_guard<std::mutex> lock(context->mtx_);
         auto iter = context->caps_.find(port->portId);
@@ -306,32 +272,20 @@ static int32_t GetPortCapabilityInternal(struct AudioAdapter *adapter, const str
 
 static int32_t ReleaseAudioRouteInternal(struct AudioAdapter *adapter, int32_t routeHandle)
 {
-    if (adapter == nullptr) {
-        DHLOGE("The parameter is empty.");
-        return ERR_DH_AUDIO_HDI_INVALID_PARAM;
-    }
-
+    CHECK_NULL_RETURN(adapter, ERR_DH_AUDIO_HDI_INVALID_PARAM);
     AudioAdapterContext *context = reinterpret_cast<AudioAdapterContext *>(adapter);
-    if (context->proxy_ == nullptr) {
-        DHLOGE("The context or proxy for the context is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(context->proxy_, ERR_DH_AUDIO_NULLPTR);
     return context->proxy_->ReleaseAudioRoute(routeHandle);
 }
 
 static int32_t SetPassthroughModeInternal(struct AudioAdapter *adapter, const struct ::AudioPort *port,
     enum ::AudioPortPassthroughMode mode)
 {
-    if (adapter == nullptr || port == nullptr) {
-        DHLOGE("The parameter is empty.");
-        return ERR_DH_AUDIO_HDI_INVALID_PARAM;
-    }
-
+    CHECK_NULL_RETURN(adapter, ERR_DH_AUDIO_HDI_INVALID_PARAM);
+    CHECK_NULL_RETURN(port, ERR_DH_AUDIO_HDI_INVALID_PARAM);
     AudioAdapterContext *context = reinterpret_cast<AudioAdapterContext *>(adapter);
-    if (context->proxy_ == nullptr) {
-        DHLOGE("The context or proxy for the context is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(context->proxy_, ERR_DH_AUDIO_NULLPTR);
+
     AudioPort portHal = {
         .dir = static_cast<AudioPortDirection>(port->dir),
         .portId = port->portId,
@@ -383,11 +337,9 @@ static void ConvertAudioRouteNodeToHAL(const ::AudioRouteNode &node, AudioRouteN
 static int32_t UpdateAudioRouteInternal(struct AudioAdapter *adapter, const struct ::AudioRoute *route,
     int32_t *routeHandle)
 {
-    if (adapter == nullptr || route == nullptr || routeHandle == nullptr) {
-        DHLOGE("The parameter is empty.");
-        return ERR_DH_AUDIO_HDI_INVALID_PARAM;
-    }
-
+    CHECK_NULL_RETURN(adapter, ERR_DH_AUDIO_HDI_INVALID_PARAM);
+    CHECK_NULL_RETURN(route, ERR_DH_AUDIO_HDI_INVALID_PARAM);
+    CHECK_NULL_RETURN(routeHandle, ERR_DH_AUDIO_HDI_INVALID_PARAM);
     AudioRoute audioRoute;
     for (uint32_t i = 0; i < route->sourcesNum; ++i) {
         AudioRouteNode halNode = {0};
@@ -403,10 +355,7 @@ static int32_t UpdateAudioRouteInternal(struct AudioAdapter *adapter, const stru
 
     int32_t handle = -1;
     AudioAdapterContext *context = reinterpret_cast<AudioAdapterContext *>(adapter);
-    if (context->proxy_ == nullptr) {
-        DHLOGE("The context or proxy for the context is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(context->proxy_, ERR_DH_AUDIO_NULLPTR);
     int32_t ret = context->proxy_->UpdateAudioRoute(audioRoute, handle);
     *routeHandle = handle;
     return ret;
@@ -415,16 +364,12 @@ static int32_t UpdateAudioRouteInternal(struct AudioAdapter *adapter, const stru
 static int32_t SetExtraParamsInternal(struct AudioAdapter *adapter, enum ::AudioExtParamKey key,
     const char *condition, const char *value)
 {
-    if (adapter == nullptr || condition == nullptr || value == nullptr) {
-        DHLOGE("The parameter is empty.");
-        return ERR_DH_AUDIO_HDI_INVALID_PARAM;
-    }
+    CHECK_NULL_RETURN(adapter, ERR_DH_AUDIO_HDI_INVALID_PARAM);
+    CHECK_NULL_RETURN(condition, ERR_DH_AUDIO_HDI_INVALID_PARAM);
+    CHECK_NULL_RETURN(value, ERR_DH_AUDIO_HDI_INVALID_PARAM);
 
     AudioAdapterContext *context = reinterpret_cast<AudioAdapterContext *>(adapter);
-    if (context->proxy_ == nullptr) {
-        DHLOGE("The context or proxy for the context is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(context->proxy_, ERR_DH_AUDIO_NULLPTR);
     return context->proxy_->SetExtraParams(static_cast<AudioExtParamKey>(key),
         std::string(condition), std::string(value));
 }
@@ -432,16 +377,12 @@ static int32_t SetExtraParamsInternal(struct AudioAdapter *adapter, enum ::Audio
 static int32_t GetExtraParamsInternal(struct AudioAdapter *adapter, enum ::AudioExtParamKey key,
     const char *condition, char *value, int32_t length)
 {
-    if (adapter == nullptr || condition == nullptr || value == nullptr) {
-        DHLOGE("The parameter is empty.");
-        return ERR_DH_AUDIO_HDI_INVALID_PARAM;
-    }
-
+    CHECK_NULL_RETURN(adapter, ERR_DH_AUDIO_HDI_INVALID_PARAM);
+    CHECK_NULL_RETURN(condition, ERR_DH_AUDIO_HDI_INVALID_PARAM);
+    CHECK_NULL_RETURN(value, ERR_DH_AUDIO_HDI_INVALID_PARAM);
     AudioAdapterContext *context = reinterpret_cast<AudioAdapterContext *>(adapter);
-    if (context->proxy_ == nullptr) {
-        DHLOGE("The context or proxy for the context is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(context->proxy_, ERR_DH_AUDIO_NULLPTR);
+
     std::string valueHal;
     int32_t ret =
         context->proxy_->GetExtraParams(static_cast<AudioExtParamKey>(key),
@@ -459,16 +400,11 @@ static int32_t GetExtraParamsInternal(struct AudioAdapter *adapter, enum ::Audio
 
 static int32_t RegExtraParamObserverInternal(struct AudioAdapter *adapter, ParamCallback callback, void* cookie)
 {
-    if (adapter == nullptr || callback == nullptr) {
-        DHLOGE("The parameter is empty.");
-        return ERR_DH_AUDIO_HDI_INVALID_PARAM;
-    }
-
+    CHECK_NULL_RETURN(adapter, ERR_DH_AUDIO_HDI_INVALID_PARAM);
+    CHECK_NULL_RETURN(callback, ERR_DH_AUDIO_HDI_INVALID_PARAM);
     AudioAdapterContext *context = reinterpret_cast<AudioAdapterContext *>(adapter);
-    if (context->proxy_ == nullptr) {
-        DHLOGE("The context or proxy for the context is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(context->proxy_, ERR_DH_AUDIO_NULLPTR);
+
     std::lock_guard<std::mutex> lock(context->mtx_);
     if (context->callbackInternal_ == nullptr || callback != context->callback_) {
         context->callbackInternal_ = std::make_unique<AudioParamCallbackContext>(callback, cookie);

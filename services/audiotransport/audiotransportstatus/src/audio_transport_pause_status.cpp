@@ -42,21 +42,16 @@ int32_t AudioTransportPauseStatus::Stop(std::shared_ptr<IAudioChannel> audioChan
     std::shared_ptr<IAudioProcessor> processor)
 {
     (void)processor;
-    DHLOGI("Audiotransport status is pause.");
-    if (audioChannel == nullptr) {
-        DHLOGE("audioChannel is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    DHLOGI("Audio transport status is pause.");
+    CHECK_NULL_RETURN(audioChannel, ERR_DH_AUDIO_NULLPTR);
     int32_t ret = audioChannel->CloseSession();
     if (ret != DH_SUCCESS) {
         DHLOGE("Close session failed, ret: %d.", ret);
         return ret;
     }
+
     std::shared_ptr<AudioTransportContext> stateContext = stateContext_.lock();
-    if (stateContext == nullptr) {
-        DHLOGE("AudioTransport start can not get context");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(stateContext, ERR_DH_AUDIO_NULLPTR);
     stateContext->SetTransportStatus(TRANSPORT_STATE_STOP);
     return DH_SUCCESS;
 }
@@ -64,7 +59,7 @@ int32_t AudioTransportPauseStatus::Stop(std::shared_ptr<IAudioChannel> audioChan
 int32_t AudioTransportPauseStatus::Pause(std::shared_ptr<IAudioProcessor> processor)
 {
     (void)processor;
-    DHLOGI("Audiotransport status is pasue.");
+    DHLOGI("Audio transport status is pasue.");
     return DH_SUCCESS;
 }
 
@@ -72,20 +67,15 @@ int32_t AudioTransportPauseStatus::Restart(const AudioParam &localParam, const A
     std::shared_ptr<IAudioProcessor> processor)
 {
     DHLOGI("Restart.");
-    if (processor == nullptr) {
-        DHLOGE("processor is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(processor, ERR_DH_AUDIO_NULLPTR);
     auto ret = processor->StartAudioProcessor();
     if (ret != DH_SUCCESS) {
-        DHLOGE("Restart processor_ failed, ret: %d.", ret);
+        DHLOGE("Restart processor failed, ret: %d.", ret);
         return ret;
     }
+
     std::shared_ptr<AudioTransportContext> stateContext = stateContext_.lock();
-    if (stateContext == nullptr) {
-        DHLOGE("AudioTransport start can not get context");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(stateContext, ERR_DH_AUDIO_NULLPTR);
     stateContext->SetTransportStatus(TRANSPORT_STATE_START);
     DHLOGI("Restart success.");
     return DH_SUCCESS;
@@ -93,7 +83,7 @@ int32_t AudioTransportPauseStatus::Restart(const AudioParam &localParam, const A
 
 TransportStateType AudioTransportPauseStatus::GetStateType()
 {
-    DHLOGI("Audiotransport get state stype.");
+    DHLOGI("Audio transport get state stype.");
     return TRANSPORT_STATE_PAUSE;
 }
 } // namespace DistributedHardware

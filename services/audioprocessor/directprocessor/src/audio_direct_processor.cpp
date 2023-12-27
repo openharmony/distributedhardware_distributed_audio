@@ -29,11 +29,7 @@ int32_t AudioDirectProcessor::ConfigureAudioProcessor(const AudioCommonParam &lo
     const AudioCommonParam &remoteDevParam, const std::shared_ptr<IAudioProcessorCallback> &procCallback)
 {
     DHLOGI("Configure direct audio processor.");
-    if (procCallback == nullptr) {
-        DHLOGE("Processor callback is null.");
-        return ERR_DH_AUDIO_BAD_VALUE;
-    }
-
+    CHECK_NULL_RETURN(procCallback, ERR_DH_AUDIO_BAD_VALUE);
     procCallback_ = procCallback;
     return DH_SUCCESS;
 }
@@ -59,16 +55,9 @@ int32_t AudioDirectProcessor::StopAudioProcessor()
 int32_t AudioDirectProcessor::FeedAudioProcessor(const std::shared_ptr<AudioData> &inputData)
 {
     DHLOGD("Feed audio processor.");
-    if (inputData == nullptr) {
-        DHLOGE("Input data is null.");
-        return ERR_DH_AUDIO_BAD_VALUE;
-    }
-
+    CHECK_NULL_RETURN(inputData, ERR_DH_AUDIO_BAD_VALUE);
     auto cbObj = procCallback_.lock();
-    if (cbObj == nullptr) {
-        DHLOGE("Processor callback is null.");
-        return ERR_DH_AUDIO_BAD_VALUE;
-    }
+    CHECK_NULL_RETURN(cbObj, ERR_DH_AUDIO_BAD_VALUE);
     cbObj->OnAudioDataDone(inputData);
     return DH_SUCCESS;
 }

@@ -33,26 +33,21 @@ int32_t AudioTransportStartStatus::Start(std::shared_ptr<IAudioChannel> audioCha
 {
     (void)audioChannel;
     (void)processor;
-    DHLOGI("Audiotransport status is start.");
+    DHLOGI("Audio transport status is start.");
     return DH_SUCCESS;
 }
 
 int32_t AudioTransportStartStatus::Stop(std::shared_ptr<IAudioChannel> audioChannel,
     std::shared_ptr<IAudioProcessor> processor)
 {
-    DHLOGI("Audiotransport status is start.");
-    if (processor == nullptr) {
-        DHLOGE("processor is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    DHLOGI("Audio transport status is start.");
+    CHECK_NULL_RETURN(processor, ERR_DH_AUDIO_NULLPTR);
+    CHECK_NULL_RETURN(audioChannel, ERR_DH_AUDIO_NULLPTR);
+
     int32_t ret = processor->StopAudioProcessor();
     if (ret != DH_SUCCESS) {
         DHLOGE("Stop audio processor failed, ret: %d.", ret);
         return ret;
-    }
-    if (audioChannel == nullptr) {
-        DHLOGE("audioChannel is null.");
-        return ERR_DH_AUDIO_NULLPTR;
     }
     ret = audioChannel->CloseSession();
     if (ret != DH_SUCCESS) {
@@ -60,22 +55,15 @@ int32_t AudioTransportStartStatus::Stop(std::shared_ptr<IAudioChannel> audioChan
         return ret;
     }
     std::shared_ptr<AudioTransportContext> stateContext = stateContext_.lock();
-    if (stateContext == nullptr) {
-        DHLOGE("AudioTransport start can not get context");
-        return ERR_DH_AUDIO_BAD_VALUE;
-    }
+    CHECK_NULL_RETURN(stateContext, ERR_DH_AUDIO_BAD_VALUE);
     stateContext->SetTransportStatus(TRANSPORT_STATE_STOP);
     return DH_SUCCESS;
 }
 
 int32_t AudioTransportStartStatus::Pause(std::shared_ptr<IAudioProcessor> processor)
 {
-    DHLOGI("Audiotransport status is start.");
-    if (processor == nullptr) {
-        DHLOGE("Processor_ is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
-
+    DHLOGI("Audio transport status is start.");
+    CHECK_NULL_RETURN(processor, ERR_DH_AUDIO_NULLPTR);
     int32_t ret = processor->StopAudioProcessor();
     if (ret != DH_SUCCESS) {
         DHLOGE("Pause processor failed, ret: %d.", ret);
@@ -86,11 +74,9 @@ int32_t AudioTransportStartStatus::Pause(std::shared_ptr<IAudioProcessor> proces
         DHLOGE("Release audio processor failed, ret: %d.", ret);
         return ret;
     }
+
     std::shared_ptr<AudioTransportContext> stateContext = stateContext_.lock();
-    if (stateContext == nullptr) {
-        DHLOGE("AudioTransport start can not get context");
-        return ERR_DH_AUDIO_BAD_VALUE;
-    }
+    CHECK_NULL_RETURN(stateContext, ERR_DH_AUDIO_BAD_VALUE);
     stateContext->SetTransportStatus(TRANSPORT_STATE_PAUSE);
     DHLOGI("Pause success.");
     return DH_SUCCESS;
@@ -102,13 +88,13 @@ int32_t AudioTransportStartStatus::Restart(const AudioParam &localParam, const A
     (void)localParam;
     (void)remoteParam;
     (void)processor;
-    DHLOGE("Audiotransport status is start.");
+    DHLOGE("Audio transport status is start.");
     return DH_SUCCESS;
 }
 
 TransportStateType AudioTransportStartStatus::GetStateType()
 {
-    DHLOGD("Get audiotransport status.");
+    DHLOGD("Get audio transport status.");
     return TRANSPORT_STATE_START;
 }
 } // namespace DistributedHardware

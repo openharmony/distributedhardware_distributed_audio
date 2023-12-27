@@ -84,10 +84,7 @@ int32_t DAudioSinkService::ReleaseSink()
     DAudioSinkManager::GetInstance().UnInit();
     DHLOGI("Audio sink service process exit.");
     auto systemAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (systemAbilityMgr == nullptr) {
-        DHLOGE("Failed to get systemabilitymanager.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(systemAbilityMgr, ERR_DH_AUDIO_NULLPTR);
     int32_t ret = systemAbilityMgr->UnloadSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID);
     if (ret != DH_SUCCESS) {
         DHLOGE("Sink systemabilitymgr unloadsystemability failed, ret: %d", ret);

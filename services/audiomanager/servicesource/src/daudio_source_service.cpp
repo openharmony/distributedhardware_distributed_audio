@@ -84,10 +84,7 @@ int32_t DAudioSourceService::ReleaseSource()
     DAudioSourceManager::GetInstance().UnInit();
     DHLOGI("Audio source service process exit.");
     auto systemAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (systemAbilityMgr == nullptr) {
-        DHLOGE("Failed to get systemabilitymanager.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(systemAbilityMgr, ERR_DH_AUDIO_NULLPTR);
     int32_t ret = systemAbilityMgr->UnloadSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SOURCE_SA_ID);
     if (ret != DH_SUCCESS) {
         DHLOGE("Source systemabilitymgr unloadsystemability failed, ret: %d", ret);

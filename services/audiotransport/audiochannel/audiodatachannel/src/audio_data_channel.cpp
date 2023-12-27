@@ -28,11 +28,7 @@ int32_t AudioDataChannel::CreateSession(const std::shared_ptr<IAudioChannelListe
     const std::string &sessionName)
 {
     DHLOGI("Create session, peerDevId: %s.", GetAnonyString(peerDevId_).c_str());
-    if (listener == nullptr) {
-        DHLOGE("Channel listener is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
-
+    CHECK_NULL_RETURN(listener, ERR_DH_AUDIO_NULLPTR);
     channelListener_ = listener;
     sessionName_ = sessionName;
     DHLOGI("Create softbus session success.");
