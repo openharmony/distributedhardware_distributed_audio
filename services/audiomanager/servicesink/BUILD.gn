@@ -38,17 +38,7 @@ ohos_shared_library("distributed_audio_sink") {
     "${audio_client_path}/micclient/include",
     "${audio_client_path}/spkclient/include",
     "${audio_control_path}/controlsink/include",
-    "${audio_processor_path}/encodeprocessor/include",
-    "${audio_processor_path}/decodeprocessor/include",
     "${audio_processor_path}/interface",
-    "${audio_transport_path}/audiochannel/audiodatachannel/include",
-    "${audio_transport_path}/audiochannel/interface",
-    "${audio_transport_path}/audioctrltransport/include",
-    "${audio_transport_path}/audioctrltransport/interface",
-    "${audio_transport_path}/audiotransportstatus/include",
-    "${audio_transport_path}/audiotransportstatus/interface",
-    "${audio_transport_path}/decodetransport/include",
-    "${audio_transport_path}/encodetransport/include",
     "${audio_transport_path}/interface",
     "${audio_transport_path}/receiverengine/include",
     "${audio_transport_path}/senderengine/include",
@@ -79,8 +69,8 @@ ohos_shared_library("distributed_audio_sink") {
   ]
 
   deps = [
-    "${audio_transport_path}/decodetransport:distributed_audio_decode_transport",
-    "${audio_transport_path}/encodetransport:distributed_audio_encode_transport",
+    "${audio_transport_path}/receiverengine:distributed_audio_decode_transport",
+    "${audio_transport_path}/senderengine:distributed_audio_encode_transport",
     "${innerkits_path}/native_cpp/audio_sink:distributed_audio_sink_sdk",
     "${services_path}/common:distributed_audio_utils",
     "//third_party/cJSON:cjson",

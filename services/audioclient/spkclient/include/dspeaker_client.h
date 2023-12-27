@@ -21,6 +21,7 @@
 #include <cstdint>
 #include <memory>
 #include <mutex>
+#include <queue>
 #include <securec.h>
 #include <sstream>
 #include <string>
@@ -33,7 +34,6 @@
 
 #include "audio_data.h"
 #include "audio_status.h"
-#include "audio_decode_transport.h"
 #include "audio_event.h"
 #include "av_receiver_engine_transport.h"
 #include "daudio_constants.h"

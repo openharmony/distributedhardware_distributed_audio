@@ -18,7 +18,6 @@ import("../../../../distributedaudio.gni")
 group("daudio_transport_test") {
   testonly = true
   deps = [
-    "${audio_transport_path}/test/unittest/audiotransportstatus:transport_status_test",
     "${audio_transport_path}/test/unittest/receiverengine:av_receiver_engine_adapter_test",
     "${audio_transport_path}/test/unittest/senderengine:av_sender_engine_adapter_test",
   ]

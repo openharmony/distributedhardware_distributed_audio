@@ -15,9 +15,6 @@
 
 #include "daudio_source_dev_test.h"
 
-#include "audio_encode_transport.h"
-#include "audio_decode_transport.h"
-
 using namespace testing::ext;
 
 namespace OHOS {
@@ -632,7 +629,7 @@ HWTEST_F(DAudioSourceDevTest, TaskCloseDSpeaker_002, TestSize.Level1)
     auto speaker = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
     int32_t dhId = DEFAULT_RENDER_ID;
     sourceDev_->deviceMap_[dhId] = speaker;
-    speaker->speakerTrans_ = std::make_shared<AudioEncodeTransport>(DEV_ID);
+    speaker->speakerTrans_ = std::make_shared<AVTransSenderTransport>(DEV_ID, speaker);
 
     json jParam_spk = { { KEY_DH_ID, DH_ID_SPK } };
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->TaskCloseDSpeaker(jParam_spk.dump()));
@@ -701,7 +698,7 @@ HWTEST_F(DAudioSourceDevTest, TaskCloseDMic_002, TestSize.Level1)
     auto mic = std::make_shared<DMicDev>(DEV_ID, sourceDev_);
     int32_t dhId = DEFAULT_CAPTURE_ID;
     sourceDev_->deviceMap_[dhId] = mic;
-    mic->micTrans_ = std::make_shared<AudioDecodeTransport>(DEV_ID);
+    mic->micTrans_ = std::make_shared<AVTransReceiverTransport>(DEV_ID, mic);
 
     json jParam_mic = { { KEY_DH_ID, DH_ID_MIC } };
     EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskCloseDMic(jParam_mic.dump()));
@@ -747,7 +744,7 @@ HWTEST_F(DAudioSourceDevTest, TaskSetVolume_001, TestSize.Level1)
     json jParam = { { STREAM_MUTE_STATUS, 3 }, { "dhId", "3" } };
     auto speaker = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
     sourceDev_->deviceMap_[dhId] = speaker;
-    speaker->speakerTrans_ = std::make_shared<AudioEncodeTransport>(DEV_ID);
+    speaker->speakerTrans_ = std::make_shared<AVTransSenderTransport>(DEV_ID, speaker);
     EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskSetVolume(jParam.dump()));
 }
 

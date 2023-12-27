@@ -49,7 +49,7 @@ ohos_unittest("AVTransSenderAdapterTest") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "${audio_transport_path}/encodetransport:distributed_audio_encode_transport",
+    "${audio_transport_path}/senderengine:distributed_audio_encode_transport",
     "${services_path}/common:distributed_audio_utils",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",

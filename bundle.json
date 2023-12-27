@@ -71,10 +71,8 @@
                 "//foundation/distributedhardware/distributed_audio/services/audiomanager/servicesource:distributed_audio_source",
                 "//foundation/distributedhardware/distributed_audio/services/audiomanager/servicesink:distributed_audio_sink",
 
-                "//foundation/distributedhardware/distributed_audio/services/audiotransport/audiochannel/audiodatachannel:distributed_audio_data_channel",
-                "//foundation/distributedhardware/distributed_audio/services/audiotransport/audiotransportstatus:distributed_audio_transport_status",
-                "//foundation/distributedhardware/distributed_audio/services/audiotransport/decodetransport:distributed_audio_decode_transport",
-                "//foundation/distributedhardware/distributed_audio/services/audiotransport/encodetransport:distributed_audio_encode_transport",
+                "//foundation/distributedhardware/distributed_audio/services/audiotransport/receiverengine:distributed_audio_decode_transport",
+                "//foundation/distributedhardware/distributed_audio/services/audiotransport/senderengine:distributed_audio_encode_transport",
                 "//foundation/distributedhardware/distributed_audio/services/test_example:audio_distributed_test"
             ],
             "inner_kits": [{
@@ -99,21 +97,23 @@
                 },
                 {
                     "type": "so",
-                    "name": "//foundation/distributedhardware/distributed_audio/services/audiotransport/decodetransport:distributed_audio_decode_transport",
+                    "name": "//foundation/distributedhardware/distributed_audio/services/audiotransport/receiverengine:distributed_audio_decode_transport",
                     "header": {
-                        "header_base": "//foundation/distributedhardware/distributed_audio/services/audiotransport/decodetransport",
+                        "header_base": "//foundation/distributedhardware/distributed_audio/services/audiotransport/receiverengine",
                         "header_files": [
-                            "include/audio_decode_transport.h"
+                            "include/av_receiver_engine_adapter.h",
+                            "include/av_receiver_engine_transport.h"
                         ]
                     }
                 },
                 {
                     "type": "so",
-                    "name": "//foundation/distributedhardware/distributed_audio/services/audiotransport/encodetransport:distributed_audio_encode_transport",
+                    "name": "//foundation/distributedhardware/distributed_audio/services/audiotransport/senderengine:distributed_audio_encode_transport",
                     "header": {
-                        "header_base": "//foundation/distributedhardware/distributed_audio/services/audiotransport/encodetransport",
+                        "header_base": "//foundation/distributedhardware/distributed_audio/services/audiotransport/senderengine",
                         "header_files": [
-                            "include/audio_encode_transport.h"
+                            "include/av_sender_engine_adapter.h",
+                            "include/av_sender_engine_transport.h"
                         ]
                     }
                 },
