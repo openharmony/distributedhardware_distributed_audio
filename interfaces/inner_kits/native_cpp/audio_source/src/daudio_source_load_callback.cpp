@@ -28,10 +28,7 @@ void DAudioSourceLoadCallback::OnLoadSystemAbilitySuccess(int32_t systemAbilityI
     const sptr<IRemoteObject> &remoteObject)
 {
     DHLOGI("Load audio SA success, systemAbilityId: %d.", systemAbilityId);
-    if (remoteObject == nullptr) {
-        DHLOGE("remoteObject is nullptr");
-        return;
-    }
+    CHECK_NULL_VOID(remoteObject);
     DAudioSourceHandler::GetInstance().FinishStartSA(params_, remoteObject);
 }
 

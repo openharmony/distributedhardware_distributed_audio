@@ -35,15 +35,12 @@ using namespace OHOS::HDI::DistributedAudio::Audio::V1_0;
 static int32_t GetCapturePositionInternal(struct AudioCapture *capture, uint64_t *frames,
     struct ::AudioTimeStamp *time)
 {
-    if (capture == nullptr || frames == nullptr || time == nullptr) {
-        DHLOGE("The parameter is empty.");
-        return ERR_DH_AUDIO_HDI_INVALID_PARAM;
-    }
+    CHECK_NULL_RETURN(capture, ERR_DH_AUDIO_HDI_INVALID_PARAM);
+    CHECK_NULL_RETURN(frames, ERR_DH_AUDIO_HDI_INVALID_PARAM);
+    CHECK_NULL_RETURN(time, ERR_DH_AUDIO_HDI_INVALID_PARAM);
+
     AudioCaptureContext *context = reinterpret_cast<AudioCaptureContext *>(capture);
-    if (context->proxy_ == nullptr) {
-        DHLOGE("The context or proxy for the context is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(context->proxy_, ERR_DH_AUDIO_NULLPTR);
     AudioTimeStamp timeHal;
     int32_t ret = context->proxy_->GetCapturePosition(*frames, timeHal);
     if (ret != DH_SUCCESS) {
@@ -58,16 +55,12 @@ static int32_t GetCapturePositionInternal(struct AudioCapture *capture, uint64_t
 static int32_t CaptureFrameInternal(struct AudioCapture *capture, void *frame, uint64_t requestBytes,
     uint64_t *replyBytes)
 {
-    if (capture == nullptr || frame == nullptr || requestBytes == 0 || replyBytes == nullptr) {
-        DHLOGE("The parameter is empty.");
-        return ERR_DH_AUDIO_HDI_INVALID_PARAM;
-    }
+    CHECK_NULL_RETURN(capture, ERR_DH_AUDIO_HDI_INVALID_PARAM);
+    CHECK_NULL_RETURN(frame, ERR_DH_AUDIO_HDI_INVALID_PARAM);
+    CHECK_NULL_RETURN(replyBytes, ERR_DH_AUDIO_HDI_INVALID_PARAM);
 
     AudioCaptureContext *context = reinterpret_cast<AudioCaptureContext *>(capture);
-    if (context->proxy_ == nullptr) {
-        DHLOGE("The context or proxy for the context is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(context->proxy_, ERR_DH_AUDIO_NULLPTR);
     int8_t *uframe = reinterpret_cast<int8_t *>(frame);
     std::vector<int8_t> frameHal;
     int32_t ret = context->proxy_->CaptureFrame(frameHal, *replyBytes);

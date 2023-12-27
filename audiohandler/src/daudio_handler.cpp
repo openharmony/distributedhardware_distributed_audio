@@ -138,10 +138,7 @@ int32_t DAudioHandler::QueryCodecInfo()
 {
     DHLOGD("Query codec information.");
     auto avCodecList = Media::AVCodecListFactory::CreateAVCodecList();
-    if (avCodecList == nullptr) {
-        DHLOGE("Failed to query the avcodec information.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(avCodecList, ERR_DH_AUDIO_NULLPTR);
 
     bool queryFlag = false;
     for (auto codec : avCodecList->GetAudioEncoderCaps()) {
@@ -249,10 +246,7 @@ bool DAudioHandler::IsSupportPlugin()
 void DAudioHandler::RegisterPluginListener(std::shared_ptr<PluginListener> listener)
 {
     DHLOGI("Register plugin listener");
-    if (listener == nullptr) {
-        DHLOGE("The parameter is empty.");
-        return;
-    }
+    CHECK_NULL_VOID(listener);
     listener_ = listener;
 }
 

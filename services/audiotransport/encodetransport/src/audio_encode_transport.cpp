@@ -29,10 +29,7 @@ namespace DistributedHardware {
 int32_t AudioEncodeTransport::SetUp(const AudioParam &localParam, const AudioParam &remoteParam,
     const std::shared_ptr<IAudioDataTransCallback> &callback, const PortCapType capType)
 {
-    if (callback == nullptr) {
-        DHLOGE("The parameter is empty.");
-        return ERR_DH_AUDIO_TRANS_ERROR;
-    }
+    CHECK_NULL_RETURN(callback, ERR_DH_AUDIO_TRANS_ERROR);
     dataTransCallback_ = callback;
     context_ = std::make_shared<AudioTransportContext>();
     context_->SetTransportStatus(TRANSPORT_STATE_STOP);
@@ -49,10 +46,8 @@ int32_t AudioEncodeTransport::SetUp(const AudioParam &localParam, const AudioPar
 int32_t AudioEncodeTransport::Start()
 {
     DHLOGI("Start audio encode transport.");
-    if (audioChannel_ == nullptr || context_ == nullptr) {
-        DHLOGE("Audio channel or context is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(audioChannel_, ERR_DH_AUDIO_NULLPTR);
+    CHECK_NULL_RETURN(context_, ERR_DH_AUDIO_NULLPTR);
     if (capType_ == CAP_SPK && audioChannel_->OpenSession() != DH_SUCCESS) {
         DHLOGE("Audio channel open session failed.");
         return ERR_DH_AUDIO_TRANS_SESSION_NOT_OPEN;
@@ -70,20 +65,14 @@ int32_t AudioEncodeTransport::Start()
 int32_t AudioEncodeTransport::Stop()
 {
     DHLOGI("Stop audio encode transport.");
-    if (context_ == nullptr) {
-        DHLOGE("Context is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(context_, ERR_DH_AUDIO_NULLPTR);
     return context_->Stop();
 }
 
 int32_t AudioEncodeTransport::Pause()
 {
     DHLOGI("Pause.");
-    if (context_ == nullptr) {
-        DHLOGE("Context is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(context_, ERR_DH_AUDIO_NULLPTR);
     return context_->Pause();
 }
 
@@ -96,10 +85,7 @@ int32_t AudioEncodeTransport::Restart(const AudioParam &localParam, const AudioP
         processor_ = nullptr;
         return ERR_DH_AUDIO_TRANS_ERROR;
     }
-    if (context_ == nullptr) {
-        DHLOGE("Context is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(context_, ERR_DH_AUDIO_NULLPTR);
     return context_->Restart(localParam, remoteParam);
 }
 
@@ -197,10 +183,7 @@ int32_t AudioEncodeTransport::RegisterChannelListener(const PortCapType capType)
         DHLOGE("CreateSession failed.");
         return ERR_DH_AUDIO_TRANS_ERROR;
     }
-    if (context_ == nullptr) {
-        DHLOGE("Register channel listener error. state Context is null");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(context_, ERR_DH_AUDIO_NULLPTR);
     context_->SetAudioChannel(audioChannel_);
     return DH_SUCCESS;
 }
@@ -213,20 +196,15 @@ int32_t AudioEncodeTransport::RegisterProcessorListener(const AudioParam &localP
             localParam.renderOpts.renderFlags, localParam.captureOpts.capturerFlags);
         processor_ = std::make_shared<AudioDirectProcessor>();
     }
-    if (audioChannel_ == nullptr) {
-        DHLOGE("Create audio processor failed.");
-        return ERR_DH_AUDIO_TRANS_ERROR;
-    }
-
+    CHECK_NULL_RETURN(audioChannel_, ERR_DH_AUDIO_TRANS_ERROR);
+    CHECK_NULL_RETURN(processor_, ERR_DH_AUDIO_NULLPTR);
     auto ret = processor_->ConfigureAudioProcessor(localParam.comParam, remoteParam.comParam, shared_from_this());
     if (ret != DH_SUCCESS) {
         DHLOGE("Configure audio processor failed.");
         return ERR_DH_AUDIO_TRANS_ERROR;
     }
-    if (context_ == nullptr) {
-        DHLOGE("Register processor listener error. state Context is null");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+
+    CHECK_NULL_RETURN(context_, ERR_DH_AUDIO_NULLPTR);
     context_->SetAudioProcessor(processor_);
     return DH_SUCCESS;
 }
@@ -235,10 +213,7 @@ void AudioEncodeTransport::OnSessionOpened()
 {
     DHLOGD("On channel session opened.");
     auto cbObj = dataTransCallback_.lock();
-    if (cbObj == nullptr) {
-        DHLOGE("On channel session opened. callback is nullptr.");
-        return;
-    }
+    CHECK_NULL_VOID(cbObj);
     cbObj->OnStateChange(AudioEventType::DATA_OPENED);
 }
 
@@ -246,10 +221,7 @@ void AudioEncodeTransport::OnSessionClosed()
 {
     DHLOGD("On channel session close.");
     auto cbObj = dataTransCallback_.lock();
-    if (cbObj == nullptr) {
-        DHLOGE("On channel session closed. callback is nullptr.");
-        return;
-    }
+    CHECK_NULL_VOID(cbObj);
     cbObj->OnStateChange(AudioEventType::DATA_CLOSED);
 }
 

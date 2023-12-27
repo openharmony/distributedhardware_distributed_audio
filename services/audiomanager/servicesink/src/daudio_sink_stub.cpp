@@ -93,11 +93,7 @@ int32_t DAudioSinkStub::InitSinkInner(MessageParcel &data, MessageParcel &reply,
     }
     std::string param = data.ReadString();
     sptr<IRemoteObject> remoteObject = data.ReadRemoteObject();
-    if (remoteObject == nullptr) {
-        DHLOGE("Read ReadRemoteObject failed.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
-
+    CHECK_NULL_RETURN(remoteObject, ERR_DH_AUDIO_NULLPTR);
     sptr<DAudioSinkIpcCallbackProxy> dAudioSinkIpcCallbackProxy(new DAudioSinkIpcCallbackProxy(remoteObject));
     int32_t ret = InitSink(param, dAudioSinkIpcCallbackProxy);
     reply.WriteInt32(ret);

@@ -33,50 +33,35 @@ void AudioTransportContext::SetTransportStatus(TransportStateType stateType)
 
 int32_t AudioTransportContext::GetTransportStatusType()
 {
-    if (currentState_ == nullptr) {
-        DHLOGI("CurrentState is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(currentState_, ERR_DH_AUDIO_NULLPTR);
     DHLOGI("Get transport status in state %d", currentState_->GetStateType());
     return currentState_->GetStateType();
 }
 
 int32_t AudioTransportContext::Start()
 {
-    if (currentState_ == nullptr) {
-        DHLOGD("CurrentState is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(currentState_, ERR_DH_AUDIO_NULLPTR);
     DHLOGI("Audio transport context start.");
     return currentState_->Start(audioChannel_, processor_);
 }
 
 int32_t AudioTransportContext::Stop()
 {
-    if (currentState_ == nullptr) {
-        DHLOGD("CurrentState is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(currentState_, ERR_DH_AUDIO_NULLPTR);
     DHLOGI("Audio transport context stop.");
     return currentState_->Stop(audioChannel_, processor_);
 }
 
 int32_t AudioTransportContext::Pause()
 {
-    if (currentState_ == nullptr) {
-        DHLOGD("CurrentState is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(currentState_, ERR_DH_AUDIO_NULLPTR);
     DHLOGI("Audio transport context pause.");
     return currentState_->Pause(processor_);
 }
 
 int32_t AudioTransportContext::Restart(const AudioParam &localParam, const AudioParam &remoteParam)
 {
-    if (currentState_ == nullptr) {
-        DHLOGD("CurrentState is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(currentState_, ERR_DH_AUDIO_NULLPTR);
     DHLOGI("Audio transport context restart.");
     return currentState_->Restart(localParam, remoteParam, processor_);
 }
