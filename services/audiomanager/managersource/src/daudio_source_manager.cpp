@@ -70,10 +70,7 @@ DAudioSourceManager::~DAudioSourceManager()
 int32_t DAudioSourceManager::Init(const sptr<IDAudioIpcCallback> &callback)
 {
     DHLOGI("Init audio source manager.");
-    if (callback == nullptr) {
-        DHLOGE("Callback is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(callback, ERR_DH_AUDIO_NULLPTR);
     if (DAudioHdiHandler::GetInstance().InitHdiHandler() != DH_SUCCESS) {
         DHLOGE("Init Hdi handler failed.");
         return ERR_DH_AUDIO_FAILED;
@@ -104,10 +101,7 @@ int32_t DAudioSourceManager::Init(const sptr<IDAudioIpcCallback> &callback)
     }
     // init event handler
     auto runner = AppExecFwk::EventRunner::Create(true);
-    if (runner == nullptr) {
-        DHLOGE("Create runner failed.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(runner, ERR_DH_AUDIO_NULLPTR);
     handler_ = std::make_shared<DAudioSourceManager::SourceManagerHandler>(runner);
     DHLOGI("Init DAudioManager successfuly.");
     return DH_SUCCESS;
@@ -144,11 +138,8 @@ int32_t DAudioSourceManager::UnInit()
         DHLOGE("Uninit Hdi handler failed.");
         return ERR_DH_AUDIO_FAILED;
     }
-    // uninit event handler
-    if (handler_ == nullptr) {
-        DHLOGI("Uninit audio source manager exit. handler is null");
-        return DH_SUCCESS;
-    }
+
+    CHECK_NULL_RETURN(handler_, DH_SUCCESS);
     while (!handler_->IsIdle()) {
         DHLOGD("manager handler is running, wait for idle.");
         usleep(WAIT_HANDLER_IDLE_TIME_US);
@@ -172,10 +163,8 @@ int32_t DAudioSourceManager::EnableDAudio(const std::string &devId, const std::s
 {
     DHLOGI("Enable distributed audio, devId: %s, dhId: %s, version: %s, reqId: %s.", GetAnonyString(devId).c_str(),
         dhId.c_str(), version.c_str(), reqId.c_str());
-    if (handler_ == nullptr) {
-        DHLOGE("Event handler is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
+
     json jParam = { { KEY_DEV_ID, devId }, { KEY_DH_ID, dhId }, { KEY_VERSION, version },
         { KEY_ATTRS, attrs }, { KEY_REQID, reqId } };
     auto eventParam = std::make_shared<json>(jParam);
@@ -222,10 +211,7 @@ int32_t DAudioSourceManager::DisableDAudio(const std::string &devId, const std::
 {
     DHLOGI("Disable distributed audio, devId: %s, dhId: %s, reqId: %s.", GetAnonyString(devId).c_str(), dhId.c_str(),
         reqId.c_str());
-    if (handler_ == nullptr) {
-        DHLOGE("Event handler is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
     json jParam = { { KEY_DEV_ID, devId }, { KEY_DH_ID, dhId }, { KEY_REQID, reqId } };
     auto eventParam = std::make_shared<json>(jParam);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_MANAGER_DISABLE_DAUDIO, eventParam, 0);
@@ -256,10 +242,7 @@ int32_t DAudioSourceManager::DoDisableDAudio(const std::string &args)
             DHLOGE("Audio device not exist.");
             return ERR_DH_AUDIO_SA_DEVICE_NOT_EXIST;
         }
-        if (audioDevMap_[devId].dev == nullptr) {
-            DHLOGE("Audio device is null.");
-            return DH_SUCCESS;
-        }
+        CHECK_NULL_RETURN(audioDevMap_[devId].dev, DH_SUCCESS);
         audioDevMap_[devId].ports[dhId] = reqId;
         sourceDev = audioDevMap_[devId].dev;
     }
@@ -317,20 +300,11 @@ int32_t DAudioSourceManager::DAudioNotify(const std::string &devId, const std::s
     }
 
     auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (samgr == nullptr) {
-        DHLOGE("Failed to get system ability mgr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(samgr, ERR_DH_AUDIO_NULLPTR);
     auto remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID, devId);
-    if (remoteObject == nullptr) {
-        DHLOGE("Object is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(remoteObject, ERR_DH_AUDIO_NULLPTR);
     sptr<IDAudioSink> remoteSvrProxy = iface_cast<IDAudioSink>(remoteObject);
-    if (remoteSvrProxy == nullptr) {
-        DHLOGE("Failed to get remote daudio sink SA.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(remoteSvrProxy, ERR_DH_AUDIO_NULLPTR);
     {
         std::lock_guard<std::mutex> lck(remoteSvrMutex_);
         sinkServiceMap_[devId] = remoteSvrProxy;
@@ -351,10 +325,7 @@ int32_t DAudioSourceManager::OnEnableDAudio(const std::string &devId, const std:
         DeleteAudioDevice(devId, dhId);
     }
 
-    if (ipcCallback_ == nullptr) {
-        DHLOGE("Audio Ipc callback is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(ipcCallback_, ERR_DH_AUDIO_NULLPTR);
     return ipcCallback_->OnNotifyRegResult(devId, dhId, reqId, result, "");
 }
 
@@ -370,10 +341,7 @@ int32_t DAudioSourceManager::OnDisableDAudio(const std::string &devId, const std
         DeleteAudioDevice(devId, dhId);
     }
 
-    if (ipcCallback_ == nullptr) {
-        DHLOGE("Audio Ipc callback is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(ipcCallback_, ERR_DH_AUDIO_NULLPTR);
     return ipcCallback_->OnNotifyUnregResult(devId, dhId, reqId, result, "");
 }
 
@@ -433,10 +401,7 @@ void DAudioSourceManager::ClearAudioDev(const std::string &devId)
     std::lock_guard<std::mutex> lock(devMapMtx_);
     if (audioDevMap_[devId].ports.empty()) {
         DHLOGI("audioDevMap_[devId].ports is empty.");
-        if (audioDevMap_[devId].dev == nullptr) {
-            DHLOGE("audioDevMap_[devId].dev is nullptr.");
-            return;
-        }
+        CHECK_NULL_VOID(audioDevMap_[devId].dev);
         audioDevMap_[devId].dev->SleepAudioDev();
         DHLOGI("back from SleepAudioDev.");
         audioDevMap_.erase(devId);
@@ -447,10 +412,7 @@ void DAudioSourceManager::RestoreThreadStatus()
 {
     if (!audioDevMap_.empty()) {
         for (auto &iter : audioDevMap_) {
-            if (iter.second.dev == nullptr) {
-                DHLOGE("Listen audioDev error, dev is nullptr.");
-                continue;
-            }
+            CHECK_NULL_VOID(iter.second.dev);
             iter.second.dev->RestoreThreadStatus();
         }
     }
@@ -491,10 +453,7 @@ int32_t DAudioSourceManager::LoadAVSenderEngineProvider()
         return ERR_DH_AUDIO_NULLPTR;
     }
     pSHandler_ = dlopen(path, RTLD_LAZY | RTLD_NODELETE);
-    if (pSHandler_ == nullptr) {
-        DHLOGE("%s handler load failed, failed reason : %s", path, dlerror());
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(pSHandler_, ERR_DH_AUDIO_NULLPTR);
     AVTransProviderClass getEngineFactoryFunc = (AVTransProviderClass)dlsym(pSHandler_,
         GET_SENDER_PROVIDER_FUNC.c_str());
     if (getEngineFactoryFunc == nullptr) {
@@ -529,10 +488,7 @@ int32_t DAudioSourceManager::LoadAVReceiverEngineProvider()
         return ERR_DH_AUDIO_NULLPTR;
     }
     pRHandler_ = dlopen(path, RTLD_LAZY | RTLD_NODELETE);
-    if (pRHandler_ == nullptr) {
-        DHLOGE("%s handler load failed, failed reason : %s", path, dlerror());
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(pRHandler_, ERR_DH_AUDIO_NULLPTR);
     AVTransProviderClass getEngineFactoryFunc = (AVTransProviderClass)dlsym(pRHandler_,
         GET_RECEIVER_PROVIDER_FUNC.c_str());
     if (getEngineFactoryFunc == nullptr) {
@@ -589,10 +545,7 @@ void DAudioSourceManager::SourceManagerHandler::ProcessEvent(const AppExecFwk::I
 
 void DAudioSourceManager::SourceManagerHandler::EnableDAudioCallback(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (event == nullptr) {
-        DHLOGE("The input event is null.");
-        return;
-    }
+    CHECK_NULL_VOID(event);
     std::string eventParam;
     if (GetEventParam(event, eventParam) != DH_SUCCESS) {
         DHLOGE("Failed to get event parameters.");
@@ -604,10 +557,7 @@ void DAudioSourceManager::SourceManagerHandler::EnableDAudioCallback(const AppEx
 
 void DAudioSourceManager::SourceManagerHandler::DisableDAudioCallback(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (event == nullptr) {
-        DHLOGE("The input event is null.");
-        return;
-    }
+    CHECK_NULL_VOID(event);
     std::string eventParam;
     if (GetEventParam(event, eventParam) != DH_SUCCESS) {
         DHLOGE("Failed to get event parameters.");
@@ -620,15 +570,9 @@ void DAudioSourceManager::SourceManagerHandler::DisableDAudioCallback(const AppE
 int32_t DAudioSourceManager::SourceManagerHandler::GetEventParam(const AppExecFwk::InnerEvent::Pointer &event,
     std::string &eventParam)
 {
-    if (event == nullptr) {
-        DHLOGE("The input event id null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(event, ERR_DH_AUDIO_NULLPTR);
     std::shared_ptr<json> paramObj = event->GetSharedObject<json>();
-    if (paramObj == nullptr) {
-        DHLOGE("The event parameter object is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(paramObj, ERR_DH_AUDIO_NULLPTR);
     eventParam = paramObj->dump();
     return DH_SUCCESS;
 }

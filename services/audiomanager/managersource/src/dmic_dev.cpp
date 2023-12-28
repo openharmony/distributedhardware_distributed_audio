@@ -48,10 +48,7 @@ void DMicDev::OnEngineTransEvent(const AVTransEvent &event)
 
 void DMicDev::OnEngineTransMessage(const std::shared_ptr<AVTransMessage> &message)
 {
-    if (message == nullptr) {
-        DHLOGE("The parameter is nullptr");
-        return;
-    }
+    CHECK_NULL_VOID(message);
     DHLOGI("On Engine message, type : %s.", GetEventNameByType(message->type_).c_str());
     DAudioSourceManager::GetInstance().HandleDAudioNotify(message->dstDevId_, message->dstDevId_,
         message->type_, message->content_);
@@ -119,10 +116,7 @@ int32_t DMicDev::OpenDevice(const std::string &devId, const int32_t dhId)
 {
     DHLOGI("Open mic device devId: %s, dhId: %d.", GetAnonyString(devId).c_str(), dhId);
     std::shared_ptr<IAudioEventCallback> cbObj = audioEventCallback_.lock();
-    if (cbObj == nullptr) {
-        DHLOGE("Event callback is null");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(cbObj, ERR_DH_AUDIO_NULLPTR);
     json jParam = { { KEY_DH_ID, std::to_string(dhId) } };
     AudioEvent event(AudioEventType::OPEN_MIC, jParam.dump());
     cbObj->NotifyEvent(event);
@@ -135,10 +129,7 @@ int32_t DMicDev::CloseDevice(const std::string &devId, const int32_t dhId)
 {
     DHLOGI("Close mic device devId: %s, dhId: %d.", GetAnonyString(devId).c_str(), dhId);
     std::shared_ptr<IAudioEventCallback> cbObj = audioEventCallback_.lock();
-    if (cbObj == nullptr) {
-        DHLOGE("Event callback is null");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(cbObj, ERR_DH_AUDIO_NULLPTR);
     json jParam = { { KEY_DH_ID, std::to_string(dhId) } };
     AudioEvent event(AudioEventType::CLOSE_MIC, jParam.dump());
     cbObj->NotifyEvent(event);
@@ -171,10 +162,7 @@ int32_t DMicDev::NotifyEvent(const std::string &devId, const int32_t dhId, const
 {
     DHLOGD("Notify mic event, type: %d.", event.type);
     std::shared_ptr<IAudioEventCallback> cbObj = audioEventCallback_.lock();
-    if (cbObj == nullptr) {
-        DHLOGE("Event callback is null");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(cbObj, ERR_DH_AUDIO_NULLPTR);
     switch (event.type) {
         case AudioEventType::AUDIO_START:
             curStatus_ = AudioStatus::STATUS_START;
@@ -195,11 +183,7 @@ int32_t DMicDev::NotifyEvent(const std::string &devId, const int32_t dhId, const
 int32_t DMicDev::SetUp()
 {
     DHLOGI("Set up mic device.");
-    if (micTrans_ == nullptr) {
-        DHLOGE("mic trans should be init by dev.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
-
+    CHECK_NULL_RETURN(micTrans_, ERR_DH_AUDIO_NULLPTR);
     int32_t ret = micTrans_->SetUp(param_, param_, shared_from_this(), CAP_MIC);
     if (ret != DH_SUCCESS) {
         DHLOGE("Mic trans set up failed. ret: %d.", ret);
@@ -211,10 +195,7 @@ int32_t DMicDev::SetUp()
 int32_t DMicDev::Start()
 {
     DHLOGI("Start mic device.");
-    if (micTrans_ == nullptr) {
-        DHLOGE("Mic trans is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(micTrans_, ERR_DH_AUDIO_NULLPTR);
     int32_t ret = micTrans_->Start();
     if (ret != DH_SUCCESS) {
         DHLOGE("Mic trans start failed, ret: %d.", ret);
@@ -246,11 +227,7 @@ int32_t DMicDev::Restart()
 int32_t DMicDev::Stop()
 {
     DHLOGI("Stop mic device.");
-    if (micTrans_ == nullptr) {
-        DHLOGE("Mic trans is null.");
-        return DH_SUCCESS;
-    }
-
+    CHECK_NULL_RETURN(micTrans_, DH_SUCCESS);
     isOpened_.store(false);
     isTransReady_.store(false);
     int32_t ret = micTrans_->Stop();
@@ -269,10 +246,7 @@ int32_t DMicDev::Release()
         ashmem_ = nullptr;
         DHLOGI("UnInit ashmem success.");
     }
-    if (micTrans_ == nullptr) {
-        DHLOGE("Mic trans is null.");
-        return DH_SUCCESS;
-    }
+    CHECK_NULL_RETURN(micTrans_, DH_SUCCESS);
 
     int32_t ret = micTrans_->Release();
     if (ret != DH_SUCCESS) {
@@ -374,10 +348,7 @@ int32_t DMicDev::RefreshAshmemInfo(const std::string &devId, const int32_t dhId,
 
 int32_t DMicDev::MmapStart()
 {
-    if (ashmem_ == nullptr) {
-        DHLOGE("Ashmem is nullptr");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(ashmem_, ERR_DH_AUDIO_NULLPTR);
     std::lock_guard<std::mutex> lock(writeAshmemMutex_);
     frameIndex_ = 0;
     startTime_ = 0;
@@ -490,10 +461,7 @@ int32_t DMicDev::OnStateChange(const AudioEventType type)
     }
     event.content = GetCJsonString(KEY_DH_ID, std::to_string(dhId_).c_str());
     std::shared_ptr<IAudioEventCallback> cbObj = audioEventCallback_.lock();
-    if (cbObj == nullptr) {
-        DHLOGE("Event callback is null");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(cbObj, ERR_DH_AUDIO_NULLPTR);
     cbObj->NotifyEvent(event);
     return DH_SUCCESS;
 }
@@ -505,20 +473,14 @@ int32_t DMicDev::SendMessage(uint32_t type, std::string content, std::string dst
         DHLOGE("Send message to remote. not OPEN_MIC or CLOSE_MIC. type: %u", type);
         return ERR_DH_AUDIO_NULLPTR;
     }
-    if (micTrans_ == nullptr) {
-        DHLOGE("mic trans is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(micTrans_, ERR_DH_AUDIO_NULLPTR);
     micTrans_->SendMessage(type, content, dstDevId);
     return DH_SUCCESS;
 }
 
 int32_t DMicDev::OnDecodeTransDataDone(const std::shared_ptr<AudioData> &audioData)
 {
-    if (audioData == nullptr) {
-        DHLOGE("The parameter is empty.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(audioData, ERR_DH_AUDIO_NULLPTR);
     std::lock_guard<std::mutex> lock(dataQueueMtx_);
     dataQueSize_ = curStatus_ != AudioStatus::STATUS_START ?
         (param_.captureOpts.capturerFlags == MMAP_MODE ? LOW_LATENCY_DATA_QUEUE_HALF_SIZE : DATA_QUEUE_HALF_SIZE) :

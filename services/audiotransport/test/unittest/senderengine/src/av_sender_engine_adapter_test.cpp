@@ -51,7 +51,7 @@ HWTEST_F(AVSenderEngineAdapterTest, Initialize_001, TestSize.Level1)
     std::string peerDevId = "peerDevId";
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, senderAdapter_->Initialize(providerPtr, peerDevId));
     senderAdapter_->initialized_ = true;
-    EXPECT_EQ(DH_SUCCESS, senderAdapter_->Initialize(providerPtr, peerDevId));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, senderAdapter_->Initialize(providerPtr, peerDevId));
 }
 
 /**

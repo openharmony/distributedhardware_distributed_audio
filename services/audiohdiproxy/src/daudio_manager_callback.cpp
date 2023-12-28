@@ -35,12 +35,8 @@ namespace DistributedHardware {
 int32_t DAudioManagerCallback::OpenDevice(const std::string& adpName, int32_t devId)
 {
     DHLOGI("Open device.");
-    if (callback_ == nullptr) {
-        DHLOGE("Register hdi callback is nullptr.");
-        return HDF_FAILURE;
-    }
-    int32_t ret = callback_->OpenDevice(adpName, devId);
-    if (ret != DH_SUCCESS) {
+    CHECK_NULL_RETURN(callback_, HDF_FAILURE);
+    if (callback_->OpenDevice(adpName, devId) != DH_SUCCESS) {
         DHLOGE("Call hdi callback failed.");
         return HDF_FAILURE;
     }
@@ -50,12 +46,8 @@ int32_t DAudioManagerCallback::OpenDevice(const std::string& adpName, int32_t de
 int32_t DAudioManagerCallback::CloseDevice(const std::string& adpName, int32_t devId)
 {
     DHLOGI("Close device.");
-    if (callback_ == nullptr) {
-        DHLOGE("Register hdi callback is nullptr.");
-        return HDF_FAILURE;
-    }
-    int32_t ret = callback_->CloseDevice(adpName, devId);
-    if (ret != DH_SUCCESS) {
+    CHECK_NULL_RETURN(callback_, HDF_FAILURE);
+    if (callback_->CloseDevice(adpName, devId) != DH_SUCCESS) {
         DHLOGE("Rall hdi callback failed.");
         return HDF_FAILURE;
     }
@@ -112,11 +104,7 @@ int32_t DAudioManagerCallback::GetAudioParamHDF(const AudioParameter& param, Aud
 int32_t DAudioManagerCallback::SetParameters(const std::string& adpName, int32_t devId, const AudioParameter& param)
 {
     DHLOGD("Set Parameters.");
-    if (callback_ == nullptr) {
-        DHLOGE("Register hdi callback is nullptr.");
-        return HDF_FAILURE;
-    }
-
+    CHECK_NULL_RETURN(callback_, HDF_FAILURE);
     AudioParamHDF paramHDF;
     int32_t ret = GetAudioParamHDF(param, paramHDF);
     if (ret != DH_SUCCESS) {
@@ -135,10 +123,7 @@ int32_t DAudioManagerCallback::NotifyEvent(const std::string& adpName, int32_t d
     const OHOS::HDI::DistributedAudio::Audioext::V1_0::DAudioEvent& event)
 {
     DHLOGI("Notify event.");
-    if (callback_ == nullptr) {
-        DHLOGE("Register hdi callback is nullptr.");
-        return HDF_FAILURE;
-    }
+    CHECK_NULL_RETURN(callback_, HDF_FAILURE);
     AudioEvent newEvent(AudioEventType::EVENT_UNKNOWN, event.content);
     switch (event.type) {
         case AudioEventHDF::AUDIO_EVENT_VOLUME_SET:
@@ -184,12 +169,7 @@ int32_t DAudioManagerCallback::NotifyEvent(const std::string& adpName, int32_t d
 int32_t DAudioManagerCallback::WriteStreamData(const std::string &adpName, int32_t devId,
     const OHOS::HDI::DistributedAudio::Audioext::V1_0::AudioData &data)
 {
-    DHLOGD("Write Stream Data.");
-    if (callback_ == nullptr) {
-        DHLOGE("Register hdi callback is nullptr.");
-        return HDF_FAILURE;
-    }
-    DHLOGD("Audio data param frameSize is %d.", data.param.frameSize);
+    DHLOGD("Write Stream Data, audio data param frameSize is %d.", data.param.frameSize);
     if (data.param.frameSize == 0 || data.param.frameSize > DEFAULT_AUDIO_DATA_SIZE) {
         DHLOGE("Audio data param frameSize is 0. or > 4096");
         return HDF_FAILURE;
@@ -201,8 +181,9 @@ int32_t DAudioManagerCallback::WriteStreamData(const std::string &adpName, int32
         DHLOGE("Copy audio data failed, error code %d.", ret);
         return HDF_FAILURE;
     }
-    ret = callback_->WriteStreamData(adpName, devId, audioData);
-    if (ret != DH_SUCCESS) {
+
+    CHECK_NULL_RETURN(callback_, HDF_FAILURE);
+    if (callback_->WriteStreamData(adpName, devId, audioData) != DH_SUCCESS) {
         DHLOGE("WriteStreamData failed.");
         return HDF_FAILURE;
     }
@@ -213,17 +194,14 @@ int32_t DAudioManagerCallback::ReadStreamData(const std::string &adpName, int32_
     OHOS::HDI::DistributedAudio::Audioext::V1_0::AudioData &data)
 {
     DHLOGD("Read stream data.");
-    if (callback_ == nullptr) {
-        DHLOGE("Register hdi callback is nullptr.");
-        return HDF_FAILURE;
-    }
-
     std::shared_ptr<AudioData> audioData = nullptr;
-    int32_t ret = callback_->ReadStreamData(adpName, devId, audioData);
-    if (ret != DH_SUCCESS || audioData == nullptr) {
+    CHECK_NULL_RETURN(callback_, HDF_FAILURE);
+    if (callback_->ReadStreamData(adpName, devId, audioData) != DH_SUCCESS) {
         DHLOGE("Read stream data failed.");
         return HDF_FAILURE;
     }
+
+    CHECK_NULL_RETURN(audioData, HDF_FAILURE);
     data.data.assign(audioData->Data(), audioData->Data()+audioData->Capacity());
     DHLOGD("Read stream data success.");
     return HDF_SUCCESS;
@@ -233,13 +211,9 @@ int32_t DAudioManagerCallback::ReadMmapPosition(const std::string &adpName, int3
     uint64_t &frames, OHOS::HDI::DistributedAudio::Audioext::V1_0::CurrentTime &time)
 {
     DHLOGD("Read mmap position");
-    if (callback_ == nullptr) {
-        DHLOGE("Regisiter hdi callback id nullptr.");
-        return HDF_FAILURE;
-    }
     CurrentTimeHDF timeHdf;
-    int32_t ret = callback_->ReadMmapPosition(adpName, devId, frames, timeHdf);
-    if (ret != DH_SUCCESS) {
+    CHECK_NULL_RETURN(callback_, HDF_FAILURE);
+    if (callback_->ReadMmapPosition(adpName, devId, frames, timeHdf) != DH_SUCCESS) {
         DHLOGE("Read mmap position failed.");
         return HDF_FAILURE;
     }
@@ -253,12 +227,8 @@ int32_t DAudioManagerCallback::RefreshAshmemInfo(const std::string &adpName, int
     int fd, int32_t ashmemLength, int32_t lengthPerTrans)
 {
     DHLOGD("Refresh ashmem info.");
-    if (callback_ == nullptr) {
-        DHLOGE("Regisiter hdi callback id nullptr.");
-        return HDF_FAILURE;
-    }
-    int32_t ret = callback_->RefreshAshmemInfo(adpName, devId, fd, ashmemLength, lengthPerTrans);
-    if (ret != DH_SUCCESS) {
+    CHECK_NULL_RETURN(callback_, HDF_FAILURE);
+    if (callback_->RefreshAshmemInfo(adpName, devId, fd, ashmemLength, lengthPerTrans) != DH_SUCCESS) {
         DHLOGE("Refresh ashmem info failed.");
         return HDF_FAILURE;
     }

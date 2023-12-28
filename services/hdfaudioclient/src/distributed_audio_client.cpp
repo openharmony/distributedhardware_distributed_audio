@@ -36,10 +36,7 @@ static int32_t InitDescriptorPort(const AudioAdapterDescriptor &desc, ::AudioAda
 {
     DHLOGI("Init audio adapter descriptor port.");
     ::AudioPort *audioPorts = (::AudioPort *)malloc(desc.ports.size() * sizeof(AudioPort));
-    if (audioPorts == nullptr) {
-        DHLOGE("Audio ports is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(audioPorts, ERR_DH_AUDIO_NULLPTR);
     descInternal.ports = audioPorts;
 
     bool isSuccess = true;
@@ -98,10 +95,7 @@ static int32_t InitAudioAdapterDescriptor(AudioManagerContext *context,
             continue;
         }
         char* adapterName = reinterpret_cast<char *>(calloc(desc.adapterName.length() + STR_TERM_LEN, sizeof(char)));
-        if (adapterName == nullptr) {
-            DHLOGE("Calloc failed.");
-            return ERR_DH_AUDIO_NULLPTR;
-        }
+        CHECK_NULL_RETURN(adapterName, ERR_DH_AUDIO_NULLPTR);
         if (strcpy_s(adapterName, desc.adapterName.length() + STR_TERM_LEN, desc.adapterName.c_str()) != EOK) {
             DHLOGD("Strcpy_s adapter name failed.");
             free(adapterName);
@@ -128,19 +122,14 @@ static int32_t GetAllAdaptersInternal(struct AudioManager *manager, struct ::Aud
     int32_t *size)
 {
     DHLOGI("Get all adapters.");
-    if (manager == nullptr || descs == nullptr || size == nullptr) {
-        DHLOGE("The parameter is empty.");
-        return ERR_DH_AUDIO_HDI_INVALID_PARAM;
-    }
-
+    CHECK_NULL_RETURN(manager, ERR_DH_AUDIO_HDI_INVALID_PARAM);
+    CHECK_NULL_RETURN(descs, ERR_DH_AUDIO_HDI_INVALID_PARAM);
+    CHECK_NULL_RETURN(size, ERR_DH_AUDIO_HDI_INVALID_PARAM);
     AudioManagerContext *context = reinterpret_cast<AudioManagerContext *>(manager);
-    std::lock_guard<std::mutex> lock(context->mtx_);
+    CHECK_NULL_RETURN(context->proxy_, ERR_DH_AUDIO_NULLPTR);
 
+    std::lock_guard<std::mutex> lock(context->mtx_);
     std::vector<AudioAdapterDescriptor> descriptors;
-    if (context->proxy_ == nullptr) {
-        DHLOGE("The context or proxy for the context is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
     int32_t ret = context->proxy_->GetAllAdapters(descriptors);
     if (ret != DH_SUCCESS) {
         *descs = nullptr;
@@ -162,10 +151,10 @@ static int32_t LoadAdapterInternal(struct AudioManager *manager, const struct ::
     struct AudioAdapter **adapter)
 {
     DHLOGI("Load adapter.");
-    if (manager == nullptr || desc == nullptr || desc->adapterName == nullptr || adapter == nullptr) {
-        DHLOGE("The parameter is empty.");
-        return ERR_DH_AUDIO_HDI_INVALID_PARAM;
-    }
+    CHECK_NULL_RETURN(manager, ERR_DH_AUDIO_HDI_INVALID_PARAM);
+    CHECK_NULL_RETURN(desc, ERR_DH_AUDIO_HDI_INVALID_PARAM);
+    CHECK_NULL_RETURN(desc->adapterName, ERR_DH_AUDIO_HDI_INVALID_PARAM);
+    CHECK_NULL_RETURN(adapter, ERR_DH_AUDIO_HDI_INVALID_PARAM);
     AudioManagerContext *context = reinterpret_cast<AudioManagerContext *>(manager);
     std::string adpName = desc->adapterName;
     {
@@ -181,10 +170,7 @@ static int32_t LoadAdapterInternal(struct AudioManager *manager, const struct ::
         .adapterName = desc->adapterName,
     };
     sptr<IAudioAdapter> adapterProxy = nullptr;
-    if (context->proxy_ == nullptr) {
-        DHLOGE("The context or proxy for the context is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(context->proxy_, ERR_DH_AUDIO_NULLPTR);
     int32_t ret = context->proxy_->LoadAdapter(descriptor, adapterProxy);
     if (ret != DH_SUCCESS) {
         DHLOGE("Failed to load the adapter.");
@@ -206,17 +192,11 @@ static int32_t LoadAdapterInternal(struct AudioManager *manager, const struct ::
 static void UnloadAdapterInternal(struct AudioManager *manager, struct AudioAdapter *adapter)
 {
     DHLOGI("Unload adapter.");
-    if (manager == nullptr || adapter == nullptr) {
-        DHLOGE("Param is nullptr.");
-        return;
-    }
-
+    CHECK_NULL_VOID(manager);
+    CHECK_NULL_VOID(adapter);
     AudioManagerContext *context = reinterpret_cast<AudioManagerContext *>(manager);
     AudioAdapterContext *adapterContext = reinterpret_cast<AudioAdapterContext *>(adapter);
-    if (context->proxy_ == nullptr) {
-        DHLOGE("The context or proxy for the context is nullptr.");
-        return;
-    }
+    CHECK_NULL_VOID(context->proxy_);
 
     std::lock_guard<std::mutex> lock(context->mtx_);
     for (auto it = context->adapters_.begin(); it != context->adapters_.end(); it++) {
@@ -273,9 +253,7 @@ static bool AudioManagerInit()
     std::lock_guard<std::mutex> lock(g_AudioManagerContext.mtx_);
 
     sptr<IAudioManager> audioMgr = IAudioManager::Get("daudio_primary_service", false);
-    if (audioMgr == nullptr) {
-        return false;
-    }
+    CHECK_NULL_RETURN(audioMgr, false);
     g_AudioManagerContext.proxy_ = audioMgr;
     return true;
 }

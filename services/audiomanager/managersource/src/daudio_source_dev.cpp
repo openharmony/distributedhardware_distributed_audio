@@ -91,10 +91,7 @@ DAudioSourceDev::DAudioSourceDev(const std::string &devId, const std::shared_ptr
 int32_t DAudioSourceDev::AwakeAudioDev()
 {
     auto runner = AppExecFwk::EventRunner::Create(true);
-    if (runner == nullptr) {
-        DHLOGE("Create runner failed.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(runner, ERR_DH_AUDIO_NULLPTR);
     handler_ = std::make_shared<DAudioSourceDev::SourceEventHandler>(runner, shared_from_this());
     return DH_SUCCESS;
 }
@@ -102,10 +99,7 @@ int32_t DAudioSourceDev::AwakeAudioDev()
 void DAudioSourceDev::SleepAudioDev()
 {
     DHLOGD("Sleep audio dev.");
-    if (handler_ == nullptr) {
-        DHLOGI("Event handler is already stopped.");
-        return;
-    }
+    CHECK_NULL_VOID(handler_);
     while (!handler_->IsIdle()) {
         DHLOGD("handler is running, wait for idle.");
         usleep(WAIT_HANDLER_IDLE_TIME_US);
@@ -117,10 +111,8 @@ int32_t DAudioSourceDev::EnableDAudio(const std::string &dhId, const std::string
 {
     DHLOGI("Enable audio device, dhId: %s.", dhId.c_str());
     isRpcOpen_.store(true);
-    if (handler_ == nullptr) {
-        DHLOGE("Event handler is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
+
     json jParam = { { KEY_DEV_ID, devId_ }, { KEY_DH_ID, dhId }, { KEY_ATTRS, attrs } };
     auto eventParam = std::make_shared<json>(jParam);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_DAUDIO_ENABLE, eventParam, 0);
@@ -136,10 +128,7 @@ int32_t DAudioSourceDev::DisableDAudio(const std::string &dhId)
 {
     DHLOGI("Disable audio device, dhId: %s.", dhId.c_str());
     isRpcOpen_.store(false);
-    if (handler_ == nullptr) {
-        DHLOGE("Event handler is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
 
     json jParamClose = { { KEY_DH_ID, dhId } };
     AudioEvent event(AudioEventType::EVENT_UNKNOWN, jParamClose.dump());
@@ -175,10 +164,7 @@ int32_t DAudioSourceDev::DisableDAudio(const std::string &dhId)
 
 int32_t DAudioSourceDev::RestoreThreadStatus()
 {
-    if (handler_ == nullptr) {
-        DHLOGI("Event handler is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
     json jParam;
     auto eventParam = std::make_shared<json>(jParam);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_SET_THREAD_STATUS, eventParam, 0);
@@ -214,10 +200,7 @@ void DAudioSourceDev::NotifyEvent(const AudioEvent &event)
 int32_t DAudioSourceDev::HandleOpenDSpeaker(const AudioEvent &event)
 {
     DHLOGI("Open speaker device.");
-    if (handler_ == nullptr) {
-        DHLOGE("Event handler is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
 
     auto eventParam = std::make_shared<AudioEvent>(event);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_OPEN_SPEAKER, eventParam, 0);
@@ -232,11 +215,7 @@ int32_t DAudioSourceDev::HandleOpenDSpeaker(const AudioEvent &event)
 int32_t DAudioSourceDev::HandleCloseDSpeaker(const AudioEvent &event)
 {
     DHLOGI("Close speaker device.");
-    if (handler_ == nullptr) {
-        DHLOGE("Event handler is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
-
+    CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
     auto eventParam = std::make_shared<AudioEvent>(event);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_CLOSE_SPEAKER, eventParam, 0);
     if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
@@ -263,10 +242,7 @@ int32_t DAudioSourceDev::HandleDSpeakerClosed(const AudioEvent &event)
         return ERR_DH_AUDIO_FAILED;
     }
     auto speaker = FindIoDevImpl(event.content);
-    if (speaker == nullptr) {
-        DHLOGE("The IO device is invaild.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(speaker, ERR_DH_AUDIO_NULLPTR);
     return speaker->NotifyHdfAudioEvent(event, dhId);
 }
 
@@ -288,10 +264,7 @@ std::shared_ptr<DAudioIoDev> DAudioSourceDev::FindIoDevImpl(std::string args)
 int32_t DAudioSourceDev::HandleOpenDMic(const AudioEvent &event)
 {
     DHLOGI("Open mic device.");
-    if (handler_ == nullptr) {
-        DHLOGE("Event handler is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
 
     auto eventParam = std::make_shared<AudioEvent>(event);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_OPEN_MIC, eventParam, 0);
@@ -306,11 +279,7 @@ int32_t DAudioSourceDev::HandleOpenDMic(const AudioEvent &event)
 int32_t DAudioSourceDev::HandleCloseDMic(const AudioEvent &event)
 {
     DHLOGI("Close mic device.");
-    if (handler_ == nullptr) {
-        DHLOGE("Event handler is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
-
+    CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
     auto eventParam = std::make_shared<AudioEvent>(event);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_CLOSE_MIC, eventParam, 0);
     if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
@@ -331,11 +300,7 @@ int32_t DAudioSourceDev::HandleDMicOpened(const AudioEvent &event)
 int32_t DAudioSourceDev::HandleDMicClosed(const AudioEvent &event)
 {
     DHLOGI("Dmic device closed, event.content = %s.", event.content.c_str());
-    if (handler_ == nullptr) {
-        DHLOGE("Event handler is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
-
+    CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
     auto eventParam = std::make_shared<AudioEvent>(event);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_DMIC_CLOSED, eventParam, 0);
     if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
@@ -378,11 +343,7 @@ int32_t DAudioSourceDev::HandleNotifyRPC(const AudioEvent &event)
 int32_t DAudioSourceDev::HandleVolumeSet(const AudioEvent &event)
 {
     DHLOGD("Start handle volume set.");
-    if (handler_ == nullptr) {
-        DHLOGE("Event handler is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
-
+    CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
     auto eventParam = std::make_shared<AudioEvent>(event);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_VOLUME_SET, eventParam, 0);
     if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
@@ -396,11 +357,7 @@ int32_t DAudioSourceDev::HandleVolumeSet(const AudioEvent &event)
 int32_t DAudioSourceDev::HandleVolumeChange(const AudioEvent &event)
 {
     DHLOGD("Start handle volume change.");
-    if (handler_ == nullptr) {
-        DHLOGE("Event handler is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
-
+    CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
     auto eventParam = std::make_shared<AudioEvent>(event);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_VOLUME_CHANGE, eventParam, 0);
     if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
@@ -414,11 +371,7 @@ int32_t DAudioSourceDev::HandleVolumeChange(const AudioEvent &event)
 int32_t DAudioSourceDev::HandleFocusChange(const AudioEvent &event)
 {
     DHLOGD("Start handle focus change.");
-    if (handler_ == nullptr) {
-        DHLOGE("Event handler is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
-
+    CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
     auto eventParam = std::make_shared<AudioEvent>(event);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_AUDIO_FOCUS_CHANGE, eventParam, 0);
     if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
@@ -432,11 +385,7 @@ int32_t DAudioSourceDev::HandleFocusChange(const AudioEvent &event)
 int32_t DAudioSourceDev::HandleRenderStateChange(const AudioEvent &event)
 {
     DHLOGD("Start handle render state change.");
-    if (handler_ == nullptr) {
-        DHLOGE("Event handler is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
-
+    CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
     auto eventParam = std::make_shared<AudioEvent>(event);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_AUDIO_RENDER_STATE_CHANGE, eventParam, 0);
     if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
@@ -450,11 +399,7 @@ int32_t DAudioSourceDev::HandleRenderStateChange(const AudioEvent &event)
 int32_t DAudioSourceDev::HandlePlayStatusChange(const AudioEvent &event)
 {
     DHLOGD("Play status change, content: %s.", event.content.c_str());
-    if (handler_ == nullptr) {
-        DHLOGE("Event handler is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
-
+    CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
     auto eventParam = std::make_shared<AudioEvent>(event);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_CHANGE_PLAY_STATUS, eventParam, 0);
     if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
@@ -468,11 +413,7 @@ int32_t DAudioSourceDev::HandlePlayStatusChange(const AudioEvent &event)
 int32_t DAudioSourceDev::HandleSpkMmapStart(const AudioEvent &event)
 {
     DHLOGI("Spk mmap start, content: %s.", event.content.c_str());
-    if (handler_ == nullptr) {
-        DHLOGE("Event handler is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
-
+    CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
     auto eventParam = std::make_shared<AudioEvent>(event);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_MMAP_SPK_START, eventParam, 0);
     if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
@@ -486,11 +427,7 @@ int32_t DAudioSourceDev::HandleSpkMmapStart(const AudioEvent &event)
 int32_t DAudioSourceDev::HandleSpkMmapStop(const AudioEvent &event)
 {
     DHLOGI("Spk mmap stop, content: %s.", event.content.c_str());
-    if (handler_ == nullptr) {
-        DHLOGE("Event handler is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
-
+    CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
     auto eventParam = std::make_shared<AudioEvent>(event);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_MMAP_SPK_STOP, eventParam, 0);
     if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
@@ -504,11 +441,7 @@ int32_t DAudioSourceDev::HandleSpkMmapStop(const AudioEvent &event)
 int32_t DAudioSourceDev::HandleMicMmapStart(const AudioEvent &event)
 {
     DHLOGI("Mic mmap start, content: %s.", event.content.c_str());
-    if (handler_ == nullptr) {
-        DHLOGE("Event handler is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
-
+    CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
     auto eventParam = std::make_shared<AudioEvent>(event);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_MMAP_MIC_START, eventParam, 0);
     if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
@@ -522,11 +455,7 @@ int32_t DAudioSourceDev::HandleMicMmapStart(const AudioEvent &event)
 int32_t DAudioSourceDev::HandleMicMmapStop(const AudioEvent &event)
 {
     DHLOGI("Mic mmap stop, content: %s.", event.content.c_str());
-    if (handler_ == nullptr) {
-        DHLOGE("Event handler is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
-
+    CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
     auto eventParam = std::make_shared<AudioEvent>(event);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_MMAP_MIC_STOP, eventParam, 0);
     if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
@@ -636,11 +565,7 @@ void DAudioSourceDev::OnEnableTaskResult(int32_t resultCode, const std::string &
 {
     (void)funcName;
     DHLOGI("On enable task result.");
-    if (mgrCallback_ == nullptr) {
-        DHLOGE("DAudio source manager callback is null.");
-        return;
-    }
-
+    CHECK_NULL_VOID(mgrCallback_);
     if (result.length() > DAUDIO_MAX_JSON_LEN || result.empty()) {
         return;
     }
@@ -687,10 +612,7 @@ int32_t DAudioSourceDev::DisableDSpeaker(const int32_t dhId)
         return DH_SUCCESS;
     }
     auto ioDev = deviceMap_[dhId];
-    if (ioDev == nullptr) {
-        DHLOGE("Speaker device is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(ioDev, ERR_DH_AUDIO_NULLPTR);
     return ioDev->DisableDevice(dhId);
 }
 
@@ -702,10 +624,7 @@ int32_t DAudioSourceDev::DisableDMic(const int32_t dhId)
         return DH_SUCCESS;
     }
     auto ioDev = deviceMap_[dhId];
-    if (ioDev == nullptr) {
-        DHLOGE("Mic device is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(ioDev, ERR_DH_AUDIO_NULLPTR);
     return ioDev->DisableDevice(dhId);
 }
 
@@ -713,11 +632,7 @@ void DAudioSourceDev::OnDisableTaskResult(int32_t resultCode, const std::string 
 {
     (void)funcName;
     DHLOGI("On disable task result.");
-    if (mgrCallback_ == nullptr) {
-        DHLOGE("DAudio source manager callback is null.");
-        return;
-    }
-
+    CHECK_NULL_VOID(mgrCallback_);
     if (result.length() > DAUDIO_MAX_JSON_LEN || result.empty()) {
         return;
     }
@@ -743,6 +658,7 @@ int32_t DAudioSourceDev::TaskOpenDSpeaker(const std::string &args)
         return ERR_DH_AUDIO_FAILED;
     }
     auto speaker = FindIoDevImpl(args);
+
     if (speaker == nullptr) {
         DHLOGE("The IO device is invaild.");
         NotifyHDF(NOTIFY_OPEN_SPEAKER_RESULT, HDF_EVENT_RESULT_FAILED, dhId);
@@ -776,10 +692,7 @@ int32_t DAudioSourceDev::ParseDhidFromEvent(std::string args)
 {
     DHLOGI("ParseDhidFrom args : %s", args.c_str());
     cJSON *jParam = cJSON_Parse(args.c_str());
-    if (jParam == nullptr) {
-        DHLOGE("Failed to parse JSON: %s", cJSON_GetErrorPtr());
-        return -1;
-    }
+    CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_FAILED);
     if (!CJsonParamCheck(jParam, { KEY_DH_ID })) {
         DHLOGE("Not found the keys of dhId.");
         cJSON_Delete(jParam);
@@ -838,17 +751,12 @@ int32_t DAudioSourceDev::CloseSpkNew(const std::string &args)
     NotifySinkDev(CLOSE_SPEAKER, jAudioParam, jParam[KEY_DH_ID]);
     bool closeStatus = true;
     auto speaker = FindIoDevImpl(args);
-    if (speaker == nullptr) {
-        DHLOGE("The IO device is invaild.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
-    int32_t ret = speaker->Stop();
-    if (ret != DH_SUCCESS) {
+    CHECK_NULL_RETURN(speaker, ERR_DH_AUDIO_NULLPTR);
+    if (speaker->Stop() != DH_SUCCESS) {
         DHLOGE("Speaker stop failed.");
         closeStatus = false;
     }
-    ret = speaker->Release();
-    if (ret != DH_SUCCESS) {
+    if (speaker->Release() != DH_SUCCESS) {
         DHLOGE("Speaker release failed.");
         closeStatus = false;
     }
@@ -952,22 +860,8 @@ int32_t DAudioSourceDev::CloseMicNew(const std::string &args)
     NotifySinkDev(CLOSE_MIC, jAudioParam, jParam[KEY_DH_ID]);
 
     auto mic = FindIoDevImpl(args);
-    if (mic == nullptr) {
-        DHLOGE("Mic device not init");
-        return DH_SUCCESS;
-    }
-    bool closeStatus = true;
-    int32_t ret = mic->Stop();
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Mic stop failed, error code %d", ret);
-        closeStatus = false;
-    }
-    ret = mic->Release();
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Mic release failed, error code %d", ret);
-        closeStatus = false;
-    }
-    if (!closeStatus) {
+    CHECK_NULL_RETURN(mic, DH_SUCCESS);
+    if (mic->Stop() != DH_SUCCESS || mic->Release() != DH_SUCCESS) {
         return ERR_DH_AUDIO_FAILED;
     }
     return DH_SUCCESS;
@@ -1014,10 +908,7 @@ int32_t DAudioSourceDev::TaskDMicClosed(const std::string &args)
         return ERR_DH_AUDIO_FAILED;
     }
     auto mic = FindIoDevImpl(args);
-    if (mic == nullptr) {
-        DHLOGE("Mic already clear.");
-        return DH_SUCCESS;
-    }
+    CHECK_NULL_RETURN(mic, DH_SUCCESS);
     AudioEvent event(MIC_CLOSED, args);
     return mic->NotifyHdfAudioEvent(event, dhId);
 }
@@ -1033,10 +924,7 @@ int32_t DAudioSourceDev::TaskChangeVolume(const std::string &args)
 {
     DHLOGD("Task change volume, args: %s.", args.c_str());
     cJSON *jParam = cJSON_Parse(args.c_str());
-    if (jParam == nullptr) {
-        DHLOGE("Failed to parse JSON: %s", cJSON_GetErrorPtr());
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
     if (!CJsonParamCheck(jParam, { KEY_DH_ID })) {
         DHLOGE("Not found the keys of dhId.");
         cJSON_Delete(jParam);
@@ -1068,10 +956,8 @@ int32_t DAudioSourceDev::TaskChangeRenderState(const std::string &args)
 {
     DHLOGD("Task change render state, args: %s.", args.c_str());
     cJSON *jParam = cJSON_Parse(args.c_str());
-    if (jParam == nullptr) {
-        DHLOGE("Failed to parse JSON: %s", cJSON_GetErrorPtr());
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
+
     if (!CJsonParamCheck(jParam, { KEY_DH_ID })) {
         DHLOGE("Not found the keys of dhId.");
         cJSON_Delete(jParam);
@@ -1092,29 +978,24 @@ int32_t DAudioSourceDev::TaskPlayStatusChange(const std::string &args)
 {
     DHLOGD("Task play status change, content: %s.", args.c_str());
     AudioEvent audioEvent(CHANGE_PLAY_STATUS, args);
-    int32_t ret = SendAudioEventToRemote(audioEvent);
-    if (ret != DH_SUCCESS) {
+    if (SendAudioEventToRemote(audioEvent) != DH_SUCCESS) {
         DHLOGE("Task Play status change failed.");
         return ERR_DH_AUDIO_FAILED;
     }
     auto speaker = FindIoDevImpl(args);
-    if (speaker == nullptr) {
-        DHLOGE("The IO device is invaild.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(speaker, ERR_DH_AUDIO_NULLPTR);
+
     std::string changeType = ParseStringFromArgs(args, KEY_CHANGE_TYPE);
     if (changeType == AUDIO_EVENT_RESTART) {
-        ret = speaker->Restart();
-        if (ret != DH_SUCCESS) {
+        if (speaker->Restart() != DH_SUCCESS) {
             DHLOGE("Speaker restart failed.");
         }
-        return ret;
+        return ERR_DH_AUDIO_FAILED;
     } else if (changeType == AUDIO_EVENT_PAUSE) {
-        ret = speaker->Pause();
-        if (ret != DH_SUCCESS) {
+        if (speaker->Pause() != DH_SUCCESS) {
             DHLOGE("Speaker Pause failed.");
         }
-        return ret;
+        return ERR_DH_AUDIO_FAILED;
     } else {
         DHLOGE("Play status error.");
         return ERR_DH_AUDIO_FAILED;
@@ -1136,10 +1017,8 @@ int32_t DAudioSourceDev::SendAudioEventToRemote(const AudioEvent &event)
     } else {
         speaker = FindIoDevImpl(event.content);
     }
-    if (speaker == nullptr) {
-        DHLOGE("Audio ctrl mgr not init.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+
+    CHECK_NULL_RETURN(speaker, ERR_DH_AUDIO_NULLPTR);
     int32_t ret = speaker->SendMessage(static_cast<uint32_t>(event.type),
         event.content, devId_);
     if (ret != DH_SUCCESS) {
@@ -1153,10 +1032,7 @@ int32_t DAudioSourceDev::TaskSpkMmapStart(const std::string &args)
 {
     DHLOGI("Task spk mmap start, content: %s.", args.c_str());
     auto speaker = FindIoDevImpl(args);
-    if (speaker == nullptr) {
-        DHLOGE("Task spk mmap start, speaker is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(speaker, ERR_DH_AUDIO_NULLPTR);
     int32_t ret = speaker->MmapStart();
     if (ret != DH_SUCCESS) {
         DHLOGE("Task spk mmap start fail, error code: %d.", ret);
@@ -1168,10 +1044,7 @@ int32_t DAudioSourceDev::TaskSpkMmapStop(const std::string &args)
 {
     DHLOGI("Task spk mmap stop, content: %s.", args.c_str());
     auto speaker = FindIoDevImpl(args);
-    if (speaker == nullptr) {
-        DHLOGE("Task spk mmap start, speaker is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(speaker, ERR_DH_AUDIO_NULLPTR);
     speaker->MmapStop();
     return DH_SUCCESS;
 }
@@ -1180,10 +1053,7 @@ int32_t DAudioSourceDev::TaskMicMmapStart(const std::string &args)
 {
     DHLOGI("Task mic mmap start, content: %s.", args.c_str());
     auto mic = FindIoDevImpl(args);
-    if (mic == nullptr) {
-        DHLOGE("Task mic mmap start, mic is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(mic, ERR_DH_AUDIO_NULLPTR);
     int32_t ret = mic->MmapStart();
     if (ret != DH_SUCCESS) {
         DHLOGE("Task mic mmap start fail, error code: %d.", ret);
@@ -1195,10 +1065,7 @@ int32_t DAudioSourceDev::TaskMicMmapStop(const std::string &args)
 {
     DHLOGI("Task mic mmap stop, content: %s.", args.c_str());
     auto mic = FindIoDevImpl(args);
-    if (mic == nullptr) {
-        DHLOGE("Task mic mmap stop, mic is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(mic, ERR_DH_AUDIO_NULLPTR);
     mic->MmapStop();
     return DH_SUCCESS;
 }
@@ -1332,44 +1199,24 @@ void DAudioSourceDev::SourceEventHandler::ProcessEvent(const AppExecFwk::InnerEv
 
 void DAudioSourceDev::SourceEventHandler::EnableDAudioCallback(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (event == nullptr) {
-        DHLOGE("The input event is null.");
-        return;
-    }
+    CHECK_NULL_VOID(event);
     std::shared_ptr<json> jParam = event->GetSharedObject<json>();
-    if (jParam == nullptr) {
-        DHLOGE("The json parameter is null.");
-        return;
-    }
+    CHECK_NULL_VOID(jParam);
     auto sourceDevObj = sourceDev_.lock();
-    if (sourceDevObj == nullptr) {
-        DHLOGE("Source dev is invalid.");
-        return;
-    }
-    int32_t ret = sourceDevObj->TaskEnableDAudio(jParam->dump());
-    if (ret != DH_SUCCESS) {
+    CHECK_NULL_VOID(sourceDevObj);
+    if (sourceDevObj->TaskEnableDAudio(jParam->dump()) != DH_SUCCESS) {
         DHLOGE("Open ctrl channel failed.");
     }
 }
 
 void DAudioSourceDev::SourceEventHandler::DisableDAudioCallback(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (event == nullptr) {
-        DHLOGE("The input event is null.");
-        return;
-    }
+    CHECK_NULL_VOID(event);
     std::shared_ptr<json> jParam = event->GetSharedObject<json>();
-    if (jParam == nullptr) {
-        DHLOGE("The json parameter is null.");
-        return;
-    }
+    CHECK_NULL_VOID(jParam);
     auto sourceDevObj = sourceDev_.lock();
-    if (sourceDevObj == nullptr) {
-        DHLOGE("Source dev is invalid.");
-        return;
-    }
-    int32_t ret = sourceDevObj->TaskDisableDAudio(jParam->dump());
-    if (ret != DH_SUCCESS) {
+    CHECK_NULL_VOID(sourceDevObj);
+    if (sourceDevObj->TaskDisableDAudio(jParam->dump()) != DH_SUCCESS) {
         DHLOGE("Disable distributed audio failed.");
     }
 }
@@ -1382,10 +1229,7 @@ void DAudioSourceDev::SourceEventHandler::OpenDSpeakerCallback(const AppExecFwk:
         return;
     }
     auto sourceDevObj = sourceDev_.lock();
-    if (sourceDevObj == nullptr) {
-        DHLOGE("Source dev is invalid.");
-        return;
-    }
+    CHECK_NULL_VOID(sourceDevObj);
     if (sourceDevObj->TaskOpenDSpeaker(eventParam) != DH_SUCCESS) {
         DHLOGE("Open speaker failed.");
         return;
@@ -1401,10 +1245,7 @@ void DAudioSourceDev::SourceEventHandler::CloseDSpeakerCallback(const AppExecFwk
         return;
     }
     auto sourceDevObj = sourceDev_.lock();
-    if (sourceDevObj == nullptr) {
-        DHLOGE("Source dev is invalid.");
-        return;
-    }
+    CHECK_NULL_VOID(sourceDevObj);
     if (sourceDevObj->TaskCloseDSpeaker(eventParam) != DH_SUCCESS) {
         DHLOGE("Close speaker failed.");
         return;
@@ -1420,10 +1261,7 @@ void DAudioSourceDev::SourceEventHandler::OpenDMicCallback(const AppExecFwk::Inn
         return;
     }
     auto sourceDevObj = sourceDev_.lock();
-    if (sourceDevObj == nullptr) {
-        DHLOGE("Source dev is invalid.");
-        return;
-    }
+    CHECK_NULL_VOID(sourceDevObj);
     if (sourceDevObj->TaskOpenDMic(eventParam) != DH_SUCCESS) {
         DHLOGE("Open mic failed.");
         return;
@@ -1439,10 +1277,7 @@ void DAudioSourceDev::SourceEventHandler::CloseDMicCallback(const AppExecFwk::In
         return;
     }
     auto sourceDevObj = sourceDev_.lock();
-    if (sourceDevObj == nullptr) {
-        DHLOGE("Source dev is invalid.");
-        return;
-    }
+    CHECK_NULL_VOID(sourceDevObj);
     if (sourceDevObj->TaskCloseDMic(eventParam) != DH_SUCCESS) {
         DHLOGE("Close mic failed.");
         return;
@@ -1458,10 +1293,7 @@ void DAudioSourceDev::SourceEventHandler::DMicClosedCallback(const AppExecFwk::I
         return;
     }
     auto sourceDevObj = sourceDev_.lock();
-    if (sourceDevObj == nullptr) {
-        DHLOGE("Source dev is invalid.");
-        return;
-    }
+    CHECK_NULL_VOID(sourceDevObj);
     if (sourceDevObj->TaskDMicClosed(eventParam) != DH_SUCCESS) {
         DHLOGE("Deal dmic closed failed.");
         return;
@@ -1477,10 +1309,7 @@ void DAudioSourceDev::SourceEventHandler::SetVolumeCallback(const AppExecFwk::In
         return;
     }
     auto sourceDevObj = sourceDev_.lock();
-    if (sourceDevObj == nullptr) {
-        DHLOGE("Source dev is invalid.");
-        return;
-    }
+    CHECK_NULL_VOID(sourceDevObj);
     if (sourceDevObj->TaskSetVolume(eventParam) != DH_SUCCESS) {
         DHLOGE("Set volume failed.");
         return;
@@ -1496,10 +1325,7 @@ void DAudioSourceDev::SourceEventHandler::ChangeVolumeCallback(const AppExecFwk:
         return;
     }
     auto sourceDevObj = sourceDev_.lock();
-    if (sourceDevObj == nullptr) {
-        DHLOGE("Source dev is invalid.");
-        return;
-    }
+    CHECK_NULL_VOID(sourceDevObj);
     if (sourceDevObj->TaskChangeVolume(eventParam) != DH_SUCCESS) {
         DHLOGE("Failed to process volume change event.");
         return;
@@ -1515,10 +1341,7 @@ void DAudioSourceDev::SourceEventHandler::ChangeFocusCallback(const AppExecFwk::
         return;
     }
     auto sourceDevObj = sourceDev_.lock();
-    if (sourceDevObj == nullptr) {
-        DHLOGE("Source dev is invalid.");
-        return;
-    }
+    CHECK_NULL_VOID(sourceDevObj);
     if (sourceDevObj->TaskChangeFocus(eventParam) != DH_SUCCESS) {
         DHLOGE("Failed to process focus change event.");
         return;
@@ -1534,10 +1357,7 @@ void DAudioSourceDev::SourceEventHandler::ChangeRenderStateCallback(const AppExe
         return;
     }
     auto sourceDevObj = sourceDev_.lock();
-    if (sourceDevObj == nullptr) {
-        DHLOGE("Source dev is invalid.");
-        return;
-    }
+    CHECK_NULL_VOID(sourceDevObj);
     if (sourceDevObj->TaskChangeRenderState(eventParam) != DH_SUCCESS) {
         DHLOGE("Failed to process render state change event.");
         return;
@@ -1553,10 +1373,7 @@ void DAudioSourceDev::SourceEventHandler::PlayStatusChangeCallback(const AppExec
         return;
     }
     auto sourceDevObj = sourceDev_.lock();
-    if (sourceDevObj == nullptr) {
-        DHLOGE("Source dev is invalid.");
-        return;
-    }
+    CHECK_NULL_VOID(sourceDevObj);
     if (sourceDevObj->TaskPlayStatusChange(eventParam) != DH_SUCCESS) {
         DHLOGE("Failed to process playing status change event.");
         return;
@@ -1572,10 +1389,7 @@ void DAudioSourceDev::SourceEventHandler::SpkMmapStartCallback(const AppExecFwk:
         return;
     }
     auto sourceDevObj = sourceDev_.lock();
-    if (sourceDevObj == nullptr) {
-        DHLOGE("Source dev is invalid.");
-        return;
-    }
+    CHECK_NULL_VOID(sourceDevObj);
     if (sourceDevObj->TaskSpkMmapStart(eventParam) != DH_SUCCESS) {
         DHLOGE("Failed to start speaker with mmap mode.");
         return;
@@ -1591,10 +1405,7 @@ void DAudioSourceDev::SourceEventHandler::SpkMmapStopCallback(const AppExecFwk::
         return;
     }
     auto sourceDevObj = sourceDev_.lock();
-    if (sourceDevObj == nullptr) {
-        DHLOGE("Source dev is invalid.");
-        return;
-    }
+    CHECK_NULL_VOID(sourceDevObj);
     if (sourceDevObj->TaskSpkMmapStop(eventParam) != DH_SUCCESS) {
         DHLOGE("Failed to stop speaker with mmap mode.");
         return;
@@ -1610,10 +1421,7 @@ void DAudioSourceDev::SourceEventHandler::MicMmapStartCallback(const AppExecFwk:
         return;
     }
     auto sourceDevObj = sourceDev_.lock();
-    if (sourceDevObj == nullptr) {
-        DHLOGE("Source dev is invalid.");
-        return;
-    }
+    CHECK_NULL_VOID(sourceDevObj);
     if (sourceDevObj->TaskMicMmapStart(eventParam) != DH_SUCCESS) {
         DHLOGE("Failed to start mic with mmap mode.");
         return;
@@ -1629,10 +1437,7 @@ void DAudioSourceDev::SourceEventHandler::MicMmapStopCallback(const AppExecFwk::
         return;
     }
     auto sourceDevObj = sourceDev_.lock();
-    if (sourceDevObj == nullptr) {
-        DHLOGE("Source dev is invalid.");
-        return;
-    }
+    CHECK_NULL_VOID(sourceDevObj);
     if (sourceDevObj->TaskMicMmapStop(eventParam) != DH_SUCCESS) {
         DHLOGE("Failed to stop mic with mmap mode.");
         return;
@@ -1643,26 +1448,17 @@ void DAudioSourceDev::SourceEventHandler::MicMmapStopCallback(const AppExecFwk::
 void DAudioSourceDev::SourceEventHandler::SetThreadStatusFlagTrue(const AppExecFwk::InnerEvent::Pointer &event)
 {
     (void) event;
-    auto sourceDevobj = sourceDev_.lock();
-    if (sourceDevobj == nullptr) {
-        DHLOGE("Source dev is invaild.");
-        return;
-    }
-    sourceDevobj->threadStatusFlag_ = true;
+    auto sourceDevObj = sourceDev_.lock();
+    CHECK_NULL_VOID(sourceDevObj);
+    sourceDevObj->threadStatusFlag_ = true;
 }
 
 int32_t DAudioSourceDev::SourceEventHandler::GetEventParam(const AppExecFwk::InnerEvent::Pointer &event,
     std::string &eventParam)
 {
-    if (event == nullptr) {
-        DHLOGE("The input event is null.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(event, ERR_DH_AUDIO_NULLPTR);
     std::shared_ptr<AudioEvent> paramObj = event->GetSharedObject<AudioEvent>();
-    if (paramObj == nullptr) {
-        DHLOGE("The event parameter object is nullptr.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(paramObj, ERR_DH_AUDIO_NULLPTR);
     eventParam = paramObj->content;
     return DH_SUCCESS;
 }

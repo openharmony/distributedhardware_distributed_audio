@@ -44,10 +44,8 @@ int32_t DaudioHdfOperate::LoadDaudioHDFImpl()
     }
     servMgr_ = IServiceManager::Get();
     devmgr_ = IDeviceManager::Get();
-    if (servMgr_ == nullptr || devmgr_ == nullptr) {
-        DHLOGE("Get hdi service manager or device manager failed!");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(servMgr_, ERR_DH_AUDIO_NULLPTR);
+    CHECK_NULL_RETURN(devmgr_, ERR_DH_AUDIO_NULLPTR);
 
     ::OHOS::sptr<IServStatListener> listener(
         new DAudioHdfServStatListener(DAudioHdfServStatListener::StatusCallback([&](const ServiceStatus& status) {
@@ -110,10 +108,7 @@ int32_t DaudioHdfOperate::UnLoadDaudioHDFImpl()
 {
     DHLOGI("UnLoad daudio hdf impl begin!");
     devmgr_ = IDeviceManager::Get();
-    if (devmgr_ == nullptr) {
-        DHLOGE("Get hdi device manager failed!");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(devmgr_, ERR_DH_AUDIO_NULLPTR);
 
     int32_t ret = devmgr_->UnloadDevice(AUDIO_SERVICE_NAME);
     if (ret != HDF_SUCCESS) {
