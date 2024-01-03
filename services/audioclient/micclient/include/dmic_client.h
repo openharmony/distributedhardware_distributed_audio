@@ -20,6 +20,7 @@
 #include <condition_variable>
 #include <cstdint>
 #include <memory>
+#include <queue>
 #include <sstream>
 #include <string>
 #include <thread>
@@ -28,7 +29,6 @@
 #include "audio_info.h"
 
 #include "audio_data.h"
-#include "audio_encode_transport.h"
 #include "audio_event.h"
 #include "audio_param.h"
 #include "audio_status.h"

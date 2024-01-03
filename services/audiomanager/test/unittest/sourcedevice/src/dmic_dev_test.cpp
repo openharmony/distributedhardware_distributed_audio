@@ -15,8 +15,6 @@
 
 #include "dmic_dev_test.h"
 
-#include "audio_decode_transport.h"
-
 using namespace testing::ext;
 
 namespace OHOS {
@@ -185,7 +183,7 @@ HWTEST_F(DMicDevTest, Start_001, TestSize.Level1)
     mic_->micTrans_ = nullptr;
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->Start());
 
-    mic_->micTrans_ = std::make_shared<AudioDecodeTransport>(DEV_ID);
+    mic_->micTrans_ = std::make_shared<AVTransReceiverTransport>(DEV_ID, mic_);
     EXPECT_NE(DH_SUCCESS, mic_->Start());
     EXPECT_FALSE(mic_->IsOpened());
 
@@ -228,7 +226,7 @@ HWTEST_F(DMicDevTest, Stop_001, TestSize.Level1)
     mic_->micTrans_ = nullptr;
     EXPECT_EQ(DH_SUCCESS, mic_->Stop());
 
-    mic_->micTrans_ = std::make_shared<AudioDecodeTransport>(DEV_ID);
+    mic_->micTrans_ = std::make_shared<AVTransReceiverTransport>(DEV_ID, mic_);
     EXPECT_EQ(DH_SUCCESS, mic_->Stop());
 
     mic_->micTrans_ = std::make_shared<MockIAudioDataTransport>();
@@ -262,8 +260,8 @@ HWTEST_F(DMicDevTest, Release_001, TestSize.Level1)
     mic_->micTrans_ = nullptr;
     EXPECT_EQ(DH_SUCCESS, mic_->Release());
 
-    mic_->micTrans_ = std::make_shared<AudioDecodeTransport>(DEV_ID);
-    EXPECT_EQ(DH_SUCCESS, mic_->Release());
+    mic_->micTrans_ = std::make_shared<AVTransReceiverTransport>(DEV_ID, mic_);
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->Release());
 
     mic_->micTrans_ = std::make_shared<MockIAudioDataTransport>();
     EXPECT_EQ(DH_SUCCESS, mic_->Release());

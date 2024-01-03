@@ -17,7 +17,7 @@ import("//build/test.gni")
 import("../../../../../../distributedaudio.gni")
 
 module_output_path =
-    "distributed_audio/services/audioprocessor/decode_processor_test"
+    "distributed_audio/services/audioprocessor/direct_processor_test"
 
 config("module_private_config") {
   visibility = [ ":*" ]
@@ -35,19 +35,18 @@ config("module_private_config") {
     "${services_path}/common/audiodata/include",
     "${audio_processor_path}/directprocessor/include",
     "${audio_processor_path}/interface",
-    "${audio_processor_path}/test/unittest/common",
   ]
 }
 
 ohos_unittest("DirectProcessorTest") {
   module_out_path = module_output_path
 
-  sources = [ "../directprocessor/audio_direct_processor_test.cpp" ]
+  sources = [ "audio_direct_processor_test.cpp" ]
 
   configs = [ ":module_private_config" ]
 
   deps = [
-    "${audio_transport_path}/decodetransport:distributed_audio_decode_transport",
+    "${audio_transport_path}/receiverengine:distributed_audio_decode_transport",
     "${services_path}/common:distributed_audio_utils",
     "//third_party/googletest:gtest_main",
   ]

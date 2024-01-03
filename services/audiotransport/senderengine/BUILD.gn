@@ -15,19 +15,15 @@ import("//build/ohos.gni")
 import("//build/ohos_var.gni")
 import("../../../distributedaudio.gni")
 
-config("decode_transport_pub_config") {
+config("encode_transport_pub_config") {
   include_dirs = [
     "include",
-    "../audiochannel/audiodatachannel/include",
-    "../audiochannel/interface",
-    "../audiotransportstatus/include",
-    "../audiotransportstatus/interface",
     "../interface",
     "../../audioprocessor/interface",
   ]
 }
 
-ohos_shared_library("distributed_audio_decode_transport") {
+ohos_shared_library("distributed_audio_encode_transport") {
   sanitize = {
     boundary_sanitize = true
     cfi = true
@@ -47,37 +43,30 @@ ohos_shared_library("distributed_audio_decode_transport") {
     "include",
     "${audio_processor_path}/directprocessor/include",
     "${audio_processor_path}/interface",
-    "${audio_transport_path}/audiochannel/audiodatachannel/include",
-    "${audio_transport_path}/audiochannel/interface",
-    "${audio_transport_path}/audiotransportstatus/include",
-    "${audio_transport_path}/audiotransportstatus/interface",
     "${audio_transport_path}/interface",
-    "${audio_transport_path}/receiverengine/include",
-    "${common_path}/include",
+    "${audio_transport_path}/senderengine/include",
     "${common_path}/dfx_utils/include",
+    "${common_path}/include",
     "${services_path}/common/audiodata/include",
     "${services_path}/common/audioparam",
   ]
 
-  public_configs = [ ":decode_transport_pub_config" ]
+  public_configs = [ ":encode_transport_pub_config" ]
 
   sources = [
     "${audio_processor_path}/directprocessor/src/audio_direct_processor.cpp",
-    "${audio_transport_path}/receiverengine/src/av_receiver_engine_adapter.cpp",
-    "${audio_transport_path}/receiverengine/src/av_receiver_engine_transport.cpp",
+    "${audio_transport_path}/senderengine/src/av_sender_engine_adapter.cpp",
+    "${audio_transport_path}/senderengine/src/av_sender_engine_transport.cpp",
     "${services_path}/common/audiodata/src/audio_data.cpp",
-    "src/audio_decode_transport.cpp",
   ]
 
   deps = [
-    "${audio_transport_path}/audiochannel/audiodatachannel:distributed_audio_data_channel",
-    "${audio_transport_path}/audiotransportstatus:distributed_audio_transport_status",
     "${services_path}/common:distributed_audio_utils",
   ]
 
   external_deps = [
     "c_utils:utils",
-    "distributed_hardware_fwk:distributed_av_receiver",
+    "distributed_hardware_fwk:distributed_av_sender",
     "dsoftbus:softbus_client",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",

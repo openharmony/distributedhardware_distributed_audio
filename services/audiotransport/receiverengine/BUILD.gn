@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -13,10 +13,17 @@
 
 import("//build/ohos.gni")
 import("//build/ohos_var.gni")
-import("../../../../distributedaudio.gni")
+import("../../../distributedaudio.gni")
 
-ohos_shared_library("distributed_audio_data_channel") {
-  branch_protector_ret = "pac_ret"
+config("decode_transport_pub_config") {
+  include_dirs = [
+    "include",
+    "../interface",
+    "../../audioprocessor/interface",
+  ]
+}
+
+ohos_shared_library("distributed_audio_decode_transport") {
   sanitize = {
     boundary_sanitize = true
     cfi = true
@@ -27,27 +34,43 @@ ohos_shared_library("distributed_audio_data_channel") {
   }
   stack_protector_ret = true
   include_dirs = [
-    "${fwk_common_path}/utils/include",
+    "${mediastandard_path}/interfaces/innerkits/native/media/include",
+    "${mediastandardfwk_path}/audiocommon/include",
     "//third_party/json/include",
   ]
 
   include_dirs += [
     "include",
+    "${audio_processor_path}/directprocessor/include",
+    "${audio_processor_path}/interface",
+    "${audio_transport_path}/interface",
+    "${audio_transport_path}/receiverengine/include",
     "${common_path}/include",
     "${common_path}/dfx_utils/include",
-    "${services_path}/common/audioparam",
     "${services_path}/common/audiodata/include",
-    "${audio_transport_path}/audiochannel/interface",
+    "${services_path}/common/audioparam",
   ]
 
-  sources = [ "src/audio_data_channel.cpp" ]
+  public_configs = [ ":decode_transport_pub_config" ]
 
-  deps = [ "${services_path}/common:distributed_audio_utils" ]
+  sources = [
+    "${audio_processor_path}/directprocessor/src/audio_direct_processor.cpp",
+    "${audio_transport_path}/receiverengine/src/av_receiver_engine_adapter.cpp",
+    "${audio_transport_path}/receiverengine/src/av_receiver_engine_transport.cpp",
+    "${services_path}/common/audiodata/src/audio_data.cpp",
+  ]
+
+  deps = [
+    "${services_path}/common:distributed_audio_utils",
+  ]
 
   external_deps = [
     "c_utils:utils",
+    "distributed_hardware_fwk:distributed_av_receiver",
     "dsoftbus:softbus_client",
+    "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
+    "player_framework:media_client",
   ]
 
   defines = [

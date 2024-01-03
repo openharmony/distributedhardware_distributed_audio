@@ -15,8 +15,6 @@
 
 #include "dspeaker_dev_test.h"
 
-#include "audio_encode_transport.h"
-
 using namespace testing::ext;
 
 namespace OHOS {
@@ -182,7 +180,7 @@ HWTEST_F(DSpeakerDevTest, Start_001, TestSize.Level1)
     spk_->speakerTrans_ = nullptr;
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, spk_->Start());
 
-    spk_->speakerTrans_ = std::make_shared<AudioEncodeTransport>(DEV_ID);
+    spk_->speakerTrans_ = std::make_shared<AVTransSenderTransport>(DEV_ID, spk_);
     EXPECT_NE(DH_SUCCESS, spk_->Start());
     EXPECT_FALSE(spk_->IsOpened());
 }
@@ -262,7 +260,7 @@ HWTEST_F(DSpeakerDevTest, Pause_001, TestSize.Level1)
     spk_->speakerTrans_ = nullptr;
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, spk_->Pause());
 
-    spk_->speakerTrans_ = std::make_shared<AudioEncodeTransport>(DEV_ID);
+    spk_->speakerTrans_ = std::make_shared<AVTransSenderTransport>(DEV_ID, spk_);
     EXPECT_NE(DH_SUCCESS, spk_->Pause());
 
     spk_->speakerTrans_ = std::make_shared<MockIAudioDataTransport>();
@@ -290,7 +288,7 @@ HWTEST_F(DSpeakerDevTest, Restart_001, TestSize.Level1)
         .ext = "Test",
     };
     EXPECT_EQ(DH_SUCCESS, spk_->SetParameters(DEV_ID, DH_ID, param));
-    spk_->speakerTrans_ = std::make_shared<AudioEncodeTransport>(DEV_ID);
+    spk_->speakerTrans_ = std::make_shared<AVTransSenderTransport>(DEV_ID, spk_);
     EXPECT_NE(DH_SUCCESS, spk_->Restart());
 
     spk_->speakerTrans_ = std::make_shared<MockIAudioDataTransport>();
@@ -308,7 +306,7 @@ HWTEST_F(DSpeakerDevTest, Release_001, TestSize.Level1)
     spk_->speakerTrans_ = nullptr;
     EXPECT_EQ(DH_SUCCESS, spk_->Release());
 
-    spk_->speakerTrans_ = std::make_shared<AudioEncodeTransport>(DEV_ID);
+    spk_->speakerTrans_ = std::make_shared<AVTransSenderTransport>(DEV_ID, spk_);
     EXPECT_EQ(DH_SUCCESS, spk_->Release());
 
     spk_->speakerTrans_ = std::make_shared<MockIAudioDataTransport>();
@@ -344,7 +342,7 @@ HWTEST_F(DSpeakerDevTest, WriteStreamData_002, TestSize.Level1)
 {
     const size_t capacity = 1;
     auto writeData = std::make_shared<AudioData>(capacity);
-    spk_->speakerTrans_ = std::make_shared<AudioEncodeTransport>(DEV_ID);
+    spk_->speakerTrans_ = std::make_shared<AVTransSenderTransport>(DEV_ID, spk_);
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, spk_->WriteStreamData(DEV_ID, DH_ID, writeData));
 
     spk_->speakerTrans_ = std::make_shared<MockIAudioDataTransport>();
