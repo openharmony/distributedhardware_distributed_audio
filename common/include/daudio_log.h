@@ -40,19 +40,19 @@ void DHLog(DHLogLevel logLevel, const char *fmt, ...);
     (std::string("[") + DH_LOG_TAG + "][" + __FUNCTION__ + "]:" + fmt).c_str(), ##__VA_ARGS__)
 
 #define CHECK_NULL_VOID(ptr)                  \
-    do {                                      \
-        if (ptr == nullptr) {                 \
-            DHLOGE("Address pointer is null");\
-            return;                           \
-        }                                     \
+    do {                                        \
+        if ((ptr) == nullptr) {                 \
+            DHLOGE("Address pointer is null");  \
+            return;                             \
+        }                                       \
     } while (0)
 
-#define CHECK_NULL_RETURN(ptr, ret)           \
-    do {                                      \
-        if (ptr == nullptr) {                 \
-            DHLOGE("Address pointer is null");\
-            return ret;                       \
-        }                                     \
+#define CHECK_NULL_RETURN(ptr, ret)         \
+    do {                                        \
+        if ((ptr) == nullptr) {                 \
+            DHLOGE("Address pointer is null");  \
+            return (ret);                       \
+        }                                       \
     } while (0)
 } // namespace DistributedHardware
 } // namespace OHOS
