@@ -658,7 +658,6 @@ int32_t DAudioSourceDev::TaskOpenDSpeaker(const std::string &args)
         return ERR_DH_AUDIO_FAILED;
     }
     auto speaker = FindIoDevImpl(args);
-
     if (speaker == nullptr) {
         DHLOGE("The IO device is invaild.");
         NotifyHDF(NOTIFY_OPEN_SPEAKER_RESULT, HDF_EVENT_RESULT_FAILED, dhId);
