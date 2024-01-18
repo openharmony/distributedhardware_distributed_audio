@@ -120,8 +120,9 @@ int32_t AVTransReceiverAdapter::RegisterAdapterCallback(const std::shared_ptr<AV
 int32_t AVTransReceiverAdapter::WaitForChannelCreated()
 {
     std::unique_lock<std::mutex> lock(chnCreatedMtx_);
-    auto status = chnCreatedCondVar_.wait_for(lock, std::chrono::milliseconds(WAIT_TIMEOUT_MS));
-    if (status == std::cv_status::timeout) {
+    auto status = chnCreatedCondVar_.wait_for(lock, std::chrono::milliseconds(WAIT_TIMEOUT_MS),
+        [this]() { return chnCreateSuccess_.load(); });
+    if (!status) {
         DHLOGI("Wait timeout.");
         return ERR_DH_AUDIO_SA_WAIT_TIMEOUT;
     }
