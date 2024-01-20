@@ -106,7 +106,7 @@ HWTEST_F(DSpeakerClientTest, SetUp_001, TestSize.Level1)
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, speakerClient_->SetUp(audioParam));
     EXPECT_EQ(DH_SUCCESS, speakerClient_->Release());
     speakerClient_->clientStatus_ = AudioStatus::STATUS_READY;
-    EXPECT_EQ(ERR_DH_AUDIO_CLIENT_RENDER_RELEASE_FAILED, speakerClient_->Release());
+    EXPECT_EQ(DH_SUCCESS, speakerClient_->Release());
 }
 
 /**

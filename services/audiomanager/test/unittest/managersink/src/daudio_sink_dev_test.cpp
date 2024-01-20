@@ -398,5 +398,19 @@ HWTEST_F(DAudioSinkDevTest, SendAudioEventToRemote_002, TestSize.Level1)
     sinkDev_->spkClientMap_.insert(std::make_pair(DEFAULT_RENDER_ID, spkClient));
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sinkDev_->SendAudioEventToRemote(event));
 }
+
+/**
+ * @tc.name: PauseDistributedHardware_001
+ * @tc.desc: Verify the PauseDistributedHardware function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkDevTest, PauseDistributedHardware_001, TestSize.Level1)
+{
+    std::string networkId = "networkId";
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sinkDev_->PauseDistributedHardware(networkId));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sinkDev_->ResumeDistributedHardware(networkId));
+    EXPECT_EQ(DH_SUCCESS, sinkDev_->StopDistributedHardware(networkId));
+}
 } // DistributedHardware
 } // OHOS
