@@ -405,7 +405,7 @@ void DMicDev::EnqueueThread()
 
 void DMicDev::FillJitterQueue()
 {
-    while (true) {
+    while (isEnqueueRunning_.load()) {
         {
             std::lock_guard<std::mutex> lock(dataQueueMtx_);
             if (dataQueue_.size() >= LOW_LATENCY_DATA_QUEUE_HALF_SIZE) {

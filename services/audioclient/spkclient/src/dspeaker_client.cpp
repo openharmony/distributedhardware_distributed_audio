@@ -325,7 +325,7 @@ void DSpeakerClient::FillJitterQueue()
 
 void DSpeakerClient::FlushJitterQueue()
 {
-    while (true) {
+    while (isRenderReady_.load()) {
         {
             std::lock_guard<std::mutex> lock(dataQueueMtx_);
             if (dataQueue_.empty()) {
