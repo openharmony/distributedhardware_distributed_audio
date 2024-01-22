@@ -65,15 +65,10 @@ int32_t DAudioSinkManager::Init(const sptr<IDAudioSinkIpcCallback> &sinkCallback
     DHLOGI("Init audio sink manager.");
     initCallback_ = std::make_shared<DeviceInitCallback>();
     ipcSinkCallback_ = sinkCallback;
-    if (GetLocalDeviceNetworkId(localNetworkId_) != DH_SUCCESS) {
-        DHLOGE("Get local network id failed.");
-        return ERR_DH_AUDIO_FAILED;
-    }
-
-    if (LoadAVReceiverEngineProvider() != DH_SUCCESS) {
-        DHLOGE("Load av receiver engine failed.");
-        return ERR_DH_AUDIO_FAILED;
-    }
+    CHECK_AND_RETURN_RET_LOG(GetLocalDeviceNetworkId(localNetworkId_) != DH_SUCCESS,
+        ERR_DH_AUDIO_FAILED, "%s", "Get local network id failed.");
+    CHECK_AND_RETURN_RET_LOG(LoadAVReceiverEngineProvider() != DH_SUCCESS,
+        ERR_DH_AUDIO_FAILED, "%s", "Load av receiver engine failed.");
     CHECK_NULL_RETURN(rcvProviderPtr_, ERR_DH_AUDIO_FAILED);
     providerListener_ = std::make_shared<EngineProviderListener>();
     if (rcvProviderPtr_->RegisterProviderCallback(providerListener_) != DH_SUCCESS) {
@@ -91,6 +86,8 @@ int32_t DAudioSinkManager::Init(const sptr<IDAudioSinkIpcCallback> &sinkCallback
         DHLOGE("Register av sender engine callback failed.");
         return ERR_DH_AUDIO_FAILED;
     }
+    CHECK_AND_RETURN_RET_LOG(sendProviderPtr_->RegisterProviderCallback(providerListener_) != DH_SUCCESS,
+        ERR_DH_AUDIO_FAILED, "%s", "Register av sender engine callback failed.");
     DHLOGI("Load av sender engine success.");
     return DH_SUCCESS;
 }
@@ -238,10 +235,8 @@ void DAudioSinkManager::NotifyEvent(const std::string &devId, const int32_t even
     AudioEvent audioEvent(eventType, eventContent);
     std::lock_guard<std::mutex> lock(devMapMutex_);
     DHLOGI("Notify event, devId: %s.", GetAnonyString(devId).c_str());
-    if (audioDevMap_.find(devId) == audioDevMap_.end()) {
-        DHLOGE("Notify event error, dev not exist.");
-        return;
-    }
+    CHECK_AND_RETURN_LOG(audioDevMap_.find(devId) == audioDevMap_.end(),
+        "%s", "Notify event error, dev not exist.");
     CHECK_NULL_VOID(audioDevMap_[devId]);
     audioDevMap_[devId]->NotifyEvent(audioEvent);
 }

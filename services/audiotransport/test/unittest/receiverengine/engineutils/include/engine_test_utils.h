@@ -198,6 +198,78 @@ public:
         return false;
     }
 };
+
+class MockIAVSenderEngineForFail : public IAVSenderEngine {
+public:
+    explicit MockIAVSenderEngineForFail() {}
+    ~MockIAVSenderEngineForFail() {}
+
+    int32_t Initialize() override
+    {
+        return 0;
+    }
+
+    int32_t Start() override
+    {
+        return 0;
+    }
+
+    int32_t Stop() override
+    {
+        return 0;
+    }
+
+    int32_t Release() override
+    {
+        return 1;
+    }
+
+    int32_t PushData(const std::shared_ptr<AVTransBuffer> &buffer) override
+    {
+        return 0;
+    }
+
+    int32_t SetParameter(AVTransTag tag, const std::string &value) override
+    {
+        (void) tag;
+        (void) value;
+        return 0;
+    }
+
+    int32_t SendMessage(const std::shared_ptr<AVTransMessage> &message) override
+    {
+        return 0;
+    }
+
+    int32_t CreateControlChannel(const std::vector<std::string> &dstDevIds,
+        const ChannelAttribute &attribution) override
+    {
+        (void) dstDevIds;
+        (void) attribution;
+        return 1;
+    }
+
+    int32_t RegisterSenderCallback(const std::shared_ptr<IAVSenderEngineCallback> &callback)
+    {
+        (void) callback;
+        return 0;
+    }
+
+    bool StartDumpMediaData() override
+    {
+        return false;
+    }
+
+    bool StopDumpMediaData() override
+    {
+        return false;
+    }
+
+    bool ReStartDumpMediaData() override
+    {
+        return false;
+    }
+};
 } // DistributedHardware
 } // OHOS
 #endif // OHOS_ENGINE_TEST_UTILS_H

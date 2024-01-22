@@ -23,6 +23,7 @@ config("module_private_config") {
 
   include_dirs = [
     "${fwk_common_path}/utils/include",
+    "//third_party/cJSON",
     "//third_party/json/include",
   ]
 
@@ -41,6 +42,7 @@ ohos_unittest("DaudioUtilsTest") {
 
   deps = [
     "${services_path}/common:distributed_audio_utils",
+    "//third_party/cJSON:cjson",
     "//third_party/googletest:gtest_main",
   ]
 

@@ -17,6 +17,7 @@
 
 #include <thread>
 
+#include "cJSON.h"
 #include "securec.h"
 
 #include "daudio_constants.h"
@@ -298,6 +299,25 @@ HWTEST_F(DAudioUtilsTest, DAudioUtilTest_007, TestSize.Level1)
 
     tempDevIdStr = "Test1";
     EXPECT_EQ(true, CheckDevIdIsLegal(tempDevIdStr));
+}
+
+/**
+ * @tc.name: DAudioLogTest_008
+ * @tc.desc: Verify the GetEventNameByType function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5U
+ */
+HWTEST_F(DAudioUtilsTest, DAudioUtilTest_008, TestSize.Level1)
+{
+    int32_t eventType = 200;
+    GetEventNameByType(eventType);
+    cJSON * jsonObj = nullptr;
+    std::initializer_list<std::string> keys = { "one", "two" };
+    CJsonParamCheck(jsonObj, keys);
+    jsonObj = cJSON_CreateObject();
+    cJSON_AddStringToObject(jsonObj, "one", "one");
+    cJSON_AddNumberToObject(jsonObj, "two", 2);
+    CJsonParamCheck(jsonObj, keys);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -58,6 +58,35 @@ HWTEST_F(DAudioSinkManagerTest, Init_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: OnSinkDevReleased_001
+ * @tc.desc: Verify the OnSinkDevReleased function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkManagerTest, OnSinkDevReleased_001, TestSize.Level1)
+{
+    std::string devId = "1";
+    daudioSinkManager.devClearThread_ = std::thread(&DAudioSinkManager::ClearAudioDev, &daudioSinkManager, devId);
+    daudioSinkManager.OnSinkDevReleased(devId);
+}
+
+/**
+ * @tc.name: HandleDAudioNotify_001
+ * @tc.desc: Verify the HandleDAudioNotify function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkManagerTest, HandleDAudioNotify_001, TestSize.Level1)
+{
+    std::string devId = "1";
+    std::string dhId = "1";
+    std::string content = "1";
+    int32_t type = 1;
+    daudioSinkManager.audioDevMap_.emplace(devId, nullptr);
+    EXPECT_EQ(DH_SUCCESS, daudioSinkManager.HandleDAudioNotify(devId, dhId, type, content));
+}
+
+/**
  * @tc.name: DAudioNotify_001
  * @tc.desc: Verify the DAudioNotify function.
  * @tc.type: FUNC
