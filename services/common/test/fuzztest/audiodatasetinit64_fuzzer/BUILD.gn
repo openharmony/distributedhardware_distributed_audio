@@ -42,7 +42,7 @@ ohos_fuzztest("AudioDataSetInit64FuzzTest") {
   defines = [
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"AudioDataSetInit64FuzzTest\"",
-    "LOG_DOMAIN=0xD004100",
+    "LOG_DOMAIN=0xD004130",
   ]
 
   external_deps = [

@@ -48,7 +48,7 @@ ohos_unittest("AudioAdapterHdiTest") {
   defines = [
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"unittest\"",
-    "LOG_DOMAIN=0xD004100",
+    "LOG_DOMAIN=0xD004130",
   ]
 
   cflags = [
@@ -78,7 +78,7 @@ ohos_unittest("AudioRenderInternalTest") {
   defines = [
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"unittest\"",
-    "LOG_DOMAIN=0xD004100",
+    "LOG_DOMAIN=0xD004130",
   ]
 
   cflags = [
@@ -108,7 +108,7 @@ ohos_unittest("AudioCaptureInternalTest") {
   defines = [
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"unittest\"",
-    "LOG_DOMAIN=0xD004100",
+    "LOG_DOMAIN=0xD004130",
   ]
 
   cflags = [
@@ -142,7 +142,7 @@ ohos_unittest("AudioAdapterInternalTest") {
   defines = [
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"unittest\"",
-    "LOG_DOMAIN=0xD004100",
+    "LOG_DOMAIN=0xD004130",
   ]
 
   cflags = [

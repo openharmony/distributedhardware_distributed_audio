@@ -52,7 +52,7 @@ ohos_shared_library("distributed_audio_handler") {
 
   defines = [
     "HI_LOG_ENABLE",
-    "LOG_DOMAIN=0xD004100",
+    "LOG_DOMAIN=0xD004130",
   ]
 
   cflags = [ "-Wno-shadow" ]
