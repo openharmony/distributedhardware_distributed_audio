@@ -122,5 +122,18 @@ HWTEST_F(DAudioSinkServiceTest, UnsubscribeLocalHardware_001, TestSize.Level1)
     EXPECT_EQ(DH_SUCCESS, sinkSrv_->UnsubscribeLocalHardware(dhId));
     sinkSrv_->ReleaseSink();
 }
+
+/**
+ * @tc.name: Dump_001
+ * @tc.desc: Verify the Dump function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkServiceTest, Dump_001, TestSize.Level1)
+{
+    int32_t fd = 1;
+    std::vector<std::u16string> args;
+    EXPECT_EQ(DH_SUCCESS, sinkSrv_->Dump(fd, args));
+}
 } // DistributedHardware
 } // OHOS

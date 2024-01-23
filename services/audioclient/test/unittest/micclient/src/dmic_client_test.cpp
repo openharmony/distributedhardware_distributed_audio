@@ -124,6 +124,8 @@ HWTEST_F(DMicClientTest, StartCapture001, TestSize.Level1)
     };
     micClient_->audioCapturer_ = AudioStandard::AudioCapturer::Create(capturerOptions);
     micClient_->micTrans_ = std::make_shared<MockIAudioDataTransport>();
+    micClient_->clientStatus_ = AudioStatus::STATUS_STOP;
+    EXPECT_EQ(ERR_DH_AUDIO_SA_STATUS_ERR, micClient_->StartCapture());
     micClient_->clientStatus_ = AudioStatus::STATUS_READY;
     EXPECT_NE(nullptr, micClient_->audioCapturer_);
     EXPECT_EQ(DH_SUCCESS, micClient_->StartCapture());
@@ -193,6 +195,12 @@ HWTEST_F(DMicClientTest, Release001, TestSize.Level1)
     micClient_->audioCapturer_ = AudioStandard::AudioCapturer::Create(capturerOptions);
     EXPECT_NE(nullptr, micClient_->audioCapturer_);
     EXPECT_EQ(DH_SUCCESS, micClient_->Release());
+    micClient_->audioCapturer_ = nullptr;
+    micClient_->micTrans_ = std::make_shared<MockIAudioDataTransport>();
+    micClient_->clientStatus_ = AudioStatus::STATUS_STOP;
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, micClient_->Release());
+    micClient_->clientStatus_ = AudioStatus::STATUS_IDLE;
+    EXPECT_EQ(ERR_DH_AUDIO_SA_STATUS_ERR, micClient_->Release());
 }
 
 /**

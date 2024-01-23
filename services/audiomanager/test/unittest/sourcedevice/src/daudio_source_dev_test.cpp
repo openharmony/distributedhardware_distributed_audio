@@ -28,6 +28,12 @@ const std::string DH_ID_SPK = "1";
 const std::string DH_ID_UNKNOWN = "0";
 const int32_t TASK_QUEUE_LEN = 20;
 const size_t AUDIO_DATA_CAP = 1;
+constexpr uint32_t EVENT_MMAP_SPK_START = 81;
+constexpr uint32_t EVENT_MMAP_SPK_STOP = 82;
+constexpr uint32_t EVENT_MMAP_MIC_START = 83;
+constexpr uint32_t EVENT_MMAP_MIC_STOP = 84;
+constexpr uint32_t EVENT_DMIC_CLOSED = 24;
+constexpr uint32_t EVENT_OPEN_MIC = 21;
 
 void DAudioSourceDevTest::SetUpTestCase(void) {}
 
@@ -968,6 +974,132 @@ HWTEST_F(DAudioSourceDevTest, SendAudioEventToRemote_002, TestSize.Level1)
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->SendAudioEventToRemote(event));
     sourceDev_->speaker_ = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->SendAudioEventToRemote(event));
+}
+
+/**
+ * @tc.name: TaskDMicClosed_003
+ * @tc.desc: Verify the TaskDMicClosed function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, TaskDMicClosed_003, TestSize.Level1)
+{
+    std::string args = "";
+    sourceDev_->AwakeAudioDev();
+    AudioEvent event;
+    auto eventParam = std::make_shared<AudioEvent>(event);
+    auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_OPEN_MIC, eventParam, 0);
+    sourceDev_->handler_->ProcessEvent(msgEvent);
+    sourceDev_->handler_->OpenDSpeakerCallback(msgEvent);
+    sourceDev_->handler_->CloseDSpeakerCallback(msgEvent);
+    sourceDev_->handler_->OpenDMicCallback(msgEvent);
+    sourceDev_->handler_->CloseDMicCallback(msgEvent);
+    sourceDev_->SleepAudioDev();
+    EXPECT_EQ(ERR_DH_AUDIO_SA_PARAM_INVALID, sourceDev_->TaskDMicClosed(args));
+}
+
+/**
+ * @tc.name: TaskDMicClosed_004
+ * @tc.desc: Verify the TaskDMicClosed function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, TaskDMicClosed_004, TestSize.Level1)
+{
+    std::string devId = "1";
+    int32_t dhId = 1;
+    std::string args = "{\"dhId\":\"1\"}";
+    sourceDev_->AwakeAudioDev();
+    AudioEvent event = AudioEvent(MIC_CLOSED, args);
+    auto eventParam = std::make_shared<AudioEvent>(event);
+    auto mic = std::make_shared<DMicDev>(devId, sourceDev_);
+    sourceDev_->deviceMap_.insert(std::make_pair(dhId, mic));
+    auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_MMAP_MIC_START, eventParam, 0);
+    sourceDev_->handler_->MicMmapStartCallback(msgEvent);
+    auto msgEvent1 = AppExecFwk::InnerEvent::Get(EVENT_MMAP_MIC_STOP, eventParam, 0);
+    sourceDev_->handler_->MicMmapStartCallback(msgEvent1);
+    dhId = 2;
+    args = "{\"dhId\":\"2\"}";
+    AudioEvent event1 = AudioEvent(SPEAKER_CLOSED, args);
+    auto eventParam2 = std::make_shared<AudioEvent>(event1);
+    auto speaker = std::make_shared<DSpeakerDev>(devId, sourceDev_);
+    sourceDev_->deviceMap_.insert(std::make_pair(dhId, mic));
+    auto msgEvent3 = AppExecFwk::InnerEvent::Get(EVENT_MMAP_SPK_START, eventParam2, 0);
+    sourceDev_->handler_->MicMmapStartCallback(msgEvent3);
+    auto msgEvent4 = AppExecFwk::InnerEvent::Get(EVENT_MMAP_SPK_STOP, eventParam2, 0);
+    sourceDev_->handler_->MicMmapStartCallback(msgEvent4);
+    sourceDev_->SleepAudioDev();
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskDMicClosed(args));
+    args = "{\"dhId\":\"-1\"}";
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->TaskDMicClosed(args));
+}
+
+/**
+ * @tc.name: EnableDMic_002
+ * @tc.desc: Verify the EnableDMic function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, EnableDMic_002, TestSize.Level1)
+{
+    int32_t dhId = 1;
+    std::string devId = "123";
+    std::string attrs = "1234";
+    sourceDev_->AwakeAudioDev();
+    AudioEvent event = AudioEvent(MIC_CLOSED, "{\"dhId\":\"1\"}");
+    auto eventParam = std::make_shared<AudioEvent>(event);
+    auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_DMIC_CLOSED, eventParam, 0);
+    sourceDev_->handler_->DMicClosedCallback(msgEvent);
+    sourceDev_->SleepAudioDev();
+    auto mic = std::make_shared<DMicDev>(devId, sourceDev_);
+    sourceDev_->deviceMap_.insert(std::make_pair(dhId, mic));
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->EnableDMic(dhId, attrs));
+}
+
+/**
+ * @tc.name: EnableDMic_003
+ * @tc.desc: Verify the EnableDMic function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, EnableDMic_003, TestSize.Level1)
+{
+    int32_t dhId = 1;
+    sourceDev_->AwakeAudioDev();
+    AudioEvent event;
+    auto eventParam = std::make_shared<AudioEvent>(event);
+    auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_DMIC_CLOSED, eventParam, 0);
+    sourceDev_->handler_->DMicClosedCallback(msgEvent);
+    sourceDev_->handler_->SetVolumeCallback(msgEvent);
+    sourceDev_->handler_->ChangeVolumeCallback(msgEvent);
+    sourceDev_->handler_->ChangeFocusCallback(msgEvent);
+    sourceDev_->handler_->ChangeRenderStateCallback(msgEvent);
+    sourceDev_->handler_->PlayStatusChangeCallback(msgEvent);
+    sourceDev_->handler_->SpkMmapStartCallback(msgEvent);
+    sourceDev_->handler_->SpkMmapStopCallback(msgEvent);
+    sourceDev_->handler_->MicMmapStartCallback(msgEvent);
+    sourceDev_->handler_->MicMmapStopCallback(msgEvent);
+    sourceDev_->handler_->SetThreadStatusFlagTrue(msgEvent);
+    sourceDev_->SleepAudioDev();
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->EnableDMic(dhId, ATTRS));
+}
+
+/**
+ * @tc.name: HandleDSpeakerClosed_002
+ * @tc.desc: Verify the HandleDSpeakerClosed function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, HandleDSpeakerClosed_002, TestSize.Level1)
+{
+    AudioEvent event = AudioEvent(SPEAKER_CLOSED, "{\"dhId\":\"-1\"}");
+    sourceDev_->AwakeAudioDev();
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->HandleDSpeakerClosed(event));
+    EXPECT_EQ(ERR_DH_AUDIO_NOT_SUPPORT, sourceDev_->DisableDAudio(event.content));
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->TaskOpenDSpeaker(event.content));
+    std::string args = "{\"dhId\":\"10\"}";
+    EXPECT_EQ(ERR_DH_AUDIO_NOT_SUPPORT, sourceDev_->DisableDAudio(event.content));
+    sourceDev_->SleepAudioDev();
 }
 } // namespace DistributedHardware
 } // namespace OHOS
