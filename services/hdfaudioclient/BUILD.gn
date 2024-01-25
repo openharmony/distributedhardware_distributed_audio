@@ -53,7 +53,7 @@ ohos_shared_library("daudio_client") {
 
   defines = [
     "HI_LOG_ENABLE",
-    "LOG_DOMAIN=0xD004100",
+    "LOG_DOMAIN=0xD004130",
   ]
 
   subsystem_name = "distributedhardware"

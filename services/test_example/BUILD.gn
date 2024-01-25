@@ -41,7 +41,7 @@ ohos_executable("audio_distributed_test") {
   defines = [
     "DH_LOG_TAG=\"daudioTest\"",
     "HI_LOG_ENABLE",
-    "LOG_DOMAIN=0xD004100",
+    "LOG_DOMAIN=0xD004130",
   ]
 
   install_enable = false

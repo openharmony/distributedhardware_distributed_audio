@@ -50,7 +50,7 @@ ohos_fuzztest("SourceProxyInitSourceFuzzTest") {
   defines = [
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"SourceProxyInitSourceFuzzTest\"",
-    "LOG_DOMAIN=0xD004100",
+    "LOG_DOMAIN=0xD004130",
   ]
 
   external_deps = [

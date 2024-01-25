@@ -49,7 +49,7 @@ ohos_fuzztest("SourceHandlerFinishStartSAFuzzTest") {
   defines = [
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"SourceHandlerFinishStartSAFuzzTest\"",
-    "LOG_DOMAIN=0xD004100",
+    "LOG_DOMAIN=0xD004130",
   ]
 
   external_deps = [

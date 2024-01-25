@@ -56,7 +56,7 @@ ohos_fuzztest("SourceServiceConfigDistributedHardwareFuzzTest") {
   defines = [
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"SourceServiceConfigDistributedHardwareFuzzTest\"",
-    "LOG_DOMAIN=0xD004100",
+    "LOG_DOMAIN=0xD004130",
   ]
 
   external_deps = [

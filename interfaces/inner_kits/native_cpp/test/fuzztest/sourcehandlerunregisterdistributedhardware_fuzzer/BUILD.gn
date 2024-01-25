@@ -58,7 +58,7 @@ ohos_fuzztest("SourceHandlerUnregisterDistributedHardwareFuzzTest") {
   defines = [
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"SourceHandlerUnregisterDistributedHardwareFuzzTest\"",
-    "LOG_DOMAIN=0xD004100",
+    "LOG_DOMAIN=0xD004130",
   ]
 }
 

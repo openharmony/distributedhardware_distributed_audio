@@ -48,7 +48,7 @@ ohos_unittest("DaudioUtilsTest") {
 
   defines = [
     "HI_LOG_ENABLE",
-    "LOG_DOMAIN=0xD004100",
+    "LOG_DOMAIN=0xD004130",
   ]
 }
 
