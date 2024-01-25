@@ -92,5 +92,18 @@ HWTEST_F(DAudioSourceServiceTest, ConfigDistributedHardware_001, TestSize.Level1
 
     EXPECT_EQ(DH_SUCCESS, sourceSrv_->ConfigDistributedHardware(devId, dhId, key, value));
 }
+
+/**
+ * @tc.name: Dump_001
+ * @tc.desc: Verify the Dump function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceServiceTest, Dump_001, TestSize.Level1)
+{
+    int32_t fd = 1;
+    std::vector<std::u16string> args;
+    EXPECT_EQ(DH_SUCCESS, sourceSrv_->Dump(fd, args));
+}
 } // DistributedHardware
 } // OHOS

@@ -185,6 +185,11 @@ HWTEST_F(DSpeakerClientTest, OnDecodeTransDataDone001, TestSize.Level1)
  */
 HWTEST_F(DSpeakerClientTest, Release001, TestSize.Level1)
 {
+    speakerClient_->speakerTrans_ = std::make_shared<MockIAudioDataTransport>();
+    std::string args = "{\"ChangeType\":\"restart\"}";
+    speakerClient_->PlayStatusChange(args);
+    args = "{\"ChangeType\":\"pause\"}";
+    speakerClient_->PlayStatusChange(args);
     speakerClient_->Pause();
     EXPECT_EQ(ERR_DH_AUDIO_SA_STATUS_ERR, speakerClient_->Release());
 }
@@ -215,6 +220,9 @@ HWTEST_F(DSpeakerClientTest, SendMessage_001, TestSize.Level1)
 {
     std::string content = "content";
     std::string dstDevId = "dstDevId";
+    audioParam_.renderOpts.renderFlags = MMAP_MODE;
+    speakerClient_->speakerTrans_ = std::make_shared<MockIAudioDataTransport>();
+    speakerClient_->Pause();
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, speakerClient_->SendMessage(EVENT_UNKNOWN, content, dstDevId));
     EXPECT_EQ(DH_SUCCESS, speakerClient_->SendMessage(NOTIFY_OPEN_SPEAKER_RESULT, content, dstDevId));
     speakerClient_->speakerTrans_ = nullptr;
