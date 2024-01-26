@@ -70,6 +70,18 @@ HWTEST_F(AVSenderEngineAdapterTest, Initialize_002, TestSize.Level1)
 }
 
 /**
+ * @tc.name: Release_001
+ * @tc.desc: Verify the Release function.
+ * @tc.type: FUNC
+ * @tc.require: AR000HTAPM
+ */
+HWTEST_F(AVSenderEngineAdapterTest, Release_001, TestSize.Level1)
+{
+    senderAdapter_->senderEngine_ = std::make_shared<MockIAVSenderEngineForFail>();
+    EXPECT_EQ(DH_SUCCESS, senderAdapter_->Release());
+}
+
+/**
  * @tc.name: Start_001
  * @tc.desc: Verify the Start and Stop function.
  * @tc.type: FUNC
@@ -150,6 +162,20 @@ HWTEST_F(AVSenderEngineAdapterTest, CreateControlChannel_002, TestSize.Level1)
 }
 
 /**
+ * @tc.name: WaitForChannelCreated_001
+ * @tc.desc: Verify the WaitForChannelCreated function.
+ * @tc.type: FUNC
+ * @tc.require: AR000HTAPM
+ */
+HWTEST_F(AVSenderEngineAdapterTest, WaitForChannelCreated_001, TestSize.Level1)
+{
+    senderAdapter_->chnCreateSuccess_ = true;
+    EXPECT_EQ(DH_SUCCESS, senderAdapter_->WaitForChannelCreated());
+    senderAdapter_->chnCreateSuccess_ = false;
+    EXPECT_EQ(ERR_DH_AUDIO_SA_WAIT_TIMEOUT, senderAdapter_->WaitForChannelCreated());
+}
+
+/**
  * @tc.name: SendMessageToRemote_001
  * @tc.desc: Verify the SendMessageToRemote function.
  * @tc.type: FUNC
@@ -195,6 +221,22 @@ HWTEST_F(AVSenderEngineAdapterTest, OnSenderEvent_001, TestSize.Level1)
     senderAdapter_->adapterCallback_ = std::make_shared<MockAVSenderAdapterCallback>();
     EXPECT_EQ(DH_SUCCESS, senderAdapter_->OnSenderEvent(event));
     EXPECT_EQ(DH_SUCCESS, senderAdapter_->OnMessageReceived(message));
+}
+
+/**
+ * @tc.name: OnSenderEvent_002
+ * @tc.desc: Verify the OnSenderEvent function.
+ * @tc.type: FUNC
+ * @tc.require: AR000HTAPM
+ */
+HWTEST_F(AVSenderEngineAdapterTest, OnSenderEvent_002, TestSize.Level1)
+{
+    AVTransEvent event;
+    event.type = EventType::EVENT_ADD_STREAM;
+    EXPECT_EQ(DH_SUCCESS, senderAdapter_->OnSenderEvent(event));
+    senderAdapter_->adapterCallback_ = std::make_shared<MockAVSenderAdapterCallback>();
+    event.type = EventType::EVENT_START_SUCCESS;
+    EXPECT_EQ(DH_SUCCESS, senderAdapter_->OnSenderEvent(event));
 }
 } // namespace DistributedHardware
 } // namespace OHOS

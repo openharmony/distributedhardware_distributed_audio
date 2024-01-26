@@ -39,7 +39,7 @@ void DHLog(DHLogLevel logLevel, const char *fmt, ...);
 #define DHLOGE(fmt, ...) DHLog(DH_LOG_ERROR, \
     (std::string("[") + DH_LOG_TAG + "][" + __FUNCTION__ + "]:" + fmt).c_str(), ##__VA_ARGS__)
 
-#define CHECK_NULL_VOID(ptr)                  \
+#define CHECK_NULL_VOID(ptr)                    \
     do {                                        \
         if ((ptr) == nullptr) {                 \
             DHLOGE("Address pointer is null");  \
@@ -47,12 +47,35 @@ void DHLog(DHLogLevel logLevel, const char *fmt, ...);
         }                                       \
     } while (0)
 
-#define CHECK_NULL_RETURN(ptr, ret)         \
+#define CHECK_NULL_RETURN(ptr, ret)             \
     do {                                        \
         if ((ptr) == nullptr) {                 \
             DHLOGE("Address pointer is null");  \
             return (ret);                       \
         }                                       \
+    } while (0)
+
+#define CHECK_AND_RETURN_RET_LOG(cond, ret, fmt, ...)   \
+    do {                                                \
+        if ((cond)) {                                   \
+            DHLOGE(fmt, ##__VA_ARGS__);                 \
+            return (ret);                               \
+        }                                               \
+    } while (0)
+
+#define CHECK_AND_RETURN_LOG(cond, fmt, ...)   \
+    do {                                       \
+        if ((cond)) {                          \
+            DHLOGE(fmt, ##__VA_ARGS__);        \
+            return;                            \
+        }                                      \
+    } while (0)
+
+#define CHECK_AND_LOG(cond, fmt, ...)          \
+    do {                                       \
+        if ((cond)) {                          \
+            DHLOGE(fmt, ##__VA_ARGS__);        \
+        }                                      \
     } while (0)
 } // namespace DistributedHardware
 } // namespace OHOS

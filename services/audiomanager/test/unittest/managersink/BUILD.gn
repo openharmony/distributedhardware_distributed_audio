@@ -77,6 +77,7 @@ ohos_unittest("DaudioSinkDevTest") {
     "device_security_level:dslm_sdk",
     "distributed_hardware_fwk:distributed_av_receiver",
     "distributed_hardware_fwk:distributed_av_sender",
+    "eventhandler:libeventhandler",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",

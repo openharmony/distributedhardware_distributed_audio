@@ -127,10 +127,8 @@ int32_t DAudioSinkDev::TaskOpenDSpeaker(const std::string &args)
         return ERR_DH_AUDIO_FAILED;
     }
     int32_t dhId = ConvertString2Int(std::string(jParam[KEY_DH_ID]));
-    if (dhId == -1) {
-        DHLOGE("Parse dhId error.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_AND_RETURN_RET_LOG(dhId == -1, ERR_DH_AUDIO_NULLPTR,
+        "%s", "Parse dhId error.");
     std::shared_ptr<ISpkClient> speakerClient = nullptr;
     {
         std::lock_guard<std::mutex> devLck(spkClientMutex_);
@@ -138,17 +136,12 @@ int32_t DAudioSinkDev::TaskOpenDSpeaker(const std::string &args)
     }
     AudioParam audioParam;
     int32_t ret = from_json(jParam[KEY_AUDIO_PARAM], audioParam);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Get audio param from json failed, error code %d.", ret);
-        return ret;
-    }
-
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret,
+        "Get audio param from json failed, error code %d.", ret);
     CHECK_NULL_RETURN(speakerClient, ERR_DH_AUDIO_NULLPTR);
     ret = speakerClient->SetUp(audioParam);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Setup speaker failed, ret: %d.", ret);
-        return ret;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret,
+        "Setup speaker failed, ret: %d.", ret);
     isSpkInUse_.store(true);
     return ret;
 }
@@ -216,10 +209,8 @@ int32_t DAudioSinkDev::TaskStartRender(const std::string &args)
     CHECK_NULL_RETURN(speakerClient, ERR_DH_AUDIO_NULLPTR);
 
     int32_t ret = speakerClient->StartRender();
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Start render failed. ret: %d.", ret);
-        return ret;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret,
+        "Start render failed. ret: %d.", ret);
     DHLOGI("Start render success.");
     return DH_SUCCESS;
 }
@@ -236,33 +227,24 @@ int32_t DAudioSinkDev::TaskOpenDMic(const std::string &args)
     }
     AudioParam audioParam;
     int32_t ret = from_json(jParam[KEY_AUDIO_PARAM], audioParam);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Get audio param from json failed, error code %d.", ret);
-        return ret;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret,
+        "Get audio param from json failed, error code %d.", ret);
     micDhId_ = std::string(jParam[KEY_DH_ID]);
     int32_t dhId = ConvertString2Int(std::string(jParam[KEY_DH_ID]));
-    if (dhId == -1) {
-        DHLOGE("Parse dhId error.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_AND_RETURN_RET_LOG(dhId == -1, ERR_DH_AUDIO_NULLPTR,
+        "%s", "Parse dhId error.");
     std::shared_ptr<DMicClient> micClient = nullptr;
     {
         std::lock_guard<std::mutex> devLck(micClientMutex_);
         micClient = micClientMap_[dhId];
     }
     CHECK_NULL_RETURN(micClient, ERR_DH_AUDIO_NULLPTR);
-
     ret = micClient->SetUp(audioParam);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Set up mic failed, ret: %d.", ret);
-        return ERR_DH_AUDIO_FAILED;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ERR_DH_AUDIO_FAILED,
+        "Set up mic failed, ret: %d.", ret);
     ret = micClient->StartCapture();
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Start capture failed, ret: %d.", ret);
-        return ERR_DH_AUDIO_FAILED;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ERR_DH_AUDIO_FAILED,
+        "Start capture failed, ret: %d.", ret);
     PullUpPage();
     isMicInUse_.store(true);
     return ret;
@@ -281,13 +263,9 @@ int32_t DAudioSinkDev::TaskCloseDMic(const std::string &args)
     CHECK_NULL_RETURN(micClient, DH_SUCCESS);
 
     int32_t ret = micClient->StopCapture();
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Stop mic client failed, ret: %d.", ret);
-    }
+    CHECK_AND_LOG(ret != DH_SUCCESS, "Stop mic client failed, ret: %d.", ret);
     ret = micClient->Release();
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Release mic client failed, ret: %d.", ret);
-    }
+    CHECK_AND_LOG(ret != DH_SUCCESS, "Release mic client failed, ret: %d.", ret);
     micClientMap_.erase(dhId);
     if (isPageStatus_.load()) {
         bool isSensitive = false;
@@ -335,10 +313,8 @@ int32_t DAudioSinkDev::TaskSetVolume(const std::string &args)
 
     AudioEvent event(AudioEventType::VOLUME_SET, args);
     int32_t ret = speakerClient->SetAudioParameters(event);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Volume set failed, ret: %d.", ret);
-        return ret;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret,
+        "Volume set failed, ret: %d.", ret);
     DHLOGD("Set audio volume success.");
     return DH_SUCCESS;
 }
@@ -360,10 +336,8 @@ int32_t DAudioSinkDev::TaskSetMute(const std::string &args)
 
     AudioEvent event(AudioEventType::VOLUME_MUTE_SET, args);
     int32_t ret = speakerClient->SetMute(event);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Set mute failed, ret: %d.", ret);
-        return ret;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret,
+        "Set mute failed, ret: %d.", ret);
     DHLOGD("Set mute success.");
     return DH_SUCCESS;
 }
@@ -426,10 +400,8 @@ int32_t DAudioSinkDev::SendAudioEventToRemote(const AudioEvent &event)
 
     int32_t ret = speakerClient->SendMessage(static_cast<uint32_t>(event.type),
         event.content, devId_);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Task send message to remote failed.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ERR_DH_AUDIO_NULLPTR,
+        "%s", "Task send message to remote failed.");
     return DH_SUCCESS;
 }
 
@@ -607,10 +579,7 @@ void DAudioSinkDev::SinkEventHandler::NotifyOpenSpeaker(const AppExecFwk::InnerE
     int32_t ret = sinkDevObj->TaskOpenDSpeaker(eventParam);
     sinkDevObj->NotifySourceDev(NOTIFY_OPEN_SPEAKER_RESULT, jParam[KEY_DH_ID], ret);
     DHLOGI("Open speaker device task end, notify source ret %d.", ret);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Open speaker failed.");
-        return;
-    }
+    CHECK_AND_RETURN_LOG(ret != DH_SUCCESS, "%s", "Open speaker failed.");
 }
 
 void DAudioSinkDev::SinkEventHandler::NotifyCloseSpeaker(const AppExecFwk::InnerEvent::Pointer &event)
@@ -622,10 +591,8 @@ void DAudioSinkDev::SinkEventHandler::NotifyCloseSpeaker(const AppExecFwk::Inner
     }
     auto sinkDevObj = sinkDev_.lock();
     CHECK_NULL_VOID(sinkDevObj);
-    if (sinkDevObj->TaskCloseDSpeaker(eventParam) != DH_SUCCESS) {
-        DHLOGE("Open speaker failed.");
-        return;
-    }
+    CHECK_AND_RETURN_LOG(sinkDevObj->TaskCloseDSpeaker(eventParam) != DH_SUCCESS,
+        "%s", "close speaker failed.");
 }
 
 void DAudioSinkDev::SinkEventHandler::NotifySpeakerOpened(const AppExecFwk::InnerEvent::Pointer &event)
@@ -638,15 +605,10 @@ void DAudioSinkDev::SinkEventHandler::NotifySpeakerOpened(const AppExecFwk::Inne
     }
     auto sinkDevObj = sinkDev_.lock();
     CHECK_NULL_VOID(sinkDevObj);
-
-    if (sinkDevObj->TaskStartRender(eventParam) != DH_SUCCESS) {
-        DHLOGE("Speaker client start failed.");
-        return;
-    }
-    if (sinkDevObj->TaskVolumeChange(eventParam) != DH_SUCCESS) {
-        DHLOGE("Notify pimary volume to source device failed.");
-        return;
-    }
+    CHECK_AND_RETURN_LOG(sinkDevObj->TaskStartRender(eventParam) != DH_SUCCESS,
+        "%s", "Speaker client start failed.");
+    CHECK_AND_RETURN_LOG(sinkDevObj->TaskVolumeChange(eventParam) != DH_SUCCESS,
+        "%s", "Notify pimary volume to source device failed.");
 }
 
 void DAudioSinkDev::SinkEventHandler::NotifySpeakerClosed(const AppExecFwk::InnerEvent::Pointer &event)
@@ -658,11 +620,8 @@ void DAudioSinkDev::SinkEventHandler::NotifySpeakerClosed(const AppExecFwk::Inne
     }
     auto sinkDevObj = sinkDev_.lock();
     CHECK_NULL_VOID(sinkDevObj);
-
-    if (sinkDevObj->TaskCloseDSpeaker(eventParam) != DH_SUCCESS) {
-        DHLOGE("Close speaker failed.");
-        return;
-    }
+    CHECK_AND_RETURN_LOG(sinkDevObj->TaskCloseDSpeaker(eventParam) != DH_SUCCESS,
+        "%s", "Close speaker failed.");
 }
 
 void DAudioSinkDev::SinkEventHandler::NotifyOpenMic(const AppExecFwk::InnerEvent::Pointer &event)
@@ -683,10 +642,7 @@ void DAudioSinkDev::SinkEventHandler::NotifyOpenMic(const AppExecFwk::InnerEvent
     int32_t ret = sinkDevObj->TaskOpenDMic(eventParam);
     sinkDevObj->NotifySourceDev(NOTIFY_OPEN_MIC_RESULT, jParam[KEY_DH_ID], ret);
     DHLOGI("Open mic device task end, notify source ret %d.", ret);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Open mic failed.");
-        return;
-    }
+    CHECK_AND_RETURN_LOG(ret != DH_SUCCESS, "%s", "Open mic failed.");
 }
 
 void DAudioSinkDev::SinkEventHandler::NotifyCloseMic(const AppExecFwk::InnerEvent::Pointer &event)
@@ -698,11 +654,8 @@ void DAudioSinkDev::SinkEventHandler::NotifyCloseMic(const AppExecFwk::InnerEven
     }
     auto sinkDevObj = sinkDev_.lock();
     CHECK_NULL_VOID(sinkDevObj);
-
-    if (sinkDevObj->TaskCloseDMic(eventParam) != DH_SUCCESS) {
-        DHLOGE("Close mic failed.");
-        return;
-    }
+    CHECK_AND_RETURN_LOG(sinkDevObj->TaskCloseDMic(eventParam) != DH_SUCCESS,
+        "%s", "Close mic failed.");
 }
 
 void DAudioSinkDev::SinkEventHandler::NotifyMicOpened(const AppExecFwk::InnerEvent::Pointer &event)
@@ -720,11 +673,8 @@ void DAudioSinkDev::SinkEventHandler::NotifyMicClosed(const AppExecFwk::InnerEve
     }
     auto sinkDevObj = sinkDev_.lock();
     CHECK_NULL_VOID(sinkDevObj);
-
-    if (sinkDevObj->TaskCloseDMic(eventParam) != DH_SUCCESS) {
-        DHLOGE("Close mic failed.");
-        return;
-    }
+    CHECK_AND_RETURN_LOG(sinkDevObj->TaskCloseDMic(eventParam) != DH_SUCCESS,
+        "%s", "Close mic failed.");
 }
 
 void DAudioSinkDev::SinkEventHandler::NotifySetVolume(const AppExecFwk::InnerEvent::Pointer &event)
@@ -736,11 +686,8 @@ void DAudioSinkDev::SinkEventHandler::NotifySetVolume(const AppExecFwk::InnerEve
     }
     auto sinkDevObj = sinkDev_.lock();
     CHECK_NULL_VOID(sinkDevObj);
-
-    if (sinkDevObj->TaskSetVolume(eventParam) != DH_SUCCESS) {
-        DHLOGE("Set volume failed.");
-        return;
-    }
+    CHECK_AND_RETURN_LOG(sinkDevObj->TaskSetVolume(eventParam) != DH_SUCCESS,
+        "%s", "Set volume failed.");
 }
 
 void DAudioSinkDev::SinkEventHandler::NotifyVolumeChange(const AppExecFwk::InnerEvent::Pointer &event)
@@ -752,11 +699,8 @@ void DAudioSinkDev::SinkEventHandler::NotifyVolumeChange(const AppExecFwk::Inner
     }
     auto sinkDevObj = sinkDev_.lock();
     CHECK_NULL_VOID(sinkDevObj);
-
-    if (sinkDevObj->TaskVolumeChange(eventParam) != DH_SUCCESS) {
-        DHLOGE("Notify volume change status to source device failed.");
-        return;
-    }
+    CHECK_AND_RETURN_LOG(sinkDevObj->TaskVolumeChange(eventParam) != DH_SUCCESS,
+        "%s", "Notify volume change status to source device failed.");
 }
 
 void DAudioSinkDev::SinkEventHandler::NotifySetParam(const AppExecFwk::InnerEvent::Pointer &event)
@@ -768,11 +712,8 @@ void DAudioSinkDev::SinkEventHandler::NotifySetParam(const AppExecFwk::InnerEven
     }
     auto sinkDevObj = sinkDev_.lock();
     CHECK_NULL_VOID(sinkDevObj);
-
-    if (sinkDevObj->TaskSetParameter(eventParam) != DH_SUCCESS) {
-        DHLOGE("Set parameters failed.");
-        return;
-    }
+    CHECK_AND_RETURN_LOG(sinkDevObj->TaskSetParameter(eventParam) != DH_SUCCESS,
+        "%s", "Set parameters failed.");
 }
 
 void DAudioSinkDev::SinkEventHandler::NotifySetMute(const AppExecFwk::InnerEvent::Pointer &event)
@@ -784,11 +725,8 @@ void DAudioSinkDev::SinkEventHandler::NotifySetMute(const AppExecFwk::InnerEvent
     }
     auto sinkDevObj = sinkDev_.lock();
     CHECK_NULL_VOID(sinkDevObj);
-
-    if (sinkDevObj->TaskSetMute(eventParam) != DH_SUCCESS) {
-        DHLOGE("Set mute failed.");
-        return;
-    }
+    CHECK_AND_RETURN_LOG(sinkDevObj->TaskSetMute(eventParam) != DH_SUCCESS,
+        "%s", "Set mute failed.");
 }
 
 void DAudioSinkDev::SinkEventHandler::NotifyFocusChange(const AppExecFwk::InnerEvent::Pointer &event)
@@ -800,11 +738,8 @@ void DAudioSinkDev::SinkEventHandler::NotifyFocusChange(const AppExecFwk::InnerE
     }
     auto sinkDevObj = sinkDev_.lock();
     CHECK_NULL_VOID(sinkDevObj);
-
-    if (sinkDevObj->TaskFocusChange(eventParam) != DH_SUCCESS) {
-        DHLOGE("Handle focus change event failed.");
-        return;
-    }
+    CHECK_AND_RETURN_LOG(sinkDevObj->TaskFocusChange(eventParam) != DH_SUCCESS,
+        "%s", "Handle focus change event failed.");
 }
 
 void DAudioSinkDev::SinkEventHandler::NotifyRenderStateChange(const AppExecFwk::InnerEvent::Pointer &event)
@@ -816,11 +751,8 @@ void DAudioSinkDev::SinkEventHandler::NotifyRenderStateChange(const AppExecFwk::
     }
     auto sinkDevObj = sinkDev_.lock();
     CHECK_NULL_VOID(sinkDevObj);
-
-    if (sinkDevObj->TaskRenderStateChange(eventParam) != DH_SUCCESS) {
-        DHLOGE("Handle render state change failed.");
-        return;
-    }
+    CHECK_AND_RETURN_LOG(sinkDevObj->TaskRenderStateChange(eventParam) != DH_SUCCESS,
+        "%s", "Handle render state change failed.");
 }
 
 void DAudioSinkDev::SinkEventHandler::NotifyPlayStatusChange(const AppExecFwk::InnerEvent::Pointer &event)
@@ -832,11 +764,8 @@ void DAudioSinkDev::SinkEventHandler::NotifyPlayStatusChange(const AppExecFwk::I
     }
     auto sinkDevObj = sinkDev_.lock();
     CHECK_NULL_VOID(sinkDevObj);
-
-    if (sinkDevObj->TaskPlayStatusChange(eventParam) != DH_SUCCESS) {
-        DHLOGE("Handle play status change event failed.");
-        return;
-    }
+    CHECK_AND_RETURN_LOG(sinkDevObj->TaskPlayStatusChange(eventParam) != DH_SUCCESS,
+        "%s", "Handle play status change event failed.");
 }
 
 int32_t DAudioSinkDev::SinkEventHandler::GetEventParam(const AppExecFwk::InnerEvent::Pointer &event,
@@ -861,9 +790,7 @@ int32_t DAudioSinkDev::PauseDistributedHardware(const std::string &networkId)
 
     CHECK_NULL_RETURN(micClient, ERR_DH_AUDIO_NULLPTR);
     int32_t ret = micClient->PauseCapture();
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Pause mic client failed, ret: %d.", ret);
-    }
+    CHECK_AND_LOG(ret != DH_SUCCESS, "Pause mic client failed, ret: %d.", ret);
     return ret;
 }
 
@@ -879,9 +806,7 @@ int32_t DAudioSinkDev::ResumeDistributedHardware(const std::string &networkId)
 
     CHECK_NULL_RETURN(micClient, ERR_DH_AUDIO_NULLPTR);
     int32_t ret = micClient->ResumeCapture();
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Resume mic client failed, ret: %d.", ret);
-    }
+    CHECK_AND_LOG(ret != DH_SUCCESS, "Resume mic client failed, ret: %d.", ret);
     return ret;
 }
 

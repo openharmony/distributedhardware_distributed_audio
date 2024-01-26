@@ -93,6 +93,18 @@ HWTEST_F(DAudioSinkDevTest, TaskPlayStatusChange_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: TaskDisableDevice_001
+ * @tc.desc: Verify the TaskDisableDevice function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkDevTest, TaskDisableDevice_001, TestSize.Level1)
+{
+    std::string spkName = "ohos.dhardware.daudio.dspeaker.ohos.dhardware.daudio.dmic";
+    EXPECT_EQ(DH_SUCCESS, sinkDev_->TaskDisableDevice(spkName));
+}
+
+/**
  * @tc.name: TaskOpenDSpeaker_001
  * @tc.desc: Verify the TaskOpenDSpeaker function.
  * @tc.type: FUNC
@@ -145,6 +157,20 @@ HWTEST_F(DAudioSinkDevTest, TaskCloseDSpeaker_002, TestSize.Level1)
 }
 
 /**
+ * @tc.name: ParseDhidFromEvent_001
+ * @tc.desc: Verify the ParseDhidFromEvent function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkDevTest, ParseDhidFromEvent_001, TestSize.Level1)
+{
+    std::string args = "{\"devId\":\"1\"}";
+    EXPECT_NE(DH_SUCCESS, sinkDev_->ParseDhidFromEvent(args));
+    std::string dhIdArgs = "{\"dhId\": 1 }";
+    EXPECT_NE(DH_SUCCESS, sinkDev_->ParseDhidFromEvent(dhIdArgs));
+}
+
+/**
  * @tc.name: TaskStartRender_001
  * @tc.desc: Verify the TaskStartRender function.
  * @tc.type: FUNC
@@ -159,6 +185,8 @@ HWTEST_F(DAudioSinkDevTest, TaskStartRender_001, TestSize.Level1)
     auto spkClient = std::make_shared<DSpeakerClient>(devId, dhId, sinkDev_);
     sinkDev_->spkClientMap_.insert(std::make_pair(DEFAULT_RENDER_ID, spkClient));
     EXPECT_NE(DH_SUCCESS, sinkDev_->TaskStartRender(args));
+    std::string devIdArgs = "{\"devId\":\"1\"}";
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sinkDev_->TaskStartRender(devIdArgs));
 }
 
 /**
@@ -211,6 +239,8 @@ HWTEST_F(DAudioSinkDevTest, TaskCloseDMic_002, TestSize.Level1)
     auto micClient = std::make_shared<DMicClient>(devId, dhId, sinkDev_);
     sinkDev_->micClientMap_.insert(std::make_pair(DEFAULT_CAPTURE_ID, micClient));
     EXPECT_EQ(DH_SUCCESS, sinkDev_->TaskCloseDMic(args));
+    std::string dhIdArgs = "{\"dhId\":1}";
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sinkDev_->TaskCloseDMic(dhIdArgs));
 }
 
 /**
@@ -222,6 +252,13 @@ HWTEST_F(DAudioSinkDevTest, TaskCloseDMic_002, TestSize.Level1)
 HWTEST_F(DAudioSinkDevTest, TaskSetParameter_001, TestSize.Level1)
 {
     std::string args;
+    EXPECT_NE(DH_SUCCESS, sinkDev_->TaskSetParameter(args));
+    int32_t dhId = 1;
+    std::string devId = "devId";
+    args += "{\"dhId\":\"1\"}";
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sinkDev_->TaskSetParameter(args));
+    auto spkClient = std::make_shared<DSpeakerClient>(devId, dhId, sinkDev_);
+    sinkDev_->spkClientMap_.insert(std::make_pair(DEFAULT_RENDER_ID, spkClient));
     EXPECT_NE(DH_SUCCESS, sinkDev_->TaskSetParameter(args));
 }
 
@@ -261,7 +298,7 @@ HWTEST_F(DAudioSinkDevTest, TaskSetVolume_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSinkDevTest, TaskSetVolume_002, TestSize.Level1)
 {
-    std::string args;
+    std::string args = "{\"dhId\":\"1\"}";
     std::string devId;
     int32_t dhId = 1;
     auto spkClient = std::make_shared<DSpeakerClient>(devId, dhId, sinkDev_);
@@ -289,8 +326,8 @@ HWTEST_F(DAudioSinkDevTest, TaskSetMute_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSinkDevTest, TaskSetMute_002, TestSize.Level1)
 {
-    std::string args;
-    std::string devId;
+    std::string args = "{\"dhId\":\"1\", \"eventType\":\"setMute\"}";
+    std::string devId = "devId";
     int32_t dhId = 1;
     auto spkClient = std::make_shared<DSpeakerClient>(devId, dhId, sinkDev_);
     sinkDev_->spkClientMap_.insert(std::make_pair(DEFAULT_RENDER_ID, spkClient));
@@ -357,10 +394,19 @@ HWTEST_F(DAudioSinkDevTest, TaskFocusChange_002, TestSize.Level1)
  */
 HWTEST_F(DAudioSinkDevTest, TaskRenderStateChange_001, TestSize.Level1)
 {
+    int32_t dhIdSpk = 1;
+    int32_t dhIdMic = 1 << 27 | 1 << 0;
     std::string args = "{\"dhId\":\"123\"}";
     std::string dhId = "123";
+    std::string devId = "devId";
     int32_t result = 0;
+    auto spkClient = std::make_shared<DSpeakerClient>(devId, dhIdSpk, sinkDev_);
+    sinkDev_->spkClientMap_.insert(std::make_pair(DEFAULT_RENDER_ID, spkClient));
+    auto micClient = std::make_shared<DMicClient>(devId, dhIdMic, sinkDev_);
+    sinkDev_->micClientMap_.insert(std::make_pair(DEFAULT_CAPTURE_ID, micClient));
     sinkDev_->NotifySourceDev(AUDIO_START, dhId, result);
+    sinkDev_->NotifySourceDev(NOTIFY_OPEN_CTRL_RESULT, dhId, result);
+    sinkDev_->NotifySourceDev(AUDIO_START, devId, result);
     EXPECT_NE(DH_SUCCESS, sinkDev_->TaskRenderStateChange(args));
 }
 
@@ -411,6 +457,152 @@ HWTEST_F(DAudioSinkDevTest, PauseDistributedHardware_001, TestSize.Level1)
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sinkDev_->PauseDistributedHardware(networkId));
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sinkDev_->ResumeDistributedHardware(networkId));
     EXPECT_EQ(DH_SUCCESS, sinkDev_->StopDistributedHardware(networkId));
+}
+
+/**
+ * @tc.name: JudgeDeviceStatus_001
+ * @tc.desc: Verify the JudgeDeviceStatus function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkDevTest, JudgeDeviceStatus_001, TestSize.Level1)
+{
+    sinkDev_->isSpkInUse_.store(true);
+    sinkDev_->JudgeDeviceStatus();
+    sinkDev_->isSpkInUse_.store(false);
+    sinkDev_->isMicInUse_.store(false);
+    sinkDev_->JudgeDeviceStatus();
+    std::string args = "one";
+    EXPECT_NE(DH_SUCCESS, sinkDev_->ConvertString2Int(args));
+}
+
+/**
+ * @tc.name: SinkEventHandler_001
+ * @tc.desc: Verify the SinkEventHandler function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkDevTest, SinkEventHandler_001, TestSize.Level1)
+{
+    int32_t eventType = 2500;
+    std::string eventContent = "eventContent";
+    AudioEvent audioEvent(eventType, eventContent);
+    auto eventParam = std::make_shared<AudioEvent>(audioEvent);
+    auto msgEvent = AppExecFwk::InnerEvent::Get(static_cast<uint32_t>(audioEvent.type), eventParam, 0);
+    EXPECT_EQ(DH_SUCCESS, sinkDev_->AwakeAudioDev());
+    sinkDev_->handler_->ProcessEvent(msgEvent);
+    eventType = CTRL_OPENED;
+    std::string content = "content";
+    AudioEvent event(eventType, content);
+    auto Param = std::make_shared<AudioEvent>(event);
+    auto msg = AppExecFwk::InnerEvent::Get(static_cast<uint32_t>(event.type), Param, 0);
+    sinkDev_->handler_->ProcessEvent(msg);
+    sinkDev_->handler_->NotifyCtrlOpened(msg);
+    std::string networkId = "networkId";
+    std::string devId;
+    int32_t dhId = 134217729;
+    sinkDev_->micDhId_ = "134217729";
+    auto micClient = std::make_shared<DMicClient>(devId, dhId, sinkDev_);
+    sinkDev_->micClientMap_.insert(std::make_pair(DEFAULT_CAPTURE_ID, micClient));
+    EXPECT_EQ(DH_SUCCESS, sinkDev_->PauseDistributedHardware(networkId));
+}
+
+/**
+ * @tc.name: SinkEventHandler_002
+ * @tc.desc: Verify the SinkEventHandler function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkDevTest, SinkEventHandler_002, TestSize.Level1)
+{
+    int32_t dhId = 1;
+    int32_t eventType = CTRL_CLOSED;
+    std::string eventContent = "{\"dhId\":\"1\"}";
+    std::string devId = "devId";
+    AudioEvent audioEvent(eventType, eventContent);
+    auto eventParam = std::make_shared<AudioEvent>(audioEvent);
+    auto msgEvent = AppExecFwk::InnerEvent::Get(static_cast<uint32_t>(audioEvent.type), eventParam, 0);
+    EXPECT_EQ(DH_SUCCESS, sinkDev_->AwakeAudioDev());
+    sinkDev_->spkClientMap_[dhId] = nullptr;
+    sinkDev_->micClientMap_[dhId] = nullptr;
+    sinkDev_->handler_->NotifyCtrlClosed(msgEvent);
+    auto micClient = std::make_shared<DMicClient>(devId, dhId, sinkDev_);
+    sinkDev_->micClientMap_.insert(std::make_pair(DEFAULT_CAPTURE_ID, micClient));
+    micClient->micTrans_ =nullptr;
+    sinkDev_->handler_->NotifyCtrlClosed(msgEvent);
+    std::string content = "content";
+    AudioEvent event(eventType, content);
+    auto Param = std::make_shared<AudioEvent>(event);
+    auto msg = AppExecFwk::InnerEvent::Get(static_cast<uint32_t>(event.type), Param, 0);
+    sinkDev_->handler_->NotifyCtrlClosed(msg);
+    std::string networkId = "networkId";
+    dhId = 134217729;
+    sinkDev_->micDhId_ = "134217729";
+    micClient = std::make_shared<DMicClient>(devId, dhId, sinkDev_);
+    sinkDev_->micClientMap_.insert(std::make_pair(DEFAULT_CAPTURE_ID, micClient));
+    EXPECT_EQ(DH_SUCCESS, sinkDev_->ResumeDistributedHardware(networkId));
+}
+
+/**
+ * @tc.name: SinkEventHandler_003
+ * @tc.desc: Verify the SinkEventHandler function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkDevTest, SinkEventHandler_003, TestSize.Level1)
+{
+    int32_t eventType = OPEN_SPEAKER;
+    std::string eventContent = "{\"dhId\":\"dhId\",\"audioParam\":\"audioParam\"}";
+    std::string devId = "devId";
+    std::string networkId = "networkId";
+    AudioEvent audioEvent(eventType, devId);
+    auto eventParam = std::make_shared<AudioEvent>(audioEvent);
+    auto msgEvent = AppExecFwk::InnerEvent::Get(static_cast<uint32_t>(audioEvent.type), eventParam, 0);
+    EXPECT_EQ(DH_SUCCESS, sinkDev_->AwakeAudioDev());
+    sinkDev_->handler_->NotifyOpenSpeaker(msgEvent);
+    sinkDev_->handler_->NotifyOpenMic(msgEvent);
+    AudioEvent event(eventType, eventContent);
+    auto Param = std::make_shared<AudioEvent>(event);
+    auto msg = AppExecFwk::InnerEvent::Get(static_cast<uint32_t>(event.type), Param, 0);
+    sinkDev_->handler_->NotifyOpenSpeaker(msg);
+    EXPECT_EQ(DH_SUCCESS, sinkDev_->StopDistributedHardware(networkId));
+}
+
+/**
+ * @tc.name: SinkEventHandler_004
+ * @tc.desc: Verify the SinkEventHandler function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkDevTest, SinkEventHandler_004, TestSize.Level1)
+{
+    int32_t eventType = OPEN_SPEAKER;
+    std::shared_ptr<AudioEvent> nullForFail = nullptr;
+    auto msgEvent = AppExecFwk::InnerEvent::Get(static_cast<uint32_t>(eventType), nullForFail, 0);
+    EXPECT_EQ(DH_SUCCESS, sinkDev_->AwakeAudioDev());
+    sinkDev_->handler_->NotifyCtrlOpened(msgEvent);
+    sinkDev_->handler_->NotifyCtrlClosed(msgEvent);
+    sinkDev_->handler_->NotifyOpenSpeaker(msgEvent);
+    sinkDev_->handler_->NotifyCloseSpeaker(msgEvent);
+    sinkDev_->handler_->NotifySpeakerOpened(msgEvent);
+    sinkDev_->handler_->NotifySpeakerClosed(msgEvent);
+    sinkDev_->handler_->NotifyOpenMic(msgEvent);
+    sinkDev_->handler_->NotifyCloseMic(msgEvent);
+    sinkDev_->handler_->NotifyMicOpened(msgEvent);
+    sinkDev_->handler_->NotifyMicClosed(msgEvent);
+    sinkDev_->handler_->NotifySetVolume(msgEvent);
+    sinkDev_->handler_->NotifyVolumeChange(msgEvent);
+    sinkDev_->handler_->NotifySetParam(msgEvent);
+    sinkDev_->handler_->NotifySetMute(msgEvent);
+    sinkDev_->handler_->NotifyFocusChange(msgEvent);
+    sinkDev_->handler_->NotifyRenderStateChange(msgEvent);
+    sinkDev_->handler_->NotifyPlayStatusChange(msgEvent);
+    std::string eventContent = "{\"dhId\":\"1\"}";
+    std::string paramResult;
+    AudioEvent audioEvent(eventType, eventContent);
+    auto eventParam = std::make_shared<AudioEvent>(audioEvent);
+    auto msg = AppExecFwk::InnerEvent::Get(static_cast<uint32_t>(audioEvent.type), eventParam, 0);
+    EXPECT_EQ(DH_SUCCESS, sinkDev_->handler_->GetEventParam(msg, paramResult));
 }
 } // DistributedHardware
 } // OHOS
