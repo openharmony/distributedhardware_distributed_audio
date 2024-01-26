@@ -53,7 +53,6 @@ HWTEST_F(AudioManagerTest, GetAllAdaptersAbnormal, TestSize.Level1)
     struct AudioManagerContext managerContext;
     int32_t size = 0;
     AudioAdapterDescriptor *descs = nullptr;
-
     int32_t ret = managerContext.instance_.GetAllAdapters(nullptr, &descs, &size);
     EXPECT_EQ(ERR_DH_AUDIO_HDI_INVALID_PARAM, ret);
     ret = managerContext.instance_.GetAllAdapters(&managerContext.instance_, nullptr, &size);
@@ -74,7 +73,6 @@ HWTEST_F(AudioManagerTest, LoadAdapterAbnormal, TestSize.Level1)
     AudioAdapterDescriptor desc = {};
     AudioAdapter *adapter = nullptr;
     struct AudioManager *manager = nullptr;
-
     int32_t ret = managerContext.instance_.LoadAdapter(nullptr, &desc, &adapter);
     EXPECT_EQ(ERR_DH_AUDIO_HDI_INVALID_PARAM, ret);
     ret = managerContext.instance_.LoadAdapter(&managerContext.instance_, nullptr, &adapter);

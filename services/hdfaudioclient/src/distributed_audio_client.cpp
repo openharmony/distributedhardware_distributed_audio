@@ -252,6 +252,9 @@ static bool AudioManagerInit()
 {
     std::lock_guard<std::mutex> lock(g_AudioManagerContext.mtx_);
 
+    g_AudioManagerContext.adapters_.clear();
+    g_AudioManagerContext.ClearDescriptors();
+
     sptr<IAudioManager> audioMgr = IAudioManager::Get("daudio_primary_service", false);
     CHECK_NULL_RETURN(audioMgr, false);
     g_AudioManagerContext.proxy_ = audioMgr;
