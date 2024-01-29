@@ -141,10 +141,10 @@ int32_t DAudioSinkManager::HandleDAudioNotify(const std::string &devId, const st
     }
 
     // now ctrl channel is also goto here, please sure here not crash.
-    json jParam = json::parse(eventContent, nullptr, false);
-    if (JsonParamCheck(jParam, { KEY_RANDOM_TASK_CODE })) {
+    cJSON *jParam = cJSON_Parse(eventContent.c_str());
+    if (CJsonParamCheck(jParam, { KEY_RANDOM_TASK_CODE })) {
         DHLOGD("Receive audio notify from source, random task code: %s",
-            ((std::string)jParam[KEY_RANDOM_TASK_CODE]).c_str());
+            cJSON_GetObjectItemCaseSensitive(jParam, KEY_RANDOM_TASK_CODE)->valuestring);
     }
     bool isDevExisted = false;
     {
@@ -154,9 +154,11 @@ int32_t DAudioSinkManager::HandleDAudioNotify(const std::string &devId, const st
     if (!isDevExisted) {
         DHLOGE("Device is not exist, devId: %s, dhId: %s.", GetAnonyString(devId).c_str(),
             GetAnonyString(dhId).c_str());
+        cJSON_Delete(jParam);
         return ERR_DH_AUDIO_FAILED;
     }
     NotifyEvent(devId, eventType, eventContent);
+    cJSON_Delete(jParam);
     return DH_SUCCESS;
 }
 

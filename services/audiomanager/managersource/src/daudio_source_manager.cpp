@@ -165,9 +165,14 @@ int32_t DAudioSourceManager::EnableDAudio(const std::string &devId, const std::s
         dhId.c_str(), version.c_str(), reqId.c_str());
     CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
 
-    json jParam = { { KEY_DEV_ID, devId }, { KEY_DH_ID, dhId }, { KEY_VERSION, version },
-        { KEY_ATTRS, attrs }, { KEY_REQID, reqId } };
-    auto eventParam = std::make_shared<json>(jParam);
+    cJSON *jParam = cJSON_CreateObject();
+    CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
+    cJSON_AddStringToObject(jParam, KEY_DEV_ID, devId.c_str());
+    cJSON_AddStringToObject(jParam, KEY_DH_ID, dhId.c_str());
+    cJSON_AddStringToObject(jParam, KEY_VERSION, version.c_str());
+    cJSON_AddStringToObject(jParam, KEY_ATTRS, attrs.c_str());
+    cJSON_AddStringToObject(jParam, KEY_REQID, reqId.c_str());
+    auto eventParam = std::shared_ptr<cJSON>(jParam, cJSON_Delete);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_MANAGER_ENABLE_DAUDIO, eventParam, 0);
     if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
         DHLOGE("Send event failed.");
@@ -212,8 +217,12 @@ int32_t DAudioSourceManager::DisableDAudio(const std::string &devId, const std::
     DHLOGI("Disable distributed audio, devId: %s, dhId: %s, reqId: %s.", GetAnonyString(devId).c_str(), dhId.c_str(),
         reqId.c_str());
     CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
-    json jParam = { { KEY_DEV_ID, devId }, { KEY_DH_ID, dhId }, { KEY_REQID, reqId } };
-    auto eventParam = std::make_shared<json>(jParam);
+    cJSON *jParam = cJSON_CreateObject();
+    CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
+    cJSON_AddStringToObject(jParam, KEY_DEV_ID, devId.c_str());
+    cJSON_AddStringToObject(jParam, KEY_DH_ID, dhId.c_str());
+    cJSON_AddStringToObject(jParam, KEY_REQID, reqId.c_str());
+    auto eventParam = std::shared_ptr<cJSON>(jParam, cJSON_Delete);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_MANAGER_DISABLE_DAUDIO, eventParam, 0);
     if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
         DHLOGE("Send event failed.");
@@ -261,10 +270,10 @@ int32_t DAudioSourceManager::HandleDAudioNotify(const std::string &devId, const 
     }
 
     // now ctrl channel is also goto here, please sure here not crash.
-    json jParam = json::parse(eventContent, nullptr, false);
-    if (JsonParamCheck(jParam, { KEY_RANDOM_TASK_CODE })) {
+    cJSON *jParam = cJSON_Parse(eventContent.c_str());
+    if (CJsonParamCheck(jParam, { KEY_RANDOM_TASK_CODE })) {
         DHLOGD("Receive audio notify from sink, random task code: %s",
-            ((std::string)jParam[KEY_RANDOM_TASK_CODE]).c_str());
+            cJSON_GetObjectItemCaseSensitive(jParam, KEY_RANDOM_TASK_CODE)->valuestring);
     }
 
     std::shared_ptr<DAudioSourceDev> sourceDev = nullptr;
@@ -280,6 +289,7 @@ int32_t DAudioSourceManager::HandleDAudioNotify(const std::string &devId, const 
 
     AudioEvent audioEvent(eventType, eventContent);
     sourceDev->NotifyEvent(audioEvent);
+    cJSON_Delete(jParam);
     return DH_SUCCESS;
 }
 
@@ -571,9 +581,17 @@ int32_t DAudioSourceManager::SourceManagerHandler::GetEventParam(const AppExecFw
     std::string &eventParam)
 {
     CHECK_NULL_RETURN(event, ERR_DH_AUDIO_NULLPTR);
-    std::shared_ptr<json> paramObj = event->GetSharedObject<json>();
+    cJSON *paramObj = event->GetSharedObject<cJSON>().get();
     CHECK_NULL_RETURN(paramObj, ERR_DH_AUDIO_NULLPTR);
-    eventParam = paramObj->dump();
+    char* jsonString = cJSON_PrintUnformatted(paramObj);
+    if (jsonString == nullptr) {
+        DHLOGE("Failed to create JSON data.");
+        cJSON_Delete(paramObj);
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    eventParam = std::string(jsonString);
+    cJSON_Delete(paramObj);
+    cJSON_free(jsonString);
     return DH_SUCCESS;
 }
 } // DistributedHardware

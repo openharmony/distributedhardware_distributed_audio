@@ -18,6 +18,8 @@
 
 #include <set>
 
+#include "cJSON.h"
+
 #include "ihardware_handler.h"
 #include "single_instance.h"
 #include "audio_param.h"
@@ -57,6 +59,7 @@ private:
     ~DAudioHandler();
     int32_t QueryCodecInfo();
     int32_t QueryAudioInfo();
+    void AddItemsToObject(DHItem &dhItem, cJSON *infoJson, const int32_t &dhId);
     void GetSupportAudioInfo(AudioInfo &audioInfos, CoderInfo &encoderInfos, CoderInfo &decoderInfos);
 
 private:
