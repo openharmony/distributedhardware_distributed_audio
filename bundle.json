@@ -14,9 +14,7 @@
     "component": {
         "name": "distributed_audio",
         "subsystem": "distributedhardware",
-        "syscap": [
-            "SystemCapability.DistributedHardware.DistributedAudio"
-        ],
+        "syscap": [],
         "features": [],
         "adapted_system_type": [
             "standard"
