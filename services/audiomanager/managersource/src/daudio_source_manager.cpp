@@ -172,7 +172,13 @@ int32_t DAudioSourceManager::EnableDAudio(const std::string &devId, const std::s
     cJSON_AddStringToObject(jParam, KEY_VERSION, version.c_str());
     cJSON_AddStringToObject(jParam, KEY_ATTRS, attrs.c_str());
     cJSON_AddStringToObject(jParam, KEY_REQID, reqId.c_str());
-    auto eventParam = std::shared_ptr<cJSON>(jParam, cJSON_Delete);
+    char *jsonString = cJSON_PrintUnformatted(jParam);
+    if (jsonString == nullptr) {
+        DHLOGE("Failed to create JSON data");
+        cJSON_Delete(jParam);
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    auto eventParam = std::make_shared<std::string>(jsonString);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_MANAGER_ENABLE_DAUDIO, eventParam, 0);
     if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
         DHLOGE("Send event failed.");
@@ -222,7 +228,13 @@ int32_t DAudioSourceManager::DisableDAudio(const std::string &devId, const std::
     cJSON_AddStringToObject(jParam, KEY_DEV_ID, devId.c_str());
     cJSON_AddStringToObject(jParam, KEY_DH_ID, dhId.c_str());
     cJSON_AddStringToObject(jParam, KEY_REQID, reqId.c_str());
-    auto eventParam = std::shared_ptr<cJSON>(jParam, cJSON_Delete);
+    char *jsonString = cJSON_PrintUnformatted(jParam);
+    if (jsonString == nullptr) {
+        DHLOGE("Failed to create JSON data");
+        cJSON_Delete(jParam);
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    auto eventParam = std::make_shared<std::string>(jsonString);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_MANAGER_DISABLE_DAUDIO, eventParam, 0);
     if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
         DHLOGE("Send event failed.");
@@ -581,17 +593,9 @@ int32_t DAudioSourceManager::SourceManagerHandler::GetEventParam(const AppExecFw
     std::string &eventParam)
 {
     CHECK_NULL_RETURN(event, ERR_DH_AUDIO_NULLPTR);
-    cJSON *paramObj = event->GetSharedObject<cJSON>().get();
-    CHECK_NULL_RETURN(paramObj, ERR_DH_AUDIO_NULLPTR);
-    char* jsonString = cJSON_PrintUnformatted(paramObj);
-    if (jsonString == nullptr) {
-        DHLOGE("Failed to create JSON data.");
-        cJSON_Delete(paramObj);
-        return ERR_DH_AUDIO_NULLPTR;
-    }
-    eventParam = std::string(jsonString);
-    cJSON_Delete(paramObj);
-    cJSON_free(jsonString);
+    auto jsonString = event->GetSharedObject<std::string>().get();
+    CHECK_NULL_RETURN(jsonString, ERR_DH_AUDIO_NULLPTR);
+    eventParam = *jsonString;
     return DH_SUCCESS;
 }
 } // DistributedHardware

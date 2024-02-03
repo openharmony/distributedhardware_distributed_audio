@@ -20,7 +20,6 @@ config("module_private_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "//third_party/json/include",
     "${fwk_common_path}/utils/include",
     "${mediastandard_path}/interfaces/inner_api/native",
     "${mediastandard_path}/services/utils/include",
@@ -47,6 +46,7 @@ ohos_unittest("AudioHandlerTest") {
 
   deps = [
     "${distributedaudio_path}/audiohandler:distributed_audio_handler",
+    "${third_party_path}/cJSON:cjson",
     "//third_party/googletest:gtest_main",
   ]
 

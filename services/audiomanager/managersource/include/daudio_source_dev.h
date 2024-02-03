@@ -57,6 +57,7 @@ private:
     int32_t EnableDMic(const int32_t dhId, const std::string &attrs);
     int32_t DisableDSpeaker(const int32_t dhId);
     int32_t DisableDMic(const int32_t dhId);
+    int32_t DisableDAudioInner(const std::string &dhId);
 
     int32_t TaskEnableDAudio(const std::string &args);
     int32_t TaskDisableDAudio(const std::string &args);

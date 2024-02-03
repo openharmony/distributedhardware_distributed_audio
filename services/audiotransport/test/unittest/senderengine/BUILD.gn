@@ -22,7 +22,6 @@ config("module_private_config") {
   include_dirs = [
     "${mediastandard_path}/interfaces/innerkits/native/media/include",
     "${mediastandardfwk_path}/audiocommon/include",
-    "//third_party/json/include",
   ]
 
   include_dirs += [

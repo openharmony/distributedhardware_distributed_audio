@@ -118,7 +118,13 @@ int32_t DAudioSourceDev::EnableDAudio(const std::string &dhId, const std::string
     cJSON_AddStringToObject(jParam, KEY_DEV_ID, devId_.c_str());
     cJSON_AddStringToObject(jParam, KEY_DH_ID, dhId.c_str());
     cJSON_AddStringToObject(jParam, KEY_ATTRS, attrs.c_str());
-    auto eventParam = std::shared_ptr<cJSON>(jParam, cJSON_Delete);
+    char *jsonString = cJSON_PrintUnformatted(jParam);
+    if (jsonString == nullptr) {
+        DHLOGE("Failed to create JSON data");
+        cJSON_Delete(jParam);
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    auto eventParam = std::make_shared<std::string>(jsonString);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_DAUDIO_ENABLE, eventParam, 0);
     if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
         DHLOGE("Send event failed.");
@@ -128,11 +134,36 @@ int32_t DAudioSourceDev::EnableDAudio(const std::string &dhId, const std::string
     return DH_SUCCESS;
 }
 
+int32_t DAudioSourceDev::DisableDAudioInner(const std::string &dhId)
+{
+    CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
+    cJSON *jParam = cJSON_CreateObject();
+    CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
+    cJSON_AddStringToObject(jParam, KEY_DEV_ID, devId_.c_str());
+    cJSON_AddStringToObject(jParam, KEY_DH_ID, dhId.c_str());
+    char *jsonString = cJSON_PrintUnformatted(jParam);
+    if (jsonString == nullptr) {
+        DHLOGE("Failed to create JSON data");
+        cJSON_Delete(jParam);
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    auto eventParam = std::make_shared<std::string>(jsonString);
+    auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_DAUDIO_DISABLE, eventParam, 0);
+    if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
+        DHLOGE("Send event failed.");
+        cJSON_Delete(jParam);
+        cJSON_free(jsonString);
+        return ERR_DH_AUDIO_FAILED;
+    }
+    cJSON_Delete(jParam);
+    cJSON_free(jsonString);
+    return DH_SUCCESS;
+}
+
 int32_t DAudioSourceDev::DisableDAudio(const std::string &dhId)
 {
     DHLOGI("Disable audio device, dhId: %s.", dhId.c_str());
     isRpcOpen_.store(false);
-    CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
 
     cJSON *jParamClose = cJSON_CreateObject();
     CHECK_NULL_RETURN(jParamClose, ERR_DH_AUDIO_NULLPTR);
@@ -161,20 +192,14 @@ int32_t DAudioSourceDev::DisableDAudio(const std::string &dhId)
             DHLOGE("Unknown audio device. dhId: %d.", dhIdNum);
             return ERR_DH_AUDIO_NOT_SUPPORT;
     }
-
-    cJSON *jParam = cJSON_CreateObject();
-    CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
-    cJSON_AddStringToObject(jParam, KEY_DEV_ID, devId_.c_str());
-+   cJSON_AddStringToObject(jParam, KEY_DH_ID, dhId.c_str());
-    auto eventParam = std::shared_ptr<cJSON>(jParam, cJSON_Delete);
-    auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_DAUDIO_DISABLE, eventParam, 0);
-    if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
-        DHLOGE("Send event failed.");
-        return ERR_DH_AUDIO_FAILED;
-    }
-    DHLOGI("Disable audio task generate successfully.");
     cJSON_Delete(jParamClose);
     cJSON_free(data);
+    int32_t ret = DisableDAudioInner(dhId);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Failed to disable audio device, result is: %d.", ret);
+        return ret;
+    }
+    DHLOGI("Disable audio task generate successfully.");
     return DH_SUCCESS;
 }
 
@@ -183,7 +208,13 @@ int32_t DAudioSourceDev::RestoreThreadStatus()
     CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
     cJSON *jParam = cJSON_CreateObject();
     CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
-    auto eventParam = std::shared_ptr<cJSON>(jParam, cJSON_Delete);
+    char *jsonString = cJSON_PrintUnformatted(jParam);
+    if (jsonString == nullptr) {
+        DHLOGE("Failed to create JSON data");
+        cJSON_Delete(jParam);
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    auto eventParam = std::make_shared<std::string>(jsonString);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_SET_THREAD_STATUS, eventParam, 0);
     if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
         DHLOGE("Send event failed.");
@@ -348,7 +379,7 @@ int32_t DAudioSourceDev::HandleNotifyRPC(const AudioEvent &event)
         return ERR_DH_AUDIO_FAILED;
     }
 
-    rpcResult_ = cJSON_GetObjectItem(jParam, KEY_DH_ID)->valueint;
+    rpcResult_ = cJSON_GetObjectItem(jParam, KEY_RESULT)->valueint;
     DHLOGD("Notify RPC event: %d, result: %d.", event.type, rpcResult_);
     std::map<AudioEventType, uint8_t>::iterator iter = eventNotifyMap_.find(event.type);
     if (iter == eventNotifyMap_.end()) {
@@ -786,16 +817,11 @@ int32_t DAudioSourceDev::OpenDSpeakerInner(std::shared_ptr<DAudioIoDev> &speaker
 int32_t DAudioSourceDev::CloseSpkNew(const std::string &args)
 {
     DHLOGI("Close speaker new");
-    cJSON *jAudioParam = cJSON_CreateObject();
-    CHECK_NULL_RETURN(jAudioParam, ERR_DH_AUDIO_NULLPTR);
-    cJSON *jParam = cJSON_Parse(args.c_str());
-    CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
-    if (!CJsonParamCheck(jParam, { KEY_DH_ID })) {
-        DHLOGE("Task close speaker, cjson param check failed.");
-        cJSON_Delete(jParam);
-        return ERR_DH_AUDIO_FAILED;
-    }
-    NotifySinkDev(CLOSE_SPEAKER, jAudioParam, std::string(cJSON_GetObjectItem(jParam, KEY_DH_ID)->valuestring));
+    cJSON *jAudioParam = nullptr;
+    int32_t dhId = ParseDhidFromEvent(args);
+    CHECK_AND_RETURN_RET_LOG(dhId == -1, ERR_DH_AUDIO_NULLPTR,
+        "%s", "Parse dhId error.");
+    NotifySinkDev(CLOSE_SPEAKER, jAudioParam, std::to_string(dhId));
     bool closeStatus = true;
     auto speaker = FindIoDevImpl(args);
     CHECK_NULL_RETURN(speaker, ERR_DH_AUDIO_NULLPTR);
@@ -808,10 +834,8 @@ int32_t DAudioSourceDev::CloseSpkNew(const std::string &args)
         closeStatus = false;
     }
     if (!closeStatus) {
-        cJSON_Delete(jParam);
         return ERR_DH_AUDIO_FAILED;
     }
-    cJSON_Delete(jParam);
     return DH_SUCCESS;
 }
 
@@ -851,10 +875,7 @@ int32_t DAudioSourceDev::TaskOpenDMic(const std::string &args)
         return ERR_DH_AUDIO_SA_PARAM_INVALID;
     }
     int32_t dhId = ParseDhidFromEvent(args);
-    if (dhId < 0) {
-        DHLOGE("Failed to parse dhardware id.");
-        return ERR_DH_AUDIO_FAILED;
-    }
+    CHECK_AND_RETURN_RET_LOG(dhId < 0, ERR_DH_AUDIO_FAILED, "%s", "Failed to parse dhardware id.");
     auto mic = FindIoDevImpl(args);
     if (mic == nullptr) {
         DHLOGE("Mic device not init");
@@ -877,8 +898,7 @@ int32_t DAudioSourceDev::TaskOpenDMic(const std::string &args)
     cJSON *jAudioParam = cJSON_CreateObject();
     CHECK_NULL_RETURN(jAudioParam, ERR_DH_AUDIO_NULLPTR);
     to_json(&jAudioParam, mic->GetAudioParam());
-    std::string dhIdString = std::to_string(dhId);
-    ret = NotifySinkDev(OPEN_MIC, jAudioParam, dhIdString);
+    ret = NotifySinkDev(OPEN_MIC, jAudioParam, std::to_string(dhId));
     if (ret != DH_SUCCESS) {
         DHLOGE("Notify sink open mic failed, error code %d.", ret);
         mic->Release();
@@ -904,27 +924,17 @@ int32_t DAudioSourceDev::TaskOpenDMic(const std::string &args)
 int32_t DAudioSourceDev::CloseMicNew(const std::string &args)
 {
     DHLOGI("Close mic new.");
-    cJSON *jAudioParam = cJSON_CreateObject();
-    CHECK_NULL_RETURN(jAudioParam, ERR_DH_AUDIO_NULLPTR);
-    cJSON *jParam = cJSON_Parse(args.c_str());
-    CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
-    if (!CJsonParamCheck(jParam, { KEY_DH_ID })) {
-        DHLOGE("Task close mic, cjson param check failed.");
-        cJSON_Delete(jParam);
-        cJSON_Delete(jAudioParam);
-        return ERR_DH_AUDIO_FAILED;
-    }
-    NotifySinkDev(CLOSE_MIC, jAudioParam, std::string(cJSON_GetObjectItem(jParam, KEY_DH_ID)->valuestring));
+    cJSON *jAudioParam = nullptr;
+    int32_t dhId = ParseDhidFromEvent(args);
+    CHECK_AND_RETURN_RET_LOG(dhId == -1, ERR_DH_AUDIO_NULLPTR,
+        "%s", "Parse dhId error.");
+    NotifySinkDev(CLOSE_MIC, jAudioParam, std::to_string(dhId));
 
     auto mic = FindIoDevImpl(args);
     CHECK_NULL_RETURN(mic, DH_SUCCESS);
     if (mic->Stop() != DH_SUCCESS || mic->Release() != DH_SUCCESS) {
-        cJSON_Delete(jParam);
-        cJSON_Delete(jAudioParam);
         return ERR_DH_AUDIO_FAILED;
     }
-    cJSON_Delete(jParam);
-    cJSON_Delete(jAudioParam);
     return DH_SUCCESS;
 }
 
@@ -1163,14 +1173,12 @@ int32_t DAudioSourceDev::NotifySinkDev(const AudioEventType type, const cJSON *P
     int32_t dhIdInt = ConvertString2Int(dhId);
     if (deviceMap_.find(dhIdInt) == deviceMap_.end()) {
         DHLOGE("speaker or mic dev is null. find index: %d.", dhIdInt);
-        cJSON_Delete(jParamCopy);
         cJSON_Delete(jParam);
         return ERR_DH_AUDIO_NULLPTR;
     }
     auto ioDev = deviceMap_[dhIdInt];
     if (type == OPEN_CTRL || type == CLOSE_CTRL) {
         DHLOGE("In new engine mode, ctrl is not allowed.");
-        cJSON_Delete(jParamCopy);
         cJSON_Delete(jParam);
         return ERR_DH_AUDIO_NULLPTR;
     }
@@ -1178,12 +1186,10 @@ int32_t DAudioSourceDev::NotifySinkDev(const AudioEventType type, const cJSON *P
     ioDev->SendMessage(static_cast<uint32_t>(type), std::string(content), devId_);
     if (type == CLOSE_SPEAKER || type == CLOSE_MIC) {
         // Close spk || Close mic  do not need to wait RPC
-        cJSON_Delete(jParamCopy);
         cJSON_Delete(jParam);
         cJSON_free(content);
         return DH_SUCCESS;
     }
-    cJSON_Delete(jParamCopy);
     cJSON_Delete(jParam);
     cJSON_free(content);
     return WaitForRPC(static_cast<AudioEventType>(static_cast<int32_t>(type) + eventOffset));
@@ -1279,41 +1285,25 @@ void DAudioSourceDev::SourceEventHandler::ProcessEvent(const AppExecFwk::InnerEv
 void DAudioSourceDev::SourceEventHandler::EnableDAudioCallback(const AppExecFwk::InnerEvent::Pointer &event)
 {
     CHECK_NULL_VOID(event);
-    cJSON *jParam = event->GetSharedObject<cJSON>().get();
-    CHECK_NULL_VOID(jParam);
-    char* jsonString = cJSON_PrintUnformatted(jParam);
-    if (jsonString == nullptr) {
-        DHLOGE("Failed to create JSON data.");
-        cJSON_Delete(jParam);
-        return;
-    }
+    auto jsonString = event->GetSharedObject<std::string>().get();
+    CHECK_NULL_VOID(jsonString);
     auto sourceDevObj = sourceDev_.lock();
     CHECK_NULL_VOID(sourceDevObj);
-    if (sourceDevObj->TaskEnableDAudio(std::string(jsonString)) != DH_SUCCESS) {
+    if (sourceDevObj->TaskEnableDAudio(*jsonString) != DH_SUCCESS) {
         DHLOGE("Open ctrl channel failed.");
     }
-    cJSON_Delete(jParam);
-    cJSON_free(jsonString);
 }
 
 void DAudioSourceDev::SourceEventHandler::DisableDAudioCallback(const AppExecFwk::InnerEvent::Pointer &event)
 {
     CHECK_NULL_VOID(event);
-    cJSON *jParam = event->GetSharedObject<cJSON>().get();
-    CHECK_NULL_VOID(jParam);
-    char* jsonString = cJSON_PrintUnformatted(jParam);
-    if (jsonString == nullptr) {
-        DHLOGE("Failed to create JSON data.");
-        cJSON_Delete(jParam);
-        return;
-    }
+    auto jsonString = event->GetSharedObject<std::string>().get();
+    CHECK_NULL_VOID(jsonString);
     auto sourceDevObj = sourceDev_.lock();
     CHECK_NULL_VOID(sourceDevObj);
-    if (sourceDevObj->TaskDisableDAudio(std::string(jsonString)) != DH_SUCCESS) {
+    if (sourceDevObj->TaskDisableDAudio(*jsonString) != DH_SUCCESS) {
         DHLOGE("Disable distributed audio failed.");
     }
-    cJSON_Delete(jParam);
-    cJSON_free(jsonString);
 }
 
 void DAudioSourceDev::SourceEventHandler::OpenDSpeakerCallback(const AppExecFwk::InnerEvent::Pointer &event)

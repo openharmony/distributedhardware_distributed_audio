@@ -72,19 +72,19 @@ void DAudioHandler::AddItemsToObject(DHItem &dhItem, cJSON* infoJson, const int3
     if (deviceType == AUDIO_DEVICE_TYPE_MIC) {
         dhItem.subtype = "mic";
         cJSON_AddItemToObject(infoJson, "SampleRates",
-                            cJSON_CreateIntArray(micInfos_.sampleRates.data(), micInfos_.sampleRates.size()));
+            cJSON_CreateIntArray(micInfos_.sampleRates.data(), micInfos_.sampleRates.size()));
         cJSON_AddItemToObject(infoJson, "ChannelMasks",
-                            cJSON_CreateIntArray(micInfos_.channels.data(), micInfos_.channels.size()));
+            cJSON_CreateIntArray(micInfos_.channels.data(), micInfos_.channels.size()));
         cJSON_AddItemToObject(infoJson, "Formats",
-                            cJSON_CreateIntArray(micInfos_.formats.data(), micInfos_.formats.size()));
+            cJSON_CreateIntArray(micInfos_.formats.data(), micInfos_.formats.size()));
     } else if (deviceType == AUDIO_DEVICE_TYPE_SPEAKER) {
         dhItem.subtype = "speaker";
         cJSON_AddItemToObject(infoJson, "SampleRates",
-                            cJSON_CreateIntArray(spkInfos_.sampleRates.data(), spkInfos_.sampleRates.size()));
+            cJSON_CreateIntArray(spkInfos_.sampleRates.data(), spkInfos_.sampleRates.size()));
         cJSON_AddItemToObject(infoJson, "ChannelMasks",
-                            cJSON_CreateIntArray(spkInfos_.channels.data(), spkInfos_.channels.size()));
+            cJSON_CreateIntArray(spkInfos_.channels.data(), spkInfos_.channels.size()));
         cJSON_AddItemToObject(infoJson, "Formats",
-                            cJSON_CreateIntArray(spkInfos_.formats.data(), spkInfos_.formats.size()));
+            cJSON_CreateIntArray(spkInfos_.formats.data(), spkInfos_.formats.size()));
     }
 }
 
@@ -111,15 +111,6 @@ std::vector<DHItem> DAudioHandler::Query()
         AddItemsToObject(dhItem, infoJson, dhId);
         cJSON_AddNumberToObject(infoJson, "INTERRUPT_GROUP_ID", dev->interruptGroupId_);
         cJSON_AddNumberToObject(infoJson, "VOLUME_GROUP_ID", dev->volumeGroupId_);
-        std::string audioEncoders =
-            HiStreamerQueryTool::GetInstance().QueryHiStreamerPluginInfo(HISTREAM_PLUGIN_TYPE::AUDIO_ENCODER);
-        DHLOGI("DAudio QueryAudioEncoderAbility info: %s", audioEncoders.c_str());
-        cJSON_AddStringToObject(infoJson, KEY_HISTREAMER_AUDIO_ENCODER.c_str(), audioEncoders.c_str());
-
-        std::string audioDecoders =
-            HiStreamerQueryTool::GetInstance().QueryHiStreamerPluginInfo(HISTREAM_PLUGIN_TYPE::AUDIO_DECODER);
-        DHLOGI("DAudio QueryAudioDecoderAbility info: %s", audioDecoders.c_str());
-        cJSON_AddStringToObject(infoJson, KEY_HISTREAMER_AUDIO_DECODER.c_str(), audioDecoders.c_str());
         dhItem.dhId = std::to_string(dhId);
         char *jsonInfo = cJSON_Print(infoJson);
         if (jsonInfo == NULL) {

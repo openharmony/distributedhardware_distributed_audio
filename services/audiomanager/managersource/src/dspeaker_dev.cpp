@@ -147,7 +147,7 @@ int32_t DSpeakerDev::CloseDevice(const std::string &devId, const int32_t dhId)
         return ERR_DH_AUDIO_NULLPTR;
     }
     std::string jsonDataStr(jsonData);
-    AudioEvent event(AudioEventType::OPEN_SPEAKER, jsonDataStr);
+    AudioEvent event(AudioEventType::CLOSE_SPEAKER, jsonDataStr);
     cbObj->NotifyEvent(event);
     DAudioHisysevent::GetInstance().SysEventWriteBehavior(DAUDIO_CLOSE, devId, std::to_string(dhId),
         "daudio spk device close success.");

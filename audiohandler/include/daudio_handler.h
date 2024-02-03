@@ -17,7 +17,6 @@
 #define OHOS_DAUDIO_HANDLER_H
 
 #include <set>
-
 #include "cJSON.h"
 
 #include "ihardware_handler.h"

@@ -261,34 +261,6 @@ int32_t GetAudioParamInt(const std::string &params, const std::string &key, int3
     return DH_SUCCESS;
 }
 
-bool CJsonParamCheck(const cJSON *jsonObj, const std::initializer_list<std::string> &keys)
-{
-    if (jsonObj == nullptr || !cJSON_IsObject(jsonObj)) {
-        DHLOGE("JSON parameter is invalid.");
-        return false;
-    }
-
-    for (auto it = keys.begin(); it != keys.end(); it++) {
-        cJSON *paramValue = cJSON_GetObjectItemCaseSensitive(jsonObj, (*it).c_str());
-        if (paramValue == nullptr) {
-            DHLOGE("JSON parameter does not contain key: %s", (*it).c_str());
-            return false;
-        }
-        auto iter = typeCheckMap.find(*it);
-        if (iter == typeCheckMap.end()) {
-            DHLOGE("Check is not supported yet, key %s.", (*it).c_str());
-            return false;
-        }
-        JsonTypeCheckFunc &func = iter->second;
-        bool res = (*func)(jsonObj, *it);
-        if (!res) {
-            DHLOGE("The key %s value format in JSON is illegal.", (*it).c_str());
-            return false;
-        }
-    }
-    return true;
-}
-
 bool IsString(const cJSON *jsonObj, const std::string &key)
 {
     if (jsonObj == nullptr || !cJSON_IsObject(jsonObj)) {
@@ -342,6 +314,34 @@ bool IsAudioParam(const cJSON *jsonObj, const std::string &key)
 
     return CJsonParamCheck(paramValue,
         { KEY_SAMPLING_RATE, KEY_CHANNELS, KEY_FORMAT, KEY_SOURCE_TYPE, KEY_CONTENT_TYPE, KEY_STREAM_USAGE });
+}
+
+bool CJsonParamCheck(const cJSON *jsonObj, const std::initializer_list<std::string> &keys)
+{
+    if (jsonObj == nullptr || !cJSON_IsObject(jsonObj)) {
+        DHLOGE("JSON parameter is invalid.");
+        return false;
+    }
+
+    for (auto it = keys.begin(); it != keys.end(); it++) {
+        cJSON *paramValue = cJSON_GetObjectItemCaseSensitive(jsonObj, (*it).c_str());
+        if (paramValue == nullptr) {
+            DHLOGE("JSON parameter does not contain key: %s", (*it).c_str());
+            return false;
+        }
+        auto iter = typeCheckMap.find(*it);
+        if (iter == typeCheckMap.end()) {
+            DHLOGE("Check is not supported yet, key %s.", (*it).c_str());
+            return false;
+        }
+        JsonTypeCheckFunc &func = iter->second;
+        bool res = (*func)(jsonObj, *it);
+        if (!res) {
+            DHLOGE("The key %s value format in JSON is illegal.", (*it).c_str());
+            return false;
+        }
+    }
+    return true;
 }
 
 int32_t CalculateSampleNum(uint32_t sampleRate, uint32_t timems)

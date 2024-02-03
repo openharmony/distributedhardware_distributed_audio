@@ -26,7 +26,7 @@ void DAudioHandlerTest::SetUpTestCase(void) {}
 
 void DAudioHandlerTest::TearDownTestCase(void) {}
 
-void DAudioHandlerTest::SetUp() {}
+void DAudioHandlerTest::SetUp(void) {}
 
 void DAudioHandlerTest::TearDown(void) {}
 

@@ -238,7 +238,7 @@ int32_t DAudioSinkDev::TaskOpenDMic(const std::string &args)
     cJSON *audioParamJson = cJSON_GetObjectItem(jParam, KEY_AUDIO_PARAM);
     int32_t ret = from_json(audioParamJson, audioParam);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Get audio param from json failed, error code %d.", ret);
+        DHLOGE("Get audio param from cjson failed, error code %d.", ret);
         cJSON_Delete(jParam);
         return ret;
     }
@@ -458,8 +458,8 @@ void DAudioSinkDev::NotifySourceDev(const AudioEventType type, const std::string
     CHECK_NULL_VOID(jEvent);
     cJSON_AddStringToObject(jEvent, KEY_DH_ID, dhId.c_str());
     cJSON_AddNumberToObject(jEvent, KEY_RESULT, result);
-    cJSON_AddNumberToObject(jEvent, KEY_EVENT_TYPE, static_cast<int>(type));
-    cJSON_AddNumberToObject(jEvent, KEY_RANDOM_TASK_CODE, randomTaskCode);
+    cJSON_AddNumberToObject(jEvent, KEY_EVENT_TYPE, static_cast<int32_t>(type));
+    cJSON_AddStringToObject(jEvent, KEY_RANDOM_TASK_CODE, std::to_string(randomTaskCode).c_str());
 
     DHLOGD("Notify source dev, new engine, random task code:%s", std::to_string(randomTaskCode).c_str());
     if (type == NOTIFY_OPEN_CTRL_RESULT || type == NOTIFY_CLOSE_CTRL_RESULT) {
@@ -530,8 +530,7 @@ int32_t DAudioSinkDev::GetCJsonObjectItems(const cJSON *j, AudioParam &audioPara
     CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "%s", "Get param value error.");
     ret = GetParamValue(j, KEY_RENDER_FLAGS, reinterpret_cast<int32_t&>(audioParam.renderOpts.renderFlags));
     CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "%s", "Get param value error.");
-    ret = GetParamValue(j, KEY_CAPTURE_FLAGS,
-                            reinterpret_cast<int32_t&>(audioParam.captureOpts.capturerFlags));
+    ret = GetParamValue(j, KEY_CAPTURE_FLAGS, reinterpret_cast<int32_t&>(audioParam.captureOpts.capturerFlags));
     CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "%s", "Get param value error.");
     return ret;
 }
@@ -543,8 +542,8 @@ int32_t DAudioSinkDev::from_json(const cJSON  *j, AudioParam &audioParam)
         DHLOGE("Not found the keys of dhId");
         return ERR_DH_AUDIO_FAILED;
     }
-    if (!GetCJsonObjectItems(j, audioParam)) {
-         DHLOGE("Get Cjson Object Items failed.");
+    if (GetCJsonObjectItems(j, audioParam) != DH_SUCCESS) {
+        DHLOGE("Get Cjson Object Items failed.");
         return ERR_DH_AUDIO_FAILED;
     }
     return DH_SUCCESS;
