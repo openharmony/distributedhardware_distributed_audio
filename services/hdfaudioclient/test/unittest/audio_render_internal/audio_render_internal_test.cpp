@@ -128,10 +128,10 @@ HWTEST_F(AudioRenderTest, GetRenderSpeedInternal_001, TestSize.Level1)
 */
 HWTEST_F(AudioRenderTest, GetRenderSpeedInternal_002, TestSize.Level1)
 {
-    struct AudioRenderContext renderContext;
     struct AudioRender *render = new AudioRender;
     float *speed = new float;
-    int32_t ret = renderContext.instance_.GetRenderSpeed(render, speed);
+    AudioRenderContext *context = reinterpret_cast<AudioRenderContext *>(render);
+    int32_t ret = context->instance_.GetRenderSpeed(render, speed);
     delete render;
     delete speed;
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, ret);
