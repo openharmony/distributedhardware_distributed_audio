@@ -29,11 +29,6 @@ ohos_shared_library("distributed_audio_source") {
   include_dirs = [
     "//third_party/json/include",
     "//third_party/cJSON",
-    "${driver_audio_path}/include",
-    "${fwk_common_path}/utils/include",
-    "${mediastandardfwk_path}/audiocapturer/include",
-    "${mediastandardfwk_path}/audiocommon/include",
-    "${mediastandardfwk_path}/audiomanager/include",
   ]
 
   include_dirs += [
@@ -49,7 +44,6 @@ ohos_shared_library("distributed_audio_source") {
     "${common_path}/dfx_utils/include",
     "${common_path}/include",
     "${distributedaudio_path}/audiohandler/include",
-    "${hdf_service_path}/hdi_service/common/include",
     "${innerkits_path}/native_cpp/audio_sink/include",
     "${innerkits_path}/native_cpp/audio_source/include",
     "${interfaces_path}/inner_kits/native_cpp/audio_sink/include",
@@ -92,6 +86,7 @@ ohos_shared_library("distributed_audio_source") {
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "access_token:libtokenid_sdk",
+    "audio_framework:audio_capturer",
     "c_utils:utils",
     "distributed_hardware_fwk:distributed_av_receiver",
     "distributed_hardware_fwk:distributed_av_sender",

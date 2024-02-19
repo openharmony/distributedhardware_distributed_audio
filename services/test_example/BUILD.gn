@@ -23,8 +23,6 @@ ohos_executable("audio_distributed_test") {
 
   include_dirs = [
     "./include",
-    "${driver_audio_path}/include",
-    "${hdf_service_path}/hdi_service/common/include",
     "${services_path}/hdfaudioclient/include",
   ]
 
