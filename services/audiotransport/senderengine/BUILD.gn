@@ -33,9 +33,7 @@ ohos_shared_library("distributed_audio_encode_transport") {
     ubsan = true
   }
   stack_protector_ret = true
-  include_dirs = [
-    "//third_party/json/include",
-  ]
+  include_dirs = [ "//third_party/json/include" ]
 
   include_dirs += [
     "include",
