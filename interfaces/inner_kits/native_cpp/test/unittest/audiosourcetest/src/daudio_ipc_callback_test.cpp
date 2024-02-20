@@ -82,13 +82,22 @@ HWTEST_F(DAudioIpcCallbackTest, OnNotifyRegResult_002, TestSize.Level1)
 HWTEST_F(DAudioIpcCallbackTest, OnNotifyRegResult_003, TestSize.Level1)
 {
     size_t  DAUDIO_MAX_DEVICE_ID_LEN = 101;
+    size_t  DAUDIO_LEGAL_DEVICE_ID_LEN = 10;
     std::string devId ;
     devId.resize(DAUDIO_MAX_DEVICE_ID_LEN);
-    const std::string dhId = "dhId";
-    const std::string reqId = "reqId";
+    std::string dhId = "dhId";
+    std::string reqId = "reqId";
     int32_t status = 0;
     const std::string data = "data";
     int32_t ret = dAudioIpcCallback_->OnNotifyRegResult(devId, dhId, reqId, status, data);
+    EXPECT_EQ(ERR_DH_AUDIO_SA_DEVID_ILLEGAL, ret);
+    devId.resize(DAUDIO_LEGAL_DEVICE_ID_LEN);
+    dhId.resize(DAUDIO_MAX_DEVICE_ID_LEN);
+    ret = dAudioIpcCallback_->OnNotifyRegResult(devId, dhId, reqId, status, data);
+    EXPECT_EQ(ERR_DH_AUDIO_SA_DEVID_ILLEGAL, ret);
+    dhId.resize(DAUDIO_LEGAL_DEVICE_ID_LEN);
+    reqId.resize(DAUDIO_MAX_DEVICE_ID_LEN);
+    ret = dAudioIpcCallback_->OnNotifyRegResult(devId, dhId, reqId, status, data);
     EXPECT_EQ(ERR_DH_AUDIO_SA_DEVID_ILLEGAL, ret);
 }
 

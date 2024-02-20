@@ -23,7 +23,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-DAudioSinkIpcCallbackStub::DAudioSinkIpcCallbackStub()
+DAudioSinkIpcCallbackStub::DAudioSinkIpcCallbackStub() : IRemoteStub(true)
 {
     memberFuncMap_[NOTIFY_RESOURCEINFO] = &DAudioSinkIpcCallbackStub::OnNotifyResourceInfoInner;
 }

@@ -30,7 +30,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-DAudioSinkStub::DAudioSinkStub()
+DAudioSinkStub::DAudioSinkStub() : IRemoteStub(true)
 {
     DHLOGD("Distributed audio sink stub constructed.");
     memberFuncMap_[static_cast<uint32_t>(IDAudioSinkInterfaceCode::INIT_SINK)] =
