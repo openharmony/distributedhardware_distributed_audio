@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("../../distributedaudio.gni")
 
 ohos_shared_library("daudio_client") {
@@ -28,6 +29,7 @@ ohos_shared_library("daudio_client") {
   include_dirs = [
     "./include",
     "${common_path}/include",
+    "${driver_audio_path}/include",
   ]
 
   sources = [
@@ -39,7 +41,7 @@ ohos_shared_library("daudio_client") {
     "./src/distributed_audio_client.cpp",
   ]
 
-  deps = [ "${services_path}/common:distributed_audio_utils" ]
+  public_deps = [ "${services_path}/common:distributed_audio_utils" ]
 
   external_deps = [
     "c_utils:utils",
