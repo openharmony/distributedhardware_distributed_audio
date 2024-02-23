@@ -22,7 +22,6 @@
 #include "single_instance.h"
 #include "audio_param.h"
 #include "audio_capturer.h"
-#include "audio_info.h"
 
 namespace OHOS {
 namespace DistributedHardware {

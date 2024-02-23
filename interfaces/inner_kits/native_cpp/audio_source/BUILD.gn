@@ -26,10 +26,7 @@ ohos_shared_library("distributed_audio_source_sdk") {
     ubsan = true
   }
   stack_protector_ret = true
-  include_dirs = [
-    "${fwk_common_path}/utils/include",
-    "//third_party/json/include",
-  ]
+  include_dirs = [ "//third_party/json/include" ]
 
   include_dirs += [
     "include",
