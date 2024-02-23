@@ -20,11 +20,6 @@
 #include <vector>
 #include "sys/stat.h"
 
-#include "audio_capturer.h"
-#include "audio_info.h"
-
-#include "audio_adapter.h"
-#include "audio_manager.h"
 #include "daudio_handler.h"
 #include "single_instance.h"
 
@@ -60,10 +55,7 @@ private:
     int32_t StopDumpData(std::string &result);
 
 private:
-    AudioManager *audioManager_ = nullptr;
-    AudioAdapterDescriptor *adapterdesc_ = nullptr;
     bool dumpAudioDataFlag_ = false;
-    int32_t g_deviceNum = 0;
     const std::string DEFAULT_SPK_DHID = "1";
     const std::string DEFAULT_MIC_DHID = "134217729";
 };

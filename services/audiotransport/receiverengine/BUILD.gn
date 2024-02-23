@@ -33,11 +33,7 @@ ohos_shared_library("distributed_audio_decode_transport") {
     ubsan = true
   }
   stack_protector_ret = true
-  include_dirs = [
-    "${mediastandard_path}/interfaces/innerkits/native/media/include",
-    "${mediastandardfwk_path}/audiocommon/include",
-    "//third_party/json/include",
-  ]
+  include_dirs = [ "//third_party/json/include" ]
 
   include_dirs += [
     "include",

@@ -22,7 +22,6 @@
 #include "nlohmann/json.hpp"
 #include "string_ex.h"
 
-#include "histreamer_query_tool.h"
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
 #include "daudio_log.h"
