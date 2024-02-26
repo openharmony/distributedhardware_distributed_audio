@@ -49,7 +49,6 @@ config("module_private_config") {
     "${fwk_common_path}/utils/include",
     "${mediastandardfwk_path}/audiocapturer/include",
     "${mediastandardfwk_path}/audiocommon/include",
-    "${mediastandardfwk_path}/audiorenderer/include",
     "${mediastandardfwk_path}/audiomanager/include",
   ]
 }
@@ -72,6 +71,7 @@ ohos_unittest("DAudioDfxTest") {
 
   external_deps = [
     "audio_framework:audio_capturer",
+    "audio_framework:audio_renderer",
     "c_utils:utils",
     "dsoftbus:softbus_client",
     "hisysevent:libhisysevent",

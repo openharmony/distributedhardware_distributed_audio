@@ -27,14 +27,6 @@
 namespace OHOS {
 namespace DistributedHardware {
 typedef struct {
-    std::vector<int32_t> sampleRates;
-    std::vector<int32_t> channels;
-    std::vector<int32_t> formats;
-    int32_t channelMaxVal;
-    int32_t channelMinVal;
-} CoderInfo;
-
-typedef struct {
     std::vector<AudioStandard::AudioSamplingRate> sampleRates;
     std::vector<AudioStandard::AudioChannel> channels;
     std::vector<AudioStandard::AudioSampleFormat> formats;
@@ -55,16 +47,11 @@ public:
 private:
     DAudioHandler();
     ~DAudioHandler();
-    int32_t QueryCodecInfo();
     int32_t QueryAudioInfo();
-    void GetSupportAudioInfo(AudioInfo &audioInfos, CoderInfo &encoderInfos, CoderInfo &decoderInfos);
 
 private:
-    CoderInfo encoderInfos_;
-    CoderInfo decoderInfos_;
-    AudioInfo audioInfos_;
-    CoderInfo spkInfos_;
-    CoderInfo micInfos_;
+    AudioInfo spkInfos_;
+    AudioInfo micInfos_;
     std::shared_ptr<PluginListener> listener_ = nullptr;
 };
 

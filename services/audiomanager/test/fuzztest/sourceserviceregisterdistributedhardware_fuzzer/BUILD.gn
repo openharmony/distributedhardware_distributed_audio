@@ -38,6 +38,7 @@ ohos_fuzztest("SourceServiceRegisterDistributedHardwareFuzzTest") {
     "${mediastandardfwk_path}/audiocapturer/include",
     "${mediastandardfwk_path}/audiomanager/include",
     "${mediastandardfwk_path}/audiocommon/include",
+    "${mediastandardfwk_path}/audiorenderer/include",
   ]
 
   include_dirs += [
