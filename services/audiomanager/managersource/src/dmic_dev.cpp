@@ -56,7 +56,7 @@ void DMicDev::OnEngineTransMessage(const std::shared_ptr<AVTransMessage> &messag
 
 void DMicDev::OnEngineTransDataAvailable(const std::shared_ptr<AudioData> &audioData)
 {
-    DHLOGI("On Engine Data available");
+    DHLOGD("On Engine Data available");
     OnDecodeTransDataDone(audioData);
 }
 

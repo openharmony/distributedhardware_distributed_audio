@@ -45,9 +45,9 @@ ohos_shared_library("distributed_audio_handler") {
   external_deps = [
     "audio_framework:audio_capturer",
     "audio_framework:audio_client",
+    "audio_framework:audio_renderer",
     "c_utils:utils",
     "distributed_hardware_fwk:distributedhardwareutils",
-    "player_framework:media_client",
   ]
 
   defines = [
