@@ -23,6 +23,7 @@
 #include "audio_param.h"
 #include "audio_capturer.h"
 #include "audio_info.h"
+#include "audio_renderer.h"
 
 namespace OHOS {
 namespace DistributedHardware {
