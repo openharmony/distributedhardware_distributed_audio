@@ -64,6 +64,7 @@ ohos_fuzztest("SourceServiceDAudioNotifyFuzzTest") {
   ]
 
   external_deps = [
+    "audio_framework:audio_renderer",
     "c_utils:utils",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",

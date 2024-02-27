@@ -128,7 +128,7 @@ int32_t DAudioSinkDev::TaskOpenDSpeaker(const std::string &args)
         return ERR_DH_AUDIO_FAILED;
     }
     int32_t dhId = ConvertString2Int(std::string(cJSON_GetObjectItem(jParam, KEY_DH_ID)->valuestring));
-    CHECK_AND_RETURN_RET_LOG(dhId == -1, ERR_DH_AUDIO_NULLPTR,
+    CHECK_AND_FREE_RETURN_RET_LOG(dhId == -1, ERR_DH_AUDIO_NULLPTR, jParam,
         "%s", "Parse dhId error.");
     std::shared_ptr<ISpkClient> speakerClient = nullptr;
     {
@@ -143,9 +143,9 @@ int32_t DAudioSinkDev::TaskOpenDSpeaker(const std::string &args)
         cJSON_Delete(jParam);
         return ret;
     }
-    CHECK_NULL_RETURN(speakerClient, ERR_DH_AUDIO_NULLPTR);
+    CHECK_NULL_FREE_RETURN(speakerClient, ERR_DH_AUDIO_NULLPTR, jParam);
     ret = speakerClient->SetUp(audioParam);
-    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret,
+    CHECK_AND_FREE_RETURN_RET_LOG(ret != DH_SUCCESS, ret, jParam,
         "Setup speaker failed, ret: %d.", ret);
     isSpkInUse_.store(true);
     cJSON_Delete(jParam);
@@ -242,10 +242,10 @@ int32_t DAudioSinkDev::TaskOpenDMic(const std::string &args)
         cJSON_Delete(jParam);
         return ret;
     }
-    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret,
+    CHECK_AND_FREE_RETURN_RET_LOG(ret != DH_SUCCESS, ret, jParam,
         "Get audio param from cjson failed, error code %d.", ret);
     int32_t dhId = ParseDhidFromEvent(args);
-    CHECK_AND_RETURN_RET_LOG(dhId == -1, ERR_DH_AUDIO_NULLPTR,
+    CHECK_AND_FREE_RETURN_RET_LOG(dhId == -1, ERR_DH_AUDIO_NULLPTR, jParam,
         "%s", "Parse dhId error.");
     micDhId_ = std::to_string(dhId);
     std::shared_ptr<DMicClient> micClient = nullptr;
@@ -253,12 +253,12 @@ int32_t DAudioSinkDev::TaskOpenDMic(const std::string &args)
         std::lock_guard<std::mutex> devLck(micClientMutex_);
         micClient = micClientMap_[dhId];
     }
-    CHECK_NULL_RETURN(micClient, ERR_DH_AUDIO_NULLPTR);
+    CHECK_NULL_FREE_RETURN(micClient, ERR_DH_AUDIO_NULLPTR, jParam);
     ret = micClient->SetUp(audioParam);
-    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ERR_DH_AUDIO_FAILED,
+    CHECK_AND_FREE_RETURN_RET_LOG(ret != DH_SUCCESS, ERR_DH_AUDIO_FAILED, jParam,
         "Set up mic failed, ret: %d.", ret);
     ret = micClient->StartCapture();
-    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ERR_DH_AUDIO_FAILED,
+    CHECK_AND_FREE_RETURN_RET_LOG(ret != DH_SUCCESS, ERR_DH_AUDIO_FAILED, jParam,
         "Start capture failed, ret: %d.", ret);
     PullUpPage();
     isMicInUse_.store(true);
@@ -694,13 +694,15 @@ void DAudioSinkDev::SinkEventHandler::NotifyOpenMic(const AppExecFwk::InnerEvent
     CHECK_NULL_VOID(jParam);
     if (!CJsonParamCheck(jParam, { KEY_DH_ID, KEY_AUDIO_PARAM })) {
         DHLOGE("Json param check failed.");
+        cJSON_Delete(jParam);
         return;
     }
     int32_t ret = sinkDevObj->TaskOpenDMic(eventParam);
     sinkDevObj->NotifySourceDev(NOTIFY_OPEN_MIC_RESULT,
         std::string(cJSON_GetObjectItem(jParam, KEY_DH_ID)->valuestring), ret);
     DHLOGI("Open mic device task end, notify source ret %d.", ret);
-    CHECK_AND_RETURN_LOG(ret != DH_SUCCESS, "%s", "Open mic failed.");
+    CHECK_AND_FREE_RETURN_LOG(ret != DH_SUCCESS, jParam, "%s", "Open mic failed.");
+    cJSON_Delete(jParam);
 }
 
 void DAudioSinkDev::SinkEventHandler::NotifyCloseMic(const AppExecFwk::InnerEvent::Pointer &event)

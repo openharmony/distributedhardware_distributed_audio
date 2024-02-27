@@ -140,6 +140,8 @@ HWTEST_F(DSpeakerClientTest, StopRender001, TestSize.Level1)
     EXPECT_NE(DH_SUCCESS, speakerClient_->StopRender());
     std::string args = "args";
     AudioEvent event;
+    speakerClient_->isRenderReady_ = true;
+    speakerClient_->FlushJitterQueue();
     speakerClient_->PlayStatusChange(args);
     speakerClient_->SetAudioParameters(event);
     speakerClient_->SetMute(event);

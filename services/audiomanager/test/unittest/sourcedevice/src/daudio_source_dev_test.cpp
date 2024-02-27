@@ -329,7 +329,7 @@ HWTEST_F(DAudioSourceDevTest, HandleNotifyRPC_003, TestSize.Level1)
     CHECK_NULL_VOID(jParam);
     cJSON_AddNumberToObject(jParam, KEY_RESULT, DH_SUCCESS);
     char *jsonString = cJSON_PrintUnformatted(jParam);
-    CHECK_NULL_VOID(jsonString);
+    CHECK_NULL_AND_FREE_VOID(jsonString, jParam);
     AudioEvent event(CHANGE_PLAY_STATUS, std::string(jsonString));
     cJSON_Delete(jParam);
     cJSON_free(jsonString);
@@ -418,7 +418,7 @@ HWTEST_F(DAudioSourceDevTest, TaskEnableDAudio_001, TestSize.Level1)
     cJSON_AddStringToObject(jParam, KEY_RESULT, "test_result");
     cJSON_AddStringToObject(jParam, KEY_DH_ID, "testDhId");
     char *jsonString = cJSON_PrintUnformatted(jParam);
-    CHECK_NULL_VOID(jsonString);
+    CHECK_NULL_AND_FREE_VOID(jsonString, jParam);
     EXPECT_EQ(ERR_DH_AUDIO_SA_PARAM_INVALID, sourceDev_->TaskEnableDAudio(std::string(jsonString)));
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->TaskDisableDAudio(std::string(jsonString)));
     cJSON_Delete(jParam);
@@ -430,7 +430,7 @@ HWTEST_F(DAudioSourceDevTest, TaskEnableDAudio_001, TestSize.Level1)
     cJSON_AddStringToObject(jParam1, KEY_DH_ID, DH_ID_UNKNOWN.c_str());
     cJSON_AddStringToObject(jParam1, KEY_ATTRS, "");
     char *jsonString1 = cJSON_PrintUnformatted(jParam1);
-    CHECK_NULL_VOID(jsonString1);
+    CHECK_NULL_AND_FREE_VOID(jsonString1, jParam1);
     EXPECT_EQ(ERR_DH_AUDIO_NOT_SUPPORT, sourceDev_->TaskEnableDAudio(std::string(jsonString1)));
     EXPECT_EQ(ERR_DH_AUDIO_NOT_SUPPORT, sourceDev_->TaskDisableDAudio(std::string(jsonString1)));
     cJSON_Delete(jParam1);
@@ -442,7 +442,7 @@ HWTEST_F(DAudioSourceDevTest, TaskEnableDAudio_001, TestSize.Level1)
     cJSON_AddStringToObject(jParam2, KEY_DH_ID, DH_ID_SPK.c_str());
     cJSON_AddStringToObject(jParam2, KEY_ATTRS, "");
     char *jsonString2 = cJSON_PrintUnformatted(jParam2);
-    CHECK_NULL_VOID(jsonString2);
+    CHECK_NULL_AND_FREE_VOID(jsonString2, jParam2);
     EXPECT_NE(DH_SUCCESS, sourceDev_->TaskEnableDAudio(std::string(jsonString2)));
     EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskDisableDAudio(std::string(jsonString2)));
     cJSON_Delete(jParam2);
@@ -454,7 +454,7 @@ HWTEST_F(DAudioSourceDevTest, TaskEnableDAudio_001, TestSize.Level1)
     cJSON_AddStringToObject(jParam3, KEY_DH_ID, DH_ID_MIC.c_str());
     cJSON_AddStringToObject(jParam3, KEY_ATTRS, "");
     char *jsonString3 = cJSON_PrintUnformatted(jParam3);
-    CHECK_NULL_VOID(jsonString3);
+    CHECK_NULL_AND_FREE_VOID(jsonString3, jParam3);
     EXPECT_NE(DH_SUCCESS, sourceDev_->TaskEnableDAudio(std::string(jsonString3)));
     EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskDisableDAudio(std::string(jsonString3)));
     cJSON_Delete(jParam3);
@@ -479,7 +479,7 @@ HWTEST_F(DAudioSourceDevTest, OnEnableTaskResult_001, TestSize.Level1)
     cJSON_AddStringToObject(jParam, KEY_DEV_ID, DEV_ID.c_str());
     cJSON_AddStringToObject(jParam, KEY_RESULT, "test_result");
     char *jsonString = cJSON_PrintUnformatted(jParam);
-    CHECK_NULL_VOID(jsonString);
+    CHECK_NULL_AND_FREE_VOID(jsonString, jParam);
     sourceDev_->OnEnableTaskResult(DH_SUCCESS, std::string(jsonString), FUNC_NAME);
     sourceDev_->OnDisableTaskResult(DH_SUCCESS, std::string(jsonString), FUNC_NAME);
     cJSON_Delete(jParam);
@@ -490,7 +490,7 @@ HWTEST_F(DAudioSourceDevTest, OnEnableTaskResult_001, TestSize.Level1)
     cJSON_AddStringToObject(jParam1, KEY_DEV_ID, DEV_ID.c_str());
     cJSON_AddStringToObject(jParam1, KEY_DH_ID, DH_ID_SPK.c_str());
     char *jsonString1 = cJSON_PrintUnformatted(jParam1);
-    CHECK_NULL_VOID(jsonString1);
+    CHECK_NULL_AND_FREE_VOID(jsonString1, jParam1);
 
     sourceDev_->OnEnableTaskResult(DH_SUCCESS, std::string(jsonString1), FUNC_NAME);
     sourceDev_->OnEnableTaskResult(ERR_DH_AUDIO_NULLPTR, std::string(jsonString1), FUNC_NAME);
@@ -595,7 +595,7 @@ HWTEST_F(DAudioSourceDevTest, TaskOpenDSpeaker_001, TestSize.Level1)
     CHECK_NULL_VOID(jParam);
     cJSON_AddStringToObject(jParam, KEY_DH_ID, DH_ID_SPK.c_str());
     char *jsonString = cJSON_PrintUnformatted(jParam);
-    CHECK_NULL_VOID(jsonString);
+    CHECK_NULL_AND_FREE_VOID(jsonString, jParam);
     sourceDev_->isRpcOpen_.store(false);
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->TaskOpenDSpeaker(std::string(jsonString)));
 
@@ -637,7 +637,7 @@ HWTEST_F(DAudioSourceDevTest, TaskCloseDSpeaker_001, TestSize.Level1)
     CHECK_NULL_VOID(jParam);
     cJSON_AddStringToObject(jParam, KEY_DH_ID, DH_ID_SPK.c_str());
     char *jsonString = cJSON_PrintUnformatted(jParam);
-    CHECK_NULL_VOID(jsonString);
+    CHECK_NULL_AND_FREE_VOID(jsonString, jParam);
     EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskCloseDSpeaker(std::string(jsonString)));
     cJSON_Delete(jParam);
     cJSON_free(jsonString);
@@ -660,7 +660,7 @@ HWTEST_F(DAudioSourceDevTest, TaskCloseDSpeaker_002, TestSize.Level1)
     CHECK_NULL_VOID(jParam);
     cJSON_AddStringToObject(jParam, KEY_DH_ID, DH_ID_SPK.c_str());
     char *jsonString = cJSON_PrintUnformatted(jParam);
-    CHECK_NULL_VOID(jsonString);
+    CHECK_NULL_AND_FREE_VOID(jsonString, jParam);
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->TaskCloseDSpeaker(std::string(jsonString)));
     cJSON_Delete(jParam);
     cJSON_free(jsonString);
@@ -688,7 +688,7 @@ HWTEST_F(DAudioSourceDevTest, TaskOpenDMic_001, TestSize.Level1)
     CHECK_NULL_VOID(jParam);
     cJSON_AddStringToObject(jParam, KEY_DH_ID, DH_ID_MIC.c_str());
     char *jsonString = cJSON_PrintUnformatted(jParam);
-    CHECK_NULL_VOID(jsonString);
+    CHECK_NULL_AND_FREE_VOID(jsonString, jParam);
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->TaskOpenDMic(std::string(jsonString)));
     cJSON_Delete(jParam);
     cJSON_free(jsonString);
@@ -724,7 +724,7 @@ HWTEST_F(DAudioSourceDevTest, TaskCloseDMic_001, TestSize.Level1)
     CHECK_NULL_VOID(jParam);
     cJSON_AddStringToObject(jParam, KEY_DH_ID, DH_ID_MIC.c_str());
     char *jsonString = cJSON_PrintUnformatted(jParam);
-    CHECK_NULL_VOID(jsonString);
+    CHECK_NULL_AND_FREE_VOID(jsonString, jParam);
     EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskCloseDMic(std::string(jsonString)));
     cJSON_Delete(jParam);
     cJSON_free(jsonString);
@@ -747,7 +747,7 @@ HWTEST_F(DAudioSourceDevTest, TaskCloseDMic_002, TestSize.Level1)
     CHECK_NULL_VOID(jParam);
     cJSON_AddStringToObject(jParam, KEY_DH_ID, DH_ID_MIC.c_str());
     char *jsonString = cJSON_PrintUnformatted(jParam);
-    CHECK_NULL_VOID(jsonString);
+    CHECK_NULL_AND_FREE_VOID(jsonString, jParam);
     EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskCloseDMic(std::string(jsonString)));
     cJSON_Delete(jParam);
     cJSON_free(jsonString);
@@ -795,7 +795,7 @@ HWTEST_F(DAudioSourceDevTest, TaskSetVolume_001, TestSize.Level1)
     cJSON_AddNumberToObject(jParam, STREAM_MUTE_STATUS.c_str(), 3);
     cJSON_AddStringToObject(jParam, "dhId", "3");
     char *jsonString = cJSON_PrintUnformatted(jParam);
-    CHECK_NULL_VOID(jsonString);
+    CHECK_NULL_AND_FREE_VOID(jsonString, jParam);
     auto speaker = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
     sourceDev_->deviceMap_[dhId] = speaker;
     speaker->speakerTrans_ = std::make_shared<AVTransSenderTransport>(DEV_ID, speaker);
@@ -819,7 +819,7 @@ HWTEST_F(DAudioSourceDevTest, TaskSetVolume_002, TestSize.Level1)
     CHECK_NULL_VOID(jParam);
     cJSON_AddNumberToObject(jParam, STREAM_MUTE_STATUS.c_str(), 1);
     char *jsonString = cJSON_PrintUnformatted(jParam);
-    CHECK_NULL_VOID(jsonString);
+    CHECK_NULL_AND_FREE_VOID(jsonString, jParam);
     EXPECT_NE(DH_SUCCESS, sourceDev_->TaskSetVolume(std::string(jsonString)));
     cJSON_Delete(jParam);
     cJSON_free(jsonString);

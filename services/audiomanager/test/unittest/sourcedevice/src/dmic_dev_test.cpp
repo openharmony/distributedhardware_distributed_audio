@@ -284,6 +284,12 @@ HWTEST_F(DMicDevTest, ReadStreamData_001, TestSize.Level1)
     std::shared_ptr<AudioData> readData = nullptr;
     mic_->dataQueue_.push(writeData);
     EXPECT_EQ(DH_SUCCESS, mic_->ReadStreamData(DEV_ID, DH_ID, readData));
+    for (size_t i = 0; i < 11; ++i) {
+        auto data = std::make_shared<AudioData>(DEFAULT_AUDIO_DATA_SIZE);
+        mic_->dataQueue_.push(data);
+    }
+    mic_->isEnqueueRunning_ = true;
+    mic_->FillJitterQueue();
 
     std::shared_ptr<AudioData> readData1 = nullptr;
     EXPECT_EQ(DH_SUCCESS, mic_->ReadStreamData(DEV_ID, DH_ID, readData1));

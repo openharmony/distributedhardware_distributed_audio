@@ -182,8 +182,12 @@ int32_t DAudioSourceManager::EnableDAudio(const std::string &devId, const std::s
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_MANAGER_ENABLE_DAUDIO, eventParam, 0);
     if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
         DHLOGE("Send event failed.");
+        cJSON_Delete(jParam);
+        cJSON_free(jsonString);
         return ERR_DH_AUDIO_FAILED;
     }
+    cJSON_Delete(jParam);
+    cJSON_free(jsonString);
     DHLOGI("Enable audio task generate successfully.");
     return DH_SUCCESS;
 }
@@ -238,8 +242,12 @@ int32_t DAudioSourceManager::DisableDAudio(const std::string &devId, const std::
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_MANAGER_DISABLE_DAUDIO, eventParam, 0);
     if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
         DHLOGE("Send event failed.");
+        cJSON_Delete(jParam);
+        cJSON_free(jsonString);
         return ERR_DH_AUDIO_FAILED;
     }
+    cJSON_Delete(jParam);
+    cJSON_free(jsonString);
     DHLOGI("Disable audio task generate successfully.");
     return DH_SUCCESS;
 }
@@ -294,6 +302,7 @@ int32_t DAudioSourceManager::HandleDAudioNotify(const std::string &devId, const 
         auto device = audioDevMap_.find(devId);
         if (device == audioDevMap_.end()) {
             DHLOGE("Audio device not exist.");
+            cJSON_Delete(jParam);
             return ERR_DH_AUDIO_SA_DEVICE_NOT_EXIST;
         }
         sourceDev = audioDevMap_[devId].dev;

@@ -71,6 +71,7 @@ ohos_unittest("DAudioDfxTest") {
 
   external_deps = [
     "audio_framework:audio_capturer",
+    "audio_framework:audio_renderer",
     "c_utils:utils",
     "dsoftbus:softbus_client",
     "hisysevent:libhisysevent",

@@ -24,7 +24,6 @@
 
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
-#include "daudio_log.h"
 #include "daudio_sink_handler.h"
 
 namespace OHOS {

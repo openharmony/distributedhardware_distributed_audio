@@ -126,7 +126,7 @@ void AVTransReceiverTransport::OnEngineMessage(const std::shared_ptr<AVTransMess
 
 void AVTransReceiverTransport::OnEngineDataAvailable(const std::shared_ptr<AVTransBuffer> &buffer)
 {
-    DHLOGI("On data availabled.");
+    DHLOGD("On data availabled.");
     CHECK_NULL_VOID(buffer);
     auto bufferData = buffer->GetBufferData(0);
     std::shared_ptr<AudioData> audioData = std::make_shared<AudioData>(bufferData->GetSize());

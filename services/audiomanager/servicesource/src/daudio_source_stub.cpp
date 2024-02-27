@@ -30,7 +30,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-DAudioSourceStub::DAudioSourceStub()
+DAudioSourceStub::DAudioSourceStub() : IRemoteStub(true)
 {
     memberFuncMap_[static_cast<uint32_t>(IDAudioSourceInterfaceCode::INIT_SOURCE)] =
         &DAudioSourceStub::InitSourceInner;

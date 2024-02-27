@@ -23,7 +23,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-DAudioIpcCallbackStub::DAudioIpcCallbackStub()
+DAudioIpcCallbackStub::DAudioIpcCallbackStub() : IRemoteStub(true)
 {
     memberFuncMap_[NOTIFY_REGRESULT] = &DAudioIpcCallbackStub::OnNotifyRegResultInner;
     memberFuncMap_[NOTIFY_UNREGRESULT] = &DAudioIpcCallbackStub::OnNotifyUnregResultInner;
