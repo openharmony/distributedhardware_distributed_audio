@@ -28,6 +28,5 @@ group("unittest") {
     "${services_path}/audiomanager/test/unittest:daudio_manager_test",
     "${services_path}/audioprocessor/test/unittest:daudio_processor_test",
     "${services_path}/audiotransport/test/unittest:daudio_transport_test",
-    "${services_path}/hdfaudioclient/test/unittest:audio_adapter_hdi_test",
   ]
 }

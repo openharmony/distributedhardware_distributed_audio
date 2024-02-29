@@ -128,6 +128,24 @@ int32_t DaudioHidumper::GetSourceDevId(std::string &result)
 int32_t DaudioHidumper::GetSinkInfo(std::string &result)
 {
     DHLOGI("Get sink info dump.");
+
+    audioManager_ = IAudioManager::Get("daudio_primary_service", false);
+    if (audioManager_ == nullptr) {
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    int32_t ret = audioManager_->GetAllAdapters(adapterdesc_);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Get all adapters failed.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    for (int32_t index = 0; index < adapterdesc_.size(); index++) {
+        AudioAdapterDescriptor desc = adapterdesc_[index];
+        result.append("sinkDevId: ").append(GetAnonyString(desc.adapterName)).append("    portId: ");
+        for (uint32_t i = 0; i < desc.ports.size(); i++) {
+            result.append(std::to_string(desc.ports[i].portId)).append(" ");
+        }
+    }
+
     return DH_SUCCESS;
 }
 

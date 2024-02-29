@@ -20,8 +20,13 @@
 #include <vector>
 #include "sys/stat.h"
 
+#include <v1_0/iaudio_manager.h>
+#include <v1_0/audio_types.h>
 #include "daudio_handler.h"
 #include "single_instance.h"
+
+using OHOS::HDI::DistributedAudio::Audio::V1_0::IAudioManager;
+using OHOS::HDI::DistributedAudio::Audio::V1_0::AudioAdapterDescriptor;
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -55,6 +60,8 @@ private:
     int32_t StopDumpData(std::string &result);
 
 private:
+    sptr<IAudioManager> audioManager_ = nullptr;
+    std::vector<AudioAdapterDescriptor> adapterdesc_;
     bool dumpAudioDataFlag_ = false;
     const std::string DEFAULT_SPK_DHID = "1";
     const std::string DEFAULT_MIC_DHID = "134217729";

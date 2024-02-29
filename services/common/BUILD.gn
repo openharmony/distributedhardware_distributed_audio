@@ -62,6 +62,7 @@ ohos_shared_library("distributed_audio_utils") {
   deps = [ "//third_party/cJSON:cjson" ]
   external_deps = [
     "c_utils:utils",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "dsoftbus:softbus_client",
     "hilog:libhilog",
     "hisysevent:libhisysevent",

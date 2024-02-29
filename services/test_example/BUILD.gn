@@ -23,15 +23,16 @@ ohos_executable("audio_distributed_test") {
 
   include_dirs = [
     "./include",
-    "${services_path}/hdfaudioclient/include",
   ]
 
   sources = [ "distributedaudiotest.cpp" ]
 
-  deps = [ "${services_path}/hdfaudioclient:daudio_client" ]
+  deps = [ "${services_path}/common:distributed_audio_utils" ]
 
   external_deps = [
     "c_utils:utils",
+    "distributed_hardware_fwk:distributedhardwareutils",
+    "drivers_interface_distributed_audio:libdaudio_proxy_1.0",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
   ]

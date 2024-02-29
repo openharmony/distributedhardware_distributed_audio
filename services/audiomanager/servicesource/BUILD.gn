@@ -52,7 +52,6 @@ ohos_shared_library("distributed_audio_source") {
     "${services_path}/common/audiodata/include",
     "${services_path}/common/audioeventcallback",
     "${services_path}/common/audioparam",
-    "${services_path}/hdfaudioclient/include",
     "${services_path}/audiomanager/common/include",
   ]
 
@@ -79,7 +78,6 @@ ohos_shared_library("distributed_audio_source") {
     "${audio_transport_path}/senderengine:distributed_audio_encode_transport",
     "${distributedaudio_path}/audiohandler:distributed_audio_handler",
     "${services_path}/common:distributed_audio_utils",
-    "${services_path}/hdfaudioclient:daudio_client",
     "//third_party/cJSON:cjson",
   ]
 
@@ -88,8 +86,10 @@ ohos_shared_library("distributed_audio_source") {
     "access_token:libtokenid_sdk",
     "audio_framework:audio_capturer",
     "c_utils:utils",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "distributed_hardware_fwk:distributed_av_receiver",
     "distributed_hardware_fwk:distributed_av_sender",
+    "drivers_interface_distributed_audio:libdaudio_proxy_1.0",
     "drivers_interface_distributed_audio:libdaudioext_proxy_1.0",
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",

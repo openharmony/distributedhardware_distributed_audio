@@ -35,7 +35,6 @@ config("module_private_config") {
     "${common_path}/dfx_utils/include",
     "${distributedaudio_path}/audiohandler/include",
     "${driver_audio_path}/include",
-    "${services_path}/hdfaudioclient/include",
     "${hdf_service_path}/hdi_service/common/include",
     "${interfaces_path}/inner_kits/native_cpp/audio_sink/include",
     "${interfaces_path}/inner_kits/native_cpp/audio_source/include",
@@ -73,6 +72,7 @@ ohos_unittest("DAudioDfxTest") {
   external_deps = [
     "audio_framework:audio_capturer",
     "c_utils:utils",
+    "drivers_interface_distributed_audio:libdaudio_proxy_1.0",
     "dsoftbus:softbus_client",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
