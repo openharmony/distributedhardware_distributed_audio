@@ -21,9 +21,7 @@ ohos_executable("audio_distributed_test") {
     debug = false
   }
 
-  include_dirs = [
-    "./include",
-  ]
+  include_dirs = [ "./include" ]
 
   sources = [ "distributedaudiotest.cpp" ]
 
