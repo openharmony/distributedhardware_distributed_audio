@@ -28,6 +28,7 @@
 #include <securec.h>
 #include "unistd.h"
 #include "distributedaudiotest.h"
+#include "daudio_errorcode.h"
 #include "daudio_log.h"
 
 using OHOS::HDI::DistributedAudio::Audio::V1_0::IAudioAdapter;
@@ -162,7 +163,7 @@ static int32_t InitTestDemo()
     g_manager = IAudioManager::Get("daudio_primary_service", false);
     if (g_manager == nullptr) {
         std::cout << "Distributed audio manager is null, Please Check network!" << std::endl;
-        return ERR_DH_AUDIO_HDF_FAIL;
+        return ERR_DH_AUDIO_FAILED;
     }
     std::cout << "Load audio manager success." << std::endl;
     FindAudioDevice();
@@ -187,16 +188,16 @@ static int32_t LoadSpkDev(const std::string &devId)
     if (dev.adapterName.data() == nullptr) {
         std::cout << "Input device id is wrong." << std::endl;
         FindAudioDevice();
-        return ERR_DH_AUDIO_HDF_FAIL;
+        return ERR_DH_AUDIO_FAILED;
     }
     if (g_manager == nullptr) {
-        return ERR_DH_AUDIO_HDF_FAIL;
+        return ERR_DH_AUDIO_FAILED;
     }
     if (g_adapter == nullptr) {
         int32_t ret = g_manager->LoadAdapter(dev, g_adapter);
         if (ret != DH_SUCCESS || g_adapter == nullptr) {
             std::cout << "Load audio device failed, ret: " << ret << std::endl;
-            return ERR_DH_AUDIO_HDF_FAIL;
+            return ERR_DH_AUDIO_FAILED;
         }
     }
     return DH_SUCCESS;
@@ -395,16 +396,16 @@ static int32_t LoadMicDev(const std::string &devId)
     if (dev.adapterName.data() == nullptr) {
         std::cout << "Input device id is wrong." << std::endl;
         FindAudioDevice();
-        return ERR_DH_AUDIO_HDF_FAIL;
+        return ERR_DH_AUDIO_FAILED;
     }
     if (g_manager == nullptr) {
-        return ERR_DH_AUDIO_HDF_FAIL;
+        return ERR_DH_AUDIO_FAILED;
     }
     if (g_adapter == nullptr) {
         int32_t ret = g_manager->LoadAdapter(dev, g_adapter);
         if (ret != DH_SUCCESS || g_adapter == nullptr) {
             std::cout << "Load audio device failed, ret: " << ret << std::endl;
-            return ERR_DH_AUDIO_HDF_FAIL;
+            return ERR_DH_AUDIO_FAILED;
         }
     }
     return DH_SUCCESS;
@@ -667,7 +668,7 @@ static void PrintInteractiveUsage()
 int main(int argc, char *argv[])
 {
     if (InitTestDemo() != DH_SUCCESS) {
-        return ERR_DH_AUDIO_HDF_FAIL;
+        return ERR_DH_AUDIO_FAILED;
     }
     while (true) {
         PrintInteractiveUsage();
