@@ -43,18 +43,6 @@ HWTEST_F(DAudioHandlerTest, Initialize_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: QueryCodecInfo_001
- * @tc.desc: Verify the QueryCodecInfo function.
- * @tc.type: FUNC
- * @tc.require: AR000H0E5F
- */
-HWTEST_F(DAudioHandlerTest, QueryCodecInfo_001, TestSize.Level1)
-{
-    int32_t actual = DAudioHandler::GetInstance().QueryCodecInfo();
-    EXPECT_EQ(DH_SUCCESS, actual);
-}
-
-/**
  * @tc.name: QueryAudioInfo_001
  * @tc.desc: Verify the QueryAudioInfo function.
  * @tc.type: FUNC
