@@ -257,14 +257,17 @@ HWTEST_F(DAudioUtilsTest, DAudioUtilTest_005, TestSize.Level1)
  */
 HWTEST_F(DAudioUtilsTest, DAudioUtilTest_006, TestSize.Level1)
 {
-    std::string tempKey = "TestParam";
-    json jParam = { { KEY_DEV_ID, "TEST_DEV_ID" }, {KEY_AUDIO_PARAM, "TEST_PARAM" }, {KEY_FORMAT, "TEST_8000" },
-        { tempKey, "TEST_TEMP_KEY" } };
-    EXPECT_EQ(false, JsonParamCheck(jParam, { KEY_ATTRS }));
-    EXPECT_EQ(false, JsonParamCheck(jParam, { KEY_AUDIO_PARAM }));
-    EXPECT_EQ(false, JsonParamCheck(jParam, { KEY_FORMAT }));
-    EXPECT_EQ(false, JsonParamCheck(jParam, { tempKey }));
-    EXPECT_EQ(true, JsonParamCheck(jParam, { KEY_DEV_ID }));
+    cJSON *jParam = cJSON_CreateObject();
+    CHECK_NULL_VOID(jParam);
+    cJSON_AddStringToObject(jParam, KEY_DEV_ID, "123");
+    cJSON_AddStringToObject(jParam, KEY_DH_ID, "1");
+    cJSON_AddStringToObject(jParam, KEY_ATTRS, "");
+    cJSON_AddStringToObject(jParam, KEY_FORMAT, "TEST_8000");
+    EXPECT_EQ(true, CJsonParamCheck(jParam, { KEY_ATTRS }));
+    EXPECT_EQ(true, CJsonParamCheck(jParam, { KEY_DH_ID }));
+    EXPECT_EQ(false, CJsonParamCheck(jParam, { KEY_FORMAT }));
+    EXPECT_EQ(true, CJsonParamCheck(jParam, { KEY_DEV_ID }));
+    cJSON_Delete(jParam);
 }
 
 /**

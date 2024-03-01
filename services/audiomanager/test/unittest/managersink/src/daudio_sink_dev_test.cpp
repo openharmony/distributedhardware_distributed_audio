@@ -18,9 +18,13 @@
 #include "audio_event.h"
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
+#include "daudio_log.h"
 #include "iservice_registry.h"
 #include "daudio_sink_ipc_callback_proxy.h"
 #include "daudio_sink_load_callback.h"
+
+#undef DH_LOG_TAG
+#define DH_LOG_TAG "DAudioSinkDevTest"
 
 using namespace testing::ext;
 
@@ -432,11 +436,13 @@ HWTEST_F(DAudioSinkDevTest, TaskRenderStateChange_002, TestSize.Level1)
 {
     std::string args;
     std::string devId = "devId";
-    json j;
+    cJSON *j = cJSON_CreateObject();
+    CHECK_NULL_VOID(j);
     AudioParam audioParam;
     sinkDev_->audioCtrlMgr_ = std::make_shared<DAudioSinkDevCtrlMgr>(devId, sinkDev_);
     EXPECT_NE(DH_SUCCESS, sinkDev_->TaskRenderStateChange(args));
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, sinkDev_->from_json(j, audioParam));
+    cJSON_Delete(j);
 }
 
 /**

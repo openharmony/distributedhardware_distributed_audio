@@ -36,7 +36,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-using JsonTypeCheckFunc = bool (*)(const json &jsonObj, const std::string &key);
+using JsonTypeCheckFunc = bool (*)(const cJSON *jsonObj, const std::string &key);
 constexpr int32_t WORD_WIDTH_8 = 8;
 constexpr int32_t WORD_WIDTH_4 = 4;
 constexpr size_t INT32_SHORT_ID_LENGTH = 20;
@@ -261,35 +261,7 @@ int32_t GetAudioParamInt(const std::string &params, const std::string &key, int3
     return DH_SUCCESS;
 }
 
-bool JsonParamCheck(const json &jsonObj, const std::initializer_list<std::string> &keys)
-{
-    if (jsonObj.is_discarded()) {
-        DHLOGE("Json parameter is invalid.");
-        return false;
-    }
-
-    for (auto it = keys.begin(); it != keys.end(); it++) {
-        if (!jsonObj.contains(*it)) {
-            DHLOGE("Json parameter not contain param(%s).", (*it).c_str());
-            return false;
-        }
-
-        auto iter = typeCheckMap.find(*it);
-        if (iter == typeCheckMap.end()) {
-            DHLOGE("Check is not supported yet, key %s.", (*it).c_str());
-            return false;
-        }
-        JsonTypeCheckFunc &func = iter->second;
-        bool res = (*func)(jsonObj, *it);
-        if (!res) {
-            DHLOGE("The key %s value format in json is illegal.", (*it).c_str());
-            return false;
-        }
-    }
-    return true;
-}
-
-static bool IsString(const cJSON *jsonObj, const std::string &key)
+bool IsString(const cJSON *jsonObj, const std::string &key)
 {
     if (jsonObj == nullptr || !cJSON_IsObject(jsonObj)) {
         DHLOGE("JSON parameter is invalid.");
@@ -307,6 +279,43 @@ static bool IsString(const cJSON *jsonObj, const std::string &key)
     return false;
 }
 
+bool IsInt32(const cJSON *jsonObj, const std::string &key)
+{
+    if (jsonObj == nullptr || !cJSON_IsObject(jsonObj)) {
+        DHLOGE("JSON parameter is invalid.");
+        return false;
+    }
+    cJSON *paramValue = cJSON_GetObjectItemCaseSensitive(jsonObj, key.c_str());
+    if (paramValue == nullptr) {
+        DHLOGE("paramValue is null");
+        return false;
+    }
+
+    if (cJSON_IsNumber(paramValue)) {
+        int value = paramValue->valueint;
+        if (INT32_MIN <= value && value <= INT32_MAX) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool IsAudioParam(const cJSON *jsonObj, const std::string &key)
+{
+    if (jsonObj == nullptr || !cJSON_IsObject(jsonObj)) {
+        DHLOGE("JSON parameter is invalid.");
+        return false;
+    }
+    cJSON *paramValue = cJSON_GetObjectItemCaseSensitive(jsonObj, key.c_str());
+    if (paramValue == nullptr || !cJSON_IsObject(paramValue)) {
+        DHLOGE("paramValue is null or is not object");
+        return false;
+    }
+
+    return CJsonParamCheck(paramValue,
+        { KEY_SAMPLING_RATE, KEY_CHANNELS, KEY_FORMAT, KEY_SOURCE_TYPE, KEY_CONTENT_TYPE, KEY_STREAM_USAGE });
+}
+
 bool CJsonParamCheck(const cJSON *jsonObj, const std::initializer_list<std::string> &keys)
 {
     if (jsonObj == nullptr || !cJSON_IsObject(jsonObj)) {
@@ -320,29 +329,19 @@ bool CJsonParamCheck(const cJSON *jsonObj, const std::initializer_list<std::stri
             DHLOGE("JSON parameter does not contain key: %s", (*it).c_str());
             return false;
         }
-        bool res = IsString(jsonObj, *it);
+        auto iter = typeCheckMap.find(*it);
+        if (iter == typeCheckMap.end()) {
+            DHLOGE("Check is not supported yet, key %s.", (*it).c_str());
+            return false;
+        }
+        JsonTypeCheckFunc &func = iter->second;
+        bool res = (*func)(jsonObj, *it);
         if (!res) {
             DHLOGE("The key %s value format in JSON is illegal.", (*it).c_str());
             return false;
         }
     }
     return true;
-}
-
-bool IsString(const json &jsonObj, const std::string &key)
-{
-    return jsonObj[key].is_string();
-}
-
-bool IsInt32(const json &jsonObj, const std::string &key)
-{
-    return jsonObj[key].is_number_integer() && INT32_MIN <= jsonObj[key] && jsonObj[key] <= INT32_MAX;
-}
-
-bool IsAudioParam(const json &jsonObj, const std::string &key)
-{
-    return JsonParamCheck(jsonObj[key],
-        { KEY_SAMPLING_RATE, KEY_CHANNELS, KEY_FORMAT, KEY_SOURCE_TYPE, KEY_CONTENT_TYPE, KEY_STREAM_USAGE });
 }
 
 int32_t CalculateSampleNum(uint32_t sampleRate, uint32_t timems)

@@ -49,7 +49,6 @@
                 "samgr"
             ],
             "third_party": [
-                "json",
                 "cJSON"
             ]
         },

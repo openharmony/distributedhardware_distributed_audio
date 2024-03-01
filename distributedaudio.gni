@@ -23,6 +23,8 @@ audio_framework_path =
     "//foundation/multimedia/audio_framework/frameworks/native"
 driver_audio_path = "//drivers/peripheral/audio/interfaces"
 
+third_party_path = "//third_party"
+
 common_path = "${distributedaudio_path}/common"
 services_path = "${distributedaudio_path}/services"
 audio_client_path = "${services_path}/audioclient"

@@ -17,6 +17,7 @@
 #define OHOS_DAUDIO_HANDLER_H
 
 #include <set>
+#include "cJSON.h"
 
 #include "ihardware_handler.h"
 #include "single_instance.h"
@@ -49,7 +50,7 @@ private:
     DAudioHandler();
     ~DAudioHandler();
     int32_t QueryAudioInfo();
-
+    void AddItemsToObject(DHItem &dhItem, cJSON *infoJson, const int32_t &dhId);
 private:
     AudioInfo spkInfos_;
     AudioInfo micInfos_;

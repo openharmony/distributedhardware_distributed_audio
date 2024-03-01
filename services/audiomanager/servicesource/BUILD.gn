@@ -27,7 +27,6 @@ ohos_shared_library("distributed_audio_source") {
   }
   stack_protector_ret = true
   include_dirs = [
-    "//third_party/json/include",
     "//third_party/cJSON",
   ]
 
@@ -78,7 +77,7 @@ ohos_shared_library("distributed_audio_source") {
     "${audio_transport_path}/senderengine:distributed_audio_encode_transport",
     "${distributedaudio_path}/audiohandler:distributed_audio_handler",
     "${services_path}/common:distributed_audio_utils",
-    "//third_party/cJSON:cjson",
+    "${third_party_path}/cJSON:cjson",
   ]
 
   external_deps = [

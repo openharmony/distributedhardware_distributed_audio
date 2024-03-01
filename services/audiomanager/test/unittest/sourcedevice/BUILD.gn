@@ -20,7 +20,7 @@ config("module_private_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "//third_party/json/include",
+    "//third_party/cJSON",
     "${driver_audio_path}/include",
     "${fwk_common_path}/utils/include",
     "${mediastandardfwk_path}/audiocapturer/include",
@@ -65,6 +65,7 @@ ohos_unittest("DaudioSourceDevTest") {
     "${audio_transport_path}/senderengine:distributed_audio_encode_transport",
     "${services_path}/audiomanager/servicesource:distributed_audio_source",
     "${services_path}/common:distributed_audio_utils",
+    "${third_party_path}/cJSON:cjson",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
   ]
@@ -92,6 +93,7 @@ ohos_unittest("DMicDevTest") {
   deps = [
     "${audio_transport_path}/receiverengine:distributed_audio_decode_transport",
     "${services_path}/audiomanager/servicesource:distributed_audio_source",
+    "${third_party_path}/cJSON:cjson",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
   ]
@@ -116,6 +118,7 @@ ohos_unittest("DSpeakerDevTest") {
   deps = [
     "${audio_transport_path}/senderengine:distributed_audio_encode_transport",
     "${services_path}/audiomanager/servicesource:distributed_audio_source",
+    "${third_party_path}/cJSON:cjson",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
   ]
