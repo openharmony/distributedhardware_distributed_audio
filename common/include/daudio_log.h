@@ -15,6 +15,7 @@
 
 #ifndef OHOS_DAUDIO_LOG_H
 #define OHOS_DAUDIO_LOG_H
+#include "cJSON.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -47,12 +48,30 @@ void DHLog(DHLogLevel logLevel, const char *fmt, ...);
         }                                       \
     } while (0)
 
+#define CHECK_NULL_AND_FREE_VOID(ptr, root, ...)     \
+    do {                                             \
+        if ((ptr) == nullptr) {                      \
+            DHLOGE("Address pointer is null");       \
+            cJSON_Delete(root);                      \
+            return;                                  \
+        }                                            \
+    } while (0)
+
 #define CHECK_NULL_RETURN(ptr, ret)             \
     do {                                        \
         if ((ptr) == nullptr) {                 \
             DHLOGE("Address pointer is null");  \
             return (ret);                       \
         }                                       \
+    } while (0)
+
+#define CHECK_NULL_FREE_RETURN(ptr, ret, root, ...)    \
+    do {                                               \
+        if ((ptr) == nullptr) {                        \
+            DHLOGE("Address pointer is null");         \
+            cJSON_Delete(root);                        \
+            return (ret);                              \
+        }                                              \
     } while (0)
 
 #define CHECK_AND_RETURN_RET_LOG(cond, ret, fmt, ...)   \
@@ -63,12 +82,39 @@ void DHLog(DHLogLevel logLevel, const char *fmt, ...);
         }                                               \
     } while (0)
 
+#define CHECK_AND_FREE_RETURN_RET_LOG(cond, ret, root, fmt, ...)    \
+    do {                                                            \
+        if ((cond)) {                                               \
+            DHLOGE(fmt, ##__VA_ARGS__);                             \
+            cJSON_Delete(root);                                     \
+            return (ret);                                           \
+        }                                                           \
+    } while (0)
+
+#define CHECK_AND_FREECHAR_RETURN_RET_LOG(cond, ret, data, fmt, ...)    \
+    do {                                                                \
+        if ((cond)) {                                                   \
+            DHLOGE(fmt, ##__VA_ARGS__);                                 \
+            cJSON_free(data);                                           \
+            return (ret);                                               \
+        }                                                               \
+    } while (0)
+
 #define CHECK_AND_RETURN_LOG(cond, fmt, ...)   \
     do {                                       \
         if ((cond)) {                          \
             DHLOGE(fmt, ##__VA_ARGS__);        \
             return;                            \
         }                                      \
+    } while (0)
+
+#define CHECK_AND_FREE_RETURN_LOG(cond, root, fmt, ...)   \
+    do {                                                  \
+        if ((cond)) {                                     \
+            DHLOGE(fmt, ##__VA_ARGS__);                   \
+            cJSON_Delete(root);                           \
+            return;                                       \
+        }                                                 \
     } while (0)
 
 #define CHECK_AND_LOG(cond, fmt, ...)          \

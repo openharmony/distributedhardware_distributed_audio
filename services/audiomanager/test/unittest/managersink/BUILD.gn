@@ -22,7 +22,6 @@ config("module_private_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "//third_party/json/include",
     "${audio_framework_path}/audiopolicy/include",
     "${mediastandardfwk_path}/audiocapturer/include",
     "${mediastandardfwk_path}/audiocommon/include",
@@ -64,6 +63,8 @@ ohos_unittest("DaudioSinkDevTest") {
   deps = [
     "${innerkits_path}/native_cpp/audio_sink:distributed_audio_sink_sdk",
     "${services_path}/audiomanager/servicesink:distributed_audio_sink",
+    "${services_path}/common:distributed_audio_utils",
+    "${third_party_path}/cJSON:cjson",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
   ]
@@ -99,6 +100,7 @@ ohos_unittest("DAudioSinkManagerTest") {
   deps = [
     "${innerkits_path}/native_cpp/audio_sink:distributed_audio_sink_sdk",
     "${services_path}/audiomanager/servicesink:distributed_audio_sink",
+    "${third_party_path}/cJSON:cjson",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
   ]

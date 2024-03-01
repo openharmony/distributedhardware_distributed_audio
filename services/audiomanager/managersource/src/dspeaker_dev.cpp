@@ -112,11 +112,22 @@ int32_t DSpeakerDev::OpenDevice(const std::string &devId, const int32_t dhId)
     std::shared_ptr<IAudioEventCallback> cbObj = audioEventCallback_.lock();
     CHECK_NULL_RETURN(cbObj, ERR_DH_AUDIO_NULLPTR);
 
-    json jParam = { { KEY_DH_ID, std::to_string(dhId) } };
-    AudioEvent event(AudioEventType::OPEN_SPEAKER, jParam.dump());
+    cJSON *jParam = cJSON_CreateObject();
+    CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
+    cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId).c_str());
+    char *jsonData = cJSON_PrintUnformatted(jParam);
+    if (jsonData == nullptr) {
+        DHLOGE("Failed to create JSON data.");
+        cJSON_Delete(jParam);
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    std::string jsonDataStr(jsonData);
+    AudioEvent event(AudioEventType::OPEN_SPEAKER, jsonDataStr);
     cbObj->NotifyEvent(event);
     DAudioHisysevent::GetInstance().SysEventWriteBehavior(DAUDIO_OPEN, devId, std::to_string(dhId),
         "daudio spk device open success.");
+    cJSON_Delete(jParam);
+    cJSON_free(jsonData);
     return DH_SUCCESS;
 }
 
@@ -126,12 +137,23 @@ int32_t DSpeakerDev::CloseDevice(const std::string &devId, const int32_t dhId)
     std::shared_ptr<IAudioEventCallback> cbObj = audioEventCallback_.lock();
     CHECK_NULL_RETURN(cbObj, ERR_DH_AUDIO_NULLPTR);
 
-    json jParam = { { KEY_DH_ID, std::to_string(dhId) } };
-    AudioEvent event(AudioEventType::CLOSE_SPEAKER, jParam.dump());
+    cJSON *jParam = cJSON_CreateObject();
+    CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
+    cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId).c_str());
+    char *jsonData = cJSON_PrintUnformatted(jParam);
+    if (jsonData == nullptr) {
+        DHLOGE("Failed to create JSON data.");
+        cJSON_Delete(jParam);
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    std::string jsonDataStr(jsonData);
+    AudioEvent event(AudioEventType::CLOSE_SPEAKER, jsonDataStr);
     cbObj->NotifyEvent(event);
     DAudioHisysevent::GetInstance().SysEventWriteBehavior(DAUDIO_CLOSE, devId, std::to_string(dhId),
         "daudio spk device close success.");
     curPort_ = 0;
+    cJSON_Delete(jParam);
+    cJSON_free(jsonData);
     return DH_SUCCESS;
 }
 

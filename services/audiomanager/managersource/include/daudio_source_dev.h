@@ -19,7 +19,7 @@
 #include <map>
 #include <mutex>
 #include <initializer_list>
-#include "nlohmann/json.hpp"
+#include "cJSON.h"
 
 #include "event_handler.h"
 
@@ -34,8 +34,6 @@
 #include "iaudio_datatrans_callback.h"
 #include "idaudio_ipc_callback.h"
 #include "idaudio_hdi_callback.h"
-
-using json = nlohmann::json;
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -59,6 +57,7 @@ private:
     int32_t EnableDMic(const int32_t dhId, const std::string &attrs);
     int32_t DisableDSpeaker(const int32_t dhId);
     int32_t DisableDMic(const int32_t dhId);
+    int32_t DisableDAudioInner(const std::string &dhId);
 
     int32_t TaskEnableDAudio(const std::string &args);
     int32_t TaskDisableDAudio(const std::string &args);
@@ -103,10 +102,10 @@ private:
     int32_t HandleMicMmapStart(const AudioEvent &event);
     int32_t HandleMicMmapStop(const AudioEvent &event);
 
-    int32_t NotifySinkDev(const AudioEventType type, const json Param, const std::string dhId);
+    int32_t NotifySinkDev(const AudioEventType type, const cJSON *Param, const std::string dhId);
     int32_t NotifyHDF(const AudioEventType type, const std::string result, const int32_t dhId);
     AudioEventType getEventTypeFromArgs(const std::string &args);
-    void to_json(json &j, const AudioParam &param);
+    void to_json(cJSON *j, const AudioParam &param);
     int32_t SendAudioEventToRemote(const AudioEvent &event);
     int32_t CloseSpkNew(const std::string &args);
     int32_t CloseMicNew(const std::string &args);

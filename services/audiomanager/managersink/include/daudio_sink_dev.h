@@ -20,9 +20,9 @@
 #include <condition_variable>
 #include <mutex>
 #include <initializer_list>
+#include "cJSON.h"
 
 #include "event_handler.h"
-#include "nlohmann/json.hpp"
 
 #include "daudio_sink_dev_ctrl_mgr.h"
 #include "dmic_client.h"
@@ -33,8 +33,6 @@
 #include "i_av_engine_provider.h"
 #include "i_av_receiver_engine_callback.h"
 #include "idaudio_sink_ipc_callback.h"
-
-using json = nlohmann::json;
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -74,11 +72,13 @@ private:
     int32_t TaskDisableDevice(const std::string &args);
 
     void NotifySourceDev(const AudioEventType type, const std::string dhId, const int32_t result);
-    int32_t from_json(const json &j, AudioParam &audioParam);
+    int32_t from_json(const cJSON *j, AudioParam &audioParam);
     int32_t HandleEngineMessage(uint32_t type, std::string content, std::string devId);
     int32_t SendAudioEventToRemote(const AudioEvent &event);
     void PullUpPage();
 
+    int32_t GetParamValue(const cJSON *j, const char* key, int32_t &value);
+    int32_t GetCJsonObjectItems(const cJSON *j, AudioParam &audioParam);
     int32_t ParseDhidFromEvent(std::string args);
     int32_t ConvertString2Int(std::string val);
 
