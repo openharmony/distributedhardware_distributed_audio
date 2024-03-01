@@ -24,7 +24,6 @@ ohos_shared_library("distributed_audio_handler") {
   }
   stack_protector_ret = true
 
-
   include_dirs = [
     "include",
     "${common_path}/include",
