@@ -57,7 +57,6 @@ config("module_private_config") {
     "${services_path}/common/audiodata/include",
     "${services_path}/common/audioeventcallback",
     "${services_path}/common/audioparam",
-    "${services_path}/hdfaudioclient/include",
   ]
 }
 
@@ -81,6 +80,7 @@ ohos_unittest("DaudioSourceServiceTest") {
     "audio_framework:audio_client",
     "audio_framework:audio_renderer",
     "c_utils:utils",
+    "drivers_interface_distributed_audio:libdaudio_proxy_1.0",
     "dsoftbus:softbus_client",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",

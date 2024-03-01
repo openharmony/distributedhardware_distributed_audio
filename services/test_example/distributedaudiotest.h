@@ -24,10 +24,10 @@
 #include <thread>
 #include <vector>
 
-#include "audio_adapter.h"
-#include "audio_manager.h"
-#include "audio_types.h"
-#include "daudio_errcode.h"
+#include <v1_0/iaudio_adapter.h>
+#include <v1_0/iaudio_manager.h>
+#include <v1_0/iaudio_callback.h>
+#include <v1_0/audio_types.h>
 
 enum class DeviceStatus : uint32_t {
     DEVICE_IDLE = 0,

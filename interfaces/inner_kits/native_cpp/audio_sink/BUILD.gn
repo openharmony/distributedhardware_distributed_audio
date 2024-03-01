@@ -26,9 +26,8 @@ ohos_shared_library("distributed_audio_sink_sdk") {
     ubsan = true
   }
   stack_protector_ret = true
-  include_dirs = [ "${fwk_common_path}/utils/include" ]
 
-  include_dirs += [
+  include_dirs = [
     "include",
     "${common_path}/include",
     "${common_path}/dfx_utils/include",
@@ -46,6 +45,7 @@ ohos_shared_library("distributed_audio_sink_sdk") {
 
   external_deps = [
     "c_utils:utils",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "ipc:ipc_core",

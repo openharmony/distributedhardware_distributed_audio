@@ -36,6 +36,7 @@ ohos_unittest("AudioAdapterHdiTest") {
 
   deps = [
     "${services_path}/hdfaudioclient:daudio_client",
+    "${third_party_path}/cJSON:cjson",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -70,6 +71,7 @@ ohos_unittest("AudioRenderInternalTest") {
 
   deps = [
     "${services_path}/hdfaudioclient:daudio_client",
+    "${third_party_path}/cJSON:cjson",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -100,6 +102,7 @@ ohos_unittest("AudioCaptureInternalTest") {
 
   deps = [
     "${services_path}/hdfaudioclient:daudio_client",
+    "${third_party_path}/cJSON:cjson",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -130,6 +133,7 @@ ohos_unittest("AudioAdapterInternalTest") {
 
   deps = [
     "${services_path}/hdfaudioclient:daudio_client",
+    "${third_party_path}/cJSON:cjson",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]

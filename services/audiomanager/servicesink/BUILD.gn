@@ -26,10 +26,7 @@ ohos_shared_library("distributed_audio_sink") {
     ubsan = true
   }
   stack_protector_ret = true
-  include_dirs = [
-    "//third_party/cJSON",
-    "${fwk_common_path}/utils/include",
-  ]
+  include_dirs = [ "//third_party/cJSON" ]
 
   include_dirs += [
     "include",
@@ -86,6 +83,7 @@ ohos_shared_library("distributed_audio_sink") {
     "device_security_level:dslm_sdk",
     "distributed_hardware_fwk:distributed_av_receiver",
     "distributed_hardware_fwk:distributed_av_sender",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "distributed_hardware_fwk:libdhfwk_sdk",
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",

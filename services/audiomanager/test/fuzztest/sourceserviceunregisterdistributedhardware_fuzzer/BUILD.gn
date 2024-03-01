@@ -65,6 +65,7 @@ ohos_fuzztest("SourceServiceUnregisterDistributedHardwareFuzzTest") {
   external_deps = [
     "audio_framework:audio_renderer",
     "c_utils:utils",
+    "drivers_interface_distributed_audio:libdaudio_proxy_1.0",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
