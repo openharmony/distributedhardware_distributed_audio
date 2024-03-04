@@ -91,8 +91,8 @@ static std::string g_devId = "";
 static constexpr const char* PLAY_THREAD = "playThread";
 static constexpr const char* CAPTURE_THREAD = "captureThread";
 
-uint32_t renderId_ = 0;
-uint32_t captureId_ = 0;
+uint32_t g_renderId = 0;
+uint32_t g_captureId = 0;
 int32_t g_frameNum = 0;
 int32_t g_frameIndex = 0;
 int32_t g_micFrameNum = 0;
@@ -224,7 +224,7 @@ static void OpenSpk(const std::string &devId)
     g_rattrs.channelCount = RENDER_CHANNEL_MASK;
     g_rattrs.sampleRate = AUDIO_SAMPLE_RATE;
     g_rattrs.format = AudioFormat::AUDIO_FORMAT_TYPE_PCM_16_BIT;
-    int32_t ret = g_adapter->CreateRender(renderDesc, g_rattrs, g_render, renderId_);
+    int32_t ret = g_adapter->CreateRender(renderDesc, g_rattrs, g_render, g_renderId);
     if (ret != DH_SUCCESS || g_render == nullptr) {
         std::cout << "Open SPK device failed, ret: " << ret << std::endl;
         return;
@@ -362,7 +362,7 @@ static void CloseSpk()
         StopRender();
     }
 
-    int32_t ret = g_adapter->DestroyRender(renderId_);
+    int32_t ret = g_adapter->DestroyRender(g_renderId);
     if (ret != DH_SUCCESS) {
         std::cout << "Close speaker failed" << std::endl;
         return;
@@ -432,7 +432,7 @@ static void OpenMic(const std::string &devId)
     captureAttr.channelCount = CAPTURE_CHANNEL_MASK;
     captureAttr.sampleRate = AUDIO_SAMPLE_RATE;
     captureAttr.format = AudioFormat::AUDIO_FORMAT_TYPE_PCM_16_BIT;
-    int32_t ret = g_adapter->CreateCapture(captureDesc, captureAttr, g_capture, captureId_);
+    int32_t ret = g_adapter->CreateCapture(captureDesc, captureAttr, g_capture, g_captureId);
     if (ret != DH_SUCCESS || g_capture == nullptr) {
         std::cout << "Open MIC device failed." << std::endl;
         return;
@@ -548,7 +548,7 @@ static void CloseMic()
         StopCapture();
     }
 
-    int32_t ret = g_adapter->DestroyCapture(captureId_);
+    int32_t ret = g_adapter->DestroyCapture(g_captureId);
     if (ret != DH_SUCCESS) {
         std::cout << "Close mic failed." << std::endl;
         return;
