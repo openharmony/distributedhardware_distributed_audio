@@ -43,7 +43,7 @@ public:
         return DH_SUCCESS;
     }
 
-    int32_t NotifyEvent(const std::string &adpName, int32_t devId,
+    int32_t NotifyEvent(const std::string &adpName, int32_t devId, int32_t streamId,
         const OHOS::HDI::DistributedAudio::Audioext::V1_0::DAudioEvent &event) override
     {
         return DH_SUCCESS;

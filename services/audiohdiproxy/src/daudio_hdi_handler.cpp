@@ -200,7 +200,7 @@ void DAudioHdiHandler::ProcessEventMsg(const AudioEvent &audioEvent, DAudioEvent
 }
 
 int32_t DAudioHdiHandler::NotifyEvent(const std::string &devId, const int32_t dhId,
-    const AudioEvent &audioEvent)
+    const int32_t streamId, const AudioEvent &audioEvent)
 {
     DHLOGD("Notify event adpname: %{public}s, dhId: %{public}d, event type: %{public}d, event content: %{public}s.",
         GetAnonyString(devId).c_str(), dhId, audioEvent.type, audioEvent.content.c_str());
@@ -208,7 +208,7 @@ int32_t DAudioHdiHandler::NotifyEvent(const std::string &devId, const int32_t dh
     ProcessEventMsg(audioEvent, newEvent);
 
     CHECK_NULL_RETURN(audioSrvHdf_, ERR_DH_AUDIO_NULLPTR);
-    if (audioSrvHdf_->NotifyEvent(devId, dhId, newEvent) != HDF_SUCCESS) {
+    if (audioSrvHdf_->NotifyEvent(devId, dhId, streamId, newEvent) != HDF_SUCCESS) {
         DHLOGE("Call hdf proxy NotifyEvent failed.");
         return ERR_DH_AUDIO_HDI_CALL_FAILED;
     }

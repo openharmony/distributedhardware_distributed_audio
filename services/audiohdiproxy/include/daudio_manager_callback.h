@@ -28,26 +28,26 @@ public:
     explicit DAudioManagerCallback(const std::shared_ptr<IDAudioHdiCallback> callback) : callback_(callback) {};
     ~DAudioManagerCallback() override = default;
 
-    int32_t OpenDevice(const std::string &adpName, int32_t devId) override;
+    int32_t CreateStream(const std::string &adpName, int32_t devId, int32_t streamId) override;
 
-    int32_t CloseDevice(const std::string &adpName, int32_t devId) override;
+    int32_t DestroyStream(const std::string &adpName, int32_t devId, int32_t streamId) override;
 
-    int32_t SetParameters(const std::string &adpName, int32_t devId,
+    int32_t SetParameters(const std::string &adpName, int32_t devId, int32_t streamId,
         const OHOS::HDI::DistributedAudio::Audioext::V1_0::AudioParameter &param) override;
 
-    int32_t NotifyEvent(const std::string &adpName, int32_t devId,
+    int32_t NotifyEvent(const std::string &adpName, int32_t devId, int32_t streamId,
         const OHOS::HDI::DistributedAudio::Audioext::V1_0::DAudioEvent &event) override;
 
-    int32_t WriteStreamData(const std::string &adpName, int32_t devId,
+    int32_t WriteStreamData(const std::string &adpName, int32_t devId, int32_t streamId,
         const OHOS::HDI::DistributedAudio::Audioext::V1_0::AudioData &data) override;
 
-    int32_t ReadStreamData(const std::string &adpName, int32_t devId,
+    int32_t ReadStreamData(const std::string &adpName, int32_t devId, int32_t streamId,
         OHOS::HDI::DistributedAudio::Audioext::V1_0::AudioData &data) override;
 
-    int32_t ReadMmapPosition(const std::string &adpName, int32_t devId, uint64_t &frames,
+    int32_t ReadMmapPosition(const std::string &adpName, int32_t devId, int32_t streamId, uint64_t &frames,
         OHOS::HDI::DistributedAudio::Audioext::V1_0::CurrentTime &time) override;
 
-    int32_t RefreshAshmemInfo(const std::string &adpName, int32_t devId,
+    int32_t RefreshAshmemInfo(const std::string &adpName, int32_t devId, int32_t streamId,
         int fd, int32_t ashmemLength, int32_t lengthPerTrans) override;
 
 private:

@@ -439,7 +439,7 @@ int32_t DSpeakerDev::SendMessage(uint32_t type, std::string content, std::string
 
 int32_t DSpeakerDev::NotifyHdfAudioEvent(const AudioEvent &event, const int32_t portId)
 {
-    int32_t ret = DAudioHdiHandler::GetInstance().NotifyEvent(devId_, portId, event);
+    int32_t ret = DAudioHdiHandler::GetInstance().NotifyEvent(devId_, portId, 0, event);
     if (ret != DH_SUCCESS) {
         DHLOGE("Notify event: %{public}d, result: %{public}s.", event.type, event.content.c_str());
     }

@@ -34,6 +34,7 @@ public:
     void TearDown();
 
     int32_t dhId_ = PIN_OUT_DAUDIO_DEFAULT;
+    int32_t streamId_ = 0;
     std::string devId_ = "PIN_OUT_DAUDIO_DEFAULT";
     std::string capability_ = "DH_SUCCESS";
 

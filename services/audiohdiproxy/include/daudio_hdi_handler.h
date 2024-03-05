@@ -47,7 +47,8 @@ public:
 
     int32_t UnRegisterAudioDevice(const std::string &devId, const int32_t dhId);
 
-    int32_t NotifyEvent(const std::string &devId, const int32_t dhId, const AudioEvent &audioEvent);
+    int32_t NotifyEvent(const std::string &devId, const int32_t dhId,
+        const int32_t streamId, const AudioEvent &audioEvent);
 
 private:
     DAudioHdiHandler();
