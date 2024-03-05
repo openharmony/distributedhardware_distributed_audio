@@ -53,6 +53,7 @@ ohos_unittest("AudioHandlerTest") {
   external_deps = [
     "audio_framework:audio_renderer",
     "c_utils:utils",
+    "hilog:libhilog",
   ]
 }
 

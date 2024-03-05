@@ -89,6 +89,7 @@ ohos_shared_library("distributed_audio_sink") {
     "eventhandler:libeventhandler",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdi",
+    "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "ipc:ipc_core",

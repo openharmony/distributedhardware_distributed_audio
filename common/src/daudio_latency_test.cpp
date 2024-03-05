@@ -44,7 +44,7 @@ int32_t DAudioLatencyTest::AddPlayTime(const int64_t playBeepTime)
         DHLOGE("Catch play high frame, but not in %d ms.", TWO_BEEP_TIME_INTERVAL);
         return ERR_DH_AUDIO_FAILED;
     }
-    DHLOGI("Catch play high frame, playTime: %lld.", playBeepTime);
+    DHLOGI("Catch play high frame, playTime: %" PRId64, playBeepTime);
     playBeepTime_.push_back(playBeepTime);
     lastPlayTime_ = GetNowTimeUs();
     return DH_SUCCESS;
@@ -61,7 +61,7 @@ int32_t DAudioLatencyTest::AddRecordTime(const int64_t recordBeepTime)
         DHLOGE("Catch record high frame, but not in %d ms.", TWO_BEEP_TIME_INTERVAL);
         return ERR_DH_AUDIO_FAILED;
     }
-    DHLOGI("Catch record high frame, recordTime: %lld.", recordBeepTime);
+    DHLOGI("Catch record high frame, recordTime: %" PRId64, recordBeepTime);
     captureBeepTime_.push_back(recordBeepTime);
     lastRecordTime_ = GetNowTimeUs();
     return DH_SUCCESS;
@@ -97,15 +97,16 @@ int32_t DAudioLatencyTest::ComputeLatency()
 {
     DHLOGD("Compute latency time.");
     int32_t playSize = static_cast<int32_t>(playBeepTime_.size());
+    int32_t captureSize = static_cast<int32_t>(captureBeepTime_.size());
     if (playSize == 0 || playBeepTime_.size() != captureBeepTime_.size()) {
-        DHLOGE("Record num is not equal <%d, %d>", playSize, captureBeepTime_.size());
+        DHLOGE("Record num is not equal %d: %d", playSize, captureSize);
         return -1;
     }
     DHLOGI("Record %d times frame high.", playSize);
     int32_t sum = 0;
     for (int32_t i = 0; i < playSize; i++) {
-        DHLOGI("Send: %lld, Received: %lld", playBeepTime_[i], captureBeepTime_[i]);
-        DHLOGI("Time is: %d ms.", (captureBeepTime_[i] - playBeepTime_[i]) / US_PER_MS);
+        DHLOGI("Send: %" PRId64", Received: %" PRId64, playBeepTime_[i], captureBeepTime_[i]);
+        DHLOGI("Time is: %" PRId64" ms.", (captureBeepTime_[i] - playBeepTime_[i]) / US_PER_MS);
         sum += captureBeepTime_[i] - playBeepTime_[i];
     }
     DHLOGI("Audio latency in average is: %d us.", sum / playSize);

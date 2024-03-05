@@ -153,7 +153,7 @@ int32_t DMicClient::TransSetUp()
 
 int32_t DMicClient::SetUp(const AudioParam &param)
 {
-    DHLOGI("Set up mic client, param: {sampleRate: %d, bitFormat: %d," +
+    DHLOGI("Set up mic client, param: {sampleRate: %d, bitFormat: %d,"
         "channelMask: %d, sourceType: %d, capturerFlags: %d, frameSize: %d}.",
         param.comParam.sampleRate, param.comParam.bitFormat, param.comParam.channelMask, param.captureOpts.sourceType,
         param.captureOpts.capturerFlags, param.comParam.frameSize);
@@ -252,8 +252,8 @@ void DMicClient::AudioFwkCaptureData()
         }
         int64_t endTime = GetNowTimeUs();
         if (IsOutDurationRange(startTime, endTime, lastCaptureStartTime_)) {
-            DHLOGE("This time capture spend: %lld us, The interval of capture this time and the last time: %lld us",
-                endTime - startTime, startTime - lastCaptureStartTime_);
+            DHLOGE("This time capture spend: %" PRId64" us, The interval of capture this time and "
+                "the last time: %" PRId64" us", endTime - startTime, startTime - lastCaptureStartTime_);
         }
         lastCaptureStartTime_ = startTime;
     }
@@ -276,8 +276,8 @@ void DMicClient::AudioFwkCaptureData()
     }
     int64_t endTransTime = GetNowTimeUs();
     if (IsOutDurationRange(startTransTime, endTransTime, lastTransStartTime_)) {
-        DHLOGE("This time send data spend: %lld us, The interval of send data this time and the last time: %lld us",
-            endTransTime - startTransTime, startTransTime - lastTransStartTime_);
+        DHLOGE("This time send data spend: %" PRId64" us, The interval of send data this time and "
+            "the last time: %" PRId64" us", endTransTime - startTransTime, startTransTime - lastTransStartTime_);
     }
     lastTransStartTime_ = startTransTime;
 }
@@ -312,8 +312,10 @@ void DMicClient::OnReadData(size_t length)
 
     std::shared_ptr<AudioData> audioData = std::make_shared<AudioData>(audioParam_.comParam.frameSize);
     if (audioData->Capacity() != bufDesc.bufLength) {
-        DHLOGE("Audio data length is not equal to buflength. datalength: %d, bufLength: %d",
-            audioData->Capacity(), bufDesc.bufLength);
+        uint64_t capacity = static_cast<uint64_t>(audioData->Capacity());
+        uint64_t bufLength = static_cast<uint64_t>(bufDesc.bufLength);
+        DHLOGE("Audio data length is not equal to buflength. datalength: %" PRIu64", bufLength: %" PRIu64,
+            capacity, bufLength);
     }
     if (memcpy_s(audioData->Data(), audioData->Capacity(), bufDesc.buffer, bufDesc.bufLength) != EOK) {
         DHLOGE("Copy audio data failed.");

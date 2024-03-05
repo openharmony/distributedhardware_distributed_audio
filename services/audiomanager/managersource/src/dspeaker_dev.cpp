@@ -314,8 +314,8 @@ int32_t DSpeakerDev::WriteStreamData(const std::string &devId, const int32_t dhI
     }
     int64_t endTime = GetNowTimeUs();
     if (IsOutDurationRange(startTime, endTime, lastwriteStartTime_)) {
-        DHLOGE("This time write data spend: %lld us, The interval of write data this time and the last time: %lld us",
-            endTime - startTime, startTime - lastwriteStartTime_);
+        DHLOGE("This time write data spend: %" PRId64" us, The interval of write data this time and "
+            "the last time: %" PRId64" us", endTime - startTime, startTime - lastwriteStartTime_);
     }
     lastwriteStartTime_ = startTime;
     return DH_SUCCESS;
@@ -324,7 +324,7 @@ int32_t DSpeakerDev::WriteStreamData(const std::string &devId, const int32_t dhI
 int32_t DSpeakerDev::ReadMmapPosition(const std::string &devId, const int32_t dhId,
     uint64_t &frames, CurrentTimeHDF &time)
 {
-    DHLOGD("Read mmap position. frames: %lu, tvsec: %lu, tvNSec:%lu",
+    DHLOGD("Read mmap position. frames: %" PRIu64", tvsec: %" PRId64", tvNSec:%" PRId64,
         readNum_, readTvSec_, readTvNSec_);
     frames = readNum_;
     time.tvSec = readTvSec_;
@@ -375,7 +375,7 @@ void DSpeakerDev::EnqueueThread()
     while (ashmem_ != nullptr && isEnqueueRunning_.load()) {
         int64_t timeOffset = UpdateTimeOffset(frameIndex_, LOW_LATENCY_INTERVAL_NS,
             startTime_);
-        DHLOGD("Read frameIndex: %lld, timeOffset: %lld.", frameIndex_, timeOffset);
+        DHLOGD("Read frameIndex: %" PRId64", timeOffset: %" PRId64, frameIndex_, timeOffset);
         auto readData = ashmem_->ReadFromAshmem(lengthPerTrans_, readIndex_);
         DHLOGI("Read from ashmem success! read index: %d, readLength: %d.", readIndex_, lengthPerTrans_);
         std::shared_ptr<AudioData> audioData = std::make_shared<AudioData>(lengthPerTrans_);

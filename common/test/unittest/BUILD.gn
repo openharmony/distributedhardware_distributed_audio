@@ -45,7 +45,10 @@ ohos_unittest("DaudioUtilsTest") {
     "//third_party/googletest:gtest_main",
   ]
 
-  external_deps = [ "c_utils:utils" ]
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+  ]
 
   defines = [
     "HI_LOG_ENABLE",

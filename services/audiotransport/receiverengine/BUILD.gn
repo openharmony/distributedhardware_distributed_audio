@@ -61,6 +61,7 @@ ohos_shared_library("distributed_audio_decode_transport") {
     "c_utils:utils",
     "distributed_hardware_fwk:distributed_av_receiver",
     "dsoftbus:softbus_client",
+    "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "player_framework:media_client",

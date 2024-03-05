@@ -367,7 +367,7 @@ int32_t AbsoluteSleep(int64_t nanoTime)
 {
     int32_t ret = -1;
     if (nanoTime <= 0) {
-        DHLOGE("AbsoluteSleep invalid sleep time : %d ns", nanoTime);
+        DHLOGE("AbsoluteSleep invalid sleep time : %" PRId64" ns", nanoTime);
         return ret;
     }
     struct timespec time;
@@ -402,7 +402,8 @@ int64_t UpdateTimeOffset(const int64_t frameIndex, const int64_t framePeriodNs, 
 bool CheckIsNum(const std::string &jsonString)
 {
     if (jsonString.empty() || jsonString.size() > MAX_KEY_DH_ID_LEN) {
-        DHLOGE("Json string size %d, is zero or too long.", jsonString.size());
+        int32_t stringSize = static_cast<int32_t>(jsonString.size());
+        DHLOGE("Json string size %d, is zero or too long.", stringSize);
         return false;
     }
     for (char const &c : jsonString) {
@@ -417,7 +418,8 @@ bool CheckIsNum(const std::string &jsonString)
 bool CheckDevIdIsLegal(const std::string &devId)
 {
     if (devId.empty() || devId.size() > DAUDIO_MAX_DEVICE_ID_LEN) {
-        DHLOGE("DevId size %d, is zero or too long.", devId.size());
+        int32_t stringSize = static_cast<int32_t>(devId.size());
+        DHLOGE("DevId size %d, is zero or too long.", stringSize);
         return false;
     }
     for (char const &c : devId) {

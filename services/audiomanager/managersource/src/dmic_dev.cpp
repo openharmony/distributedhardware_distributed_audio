@@ -329,8 +329,8 @@ int32_t DMicDev::ReadStreamData(const std::string &devId, const int32_t dhId, st
 #endif
     int64_t endTime = GetNowTimeUs();
     if (IsOutDurationRange(startTime, endTime, lastReadStartTime_)) {
-        DHLOGE("This time read data spend: %lld us, The interval of read data this time and the last time: %lld us",
-            endTime - startTime, startTime - lastReadStartTime_);
+        DHLOGE("This time read data spend: %" PRId64" us, The interval of read data this time and "
+            "the last time: %" PRId64" us", endTime - startTime, startTime - lastReadStartTime_);
     }
     lastReadStartTime_ = startTime;
     return DH_SUCCESS;
@@ -339,7 +339,7 @@ int32_t DMicDev::ReadStreamData(const std::string &devId, const int32_t dhId, st
 int32_t DMicDev::ReadMmapPosition(const std::string &devId, const int32_t dhId,
     uint64_t &frames, CurrentTimeHDF &time)
 {
-    DHLOGD("Read mmap position. frames: %lu, tvsec: %lu, tvNSec:%lu",
+    DHLOGD("Read mmap position. frames: %" PRIu64", tvsec: %" PRId64", tvNSec:%" PRId64,
         writeNum_, writeTvSec_, writeTvNSec_);
     frames = writeNum_;
     time.tvSec = writeTvSec_;
@@ -393,7 +393,7 @@ void DMicDev::EnqueueThread()
     while (ashmem_ != nullptr && isEnqueueRunning_.load()) {
         int64_t timeOffset = UpdateTimeOffset(frameIndex_, LOW_LATENCY_INTERVAL_NS,
             startTime_);
-        DHLOGD("Write frameIndex: %lld, timeOffset: %lld.", frameIndex_, timeOffset);
+        DHLOGD("Write frameIndex: %" PRId64", timeOffset: %" PRId64, frameIndex_, timeOffset);
         std::shared_ptr<AudioData> audioData = nullptr;
         {
             std::lock_guard<std::mutex> lock(dataQueueMtx_);
@@ -512,12 +512,15 @@ int32_t DMicDev::OnDecodeTransDataDone(const std::shared_ptr<AudioData> &audioDa
     if (isExistedEmpty_.load()) {
         dataQueSize_ = param_.captureOpts.capturerFlags == MMAP_MODE ? dataQueSize_ : DATA_QUEUE_EXT_SIZE;
     }
+    uint64_t queueSize;
     while (dataQueue_.size() > dataQueSize_) {
-        DHLOGD("Data queue overflow. buf current size: %d", dataQueue_.size());
+        queueSize = static_cast<uint64_t>(dataQueue_.size());
+        DHLOGD("Data queue overflow. buf current size: %" PRIu64, queueSize);
         dataQueue_.pop();
     }
     dataQueue_.push(audioData);
-    DHLOGD("Push new mic data, buf len: %d", dataQueue_.size());
+    queueSize = static_cast<uint64_t>(dataQueue_.size());
+    DHLOGD("Push new mic data, buf len: %" PRIu64, queueSize);
     return DH_SUCCESS;
 }
 } // DistributedHardware

@@ -74,7 +74,7 @@ int32_t DSpeakerClient::InitReceiverEngine(IAVEngineProvider *providerPtr)
 
 int32_t DSpeakerClient::CreateAudioRenderer(const AudioParam &param)
 {
-    DHLOGD("Set up spk client: {sampleRate: %d, bitFormat: %d, channelMask: %d," +
+    DHLOGD("Set up spk client: {sampleRate: %d, bitFormat: %d, channelMask: %d,"
         "frameSize: %d, contentType: %d, renderFlags: %d, streamUsage: %d}.",
         param.comParam.sampleRate, param.comParam.bitFormat, param.comParam.channelMask, param.comParam.frameSize,
         param.renderOpts.contentType, param.renderOpts.renderFlags, param.renderOpts.streamUsage);
@@ -127,12 +127,15 @@ void DSpeakerClient::OnWriteData(size_t length)
         } else {
             audioData = dataQueue_.front();
             dataQueue_.pop();
-            DHLOGI("Pop spk data, dataQueue size: %d.", dataQueue_.size());
+            uint64_t queueSize = static_cast<uint64_t>(dataQueue_.size());
+            DHLOGI("Pop spk data, dataQueue size: %" PRIu64, queueSize);
         }
     }
     if (audioData->Capacity() != bufDesc.bufLength) {
-        DHLOGE("Audio data length is not equal to buflength. datalength: %d, bufLength: %d",
-            audioData->Capacity(), bufDesc.bufLength);
+        uint64_t capacity = static_cast<uint64_t>(audioData->Capacity());
+        uint64_t bufLength = static_cast<uint64_t>(bufDesc.bufLength);
+        DHLOGE("Audio data length is not equal to buflength. datalength: %" PRIu64
+            ", bufLength: %" PRIu64, capacity, bufLength);
     }
     if (memcpy_s(bufDesc.buffer, bufDesc.bufLength, audioData->Data(), audioData->Capacity()) != EOK) {
         DHLOGE("Copy audio data failed.");
@@ -283,7 +286,8 @@ void DSpeakerClient::PlayThreadRunning()
             }
             audioData = dataQueue_.front();
             dataQueue_.pop();
-            DHLOGD("Pop spk data, dataqueue size: %d.", dataQueue_.size());
+            uint64_t queueSize = static_cast<uint64_t>(dataQueue_.size());
+            DHLOGD("Pop spk data, dataqueue size: %" PRIu64, queueSize);
         }
 #ifdef DUMP_DSPEAKERCLIENT_FILE
         if (DaudioSinkHidumper::GetInstance().QueryDumpDataFlag()) {
@@ -294,8 +298,9 @@ void DSpeakerClient::PlayThreadRunning()
         while (writeOffSet < static_cast<int32_t>(audioData->Capacity())) {
             int32_t writeLen = audioRenderer_->Write(audioData->Data() + writeOffSet,
                 static_cast<int32_t>(audioData->Capacity()) - writeOffSet);
-            DHLOGD("Write audio render, write len: %d, raw len: %d, offset: %d", writeLen, audioData->Capacity(),
-                writeOffSet);
+            uint64_t capacity = static_cast<uint64_t>(audioData->Capacity());
+            DHLOGD("Write audio render, write len: %d, raw len: %" PRIu64", offset: %d",
+                writeLen, capacity, writeOffSet);
             if (writeLen < 0) {
                 break;
             }
@@ -303,8 +308,8 @@ void DSpeakerClient::PlayThreadRunning()
         }
         int64_t endTime = GetNowTimeUs();
         if (IsOutDurationRange(startTime, endTime, lastPlayStartTime_)) {
-            DHLOGE("This time play spend: %lld us, The interval of play this time and the last time: %lld us",
-                endTime - startTime, startTime - lastPlayStartTime_);
+            DHLOGE("This time play spend: %" PRId64" us, The interval of play this time and "
+                "the last time: %" PRId64" us", endTime - startTime, startTime - lastPlayStartTime_);
         }
         lastPlayStartTime_ = startTime;
     }
@@ -349,11 +354,12 @@ int32_t DSpeakerClient::OnDecodeTransDataDone(const std::shared_ptr<AudioData> &
     }
     dataQueue_.push(audioData);
     dataQueueCond_.notify_all();
-    DHLOGI("Push new spk data, buf len: %d.", dataQueue_.size());
+    uint64_t queueSize = static_cast<uint64_t>(dataQueue_.size());
+    DHLOGI("Push new spk data, buf len: %" PRIu64, queueSize);
     int64_t endTime = GetNowTimeUs();
     if (IsOutDurationRange(startTime, endTime, lastReceiveStartTime_)) {
-        DHLOGE("This time receivce data spend: %lld us, Receivce data this time and the last time: %lld us",
-            endTime - startTime, startTime - lastReceiveStartTime_);
+        DHLOGE("This time receivce data spend: %" PRId64" us, Receivce data this time and "
+            "the last time: %" PRId64" us", endTime - startTime, startTime - lastReceiveStartTime_);
     }
     lastReceiveStartTime_ = startTime;
     return DH_SUCCESS;

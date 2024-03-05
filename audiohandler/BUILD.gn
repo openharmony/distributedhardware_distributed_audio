@@ -43,6 +43,7 @@ ohos_shared_library("distributed_audio_handler") {
     "audio_framework:audio_renderer",
     "c_utils:utils",
     "distributed_hardware_fwk:distributedhardwareutils",
+    "hilog:libhilog",
   ]
 
   defines = [

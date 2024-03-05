@@ -69,7 +69,7 @@ int32_t DAudioManagerCallback::GetAudioParamHDF(const AudioParameter& param, Aud
             paramHDF.bitFormat = AudioSampleFormat::SAMPLE_S24LE;
             break;
         default:
-            DHLOGE("Format [%zu] does not support conversion.", param.format);
+            DHLOGE("Format [%" PRIu32"] does not support conversion.", param.format);
             return HDF_FAILURE;
     }
     switch (static_cast<AudioCategory>(param.streamUsage)) {
@@ -86,7 +86,7 @@ int32_t DAudioManagerCallback::GetAudioParamHDF(const AudioParameter& param, Aud
             paramHDF.streamUsage = StreamUsage::STREAM_USAGE_MEDIA;
             break;
         default:
-            DHLOGE("Stream usage [%zu] does not support conversion.", param.streamUsage);
+            DHLOGE("Stream usage [%" PRIu32"] does not support conversion.", param.streamUsage);
             return HDF_FAILURE;
     }
     paramHDF.frameSize = param.frameSize;
@@ -94,8 +94,8 @@ int32_t DAudioManagerCallback::GetAudioParamHDF(const AudioParameter& param, Aud
     paramHDF.ext = param.ext;
     paramHDF.renderFlags = static_cast<OHOS::DistributedHardware::PortOperationMode>(param.renderFlags);
     paramHDF.capturerFlags = static_cast<OHOS::DistributedHardware::PortOperationMode>(param.capturerFlags);
-    DHLOGI("HDF Param: sample rate %d, channel %d, bit format %d, stream usage %d, frame size %zu, " +
-        "period %zu, renderFlags %d, capturerFlags %d, ext {%s}.", paramHDF.sampleRate, paramHDF.channelMask,
+    DHLOGI("HDF Param: sample rate %d, channel %d, bit format %d, stream usage %d, frame size %" PRIu32
+        ", period %" PRIu32", renderFlags %d, capturerFlags %d, ext {%s}.", paramHDF.sampleRate, paramHDF.channelMask,
         paramHDF.bitFormat, paramHDF.streamUsage, paramHDF.frameSize, paramHDF.period, paramHDF.renderFlags,
         paramHDF.capturerFlags, paramHDF.ext.c_str());
     return HDF_SUCCESS;

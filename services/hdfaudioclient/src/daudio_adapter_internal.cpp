@@ -200,11 +200,11 @@ static int32_t GetPassthroughModeInternal(struct AudioAdapter *adapter, const st
 static int32_t InitAudioPortCapability(std::unique_ptr<::AudioPortCapability> &capInternal,
     AudioPortCapability &capabilityHal)
 {
-    DHLOGI("Init audio port capability internal, formatNum: %zu.", capabilityHal.formatNum);
+    DHLOGI("Init audio port capability internal, formatNum: %" PRIu32, capabilityHal.formatNum);
     constexpr uint32_t maxFormatNum = 100;
     constexpr uint32_t minFormatNum = 1;
     if (capabilityHal.formatNum < minFormatNum || capabilityHal.formatNum > maxFormatNum) {
-        DHLOGE("Init audio port capability, formatNum: %zu.", capabilityHal.formatNum);
+        DHLOGE("Init audio port capability, formatNum: %" PRIu32, capabilityHal.formatNum);
         return ERR_DH_AUDIO_HDI_INVALID_PARAM;
     }
     ::AudioFormat *audioFormats = (::AudioFormat *)malloc(capabilityHal.formatNum * sizeof(::AudioFormat));

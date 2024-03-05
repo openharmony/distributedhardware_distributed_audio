@@ -82,6 +82,7 @@ ohos_unittest("DaudioSinkDevTest") {
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
+    "hilog:libhilog",
     "hitrace:hitrace_meter",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
