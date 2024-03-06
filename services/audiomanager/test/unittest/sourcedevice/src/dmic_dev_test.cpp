@@ -91,31 +91,31 @@ HWTEST_F(DMicDevTest, DisableDMic_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: OpenDevice_001
- * @tc.desc: Verify OpenDevice function.
+ * @tc.name: CreateStream_001
+ * @tc.desc: Verify CreateStream function.
  * @tc.type: FUNC
  * @tc.require: AR000H0E5F
  */
-HWTEST_F(DMicDevTest, OpenDevice_001, TestSize.Level1)
+HWTEST_F(DMicDevTest, CreateStream_001, TestSize.Level1)
 {
-    EXPECT_EQ(DH_SUCCESS, mic_->OpenDevice(DEV_ID, DH_ID));
+    EXPECT_EQ(DH_SUCCESS, mic_->CreateStream(streamId_));
 
     eventCb_ = nullptr;
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->OpenDevice(DEV_ID, DH_ID));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->CreateStream(streamId_));
 }
 
 /**
- * @tc.name: CloseDevice_001
- * @tc.desc: Verify CloseDevice function.
+ * @tc.name: DestroyStream_001
+ * @tc.desc: Verify DestroyStream function.
  * @tc.type: FUNC
  * @tc.require: AR000H0E5F
  */
-HWTEST_F(DMicDevTest, CloseDevice_001, TestSize.Level1)
+HWTEST_F(DMicDevTest, DestroyStream_001, TestSize.Level1)
 {
-    EXPECT_EQ(DH_SUCCESS, mic_->CloseDevice(DEV_ID, DH_ID));
+    EXPECT_EQ(DH_SUCCESS, mic_->DestroyStream(streamId_));
 
     eventCb_ = nullptr;
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->CloseDevice(DEV_ID, DH_ID));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->DestroyStream(streamId_));
 }
 
 /**
@@ -135,7 +135,7 @@ HWTEST_F(DMicDevTest, SetParameters_001, TestSize.Level1)
         .period = 0,
         .ext = "Test",
     };
-    EXPECT_EQ(DH_SUCCESS, mic_->SetParameters(DEV_ID, DH_ID, param));
+    EXPECT_EQ(DH_SUCCESS, mic_->SetParameters(streamId_, param));
     mic_->GetAudioParam();
 }
 
@@ -148,13 +148,13 @@ HWTEST_F(DMicDevTest, SetParameters_001, TestSize.Level1)
 HWTEST_F(DMicDevTest, NotifyEvent_001, TestSize.Level1)
 {
     AudioEvent event = AudioEvent(OPEN_MIC, "OPEN_MIC");
-    EXPECT_EQ(DH_SUCCESS, mic_->NotifyEvent(DEV_ID, DH_ID, event));
+    EXPECT_EQ(DH_SUCCESS, mic_->NotifyEvent(streamId_, event));
 
     event.type = EVENT_UNKNOWN;
-    EXPECT_EQ(DH_SUCCESS, mic_->NotifyEvent(DEV_ID, DH_ID, event));
+    EXPECT_EQ(DH_SUCCESS, mic_->NotifyEvent(streamId_, event));
 
     eventCb_ = nullptr;
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->NotifyEvent(DEV_ID, DH_ID, event));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->NotifyEvent(streamId_, event));
 }
 
 /**
@@ -279,11 +279,11 @@ HWTEST_F(DMicDevTest, ReadStreamData_001, TestSize.Level1)
     mic_->curStatus_ = AudioStatus::STATUS_START;
     const size_t capacity = 1;
     auto writeData = std::make_shared<AudioData>(capacity);
-    EXPECT_EQ(DH_SUCCESS, mic_->WriteStreamData(DEV_ID, DH_ID, writeData));
+    EXPECT_EQ(DH_SUCCESS, mic_->WriteStreamData(streamId_, writeData));
 
     std::shared_ptr<AudioData> readData = nullptr;
     mic_->dataQueue_.push(writeData);
-    EXPECT_EQ(DH_SUCCESS, mic_->ReadStreamData(DEV_ID, DH_ID, readData));
+    EXPECT_EQ(DH_SUCCESS, mic_->ReadStreamData(streamId_, readData));
     for (size_t i = 0; i < 11; ++i) {
         auto data = std::make_shared<AudioData>(DEFAULT_AUDIO_DATA_SIZE);
         mic_->dataQueue_.push(data);
@@ -292,7 +292,7 @@ HWTEST_F(DMicDevTest, ReadStreamData_001, TestSize.Level1)
     mic_->FillJitterQueue();
 
     std::shared_ptr<AudioData> readData1 = nullptr;
-    EXPECT_EQ(DH_SUCCESS, mic_->ReadStreamData(DEV_ID, DH_ID, readData1));
+    EXPECT_EQ(DH_SUCCESS, mic_->ReadStreamData(streamId_, readData1));
 }
 
 /**

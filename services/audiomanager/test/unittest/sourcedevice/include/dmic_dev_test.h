@@ -35,6 +35,7 @@ public:
     void TearDown();
 
     std::shared_ptr<DMicDev> mic_ = nullptr;
+    int32_t streamId_ = 0;
     std::shared_ptr<IAudioEventCallback> eventCb_ = nullptr;
 };
 } // namespace DistributedHardware

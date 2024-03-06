@@ -55,44 +55,42 @@ public:
     MockIDAudioHdiCallback() {}
     ~MockIDAudioHdiCallback() {}
 
-    int32_t OpenDevice(const std::string &devId, const int32_t dhId) override
+    int32_t CreateStream(const int32_t streamId) override
     {
         return DH_SUCCESS;
     }
 
-    int32_t CloseDevice(const std::string &devId, const int32_t dhId) override
+    int32_t DestroyStream(const int32_t streamId) override
     {
         return DH_SUCCESS;
     }
 
-    int32_t SetParameters(const std::string &devId, const int32_t dhId, const AudioParamHDF &param) override
+    int32_t SetParameters(const int32_t streamId, const AudioParamHDF &param) override
     {
         return DH_SUCCESS;
     }
 
-    int32_t NotifyEvent(const std::string &devId, const int32_t dhId, const AudioEvent &event) override
+    int32_t NotifyEvent(const int32_t streamId, const AudioEvent &event) override
     {
         return DH_SUCCESS;
     }
 
-    int32_t WriteStreamData(const std::string &devId, const int32_t dhId, std::shared_ptr<AudioData> &data) override
+    int32_t WriteStreamData(const int32_t streamId, std::shared_ptr<AudioData> &data) override
     {
         return DH_SUCCESS;
     }
 
-    int32_t ReadStreamData(const std::string &devId, const int32_t dhId, std::shared_ptr<AudioData> &data) override
+    int32_t ReadStreamData(const int32_t streamId, std::shared_ptr<AudioData> &data) override
     {
         return DH_SUCCESS;
     }
 
-    int32_t ReadMmapPosition(const std::string &devId, const int32_t dhId,
-        uint64_t &frames, CurrentTimeHDF &time)
+    int32_t ReadMmapPosition(const int32_t streamId, uint64_t &frames, CurrentTimeHDF &time)
     {
         return DH_SUCCESS;
     }
 
-    int32_t RefreshAshmemInfo(const std::string &devId, const int32_t dhId,
-        int32_t fd, int32_t ashmemLength, int32_t lengthPerTrans)
+    int32_t RefreshAshmemInfo(const int32_t streamId, int32_t fd, int32_t ashmemLength, int32_t lengthPerTrans)
     {
         return DH_SUCCESS;
     }

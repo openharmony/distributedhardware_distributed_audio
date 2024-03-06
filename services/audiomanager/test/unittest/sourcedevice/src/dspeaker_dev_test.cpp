@@ -88,31 +88,31 @@ HWTEST_F(DSpeakerDevTest, DisableDSpeaker_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: OpenDevice_001
- * @tc.desc: Verify OpenDevice function.
+ * @tc.name: CreateStream_001
+ * @tc.desc: Verify CreateStream function.
  * @tc.type: FUNC
  * @tc.require: AR000H0E5F
  */
-HWTEST_F(DSpeakerDevTest, OpenDevice_001, TestSize.Level1)
+HWTEST_F(DSpeakerDevTest, CreateStream_001, TestSize.Level1)
 {
-    EXPECT_EQ(DH_SUCCESS, spk_->OpenDevice(DEV_ID, DH_ID));
+    EXPECT_EQ(DH_SUCCESS, spk_->CreateStream(streamId_));
 
     eventCb_ = nullptr;
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, spk_->OpenDevice(DEV_ID, DH_ID));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, spk_->CreateStream(streamId_));
 }
 
 /**
- * @tc.name: CloseDevice_001
- * @tc.desc: Verify CloseDevice function.
+ * @tc.name: DestroyStream_001
+ * @tc.desc: Verify DestroyStream function.
  * @tc.type: FUNC
  * @tc.require: AR000H0E5F
  */
-HWTEST_F(DSpeakerDevTest, CloseDevice_001, TestSize.Level1)
+HWTEST_F(DSpeakerDevTest, DestroyStream_001, TestSize.Level1)
 {
-    EXPECT_EQ(DH_SUCCESS, spk_->CloseDevice(DEV_ID, DH_ID));
+    EXPECT_EQ(DH_SUCCESS, spk_->DestroyStream(streamId_));
 
     eventCb_ = nullptr;
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, spk_->CloseDevice(DEV_ID, DH_ID));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, spk_->DestroyStream(streamId_));
 }
 
 /**
@@ -132,7 +132,7 @@ HWTEST_F(DSpeakerDevTest, SetParameters_001, TestSize.Level1)
         .period = 0,
         .ext = "Test",
     };
-    EXPECT_EQ(DH_SUCCESS, spk_->SetParameters(DEV_ID, DH_ID, param));
+    EXPECT_EQ(DH_SUCCESS, spk_->SetParameters(streamId_, param));
     spk_->GetAudioParam();
 }
 
@@ -145,13 +145,13 @@ HWTEST_F(DSpeakerDevTest, SetParameters_001, TestSize.Level1)
 HWTEST_F(DSpeakerDevTest, NotifyEvent_001, TestSize.Level1)
 {
     AudioEvent event = AudioEvent(OPEN_SPEAKER, "OPEN_SPEAKER");
-    EXPECT_EQ(DH_SUCCESS, spk_->NotifyEvent(DEV_ID, DH_ID, event));
+    EXPECT_EQ(DH_SUCCESS, spk_->NotifyEvent(streamId_, event));
 
     event.type = EVENT_UNKNOWN;
-    EXPECT_EQ(DH_SUCCESS, spk_->NotifyEvent(DEV_ID, DH_ID, event));
+    EXPECT_EQ(DH_SUCCESS, spk_->NotifyEvent(streamId_, event));
 
     eventCb_ = nullptr;
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, spk_->NotifyEvent(DEV_ID, DH_ID, event));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, spk_->NotifyEvent(streamId_, event));
 }
 
 /**
@@ -287,7 +287,7 @@ HWTEST_F(DSpeakerDevTest, Restart_001, TestSize.Level1)
         .period = 0,
         .ext = "Test",
     };
-    EXPECT_EQ(DH_SUCCESS, spk_->SetParameters(DEV_ID, DH_ID, param));
+    EXPECT_EQ(DH_SUCCESS, spk_->SetParameters(streamId_, param));
     spk_->speakerTrans_ = std::make_shared<AVTransSenderTransport>(DEV_ID, spk_);
     EXPECT_NE(DH_SUCCESS, spk_->Restart());
 
@@ -323,10 +323,10 @@ HWTEST_F(DSpeakerDevTest, WriteStreamData_001, TestSize.Level1)
 {
     const size_t capacity = 1;
     auto writeData = std::make_shared<AudioData>(capacity);
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, spk_->WriteStreamData(DEV_ID, DH_ID, writeData));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, spk_->WriteStreamData(streamId_, writeData));
 
     std::shared_ptr<AudioData> readData = nullptr;
-    EXPECT_EQ(DH_SUCCESS, spk_->ReadStreamData(DEV_ID, DH_ID, readData));
+    EXPECT_EQ(DH_SUCCESS, spk_->ReadStreamData(streamId_, readData));
 
     std::shared_ptr<AudioData> data = nullptr;
     EXPECT_EQ(DH_SUCCESS, spk_->OnDecodeTransDataDone(data));
@@ -343,10 +343,10 @@ HWTEST_F(DSpeakerDevTest, WriteStreamData_002, TestSize.Level1)
     const size_t capacity = 1;
     auto writeData = std::make_shared<AudioData>(capacity);
     spk_->speakerTrans_ = std::make_shared<AVTransSenderTransport>(DEV_ID, spk_);
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, spk_->WriteStreamData(DEV_ID, DH_ID, writeData));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, spk_->WriteStreamData(streamId_, writeData));
 
     spk_->speakerTrans_ = std::make_shared<MockIAudioDataTransport>();
-    EXPECT_EQ(DH_SUCCESS, spk_->WriteStreamData(DEV_ID, DH_ID, writeData));
+    EXPECT_EQ(DH_SUCCESS, spk_->WriteStreamData(streamId_, writeData));
 }
 
 /**

@@ -34,6 +34,7 @@ public:
     void SetUp();
     void TearDown();
 
+    int32_t streamId_ = 0;
     std::shared_ptr<DSpeakerDev> spk_ = nullptr;
     std::shared_ptr<IAudioEventCallback> eventCb_ = nullptr;
 };
