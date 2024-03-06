@@ -66,9 +66,9 @@ int32_t DAudioSinkManager::Init(const sptr<IDAudioSinkIpcCallback> &sinkCallback
     initCallback_ = std::make_shared<DeviceInitCallback>();
     ipcSinkCallback_ = sinkCallback;
     CHECK_AND_RETURN_RET_LOG(GetLocalDeviceNetworkId(localNetworkId_) != DH_SUCCESS,
-        ERR_DH_AUDIO_FAILED, "%s", "Get local network id failed.");
+        ERR_DH_AUDIO_FAILED, "%{public}s", "Get local network id failed.");
     CHECK_AND_RETURN_RET_LOG(LoadAVReceiverEngineProvider() != DH_SUCCESS,
-        ERR_DH_AUDIO_FAILED, "%s", "Load av receiver engine failed.");
+        ERR_DH_AUDIO_FAILED, "%{public}s", "Load av receiver engine failed.");
     CHECK_NULL_RETURN(rcvProviderPtr_, ERR_DH_AUDIO_FAILED);
     providerListener_ = std::make_shared<EngineProviderListener>();
     if (rcvProviderPtr_->RegisterProviderCallback(providerListener_) != DH_SUCCESS) {
@@ -87,7 +87,7 @@ int32_t DAudioSinkManager::Init(const sptr<IDAudioSinkIpcCallback> &sinkCallback
         return ERR_DH_AUDIO_FAILED;
     }
     CHECK_AND_RETURN_RET_LOG(sendProviderPtr_->RegisterProviderCallback(providerListener_) != DH_SUCCESS,
-        ERR_DH_AUDIO_FAILED, "%s", "Register av sender engine callback failed.");
+        ERR_DH_AUDIO_FAILED, "%{public}s", "Register av sender engine callback failed.");
     DHLOGI("Load av sender engine success.");
     return DH_SUCCESS;
 }
@@ -119,7 +119,7 @@ int32_t DAudioSinkManager::UnInit()
 
 void DAudioSinkManager::OnSinkDevReleased(const std::string &devId)
 {
-    DHLOGI("Release audio device devId: %s.", GetAnonyString(devId).c_str());
+    DHLOGI("Release audio device devId: %{public}s.", GetAnonyString(devId).c_str());
     if (devClearThread_.joinable()) {
         devClearThread_.join();
     }
@@ -132,7 +132,7 @@ void DAudioSinkManager::OnSinkDevReleased(const std::string &devId)
 int32_t DAudioSinkManager::HandleDAudioNotify(const std::string &devId, const std::string &dhId,
     const int32_t eventType, const std::string &eventContent)
 {
-    DHLOGD("Receive audio event from devId: %s, event type: %d. event content: %s.",
+    DHLOGD("Receive audio event from devId: %{public}s, event type: %{public}d. event content: %{public}s.",
         GetAnonyString(devId).c_str(), eventType, eventContent.c_str());
 
     if (eventContent.length() > DAUDIO_MAX_JSON_LEN || eventContent.empty()
@@ -143,7 +143,7 @@ int32_t DAudioSinkManager::HandleDAudioNotify(const std::string &devId, const st
     // now ctrl channel is also goto here, please sure here not crash.
     cJSON *jParam = cJSON_Parse(eventContent.c_str());
     if (CJsonParamCheck(jParam, { KEY_RANDOM_TASK_CODE })) {
-        DHLOGD("Receive audio notify from source, random task code: %s",
+        DHLOGD("Receive audio notify from source, random task code: %{public}s",
             cJSON_GetObjectItemCaseSensitive(jParam, KEY_RANDOM_TASK_CODE)->valuestring);
     }
     bool isDevExisted = false;
@@ -152,7 +152,7 @@ int32_t DAudioSinkManager::HandleDAudioNotify(const std::string &devId, const st
         isDevExisted = audioDevMap_.find(devId) != audioDevMap_.end();
     }
     if (!isDevExisted) {
-        DHLOGE("Device is not exist, devId: %s, dhId: %s.", GetAnonyString(devId).c_str(),
+        DHLOGE("Device is not exist, devId: %{public}s, dhId: %{public}s.", GetAnonyString(devId).c_str(),
             GetAnonyString(dhId).c_str());
         cJSON_Delete(jParam);
         return ERR_DH_AUDIO_FAILED;
@@ -169,7 +169,7 @@ int32_t DAudioSinkManager::CreateAudioDevice(const std::string &devId)
     {
         std::lock_guard<std::mutex> lock(devMapMutex_);
         if (audioDevMap_.find(devId) != audioDevMap_.end()) {
-            DHLOGI("Audio sink dev in map. devId: %s.", GetAnonyString(devId).c_str());
+            DHLOGI("Audio sink dev in map. devId: %{public}s.", GetAnonyString(devId).c_str());
             dev = audioDevMap_[devId];
         } else {
             dev = std::make_shared<DAudioSinkDev>(devId, ipcSinkCallback_);
@@ -202,7 +202,7 @@ int32_t DAudioSinkManager::CreateAudioDevice(const std::string &devId)
 int32_t DAudioSinkManager::DAudioNotify(const std::string &devId, const std::string &dhId, const int32_t eventType,
     const std::string &eventContent)
 {
-    DHLOGD("Distributed audio notify, devId: %s, dhId: %s, eventType: %d.",
+    DHLOGD("Distributed audio notify, devId: %{public}s, dhId: %{public}s, eventType: %{public}d.",
         GetAnonyString(devId).c_str(), dhId.c_str(), eventType);
 
     {
@@ -236,9 +236,9 @@ void DAudioSinkManager::NotifyEvent(const std::string &devId, const int32_t even
 {
     AudioEvent audioEvent(eventType, eventContent);
     std::lock_guard<std::mutex> lock(devMapMutex_);
-    DHLOGI("Notify event, devId: %s.", GetAnonyString(devId).c_str());
+    DHLOGI("Notify event, devId: %{public}s.", GetAnonyString(devId).c_str());
     CHECK_AND_RETURN_LOG(audioDevMap_.find(devId) == audioDevMap_.end(),
-        "%s", "Notify event error, dev not exist.");
+        "%{public}s", "Notify event error, dev not exist.");
     CHECK_NULL_VOID(audioDevMap_[devId]);
     audioDevMap_[devId]->NotifyEvent(audioEvent);
 }
@@ -271,7 +271,7 @@ int32_t DAudioSinkManager::LoadAVReceiverEngineProvider()
     AVTransProviderClass getEngineFactoryFunc = (AVTransProviderClass)dlsym(pRHandler_,
         GET_RECEIVER_PROVIDER_FUNC.c_str());
     if (getEngineFactoryFunc == nullptr) {
-        DHLOGE("av transport engine factory function handler is null, failed reason : %s", dlerror());
+        DHLOGE("av transport engine factory function handler is null, failed reason : %{public}s", dlerror());
         dlclose(pRHandler_);
         pRHandler_ = nullptr;
         return ERR_DH_AUDIO_NULLPTR;
@@ -306,7 +306,7 @@ int32_t DAudioSinkManager::LoadAVSenderEngineProvider()
     AVTransProviderClass getEngineFactoryFunc = (AVTransProviderClass)dlsym(pSHandler_,
         GET_SENDER_PROVIDER_FUNC.c_str());
     if (getEngineFactoryFunc == nullptr) {
-        DHLOGE("av transport engine factory function handler is null, failed reason : %s", dlerror());
+        DHLOGE("av transport engine factory function handler is null, failed reason : %{public}s", dlerror());
         dlclose(pSHandler_);
         pSHandler_ = nullptr;
         return ERR_DH_AUDIO_NULLPTR;
@@ -327,7 +327,7 @@ int32_t DAudioSinkManager::UnloadAVSenderEngineProvider()
 
 void DAudioSinkManager::SetChannelState(const std::string &content)
 {
-    DHLOGI("The channel state belong to %s.", content.c_str());
+    DHLOGI("The channel state belong to %{public}s.", content.c_str());
     if (content.find(OWNER_NAME_D_SPEAKER) != content.npos) {
         channelState_ = ChannelState::SPK_CONTROL_OPENED;
     } else if (content.find(OWNER_NAME_D_MIC) != content.npos) {
@@ -337,14 +337,14 @@ void DAudioSinkManager::SetChannelState(const std::string &content)
 
 int32_t EngineProviderListener::OnProviderEvent(const AVTransEvent &event)
 {
-    DHLOGI("On provider event :%d, eventContent: %s.", event.type, event.content.c_str());
+    DHLOGI("On event :%{public}d, eventContent: %{public}s.", event.type, event.content.c_str());
     if (event.type == EventType::EVENT_CHANNEL_OPENED) {
-        DHLOGI("Received control channel opened event, create audio device for peerDevId=%s, content=%s.",
-            GetAnonyString(event.peerDevId).c_str(), event.content.c_str());
+        DHLOGI("Received control channel opened event, create audio device for peerDevId=%{public}s, "
+            "content=%{public}s.", GetAnonyString(event.peerDevId).c_str(), event.content.c_str());
         DAudioSinkManager::GetInstance().SetChannelState(event.content);
         DAudioSinkManager::GetInstance().CreateAudioDevice(event.peerDevId);
     } else if (event.type == EventType::EVENT_CHANNEL_CLOSED) {
-        DHLOGI("Received control channel closed event, clear audio device for peerDevId=%s",
+        DHLOGI("Received control channel closed event, clear audio device for peerDevId=%{public}s",
             GetAnonyString(event.peerDevId).c_str());
         std::string eventStr = event.content;
         DAudioSinkManager::GetInstance().NotifyEvent(event.peerDevId, DISABLE_DEVICE, eventStr);
@@ -358,7 +358,7 @@ int32_t DAudioSinkManager::PauseDistributedHardware(const std::string &networkId
 {
     std::lock_guard<std::mutex> lock(devMapMutex_);
     if (audioDevMap_.find(networkId) != audioDevMap_.end()) {
-        DHLOGI("Audio sink dev in map. devId: %s.", GetAnonyString(networkId).c_str());
+        DHLOGI("Audio sink dev in map. devId: %{public}s.", GetAnonyString(networkId).c_str());
         audioDevMap_[networkId]->PauseDistributedHardware(networkId);
     }
     return DH_SUCCESS;
@@ -368,7 +368,7 @@ int32_t DAudioSinkManager::ResumeDistributedHardware(const std::string &networkI
 {
     std::lock_guard<std::mutex> lock(devMapMutex_);
     if (audioDevMap_.find(networkId) != audioDevMap_.end()) {
-        DHLOGI("Audio sink dev in map. devId: %s.", GetAnonyString(networkId).c_str());
+        DHLOGI("Audio sink dev in map. devId: %{public}s.", GetAnonyString(networkId).c_str());
         audioDevMap_[networkId]->ResumeDistributedHardware(networkId);
     }
     return DH_SUCCESS;
@@ -378,7 +378,7 @@ int32_t DAudioSinkManager::StopDistributedHardware(const std::string &networkId)
 {
     std::lock_guard<std::mutex> lock(devMapMutex_);
     if (audioDevMap_.find(networkId) != audioDevMap_.end()) {
-        DHLOGI("Audio sink dev in map. devId: %s.", GetAnonyString(networkId).c_str());
+        DHLOGI("Audio sink dev in map. devId: %{public}s.", GetAnonyString(networkId).c_str());
         audioDevMap_[networkId]->StopDistributedHardware(networkId);
     }
     return DH_SUCCESS;
@@ -386,7 +386,8 @@ int32_t DAudioSinkManager::StopDistributedHardware(const std::string &networkId)
 
 bool DAudioSinkManager::CheckDeviceSecurityLevel(const std::string &srcDeviceId, const std::string &dstDeviceId)
 {
-    DHLOGI("CheckDeviceSecurityLevel srcDeviceId %s, dstDeviceId %s.", srcDeviceId.c_str(), dstDeviceId.c_str());
+    DHLOGI("CheckDeviceSecurityLevel srcDeviceId %{public}s, dstDeviceId %{public}s.",
+        srcDeviceId.c_str(), dstDeviceId.c_str());
     std::string srcUdid = GetUdidByNetworkId(srcDeviceId);
     if (srcUdid.empty()) {
         DHLOGE("src udid is empty");
@@ -397,11 +398,11 @@ bool DAudioSinkManager::CheckDeviceSecurityLevel(const std::string &srcDeviceId,
         DHLOGE("dst udid is empty");
         return false;
     }
-    DHLOGI("CheckDeviceSecurityLevel srcUdid %s, dstUdid %s.", srcUdid.c_str(), dstUdid.c_str());
+    DHLOGI("CheckDeviceSecurityLevel srcUdid %{public}s, dstUdid %{public}s.", srcUdid.c_str(), dstUdid.c_str());
     int32_t srcDeviceSecurityLevel = GetDeviceSecurityLevel(srcUdid);
     int32_t dstDeviceSecurityLevel = GetDeviceSecurityLevel(dstUdid);
-    DHLOGI("SrcDeviceSecurityLevel, level is %d", srcDeviceSecurityLevel);
-    DHLOGI("dstDeviceSecurityLevel, level is %d", dstDeviceSecurityLevel);
+    DHLOGI("SrcDeviceSecurityLevel, level is %{public}d", srcDeviceSecurityLevel);
+    DHLOGI("dstDeviceSecurityLevel, level is %{public}d", dstDeviceSecurityLevel);
     if (srcDeviceSecurityLevel == DEFAULT_DEVICE_SECURITY_LEVEL ||
         srcDeviceSecurityLevel < dstDeviceSecurityLevel) {
         DHLOGE("The device security of source device is lower.");
@@ -416,24 +417,24 @@ int32_t DAudioSinkManager::GetDeviceSecurityLevel(const std::string &udid)
     devIdentify.length = DEVICE_ID_MAX_LEN;
     int32_t ret = memcpy_s(devIdentify.identity, DEVICE_ID_MAX_LEN, udid.c_str(), DEVICE_ID_MAX_LEN);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Str copy failed %d", ret);
+        DHLOGE("Str copy failed %{public}d", ret);
         return DEFAULT_DEVICE_SECURITY_LEVEL;
     }
     DeviceSecurityInfo *info = nullptr;
     ret = RequestDeviceSecurityInfo(&devIdentify, nullptr, &info);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Request device security info failed %d", ret);
+        DHLOGE("Request device security info failed %{public}d", ret);
         FreeDeviceSecurityInfo(info);
         info = nullptr;
         return DEFAULT_DEVICE_SECURITY_LEVEL;
     }
     int32_t level = 0;
     ret = GetDeviceSecurityLevelValue(info, &level);
-    DHLOGE("Get device security level, level is %d", level);
+    DHLOGE("Get device security level, level is %{public}d", level);
     FreeDeviceSecurityInfo(info);
     info = nullptr;
     if (ret != DH_SUCCESS) {
-        DHLOGE("Get device security level failed %d", ret);
+        DHLOGE("Get device security level failed %{public}d", ret);
         return DEFAULT_DEVICE_SECURITY_LEVEL;
     }
     return level;
@@ -447,12 +448,12 @@ std::string DAudioSinkManager::GetUdidByNetworkId(const std::string &networkId)
     }
     int32_t ret = DeviceManager::GetInstance().InitDeviceManager(PKG_NAME, initCallback_);
     if (ret != ERR_OK) {
-        DHLOGE("InitDeviceManager failed ret = %d", ret);
+        DHLOGE("InitDeviceManager failed ret = %{public}d", ret);
     }
     std::string udid = "";
     ret = DeviceManager::GetInstance().GetUdidByNetworkId(PKG_NAME, networkId, udid);
     if (ret != ERR_OK) {
-        DHLOGE("GetUdidByNetworkId failed ret = %d", ret);
+        DHLOGE("GetUdidByNetworkId failed ret = %{public}d", ret);
         return "";
     }
     return udid;
@@ -464,10 +465,10 @@ int32_t DAudioSinkManager::VerifySecurityLevel(const std::string &devId)
     int32_t ret = ipcSinkCallback_->OnNotifyResourceInfo(ResourceEventType::EVENT_TYPE_QUERY_RESOURCE, subType, devId,
         isSensitive_, isSameAccount_);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Query resource failed, ret: %d", ret);
+        DHLOGE("Query resource failed, ret: %{public}d", ret);
         return ret;
     }
-    DHLOGI("VerifySecurityLevel isSensitive: %d, isSameAccount: %d", isSensitive_, isSameAccount_);
+    DHLOGI("VerifySecurityLevel isSensitive: %{public}d, isSameAccount: %{public}d", isSensitive_, isSameAccount_);
     if (isSensitive_ && !isSameAccount_) {
         DHLOGE("Privacy resource must be logged in with same account.");
         return ERR_DH_AUDIO_FAILED;
@@ -476,7 +477,7 @@ int32_t DAudioSinkManager::VerifySecurityLevel(const std::string &devId)
     std::string sinkDevId = "";
     ret = GetLocalDeviceNetworkId(sinkDevId);
     if (ret != DH_SUCCESS) {
-        DHLOGE("GetLocalDeviceNetworkId failed, ret: %d", ret);
+        DHLOGE("GetLocalDeviceNetworkId failed, ret: %{public}d", ret);
         return ret;
     }
     if (isSensitive_ && !CheckDeviceSecurityLevel(devId, sinkDevId)) {

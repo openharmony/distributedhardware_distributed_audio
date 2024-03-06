@@ -58,7 +58,7 @@ DAudioSinkStub::~DAudioSinkStub()
 
 int32_t DAudioSinkStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    DHLOGD("On remote request, code: %d.", code);
+    DHLOGD("On remote request, code: %{public}d.", code);
     std::u16string desc = DAudioSinkStub::GetDescriptor();
     std::u16string remoteDesc = data.ReadInterfaceToken();
     if (desc != remoteDesc) {

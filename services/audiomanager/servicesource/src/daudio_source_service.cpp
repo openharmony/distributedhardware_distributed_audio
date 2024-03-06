@@ -87,7 +87,7 @@ int32_t DAudioSourceService::ReleaseSource()
     CHECK_NULL_RETURN(systemAbilityMgr, ERR_DH_AUDIO_NULLPTR);
     int32_t ret = systemAbilityMgr->UnloadSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SOURCE_SA_ID);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Source systemabilitymgr unloadsystemability failed, ret: %d", ret);
+        DHLOGE("Source systemabilitymgr unloadsystemability failed, ret: %{public}d", ret);
         return ERR_DH_AUDIO_SA_LOAD_FAILED;
     }
     DHLOGI("Source systemabilitymgr unloadsystemability successfully!");
@@ -97,7 +97,7 @@ int32_t DAudioSourceService::ReleaseSource()
 int32_t DAudioSourceService::RegisterDistributedHardware(const std::string &devId, const std::string &dhId,
     const EnableParam &param, const std::string &reqId)
 {
-    DHLOGI("Register distributed audio device, devId: %s, dhId: %s.", GetAnonyString(devId).c_str(),
+    DHLOGI("Register distributed audio device, devId: %{public}s, dhId: %{public}s.", GetAnonyString(devId).c_str(),
         dhId.c_str());
     std::string version = param.sinkVersion;
     std::string attrs = param.sinkAttrs;
@@ -107,7 +107,7 @@ int32_t DAudioSourceService::RegisterDistributedHardware(const std::string &devI
 int32_t DAudioSourceService::UnregisterDistributedHardware(const std::string &devId, const std::string &dhId,
     const std::string &reqId)
 {
-    DHLOGI("Unregister distributed audio device, devId: %s, dhId: %s.", GetAnonyString(devId).c_str(),
+    DHLOGI("Unregister distributed audio device, devId: %{public}s, dhId: %{public}s.", GetAnonyString(devId).c_str(),
         dhId.c_str());
     return DAudioSourceManager::GetInstance().DisableDAudio(devId, dhId, reqId);
 }
@@ -115,7 +115,7 @@ int32_t DAudioSourceService::UnregisterDistributedHardware(const std::string &de
 int32_t DAudioSourceService::ConfigDistributedHardware(const std::string &devId, const std::string &dhId,
     const std::string &key, const std::string &value)
 {
-    DHLOGI("Config distributed audio device, devId: %s, dhId: %s.", GetAnonyString(devId).c_str(),
+    DHLOGI("Config distributed audio device, devId: %{public}s, dhId: %{public}s.", GetAnonyString(devId).c_str(),
         dhId.c_str());
     return DH_SUCCESS;
 }
@@ -123,7 +123,7 @@ int32_t DAudioSourceService::ConfigDistributedHardware(const std::string &devId,
 void DAudioSourceService::DAudioNotify(const std::string &devId, const std::string &dhId, const int32_t eventType,
     const std::string &eventContent)
 {
-    DHLOGD("Notify distributed audio device, devId: %s, dhId: %s.", GetAnonyString(devId).c_str(),
+    DHLOGD("Notify distributed audio device, devId: %{public}s, dhId: %{public}s.", GetAnonyString(devId).c_str(),
         dhId.c_str());
     DAudioSourceManager::GetInstance().HandleDAudioNotify(devId, dhId, eventType, eventContent);
 }
@@ -142,7 +142,7 @@ int DAudioSourceService::Dump(int32_t fd, const std::vector<std::u16string>& arg
         return ERR_DH_AUDIO_BAD_VALUE;
     }
 
-    int ret = dprintf(fd, "%s\n", result.c_str());
+    int ret = dprintf(fd, "%{public}s\n", result.c_str());
     if (ret < 0) {
         DHLOGE("Dprintf error");
         return ERR_DH_AUDIO_BAD_VALUE;

@@ -103,11 +103,12 @@ std::vector<DHItem> DAudioHandler::Query()
         }
         dhItem.attrs = jsonInfo;
         dhItemVec.push_back(dhItem);
-        DHLOGD("Query result: dhId: %d, subtype: %s, attrs: %s.", dhId, dhItem.subtype.c_str(), jsonInfo);
+        DHLOGD("Query result: dhId: %{public}d, subtype: %{public}s, attrs: %{public}s.",
+            dhId, dhItem.subtype.c_str(), jsonInfo);
         if (dhId == DEFAULT_RENDER_ID) {
             dhItem.dhId = std::to_string(LOW_LATENCY_RENDER_ID);
             dhItemVec.push_back(dhItem);
-            DHLOGD("Query result: dhId: %d, attrs: %s.", LOW_LATENCY_RENDER_ID, jsonInfo);
+            DHLOGD("Query result: dhId: %{public}d, attrs: %{public}s.", LOW_LATENCY_RENDER_ID, jsonInfo);
         }
         cJSON_Delete(infoJson);
         cJSON_free(jsonInfo);

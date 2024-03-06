@@ -38,10 +38,10 @@ namespace OHOS {
 namespace DistributedHardware {
 int32_t DSpeakerDev::EnableDevice(const int32_t dhId, const std::string &capability)
 {
-    DHLOGI("Enable IO device, device pin: %d.", dhId);
+    DHLOGI("Enable IO device, device pin: %{public}d.", dhId);
     int32_t ret = DAudioHdiHandler::GetInstance().RegisterAudioDevice(devId_, dhId, capability, shared_from_this());
     if (ret != DH_SUCCESS) {
-        DHLOGE("Register device failed, ret: %d.", ret);
+        DHLOGE("Register device failed, ret: %{public}d.", ret);
         DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_REGISTER_FAIL, devId_, std::to_string(dhId), ret,
             "daudio register device failed.");
         return ret;
@@ -52,10 +52,10 @@ int32_t DSpeakerDev::EnableDevice(const int32_t dhId, const std::string &capabil
 
 int32_t DSpeakerDev::DisableDevice(const int32_t dhId)
 {
-    DHLOGI("Disable IO device, device pin: %d.", dhId);
+    DHLOGI("Disable IO device, device pin: %{public}d.", dhId);
     int32_t ret = DAudioHdiHandler::GetInstance().UnRegisterAudioDevice(devId_, dhId);
     if (ret != DH_SUCCESS) {
-        DHLOGE("UnRegister failed, ret: %d.", ret);
+        DHLOGE("UnRegister failed, ret: %{public}d.", ret);
         DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_UNREGISTER_FAIL, devId_, std::to_string(dhId), ret,
             "daudio unregister device failed.");
         return ret;
@@ -101,14 +101,14 @@ void DSpeakerDev::OnEngineTransEvent(const AVTransEvent &event)
 void DSpeakerDev::OnEngineTransMessage(const std::shared_ptr<AVTransMessage> &message)
 {
     CHECK_NULL_VOID(message);
-    DHLOGI("On Engine message, type : %s.", GetEventNameByType(message->type_).c_str());
+    DHLOGI("On Engine message, type : %{public}s.", GetEventNameByType(message->type_).c_str());
     DAudioSourceManager::GetInstance().HandleDAudioNotify(message->dstDevId_, message->dstDevId_,
         message->type_, message->content_);
 }
 
 int32_t DSpeakerDev::OpenDevice(const std::string &devId, const int32_t dhId)
 {
-    DHLOGI("Open speaker device devId: %s, dhId: %d.", GetAnonyString(devId).c_str(), dhId);
+    DHLOGI("Open speaker device devId: %{public}s, dhId: %{public}d.", GetAnonyString(devId).c_str(), dhId);
     std::shared_ptr<IAudioEventCallback> cbObj = audioEventCallback_.lock();
     CHECK_NULL_RETURN(cbObj, ERR_DH_AUDIO_NULLPTR);
 
@@ -133,7 +133,7 @@ int32_t DSpeakerDev::OpenDevice(const std::string &devId, const int32_t dhId)
 
 int32_t DSpeakerDev::CloseDevice(const std::string &devId, const int32_t dhId)
 {
-    DHLOGI("Close speaker device devId: %s, dhId: %d.", GetAnonyString(devId).c_str(), dhId);
+    DHLOGI("Close speaker device devId: %{public}s, dhId: %{public}d.", GetAnonyString(devId).c_str(), dhId);
     std::shared_ptr<IAudioEventCallback> cbObj = audioEventCallback_.lock();
     CHECK_NULL_RETURN(cbObj, ERR_DH_AUDIO_NULLPTR);
 
@@ -159,10 +159,10 @@ int32_t DSpeakerDev::CloseDevice(const std::string &devId, const int32_t dhId)
 
 int32_t DSpeakerDev::SetParameters(const std::string &devId, const int32_t dhId, const AudioParamHDF &param)
 {
-    DHLOGD("Set speaker parameters {samplerate: %d, channelmask: %d, format: %d, streamusage: %d, period: %d, "
-        "framesize: %d, renderFlags: %d, ext{%s}}.",
-        param.sampleRate, param.channelMask, param.bitFormat, param.streamUsage, param.period, param.frameSize,
-        param.renderFlags, param.ext.c_str());
+    DHLOGD("Set speaker parameters {samplerate: %{public}d, channelmask: %{public}d, format: %{public}d, "
+        "streamusage: %{public}d, period: %{public}d, framesize: %{public}d, renderFlags: %{public}d, "
+        "ext{%{public}s}}.", param.sampleRate, param.channelMask, param.bitFormat, param.streamUsage,
+        param.period, param.frameSize, param.renderFlags, param.ext.c_str());
     curPort_ = dhId;
     paramHDF_ = param;
 
@@ -194,7 +194,7 @@ int32_t DSpeakerDev::SetUp()
 
     int32_t ret = speakerTrans_->SetUp(param_, param_, shared_from_this(), CAP_SPK);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Speaker trans set up failed. ret:%d", ret);
+        DHLOGE("Speaker trans set up failed. ret:%{public}d", ret);
         return ret;
     }
     return DH_SUCCESS;
@@ -206,14 +206,14 @@ int32_t DSpeakerDev::Start()
     CHECK_NULL_RETURN(speakerTrans_, ERR_DH_AUDIO_NULLPTR);
     int32_t ret = speakerTrans_->Start();
     if (ret != DH_SUCCESS) {
-        DHLOGE("Speaker trans start failed, ret: %d.", ret);
+        DHLOGE("Speaker trans start failed, ret: %{public}d.", ret);
         return ret;
     }
     std::unique_lock<std::mutex> lck(channelWaitMutex_);
     auto status = channelWaitCond_.wait_for(lck, std::chrono::seconds(CHANNEL_WAIT_SECONDS),
         [this]() { return isTransReady_.load(); });
     if (!status) {
-        DHLOGE("Wait channel open timeout(%ds).", CHANNEL_WAIT_SECONDS);
+        DHLOGE("Wait channel open timeout(%{public}ds).", CHANNEL_WAIT_SECONDS);
         return ERR_DH_AUDIO_SA_WAIT_TIMEOUT;
     }
     isOpened_.store(true);
@@ -228,7 +228,7 @@ int32_t DSpeakerDev::Stop()
     isTransReady_.store(false);
     int32_t ret = speakerTrans_->Stop();
     if (ret != DH_SUCCESS) {
-        DHLOGE("Stop speaker trans failed, ret: %d.", ret);
+        DHLOGE("Stop speaker trans failed, ret: %{public}d.", ret);
         return ret;
     }
     return DH_SUCCESS;
@@ -246,7 +246,7 @@ int32_t DSpeakerDev::Release()
     CHECK_NULL_RETURN(speakerTrans_, DH_SUCCESS);
     int32_t ret = speakerTrans_->Release();
     if (ret != DH_SUCCESS) {
-        DHLOGE("Release speaker trans failed, ret: %d.", ret);
+        DHLOGE("Release speaker trans failed, ret: %{public}d.", ret);
     }
     dumpFlag_.store(false);
     return DH_SUCCESS;
@@ -258,7 +258,7 @@ int32_t DSpeakerDev::Pause()
     CHECK_NULL_RETURN(speakerTrans_, ERR_DH_AUDIO_NULLPTR);
     int32_t ret = speakerTrans_->Pause();
     if (ret != DH_SUCCESS) {
-        DHLOGE("Pause speaker trans failed, ret: %d.", ret);
+        DHLOGE("Pause speaker trans failed, ret: %{public}d.", ret);
         return ret;
     }
     DHLOGI("Pause success.");
@@ -271,7 +271,7 @@ int32_t DSpeakerDev::Restart()
     CHECK_NULL_RETURN(speakerTrans_, ERR_DH_AUDIO_NULLPTR);
     int32_t ret = speakerTrans_->Restart(param_, param_);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Restart speaker trans failed, ret: %d.", ret);
+        DHLOGE("Restart speaker trans failed, ret: %{public}d.", ret);
         return ret;
     }
     DHLOGI("Restart success.");
@@ -294,7 +294,7 @@ int32_t DSpeakerDev::ReadStreamData(const std::string &devId, const int32_t dhId
 
 int32_t DSpeakerDev::WriteStreamData(const std::string &devId, const int32_t dhId, std::shared_ptr<AudioData> &data)
 {
-    DHLOGD("Write stream data, dhId:%d", dhId);
+    DHLOGD("Write stream data, dhId:%{public}d", dhId);
     int64_t startTime = GetNowTimeUs();
     CHECK_NULL_RETURN(speakerTrans_, ERR_DH_AUDIO_NULLPTR);
 #ifdef DUMP_DSPEAKERDEV_FILE
@@ -309,13 +309,13 @@ int32_t DSpeakerDev::WriteStreamData(const std::string &devId, const int32_t dhI
 #endif
     int32_t ret = speakerTrans_->FeedAudioData(data);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Write stream data failed, ret: %d.", ret);
+        DHLOGE("Write stream data failed, ret: %{public}d.", ret);
         return ret;
     }
     int64_t endTime = GetNowTimeUs();
     if (IsOutDurationRange(startTime, endTime, lastwriteStartTime_)) {
-        DHLOGE("This time write data spend: %" PRId64" us, The interval of write data this time and "
-            "the last time: %" PRId64" us", endTime - startTime, startTime - lastwriteStartTime_);
+        DHLOGE("This time write data spend: %{public}" PRId64" us, The interval of write data this time and "
+            "the last time: %{public}" PRId64" us", endTime - startTime, startTime - lastwriteStartTime_);
     }
     lastwriteStartTime_ = startTime;
     return DH_SUCCESS;
@@ -324,7 +324,7 @@ int32_t DSpeakerDev::WriteStreamData(const std::string &devId, const int32_t dhI
 int32_t DSpeakerDev::ReadMmapPosition(const std::string &devId, const int32_t dhId,
     uint64_t &frames, CurrentTimeHDF &time)
 {
-    DHLOGD("Read mmap position. frames: %" PRIu64", tvsec: %" PRId64", tvNSec:%" PRId64,
+    DHLOGD("Read mmap position. frames: %{public}" PRIu64", tvsec: %{public}" PRId64", tvNSec:%{public}" PRId64,
         readNum_, readTvSec_, readTvNSec_);
     frames = readNum_;
     time.tvSec = readTvSec_;
@@ -335,7 +335,8 @@ int32_t DSpeakerDev::ReadMmapPosition(const std::string &devId, const int32_t dh
 int32_t DSpeakerDev::RefreshAshmemInfo(const std::string &devId, const int32_t dhId,
     int32_t fd, int32_t ashmemLength, int32_t lengthPerTrans)
 {
-    DHLOGD("RefreshAshmemInfo: fd:%d, ashmemLength: %d, lengthPerTrans: %d", fd, ashmemLength, lengthPerTrans);
+    DHLOGD("RefreshAshmemInfo: fd:%{public}d, ashmemLength: %{public}d, lengthPerTrans: %{public}d",
+        fd, ashmemLength, lengthPerTrans);
     if (param_.renderOpts.renderFlags == MMAP_MODE) {
         DHLOGI("DSpeaker dev low-latency mode");
         if (ashmem_ != nullptr) {
@@ -344,7 +345,7 @@ int32_t DSpeakerDev::RefreshAshmemInfo(const std::string &devId, const int32_t d
         ashmem_ = new Ashmem(fd, ashmemLength);
         ashmemLength_ = ashmemLength;
         lengthPerTrans_ = lengthPerTrans;
-        DHLOGI("Create ashmem success. fd:%d, ashmem length: %d, lengthPreTrans: %d",
+        DHLOGI("Create ashmem success. fd:%{public}d, ashmem length: %{public}d, lengthPreTrans: %{public}d",
             fd, ashmemLength_, lengthPerTrans_);
         bool mapRet = ashmem_->MapReadAndWriteAshmem();
         if (!mapRet) {
@@ -371,13 +372,14 @@ void DSpeakerDev::EnqueueThread()
     readIndex_ = 0;
     readNum_ = 0;
     frameIndex_ = 0;
-    DHLOGI("Enqueue thread start, lengthPerRead length: %d.", lengthPerTrans_);
+    DHLOGI("Enqueue thread start, lengthPerRead length: %{public}d.", lengthPerTrans_);
     while (ashmem_ != nullptr && isEnqueueRunning_.load()) {
         int64_t timeOffset = UpdateTimeOffset(frameIndex_, LOW_LATENCY_INTERVAL_NS,
             startTime_);
-        DHLOGD("Read frameIndex: %" PRId64", timeOffset: %" PRId64, frameIndex_, timeOffset);
+        DHLOGD("Read frameIndex: %{public}" PRId64", timeOffset: %{public}" PRId64, frameIndex_, timeOffset);
         auto readData = ashmem_->ReadFromAshmem(lengthPerTrans_, readIndex_);
-        DHLOGI("Read from ashmem success! read index: %d, readLength: %d.", readIndex_, lengthPerTrans_);
+        DHLOGI("Read from ashmem success! read index: %{public}d, readLength: %{public}d.",
+            readIndex_, lengthPerTrans_);
         std::shared_ptr<AudioData> audioData = std::make_shared<AudioData>(lengthPerTrans_);
         if (readData != nullptr) {
             const uint8_t *readAudioData = reinterpret_cast<const uint8_t *>(readData);
@@ -393,7 +395,7 @@ void DSpeakerDev::EnqueueThread()
 #endif
         int32_t ret = speakerTrans_->FeedAudioData(audioData);
         if (ret != DH_SUCCESS) {
-            DHLOGE("Speaker enqueue thread, write stream data failed, ret: %d.", ret);
+            DHLOGE("Speaker enqueue thread, write stream data failed, ret: %{public}d.", ret);
         }
         readIndex_ += lengthPerTrans_;
         if (readIndex_ >= ashmemLength_) {
@@ -427,7 +429,7 @@ int32_t DSpeakerDev::SendMessage(uint32_t type, std::string content, std::string
     if (type != static_cast<uint32_t>(OPEN_SPEAKER) && type != static_cast<uint32_t>(CLOSE_SPEAKER) &&
         type != static_cast<uint32_t>(CHANGE_PLAY_STATUS) && type != static_cast<uint32_t>(VOLUME_SET) &&
         type != static_cast<uint32_t>(VOLUME_MUTE_SET)) {
-        DHLOGE("Send message to remote. not OPEN_SPK or CLOSE_SPK. type: %u", type);
+        DHLOGE("Send message to remote. not OPEN_SPK or CLOSE_SPK. type: %{public}u", type);
         return ERR_DH_AUDIO_NULLPTR;
     }
     CHECK_NULL_RETURN(speakerTrans_, ERR_DH_AUDIO_NULLPTR);
@@ -439,14 +441,14 @@ int32_t DSpeakerDev::NotifyHdfAudioEvent(const AudioEvent &event, const int32_t 
 {
     int32_t ret = DAudioHdiHandler::GetInstance().NotifyEvent(devId_, portId, event);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Notify event: %d, result: %s.", event.type, event.content.c_str());
+        DHLOGE("Notify event: %{public}d, result: %{public}s.", event.type, event.content.c_str());
     }
     return DH_SUCCESS;
 }
 
 int32_t DSpeakerDev::OnStateChange(const AudioEventType type)
 {
-    DHLOGI("On speaker device state change, type: %d.", type);
+    DHLOGI("On speaker device state change, type: %{public}d.", type);
     AudioEvent event;
     switch (type) {
         case AudioEventType::DATA_OPENED:

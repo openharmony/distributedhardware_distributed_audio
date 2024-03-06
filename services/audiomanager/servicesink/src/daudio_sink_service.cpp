@@ -87,7 +87,7 @@ int32_t DAudioSinkService::ReleaseSink()
     CHECK_NULL_RETURN(systemAbilityMgr, ERR_DH_AUDIO_NULLPTR);
     int32_t ret = systemAbilityMgr->UnloadSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Sink systemabilitymgr unloadsystemability failed, ret: %d", ret);
+        DHLOGE("Sink systemabilitymgr unloadsystemability failed, ret: %{public}d", ret);
         return ERR_DH_AUDIO_SA_LOAD_FAILED;
     }
     DHLOGI("Sink systemabilitymgr unloadsystemability successfully!");
@@ -109,7 +109,7 @@ int32_t DAudioSinkService::UnsubscribeLocalHardware(const std::string &dhId)
 void DAudioSinkService::DAudioNotify(const std::string &devId, const std::string &dhId, const int32_t eventType,
     const std::string &eventContent)
 {
-    DHLOGI("DAudioNotify devId:%s, dhId:%s, eventType:%d.", GetAnonyString(devId).c_str(),
+    DHLOGI("DAudioNotify devId:%{public}s, dhId:%{public}s, eventType:%{public}d.", GetAnonyString(devId).c_str(),
         dhId.c_str(), eventType);
     DAudioSinkManager::GetInstance().HandleDAudioNotify(devId, dhId, eventType, eventContent);
 }
@@ -128,7 +128,7 @@ int DAudioSinkService::Dump(int32_t fd, const std::vector<std::u16string> &args)
         return ERR_DH_AUDIO_BAD_VALUE;
     }
 
-    int ret = dprintf(fd, "%s\n", result.c_str());
+    int ret = dprintf(fd, "%{public}s\n", result.c_str());
     if (ret < 0) {
         DHLOGE("Dprintf error");
         return ERR_DH_AUDIO_BAD_VALUE;
@@ -139,21 +139,21 @@ int DAudioSinkService::Dump(int32_t fd, const std::vector<std::u16string> &args)
 
 int32_t DAudioSinkService::PauseDistributedHardware(const std::string &networkId)
 {
-    DHLOGI("PauseDistributedHardware networkId:%s.", GetAnonyString(networkId).c_str());
+    DHLOGI("PauseDistributedHardware networkId:%{public}s.", GetAnonyString(networkId).c_str());
     DAudioSinkManager::GetInstance().PauseDistributedHardware(networkId);
     return DH_SUCCESS;
 }
 
 int32_t DAudioSinkService::ResumeDistributedHardware(const std::string &networkId)
 {
-    DHLOGI("ResumeDistributedHardware networkId:%s.", GetAnonyString(networkId).c_str());
+    DHLOGI("ResumeDistributedHardware networkId:%{public}s.", GetAnonyString(networkId).c_str());
     DAudioSinkManager::GetInstance().ResumeDistributedHardware(networkId);
     return DH_SUCCESS;
 }
 
 int32_t DAudioSinkService::StopDistributedHardware(const std::string &networkId)
 {
-    DHLOGI("StopDistributedHardware networkId:%s.", GetAnonyString(networkId).c_str());
+    DHLOGI("StopDistributedHardware networkId:%{public}s.", GetAnonyString(networkId).c_str());
     DAudioSinkManager::GetInstance().StopDistributedHardware(networkId);
     return DH_SUCCESS;
 }

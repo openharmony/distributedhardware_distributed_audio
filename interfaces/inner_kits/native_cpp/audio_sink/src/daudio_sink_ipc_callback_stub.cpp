@@ -31,7 +31,7 @@ DAudioSinkIpcCallbackStub::DAudioSinkIpcCallbackStub() : IRemoteStub(true)
 int32_t DAudioSinkIpcCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
-    DHLOGI("On remote request, code: %u", code);
+    DHLOGI("On remote request, code: %{public}u", code);
     std::u16string desc = DAudioSinkIpcCallbackStub::GetDescriptor();
     std::u16string remoteDesc = data.ReadInterfaceToken();
     if (desc != remoteDesc) {

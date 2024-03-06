@@ -58,7 +58,7 @@ int32_t DAudioHdiHandler::InitHdiHandler()
     DHLOGD("Load hdf driver start.");
     int32_t ret = DaudioHdfOperate::GetInstance().LoadDaudioHDFImpl();
     if (ret != DH_SUCCESS) {
-        DHLOGE("Load hdf driver failed, ret: %d", ret);
+        DHLOGE("Load hdf driver failed, ret: %{public}d", ret);
         return ret;
     }
     DHLOGD("Load hdf driver end.");
@@ -80,7 +80,7 @@ int32_t DAudioHdiHandler::UninitHdiHandler()
 
     int32_t ret = DaudioHdfOperate::GetInstance().UnLoadDaudioHDFImpl();
     if (ret != DH_SUCCESS) {
-        DHLOGE("Unload hdf driver failed, ret: %d", ret);
+        DHLOGE("Unload hdf driver failed, ret: %{public}d", ret);
         return ret;
     }
     DHLOGI("Uninit hdi handler success.");
@@ -90,7 +90,7 @@ int32_t DAudioHdiHandler::UninitHdiHandler()
 int32_t DAudioHdiHandler::RegisterAudioDevice(const std::string &devId, const int32_t dhId,
     const std::string &capability, const std::shared_ptr<IDAudioHdiCallback> &callbackObjParam)
 {
-    DHLOGI("Register audio device, adpname: %s, dhId: %d", GetAnonyString(devId).c_str(), dhId);
+    DHLOGI("Register audio device, adpname: %{public}s, dhId: %{public}d", GetAnonyString(devId).c_str(), dhId);
     CHECK_NULL_RETURN(audioSrvHdf_, ERR_DH_AUDIO_NULLPTR);
     std::string searchKey;
     switch (GetDevTypeByDHId(dhId)) {
@@ -125,7 +125,7 @@ int32_t DAudioHdiHandler::RegisterAudioDevice(const std::string &devId, const in
     auto iter = mapAudioMgrCallback_.find(searchKey);
     int32_t res = audioSrvHdf_->RegisterAudioDevice(devId, dhId, capability, iter->second);
     if (res != HDF_SUCCESS) {
-        DHLOGE("Call hdf proxy register failed, res: %d", res);
+        DHLOGE("Call hdf proxy register failed, res: %{public}d", res);
         return ERR_DH_AUDIO_HDI_CALL_FAILED;
     }
     return DH_SUCCESS;
@@ -133,11 +133,11 @@ int32_t DAudioHdiHandler::RegisterAudioDevice(const std::string &devId, const in
 
 int32_t DAudioHdiHandler::UnRegisterAudioDevice(const std::string &devId, const int32_t dhId)
 {
-    DHLOGI("Unregister audio device, adpname: %s, dhId: %d", GetAnonyString(devId).c_str(), dhId);
+    DHLOGI("Unregister audio device, adpname: %{public}s, dhId: %{public}d", GetAnonyString(devId).c_str(), dhId);
     CHECK_NULL_RETURN(audioSrvHdf_, ERR_DH_AUDIO_NULLPTR);
     int32_t res = audioSrvHdf_->UnRegisterAudioDevice(devId, dhId);
     if (res != HDF_SUCCESS) {
-        DHLOGE("Call hdf proxy unregister failed, res: %d", res);
+        DHLOGE("Call hdf proxy unregister failed, res: %{public}d", res);
         return ERR_DH_AUDIO_HDI_CALL_FAILED;
     }
 
@@ -145,7 +145,7 @@ int32_t DAudioHdiHandler::UnRegisterAudioDevice(const std::string &devId, const 
         std::lock_guard<std::mutex> devLck(devMapMtx_);
         auto iter = mapAudioMgrDhIds_.find(devId);
         if (iter == mapAudioMgrDhIds_.end()) {
-            DHLOGE("Can not find register devId. devId: %s", GetAnonyString(devId).c_str());
+            DHLOGE("Can not find register devId. devId: %{public}s", GetAnonyString(devId).c_str());
             return ERR_DH_AUDIO_SA_CALLBACK_NOT_FOUND;
         }
 
@@ -202,7 +202,7 @@ void DAudioHdiHandler::ProcessEventMsg(const AudioEvent &audioEvent, DAudioEvent
 int32_t DAudioHdiHandler::NotifyEvent(const std::string &devId, const int32_t dhId,
     const AudioEvent &audioEvent)
 {
-    DHLOGD("Notify event adpname: %s, dhId: %d, event type: %d, event content: %s.",
+    DHLOGD("Notify event adpname: %{public}s, dhId: %{public}d, event type: %{public}d, event content: %{public}s.",
         GetAnonyString(devId).c_str(), dhId, audioEvent.type, audioEvent.content.c_str());
     DAudioEvent newEvent = {AUDIO_EVENT_UNKNOWN, audioEvent.content};
     ProcessEventMsg(audioEvent, newEvent);

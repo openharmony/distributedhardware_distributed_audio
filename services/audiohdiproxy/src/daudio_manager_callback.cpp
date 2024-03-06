@@ -69,7 +69,7 @@ int32_t DAudioManagerCallback::GetAudioParamHDF(const AudioParameter& param, Aud
             paramHDF.bitFormat = AudioSampleFormat::SAMPLE_S24LE;
             break;
         default:
-            DHLOGE("Format [%" PRIu32"] does not support conversion.", param.format);
+            DHLOGE("Format [%{public}" PRIu32"] does not support conversion.", param.format);
             return HDF_FAILURE;
     }
     switch (static_cast<AudioCategory>(param.streamUsage)) {
@@ -86,7 +86,7 @@ int32_t DAudioManagerCallback::GetAudioParamHDF(const AudioParameter& param, Aud
             paramHDF.streamUsage = StreamUsage::STREAM_USAGE_MEDIA;
             break;
         default:
-            DHLOGE("Stream usage [%" PRIu32"] does not support conversion.", param.streamUsage);
+            DHLOGE("Stream usage [%{public}" PRIu32"] does not support conversion.", param.streamUsage);
             return HDF_FAILURE;
     }
     paramHDF.frameSize = param.frameSize;
@@ -94,10 +94,11 @@ int32_t DAudioManagerCallback::GetAudioParamHDF(const AudioParameter& param, Aud
     paramHDF.ext = param.ext;
     paramHDF.renderFlags = static_cast<OHOS::DistributedHardware::PortOperationMode>(param.renderFlags);
     paramHDF.capturerFlags = static_cast<OHOS::DistributedHardware::PortOperationMode>(param.capturerFlags);
-    DHLOGI("HDF Param: sample rate %d, channel %d, bit format %d, stream usage %d, frame size %" PRIu32
-        ", period %" PRIu32", renderFlags %d, capturerFlags %d, ext {%s}.", paramHDF.sampleRate, paramHDF.channelMask,
-        paramHDF.bitFormat, paramHDF.streamUsage, paramHDF.frameSize, paramHDF.period, paramHDF.renderFlags,
-        paramHDF.capturerFlags, paramHDF.ext.c_str());
+    DHLOGI("HDF Param: sample rate %{public}d, channel %{public}d, bit format %{public}d, stream "
+        "usage %{public}d, frame size %{public}" PRIu32", period %{public}" PRIu32
+        ", renderFlags %{public}d, capturerFlags %{public}d, ext {%{public}s}.", paramHDF.sampleRate,
+        paramHDF.channelMask, paramHDF.bitFormat, paramHDF.streamUsage, paramHDF.frameSize, paramHDF.period,
+        paramHDF.renderFlags, paramHDF.capturerFlags, paramHDF.ext.c_str());
     return HDF_SUCCESS;
 }
 
@@ -169,7 +170,7 @@ int32_t DAudioManagerCallback::NotifyEvent(const std::string& adpName, int32_t d
 int32_t DAudioManagerCallback::WriteStreamData(const std::string &adpName, int32_t devId,
     const OHOS::HDI::DistributedAudio::Audioext::V1_0::AudioData &data)
 {
-    DHLOGD("Write Stream Data, audio data param frameSize is %d.", data.param.frameSize);
+    DHLOGD("Write Stream Data, audio data param frameSize is %{public}d.", data.param.frameSize);
     if (data.param.frameSize == 0 || data.param.frameSize > DEFAULT_AUDIO_DATA_SIZE) {
         DHLOGE("Audio data param frameSize is 0. or > 4096");
         return HDF_FAILURE;
@@ -178,7 +179,7 @@ int32_t DAudioManagerCallback::WriteStreamData(const std::string &adpName, int32
     std::shared_ptr<AudioData> audioData = std::make_shared<AudioData>(data.param.frameSize);
     int32_t ret = memcpy_s(audioData->Data(), audioData->Capacity(), data.data.data(), data.data.size());
     if (ret != EOK) {
-        DHLOGE("Copy audio data failed, error code %d.", ret);
+        DHLOGE("Copy audio data failed, error code %{public}d.", ret);
         return HDF_FAILURE;
     }
 

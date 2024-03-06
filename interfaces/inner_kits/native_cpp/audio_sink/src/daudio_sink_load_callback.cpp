@@ -27,14 +27,14 @@ namespace DistributedHardware {
 void DAudioSinkLoadCallback::OnLoadSystemAbilitySuccess(
     int32_t systemAbilityId, const sptr<IRemoteObject> &remoteObject)
 {
-    DHLOGI("Load audio SA success, systemAbilityId: %d.", systemAbilityId);
+    DHLOGI("Load audio SA success, systemAbilityId: %{public}d.", systemAbilityId);
     CHECK_NULL_VOID(remoteObject);
     DAudioSinkHandler::GetInstance().FinishStartSA(params_, remoteObject);
 }
 
 void DAudioSinkLoadCallback::OnLoadSystemAbilityFail(int32_t systemAbilityId)
 {
-    DHLOGE("Load audio SA failed, systemAbilityId: %d.", systemAbilityId);
+    DHLOGE("Load audio SA failed, systemAbilityId: %{public}d.", systemAbilityId);
     DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_INIT_FAIL, "daudio sink LoadSA call failed.");
 }
 } // namespace DistributedHardware

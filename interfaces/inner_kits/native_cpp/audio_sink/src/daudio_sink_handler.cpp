@@ -54,7 +54,7 @@ int32_t DAudioSinkHandler::InitSink(const std::string &params)
         sptr<DAudioSinkLoadCallback> loadCallback(new DAudioSinkLoadCallback(params));
         int32_t ret = samgr->LoadSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID, loadCallback);
         if (ret != ERR_OK) {
-            DHLOGE("Failed to Load systemAbility ret code: %d.", ret);
+            DHLOGE("Failed to Load systemAbility ret code: %{public}d.", ret);
             DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_INIT_FAIL, DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID,
                 ERR_DH_AUDIO_SA_LOAD_FAILED, "daudio sink LoadSystemAbility call failed.");
             return ERR_DH_AUDIO_SA_LOAD_FAILED;

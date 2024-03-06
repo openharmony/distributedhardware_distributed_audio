@@ -75,7 +75,7 @@ int32_t AVTransSenderAdapter::Stop()
 
 int32_t AVTransSenderAdapter::CreateControlChannel(const std::string &peerDevId)
 {
-    DHLOGI("Create control channel,peerDevId:%s", GetAnonyString(peerDevId).c_str());
+    DHLOGI("Create control channel,peerDevId:%{public}s", GetAnonyString(peerDevId).c_str());
     if (chnCreateSuccess_.load()) {
         DHLOGI("Channel already created.");
         return DH_SUCCESS;
@@ -86,12 +86,12 @@ int32_t AVTransSenderAdapter::CreateControlChannel(const std::string &peerDevId)
     int32_t ret = senderEngine_->CreateControlChannel(dstDevIds,
         ChannelAttribute{TransStrategy::LOW_LATANCY_STRATEGY});
     if (ret != DH_SUCCESS) {
-        DHLOGI("Create control channel failed, ret: %d", ret);
+        DHLOGI("Create control channel failed, ret: %{public}d", ret);
         return ERR_DH_AV_TRANS_CREATE_CHANNEL_FAILED;
     }
     ret = WaitForChannelCreated();
     if (ret != DH_SUCCESS) {
-        DHLOGE("Wait for create av transport sender channel failed ret: %d", ret);
+        DHLOGE("Wait for create av transport sender channel failed ret: %{public}d", ret);
         return ERR_DH_AV_TRANS_CREATE_CHANNEL_FAILED;
     }
     return DH_SUCCESS;
@@ -148,7 +148,7 @@ int32_t AVTransSenderAdapter::WaitForChannelCreated()
 
 int32_t AVTransSenderAdapter::OnSenderEvent(const AVTransEvent &event)
 {
-    DHLOGI("On sender event, type: %d", event.type);
+    DHLOGI("On sender event, type: %{public}d", event.type);
     switch (event.type) {
         case EventType::EVENT_CHANNEL_OPEN_FAIL:
         case EventType::EVENT_CHANNEL_OPENED: {

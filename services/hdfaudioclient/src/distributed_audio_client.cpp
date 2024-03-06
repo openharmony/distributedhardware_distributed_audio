@@ -81,13 +81,13 @@ static int32_t InitDescriptorPort(const AudioAdapterDescriptor &desc, ::AudioAda
 static int32_t InitAudioAdapterDescriptor(AudioManagerContext *context,
     std::vector<AudioAdapterDescriptor> &descriptors)
 {
-    DHLOGI("Init audio adapters descriptor, size is: %zu.", descriptors.size());
+    DHLOGI("Init audio adapters descriptor, size is: %{public}zu.", descriptors.size());
     constexpr uint32_t maxAdapterNameLen = 1000;
     constexpr uint32_t maxPortNum = 100;
     constexpr uint32_t minPortNum = 1;
     for (auto desc : descriptors) {
         if (desc.ports.size() < minPortNum || desc.ports.size() > maxPortNum) {
-            DHLOGE("The descriptor ports size: %zu.", desc.ports.size());
+            DHLOGE("The descriptor ports size: %{public}zu.", desc.ports.size());
             continue;
         }
         if (desc.adapterName.length() >= maxAdapterNameLen) {
