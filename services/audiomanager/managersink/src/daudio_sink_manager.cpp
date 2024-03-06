@@ -397,7 +397,8 @@ bool DAudioSinkManager::CheckDeviceSecurityLevel(const std::string &srcDeviceId,
         DHLOGE("dst udid is empty");
         return false;
     }
-    DHLOGI("CheckDeviceSecurityLevel srcUdid %s, dstUdid %s.", srcUdid.c_str(), dstUdid.c_str());
+    DHLOGI("CheckDeviceSecurityLevel srcUdid %s, dstUdid %s.", GetAnonyString(srcUdid).c_str(),
+        GetAnonyString(dstUdid).c_str());
     int32_t srcDeviceSecurityLevel = GetDeviceSecurityLevel(srcUdid);
     int32_t dstDeviceSecurityLevel = GetDeviceSecurityLevel(dstUdid);
     DHLOGI("SrcDeviceSecurityLevel, level is %d", srcDeviceSecurityLevel);
