@@ -51,7 +51,7 @@ void DMicClient::OnEngineTransEvent(const AVTransEvent &event)
 void DMicClient::OnEngineTransMessage(const std::shared_ptr<AVTransMessage> &message)
 {
     CHECK_NULL_VOID(message);
-    DHLOGI("On Engine message, type : %s.", GetEventNameByType(message->type_).c_str());
+    DHLOGI("On Engine message, type : %{public}s.", GetEventNameByType(message->type_).c_str());
     DAudioSinkManager::GetInstance().HandleDAudioNotify(message->dstDevId_, message->dstDevId_,
         static_cast<int32_t>(message->type_), message->content_);
 }
@@ -72,7 +72,7 @@ int32_t DMicClient::InitSenderEngine(IAVEngineProvider *providerPtr)
 
 int32_t DMicClient::OnStateChange(const AudioEventType type)
 {
-    DHLOGD("On state change type: %d.", type);
+    DHLOGD("On state change type: %{public}d.", type);
     AudioEvent event;
     cJSON *jParam = cJSON_CreateObject();
     CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
@@ -102,7 +102,7 @@ int32_t DMicClient::OnStateChange(const AudioEventType type)
             break;
         }
         default:
-            DHLOGE("Invalid parameter type: %d.", type);
+            DHLOGE("Invalid parameter type: %{public}d.", type);
             return ERR_DH_AUDIO_NOT_SUPPORT;
     }
 
@@ -153,8 +153,8 @@ int32_t DMicClient::TransSetUp()
 
 int32_t DMicClient::SetUp(const AudioParam &param)
 {
-    DHLOGI("Set up mic client, param: {sampleRate: %d, bitFormat: %d," +
-        "channelMask: %d, sourceType: %d, capturerFlags: %d, frameSize: %d}.",
+    DHLOGI("Set up mic client, param: {sampleRate: %{public}d, bitFormat: %{public}d,"
+        "channelMask: %{public}d, sourceType: %{public}d, capturerFlags: %{public}d, frameSize: %{public}d}.",
         param.comParam.sampleRate, param.comParam.bitFormat, param.comParam.channelMask, param.captureOpts.sourceType,
         param.captureOpts.capturerFlags, param.comParam.frameSize);
     audioParam_ = param;
@@ -167,7 +167,7 @@ int32_t DMicClient::SendMessage(uint32_t type, std::string content, std::string 
     if (type != static_cast<uint32_t>(NOTIFY_OPEN_MIC_RESULT) &&
         type != static_cast<uint32_t>(NOTIFY_CLOSE_MIC_RESULT) &&
         type != static_cast<uint32_t>(CLOSE_MIC)) {
-        DHLOGE("event type is not NOTIFY_OPEN_MIC or NOTIFY_CLOSE_MIC or CLOSE_MIC. type: %u", type);
+        DHLOGE("event type is not NOTIFY_OPEN_MIC or NOTIFY_CLOSE_MIC or CLOSE_MIC. type: %{public}u", type);
         return ERR_DH_AUDIO_NULLPTR;
     }
     CHECK_NULL_RETURN(micTrans_, ERR_DH_AUDIO_NULLPTR);
@@ -181,7 +181,7 @@ int32_t DMicClient::Release()
     std::lock_guard<std::mutex> lck(devMtx_);
     CHECK_NULL_RETURN(micTrans_, ERR_DH_AUDIO_SA_STATUS_ERR);
     if (clientStatus_ != AudioStatus::STATUS_READY && clientStatus_ != AudioStatus::STATUS_STOP) {
-        DHLOGE("Mic status is wrong, %d.", (int32_t)clientStatus_);
+        DHLOGE("Mic status is wrong, %{public}d.", (int32_t)clientStatus_);
         return ERR_DH_AUDIO_SA_STATUS_ERR;
     }
     bool isReleaseError = false;
@@ -210,7 +210,7 @@ int32_t DMicClient::StartCapture()
     CHECK_NULL_RETURN(audioCapturer_, ERR_DH_AUDIO_NULLPTR);
 
     if (clientStatus_ != AudioStatus::STATUS_READY) {
-        DHLOGE("Audio capturer init failed or mic status wrong, status: %d.", (int32_t)clientStatus_);
+        DHLOGE("Audio capturer init failed or mic status wrong, status: %{public}d.", (int32_t)clientStatus_);
         DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_OPT_FAIL, ERR_DH_AUDIO_SA_STATUS_ERR,
             "daudio init failed or mic status wrong.");
         return ERR_DH_AUDIO_SA_STATUS_ERR;
@@ -252,8 +252,8 @@ void DMicClient::AudioFwkCaptureData()
         }
         int64_t endTime = GetNowTimeUs();
         if (IsOutDurationRange(startTime, endTime, lastCaptureStartTime_)) {
-            DHLOGE("This time capture spend: %lld us, The interval of capture this time and the last time: %lld us",
-                endTime - startTime, startTime - lastCaptureStartTime_);
+            DHLOGE("This time capture spend: %{public}" PRId64" us, The interval of capture this time and "
+                "the last time: %{public}" PRId64" us", endTime - startTime, startTime - lastCaptureStartTime_);
         }
         lastCaptureStartTime_ = startTime;
     }
@@ -276,7 +276,8 @@ void DMicClient::AudioFwkCaptureData()
     }
     int64_t endTransTime = GetNowTimeUs();
     if (IsOutDurationRange(startTransTime, endTransTime, lastTransStartTime_)) {
-        DHLOGE("This time send data spend: %lld us, The interval of send data this time and the last time: %lld us",
+        DHLOGE("This time send data spend: %{public}" PRId64" us, The interval of send data this time and "
+            "the last time: %{public}" PRId64" us",
             endTransTime - startTransTime, startTransTime - lastTransStartTime_);
     }
     lastTransStartTime_ = startTransTime;
@@ -312,8 +313,10 @@ void DMicClient::OnReadData(size_t length)
 
     std::shared_ptr<AudioData> audioData = std::make_shared<AudioData>(audioParam_.comParam.frameSize);
     if (audioData->Capacity() != bufDesc.bufLength) {
-        DHLOGE("Audio data length is not equal to buflength. datalength: %d, bufLength: %d",
-            audioData->Capacity(), bufDesc.bufLength);
+        uint64_t capacity = static_cast<uint64_t>(audioData->Capacity());
+        uint64_t bufLength = static_cast<uint64_t>(bufDesc.bufLength);
+        DHLOGE("Audio data length is not equal to buflength. datalength: %{public}" PRIu64
+            ", bufLength: %{public}" PRIu64, capacity, bufLength);
     }
     if (memcpy_s(audioData->Data(), audioData->Capacity(), bufDesc.buffer, bufDesc.bufLength) != EOK) {
         DHLOGE("Copy audio data failed.");
@@ -331,7 +334,7 @@ int32_t DMicClient::StopCapture()
     DHLOGI("Stop capturer.");
     std::lock_guard<std::mutex> lck(devMtx_);
     if (clientStatus_ != AudioStatus::STATUS_START) {
-        DHLOGE("Capturee is not start or mic status wrong, status: %d.", (int32_t)clientStatus_);
+        DHLOGE("Capturee is not start or mic status wrong, status: %{public}d.", (int32_t)clientStatus_);
         DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_OPT_FAIL, ERR_DH_AUDIO_SA_STATUS_ERR,
             "daudio capturer is not start or mic status wrong.");
         return ERR_DH_AUDIO_SA_STATUS_ERR;

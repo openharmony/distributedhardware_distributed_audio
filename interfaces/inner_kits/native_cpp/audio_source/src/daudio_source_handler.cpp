@@ -58,7 +58,7 @@ int32_t DAudioSourceHandler::InitSource(const std::string &params)
         sptr<DAudioSourceLoadCallback> loadCallback = new DAudioSourceLoadCallback(params);
         int32_t ret = samgr->LoadSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SOURCE_SA_ID, loadCallback);
         if (ret != ERR_OK) {
-            DHLOGE("Failed to Load systemAbility, ret code: %d", ret);
+            DHLOGE("Failed to Load systemAbility, ret code: %{public}d", ret);
             DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_INIT_FAIL,
                 DISTRIBUTED_HARDWARE_AUDIO_SOURCE_SA_ID, ERR_DH_AUDIO_SA_LOAD_FAILED,
                 "daudio source LoadSystemAbility call failed.");
@@ -97,7 +97,8 @@ int32_t DAudioSourceHandler::ReleaseSource()
 int32_t DAudioSourceHandler::RegisterDistributedHardware(const std::string &devId, const std::string &dhId,
     const EnableParam &param, std::shared_ptr<RegisterCallback> callback)
 {
-    DHLOGI("Register distributed hardware, devId: %s, dhId: %s.", GetAnonyString(devId).c_str(), dhId.c_str());
+    DHLOGI("Register distributed hardware, devId: %{public}s, dhId: %{public}s.",
+        GetAnonyString(devId).c_str(), dhId.c_str());
     std::lock_guard<std::mutex> lock(sourceProxyMutex_);
     CHECK_NULL_RETURN(dAudioSourceProxy_, ERR_DH_AUDIO_SA_PROXY_NOT_INIT);
     CHECK_NULL_RETURN(dAudioIpcCallback_, ERR_DH_AUDIO_NULLPTR);
@@ -113,7 +114,8 @@ int32_t DAudioSourceHandler::RegisterDistributedHardware(const std::string &devI
 int32_t DAudioSourceHandler::UnregisterDistributedHardware(const std::string &devId, const std::string &dhId,
     std::shared_ptr<UnregisterCallback> callback)
 {
-    DHLOGI("Unregister distributed hardware, devId: %s, dhId: %s.", GetAnonyString(devId).c_str(), dhId.c_str());
+    DHLOGI("Unregister distributed hardware, devId: %{public}s, dhId: %{public}s.",
+        GetAnonyString(devId).c_str(), dhId.c_str());
     std::lock_guard<std::mutex> lock(sourceProxyMutex_);
     CHECK_NULL_RETURN(dAudioSourceProxy_, ERR_DH_AUDIO_SA_PROXY_NOT_INIT);
     CHECK_NULL_RETURN(dAudioIpcCallback_, ERR_DH_AUDIO_NULLPTR);
@@ -129,7 +131,8 @@ int32_t DAudioSourceHandler::UnregisterDistributedHardware(const std::string &de
 int32_t DAudioSourceHandler::ConfigDistributedHardware(const std::string &devId, const std::string &dhId,
     const std::string &key, const std::string &value)
 {
-    DHLOGI("Config distributed hardware, devId: %s, dhId: %s.", GetAnonyString(devId).c_str(), dhId.c_str());
+    DHLOGI("Config distributed hardware, devId: %{public}s, dhId: %{public}s.",
+        GetAnonyString(devId).c_str(), dhId.c_str());
     std::lock_guard<std::mutex> lock(sourceProxyMutex_);
     CHECK_NULL_RETURN(dAudioSourceProxy_, ERR_DH_AUDIO_SA_PROXY_NOT_INIT);
     if (devId.length() > DAUDIO_MAX_DEVICE_ID_LEN || dhId.length() > DAUDIO_MAX_DEVICE_ID_LEN) {

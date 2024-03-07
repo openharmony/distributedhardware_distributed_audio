@@ -265,7 +265,7 @@ static void Play()
         std::vector<int8_t> frameHal(RENDER_FRAME_SIZE);
         int32_t ret = memcpy_s(frameHal.data(), RENDER_FRAME_SIZE, renderData[g_frameIndex], RENDER_FRAME_SIZE);
         if (ret != EOK) {
-            DHLOGE("Copy render frame failed, error code %d.", ret);
+            DHLOGE("Copy render frame failed, error code %{public}d.", ret);
             return;
         }
         ret = g_render->RenderFrame(frameHal, size);

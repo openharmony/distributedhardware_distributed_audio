@@ -105,7 +105,7 @@ int32_t AVTransReceiverTransport::FeedAudioData(std::shared_ptr<AudioData> &audi
 
 int32_t AVTransReceiverTransport::SendMessage(uint32_t type, std::string content, std::string dstDevId)
 {
-    DHLOGI("Send message to remote. type: %u, content: %s.", type, content.c_str());
+    DHLOGI("Send message to remote. type: %{public}u, content: %{public}s.", type, content.c_str());
     CHECK_NULL_RETURN(receiverAdapter_, ERR_DH_AUDIO_NULLPTR);
     auto message = std::make_shared<AVTransMessage>(type, content, dstDevId);
     return receiverAdapter_->SendMessageToRemote(message);
@@ -132,7 +132,7 @@ void AVTransReceiverTransport::OnEngineDataAvailable(const std::shared_ptr<AVTra
     std::shared_ptr<AudioData> audioData = std::make_shared<AudioData>(bufferData->GetSize());
     int32_t ret = memcpy_s(audioData->Data(), audioData->Capacity(), bufferData->GetAddress(), bufferData->GetSize());
     if (ret != EOK) {
-        DHLOGE("Copy audio data failed, error code %d.", ret);
+        DHLOGE("Copy audio data failed, error code %{public}d.", ret);
         return;
     }
     CHECK_NULL_VOID(transCallback_);

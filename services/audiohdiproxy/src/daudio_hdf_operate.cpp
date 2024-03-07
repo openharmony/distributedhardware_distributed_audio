@@ -49,7 +49,7 @@ int32_t DaudioHdfOperate::LoadDaudioHDFImpl()
 
     ::OHOS::sptr<IServStatListener> listener(
         new DAudioHdfServStatListener(DAudioHdfServStatListener::StatusCallback([&](const ServiceStatus& status) {
-            DHLOGI("Load audio service status callback, serviceName: %s, status: %d",
+            DHLOGI("Load audio service status callback, serviceName: %{public}s, status: %{public}d",
                 status.serviceName.c_str(), status.status);
             std::unique_lock<std::mutex> lock(hdfOperateMutex_);
             if (status.serviceName == AUDIO_SERVICE_NAME) {
@@ -97,7 +97,7 @@ int32_t DaudioHdfOperate::WaitLoadService(const uint16_t& servStatus, const std:
     });
 
     if (servStatus != OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START) {
-        DHLOGE("Wait load service %s failed, status %d", servName.c_str(), servStatus);
+        DHLOGE("Wait load service %{public}s failed, status %{public}d", servName.c_str(), servStatus);
         return ERR_DH_AUDIO_FAILED;
     }
 
@@ -112,11 +112,11 @@ int32_t DaudioHdfOperate::UnLoadDaudioHDFImpl()
 
     int32_t ret = devmgr_->UnloadDevice(AUDIO_SERVICE_NAME);
     if (ret != HDF_SUCCESS) {
-        DHLOGE("Unload audio service failed, ret: %d", ret);
+        DHLOGE("Unload audio service failed, ret: %{public}d", ret);
     }
     ret = devmgr_->UnloadDevice(AUDIOEXT_SERVICE_NAME);
     if (ret != HDF_SUCCESS) {
-        DHLOGE("Unload provider service failed, ret: %d", ret);
+        DHLOGE("Unload device failed, ret: %{public}d", ret);
     }
     audioServStatus_ = INVALID_VALUE;
     audioextServStatus_ = INVALID_VALUE;

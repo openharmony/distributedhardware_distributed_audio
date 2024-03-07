@@ -88,7 +88,7 @@ int32_t AudioAttributeInternal<T>::SetSampleAttributes(AudioHandle handle,
         .sampleRate = attrs->sampleRate,
         .channelCount = attrs->channelCount,
     };
-    DHLOGD("AttrsHal.format = %u", attrsHal.format);
+    DHLOGD("AttrsHal.format = %{public}u", attrsHal.format);
     return (context == nullptr || context->proxy_ == nullptr) ?
         ERR_DH_AUDIO_HDI_INVALID_PARAM : context->proxy_->SetSampleAttributes(attrsHal);
 }

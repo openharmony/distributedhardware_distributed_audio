@@ -28,8 +28,9 @@ namespace DistributedHardware {
 int32_t DAudioIpcCallback::OnNotifyRegResult(const std::string &devId, const std::string &dhId,
     const std::string &reqId, int32_t status, const std::string &resultData)
 {
-    DHLOGI("On notify the registration result, devId: %s, dhId: %s, status: %d, resultData: %s, reqId: %s",
-        GetAnonyString(devId).c_str(), dhId.c_str(), status, resultData.c_str(), reqId.c_str());
+    DHLOGI("On notify the registration result, devId: %{public}s, dhId: %{public}s, status: %{public}d, "
+        "resultData: %{public}s, reqId: %{public}s", GetAnonyString(devId).c_str(), dhId.c_str(),
+        status, resultData.c_str(), reqId.c_str());
 
     if (devId.length() > DAUDIO_MAX_DEVICE_ID_LEN || dhId.length() > DAUDIO_MAX_DEVICE_ID_LEN ||
         reqId.length() > DAUDIO_MAX_DEVICE_ID_LEN) {
@@ -49,8 +50,9 @@ int32_t DAudioIpcCallback::OnNotifyRegResult(const std::string &devId, const std
 int32_t DAudioIpcCallback::OnNotifyUnregResult(const std::string &devId, const std::string &dhId,
     const std::string &reqId, int32_t status, const std::string &resultData)
 {
-    DHLOGI("On notify the unregistration result, devId: %s, dhId: %s, status: %d, resultData: %s, reqId: %s",
-        GetAnonyString(devId).c_str(), dhId.c_str(), status, resultData.c_str(), reqId.c_str());
+    DHLOGI("On notify the unregistration result, devId: %{public}s, dhId: %{public}s, status: %{public}d, "
+        "resultData: %{public}s, reqId: %{public}s", GetAnonyString(devId).c_str(), dhId.c_str(),
+        status, resultData.c_str(), reqId.c_str());
 
     if (devId.length() > DAUDIO_MAX_DEVICE_ID_LEN || dhId.length() > DAUDIO_MAX_DEVICE_ID_LEN ||
         reqId.length() > DAUDIO_MAX_DEVICE_ID_LEN) {
@@ -69,14 +71,14 @@ int32_t DAudioIpcCallback::OnNotifyUnregResult(const std::string &devId, const s
 void DAudioIpcCallback::PushRegisterCallback(const std::string &reqId,
     const std::shared_ptr<RegisterCallback> &callback)
 {
-    DHLOGD("Push register callback, reqId: %s", reqId.c_str());
+    DHLOGD("Push register callback, reqId: %{public}s", reqId.c_str());
     std::lock_guard<std::mutex> registerLck(registerMapMtx_);
     registerCallbackMap_.emplace(reqId, callback);
 }
 
 void DAudioIpcCallback::PopRegisterCallback(const std::string &reqId)
 {
-    DHLOGD("Pop register callback, reqId: %s", reqId.c_str());
+    DHLOGD("Pop register callback, reqId: %{public}s", reqId.c_str());
     std::lock_guard<std::mutex> registerLck(registerMapMtx_);
     registerCallbackMap_.erase(reqId);
 }
@@ -84,14 +86,14 @@ void DAudioIpcCallback::PopRegisterCallback(const std::string &reqId)
 void DAudioIpcCallback::PushUnregisterCallback(const std::string &reqId,
     const std::shared_ptr<UnregisterCallback> &callback)
 {
-    DHLOGD("Push unregister callback, reqId: %s", reqId.c_str());
+    DHLOGD("Push unregister callback, reqId: %{public}s", reqId.c_str());
     std::lock_guard<std::mutex> registerLck(unregisterMapMtx_);
     unregisterCallbackMap_.emplace(reqId, callback);
 }
 
 void DAudioIpcCallback::PopUnregisterCallback(const std::string &reqId)
 {
-    DHLOGD("Pop unregister callback, reqId: %s", reqId.c_str());
+    DHLOGD("Pop unregister callback, reqId: %{public}s", reqId.c_str());
     std::lock_guard<std::mutex> registerLck(unregisterMapMtx_);
     unregisterCallbackMap_.erase(reqId);
 }

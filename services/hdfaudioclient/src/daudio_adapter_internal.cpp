@@ -88,7 +88,7 @@ static int32_t CreateRenderInternal(struct AudioAdapter *adapter, const struct :
     *render = &renderContext->instance_;
     renderContext->proxy_ = renderProxy;
     renderContext->descHal_ = descHal;
-    DHLOGI("The render ID: %u.", renderId);
+    DHLOGI("The render ID: %{public}u.", renderId);
     {
         std::lock_guard<std::mutex> lock(context->mtx_);
         context->renders_.push_back(std::make_pair(renderId, std::move(renderContext)));
@@ -149,7 +149,7 @@ static int32_t CreateCaptureInternal(struct AudioAdapter *adapter, const struct 
     *capture = &captureContext->instance_;
     captureContext->proxy_ = captureProxy;
     captureContext->descHal_ = descHal;
-    DHLOGI("The capture ID: %u.", captureId);
+    DHLOGI("The capture ID: %{public}u.", captureId);
     {
         std::lock_guard<std::mutex> lock(context->mtx_);
         context->captures_.push_back(std::make_pair(captureId, std::move(captureContext)));
@@ -200,11 +200,11 @@ static int32_t GetPassthroughModeInternal(struct AudioAdapter *adapter, const st
 static int32_t InitAudioPortCapability(std::unique_ptr<::AudioPortCapability> &capInternal,
     AudioPortCapability &capabilityHal)
 {
-    DHLOGI("Init audio port capability internal, formatNum: %zu.", capabilityHal.formatNum);
+    DHLOGI("Init audio port capability internal, formatNum: %{public}" PRIu32, capabilityHal.formatNum);
     constexpr uint32_t maxFormatNum = 100;
     constexpr uint32_t minFormatNum = 1;
     if (capabilityHal.formatNum < minFormatNum || capabilityHal.formatNum > maxFormatNum) {
-        DHLOGE("Init audio port capability, formatNum: %zu.", capabilityHal.formatNum);
+        DHLOGE("Init audio port capability, formatNum: %{public}" PRIu32, capabilityHal.formatNum);
         return ERR_DH_AUDIO_HDI_INVALID_PARAM;
     }
     ::AudioFormat *audioFormats = (::AudioFormat *)malloc(capabilityHal.formatNum * sizeof(::AudioFormat));
@@ -300,8 +300,8 @@ static void ConvertAudioRouteNodeToHAL(const ::AudioRouteNode &node, AudioRouteN
     halNode.portId = node.portId;
     halNode.role = static_cast<AudioPortRole>(node.role);
     halNode.type = static_cast<AudioPortType>(node.type);
-    DHLOGD("Convert audio route node To HAL, portId: %d role: %d type: %d.", halNode.portId, halNode.role,
-        halNode.type);
+    DHLOGD("Convert audio route node To HAL, portId: %{public}d role: %{public}d type: %{public}d.",
+        halNode.portId, halNode.role, halNode.type);
 
     switch (node.type) {
         case AUDIO_PORT_UNASSIGNED_TYPE:
@@ -321,13 +321,14 @@ static void ConvertAudioRouteNodeToHAL(const ::AudioRouteNode &node, AudioRouteN
             halNode.ext.mix.moduleId = node.ext.mix.moduleId;
             halNode.ext.mix.streamId = node.ext.mix.streamId;
 
-            DHLOGD("Convert audio route node To HAL, [Mix] moduleId: %d streamId: %d.",
+            DHLOGD("Convert audio route node To HAL, [Mix] moduleId: %{public}d streamId: %{public}d.",
                 halNode.ext.mix.moduleId, halNode.ext.mix.streamId);
             break;
         }
         case AUDIO_PORT_SESSION_TYPE: {
             halNode.ext.session.sessionType = static_cast<AudioSessionType>(node.ext.session.sessionType);
-            DHLOGD("Convert audio route node To HAL, [Session] sessionType: %d.", halNode.ext.session.sessionType);
+            DHLOGD("Convert audio route node To HAL, [Session] sessionType: %{public}d.",
+                halNode.ext.session.sessionType);
             break;
         }
         default :
@@ -392,7 +393,7 @@ static int32_t GetExtraParamsInternal(struct AudioAdapter *adapter, enum ::Audio
     }
     ret = strcpy_s(value, length, valueHal.c_str());
     if (ret != EOK) {
-        DHLOGE("Strcpy_s failed!, ret: %d", ret);
+        DHLOGE("Strcpy_s failed!, ret: %{public}d", ret);
         return ERR_DH_AUDIO_HDI_CALL_FAILED;
     }
     return DH_SUCCESS;

@@ -130,7 +130,7 @@ int32_t GetLocalDeviceNetworkId(std::string &networkId)
     NodeBasicInfo basicInfo = { { 0 } };
     int32_t ret = GetLocalNodeDeviceInfo(PKG_NAME.c_str(), &basicInfo);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Failed to obtain the network ID of the local device. ret: %d", ret);
+        DHLOGE("Failed to obtain the network ID of the local device. ret: %{public}d", ret);
         return ret;
     }
 
@@ -187,7 +187,7 @@ std::string GetAnonyString(const std::string &value)
 
 int32_t GetDevTypeByDHId(int32_t dhId)
 {
-    DHLOGI("Get dev type by dhId: %d.", dhId);
+    DHLOGI("Get dev type by dhId: %{public}d.", dhId);
     if (static_cast<uint32_t>(dhId) & 0x8000000) {
         return AUDIO_DEVICE_TYPE_MIC;
     } else if (static_cast<uint32_t>(dhId) & 0x7ffffff) {
@@ -237,7 +237,7 @@ int32_t GetAudioParamBool(const std::string &params, const std::string &key, boo
     std::string val;
     int32_t ret = GetAudioParamStr(params, key, val);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Get audio param string fail, error code %d.", ret);
+        DHLOGE("Get audio param string fail, error code %{public}d.", ret);
         return ret;
     }
 
@@ -250,11 +250,11 @@ int32_t GetAudioParamInt(const std::string &params, const std::string &key, int3
     std::string val = "0";
     int32_t ret = GetAudioParamStr(params, key, val);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Get audio param string fail, error code %d.", ret);
+        DHLOGE("Get audio param string fail, error code %{public}d.", ret);
         return ret;
     }
     if (!CheckIsNum(val)) {
-        DHLOGE("String is not number. str:%s.", val.c_str());
+        DHLOGE("String is not number. str:%{public}s.", val.c_str());
         return ERR_DH_AUDIO_NOT_SUPPORT;
     }
     value = std::stoi(val);
@@ -326,18 +326,18 @@ bool CJsonParamCheck(const cJSON *jsonObj, const std::initializer_list<std::stri
     for (auto it = keys.begin(); it != keys.end(); it++) {
         cJSON *paramValue = cJSON_GetObjectItemCaseSensitive(jsonObj, (*it).c_str());
         if (paramValue == nullptr) {
-            DHLOGE("JSON parameter does not contain key: %s", (*it).c_str());
+            DHLOGE("JSON parameter does not contain key: %{public}s", (*it).c_str());
             return false;
         }
         auto iter = typeCheckMap.find(*it);
         if (iter == typeCheckMap.end()) {
-            DHLOGE("Check is not supported yet, key %s.", (*it).c_str());
+            DHLOGE("Check is not supported yet, key %{public}s.", (*it).c_str());
             return false;
         }
         JsonTypeCheckFunc &func = iter->second;
         bool res = (*func)(jsonObj, *it);
         if (!res) {
-            DHLOGE("The key %s value format in JSON is illegal.", (*it).c_str());
+            DHLOGE("The key %{public}s value format in JSON is illegal.", (*it).c_str());
             return false;
         }
     }
@@ -356,7 +356,7 @@ int64_t GetCurNano()
     clockid_t clockId = CLOCK_MONOTONIC;
     int ret = clock_gettime(clockId, &time);
     if (ret < 0) {
-        DHLOGE("GetCurNanoTime fail, ret: %d", ret);
+        DHLOGE("GetCurNanoTime fail, ret: %{public}d", ret);
         return result;
     }
     result = (time.tv_sec * AUDIO_NS_PER_SECOND) + time.tv_nsec;
@@ -367,7 +367,7 @@ int32_t AbsoluteSleep(int64_t nanoTime)
 {
     int32_t ret = -1;
     if (nanoTime <= 0) {
-        DHLOGE("AbsoluteSleep invalid sleep time : %d ns", nanoTime);
+        DHLOGE("AbsoluteSleep invalid sleep time : %{public}" PRId64" ns", nanoTime);
         return ret;
     }
     struct timespec time;
@@ -377,7 +377,7 @@ int32_t AbsoluteSleep(int64_t nanoTime)
     clockid_t clockId = CLOCK_MONOTONIC;
     ret = clock_nanosleep(clockId, TIMER_ABSTIME, &time, nullptr);
     if (ret != 0) {
-        DHLOGE("AbsoluteSleep may failed, ret is : %d", ret);
+        DHLOGE("AbsoluteSleep may failed, ret is : %{public}d", ret);
     }
     return ret;
 }
@@ -402,7 +402,8 @@ int64_t UpdateTimeOffset(const int64_t frameIndex, const int64_t framePeriodNs, 
 bool CheckIsNum(const std::string &jsonString)
 {
     if (jsonString.empty() || jsonString.size() > MAX_KEY_DH_ID_LEN) {
-        DHLOGE("Json string size %d, is zero or too long.", jsonString.size());
+        int32_t stringSize = static_cast<int32_t>(jsonString.size());
+        DHLOGE("Json string size %{public}d, is zero or too long.", stringSize);
         return false;
     }
     for (char const &c : jsonString) {
@@ -417,7 +418,8 @@ bool CheckIsNum(const std::string &jsonString)
 bool CheckDevIdIsLegal(const std::string &devId)
 {
     if (devId.empty() || devId.size() > DAUDIO_MAX_DEVICE_ID_LEN) {
-        DHLOGE("DevId size %d, is zero or too long.", devId.size());
+        int32_t stringSize = static_cast<int32_t>(devId.size());
+        DHLOGE("DevId size %{public}d, is zero or too long.", stringSize);
         return false;
     }
     for (char const &c : devId) {
@@ -453,32 +455,32 @@ std::string GetCJsonString(const char *key, const char *value)
     std::string content(jsonData);
     cJSON_Delete(jParam);
     cJSON_free(jsonData);
-    DHLOGD("create cJSON success : %s", content.c_str());
+    DHLOGD("create cJSON success : %{public}s", content.c_str());
     return content;
 }
 
 std::string ParseStringFromArgs(std::string args, const char *key)
 {
-    DHLOGD("ParseStringFrom Args : %s", args.c_str());
+    DHLOGD("ParseStringFrom Args : %{public}s", args.c_str());
     cJSON *jParam = cJSON_Parse(args.c_str());
     if (jParam == nullptr) {
-        DHLOGE("Failed to parse JSON: %s", cJSON_GetErrorPtr());
+        DHLOGE("Failed to parse JSON: %{public}s", cJSON_GetErrorPtr());
         return "Failed to parse JSON";
     }
     if (!CJsonParamCheck(jParam, { key })) {
-        DHLOGE("Not found the key : %s.", key);
+        DHLOGE("Not found the key : %{public}s.", key);
         cJSON_Delete(jParam);
         return "Not found the key.";
     }
     cJSON *dhIdItem = cJSON_GetObjectItem(jParam, key);
     if (dhIdItem == NULL || !cJSON_IsString(dhIdItem)) {
-        DHLOGE("Not found the value of the key : %s.", key);
+        DHLOGE("Not found the value of the key : %{public}s.", key);
         cJSON_Delete(jParam);
         return "Not found the value.";
     }
     std::string content(dhIdItem->valuestring);
     cJSON_Delete(jParam);
-    DHLOGD("Parsed string is: %s.", content.c_str());
+    DHLOGD("Parsed string is: %{public}s.", content.c_str());
     return content;
 }
 

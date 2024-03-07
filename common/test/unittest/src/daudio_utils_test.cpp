@@ -140,7 +140,6 @@ HWTEST_F(DAudioUtilsTest, DAudioUtilTest_001, TestSize.Level1)
     DHLOGI("DAudio TDD test DHLOGI print.");
     DHLOGW("DAudio TDD test DHLOGW print.");
     DHLOGE("DAudio TDD test DHLOGE print.");
-    DHLog(DHLogLevel::DH_LOG_ERROR, "");
     int64_t tvSec;
     int64_t tvNSec;
     GetCurrentTime(tvSec, tvNSec);

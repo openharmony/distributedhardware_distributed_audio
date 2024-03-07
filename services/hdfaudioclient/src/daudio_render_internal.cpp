@@ -53,7 +53,7 @@ static int32_t RenderFrameInternal(struct AudioRender *render, const void *frame
     std::vector<int8_t> frameHal(requestBytes);
     int32_t ret = memcpy_s(frameHal.data(), requestBytes, uframe, requestBytes);
     if (ret != EOK) {
-        DHLOGE("Copy render frame failed, error code %d.", ret);
+        DHLOGE("Copy render frame failed, error code %{public}d.", ret);
         return ERR_DH_AUDIO_HDI_CALL_FAILED;
     }
     return context->proxy_->RenderFrame(frameHal, *replyBytes);

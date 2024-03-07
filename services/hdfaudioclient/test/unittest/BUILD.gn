@@ -43,6 +43,7 @@ ohos_unittest("AudioAdapterHdiTest") {
 
   external_deps = [
     "drivers_interface_distributed_audio:libdaudio_proxy_1.0",
+    "hilog:libhilog",
     "ipc:ipc_core",
   ]
 
@@ -75,7 +76,10 @@ ohos_unittest("AudioRenderInternalTest") {
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
-  external_deps = [ "drivers_interface_distributed_audio:libdaudio_proxy_1.0" ]
+  external_deps = [
+    "drivers_interface_distributed_audio:libdaudio_proxy_1.0",
+    "hilog:libhilog",
+  ]
 
   defines = [
     "HI_LOG_ENABLE",
@@ -106,7 +110,10 @@ ohos_unittest("AudioCaptureInternalTest") {
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
-  external_deps = [ "drivers_interface_distributed_audio:libdaudio_proxy_1.0" ]
+  external_deps = [
+    "drivers_interface_distributed_audio:libdaudio_proxy_1.0",
+    "hilog:libhilog",
+  ]
 
   defines = [
     "HI_LOG_ENABLE",
@@ -141,6 +148,7 @@ ohos_unittest("AudioAdapterInternalTest") {
   external_deps = [
     "c_utils:utils",
     "drivers_interface_distributed_audio:libdaudio_proxy_1.0",
+    "hilog:libhilog",
   ]
 
   defines = [

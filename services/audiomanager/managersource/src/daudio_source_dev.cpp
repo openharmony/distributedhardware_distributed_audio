@@ -109,7 +109,7 @@ void DAudioSourceDev::SleepAudioDev()
 
 int32_t DAudioSourceDev::EnableDAudio(const std::string &dhId, const std::string &attrs)
 {
-    DHLOGI("Enable audio device, dhId: %s.", dhId.c_str());
+    DHLOGI("Enable audio device, dhId: %{public}s.", dhId.c_str());
     isRpcOpen_.store(true);
     CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
 
@@ -166,7 +166,7 @@ int32_t DAudioSourceDev::DisableDAudioInner(const std::string &dhId)
 
 int32_t DAudioSourceDev::DisableDAudio(const std::string &dhId)
 {
-    DHLOGI("Disable audio device, dhId: %s.", dhId.c_str());
+    DHLOGI("Disable audio device, dhId: %{public}s.", dhId.c_str());
     isRpcOpen_.store(false);
 
     cJSON *jParamClose = cJSON_CreateObject();
@@ -180,7 +180,7 @@ int32_t DAudioSourceDev::DisableDAudio(const std::string &dhId)
     }
     AudioEvent event(AudioEventType::EVENT_UNKNOWN, std::string(data));
     int32_t dhIdNum = ConvertString2Int(dhId);
-    CHECK_AND_FREECHAR_RETURN_RET_LOG(dhIdNum == -1, ERR_DH_AUDIO_NOT_SUPPORT, data, "%s", "Parse dhId error.");
+    CHECK_AND_FREECHAR_RETURN_RET_LOG(dhIdNum == -1, ERR_DH_AUDIO_NOT_SUPPORT, data, "%{public}s", "Parse dhId error.");
     switch (GetDevTypeByDHId(dhIdNum)) {
         case AUDIO_DEVICE_TYPE_SPEAKER:
             event.type = CLOSE_SPEAKER;
@@ -193,14 +193,14 @@ int32_t DAudioSourceDev::DisableDAudio(const std::string &dhId)
         default:
             cJSON_Delete(jParamClose);
             cJSON_free(data);
-            DHLOGE("Unknown audio device. dhId: %d.", dhIdNum);
+            DHLOGE("Unknown audio device. dhId: %{public}d.", dhIdNum);
             return ERR_DH_AUDIO_NOT_SUPPORT;
     }
     cJSON_Delete(jParamClose);
     cJSON_free(data);
     int32_t ret = DisableDAudioInner(dhId);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Failed to disable audio device, result is: %d.", ret);
+        DHLOGE("Failed to disable audio device, result is: %{public}d.", ret);
         return ret;
     }
     DHLOGI("Disable audio task generate successfully.");
@@ -243,10 +243,10 @@ void DAudioSourceDev::SetThreadStatusFlag()
 
 void DAudioSourceDev::NotifyEvent(const AudioEvent &event)
 {
-    DHLOGD("Notify event, eventType: %d.", event.type);
+    DHLOGD("Notify event, eventType: %{public}d.", event.type);
     std::map<AudioEventType, DAudioSourceDevFunc>::iterator iter = memberFuncMap_.find(event.type);
     if (iter == memberFuncMap_.end()) {
-        DHLOGE("Invalid eventType: %d.", event.type);
+        DHLOGE("Invalid eventType: %{public}d.", event.type);
         return;
     }
     DAudioSourceDevFunc &func = iter->second;
@@ -291,7 +291,7 @@ int32_t DAudioSourceDev::HandleDSpeakerOpened(const AudioEvent &event)
 
 int32_t DAudioSourceDev::HandleDSpeakerClosed(const AudioEvent &event)
 {
-    DHLOGI("Speaker device closed, event.content = %s.", event.content.c_str());
+    DHLOGI("Speaker device closed, event.content = %{public}s.", event.content.c_str());
     int32_t dhId = ParseDhidFromEvent(event.content);
     if (dhId < 0) {
         DHLOGE("Failed to parse dhardware id.");
@@ -355,7 +355,7 @@ int32_t DAudioSourceDev::HandleDMicOpened(const AudioEvent &event)
 
 int32_t DAudioSourceDev::HandleDMicClosed(const AudioEvent &event)
 {
-    DHLOGI("Dmic device closed, event.content = %s.", event.content.c_str());
+    DHLOGI("Dmic device closed, event.content = %{public}s.", event.content.c_str());
     CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
     auto eventParam = std::make_shared<AudioEvent>(event);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_DMIC_CLOSED, eventParam, 0);
@@ -388,7 +388,7 @@ int32_t DAudioSourceDev::HandleNotifyRPC(const AudioEvent &event)
     }
 
     rpcResult_ = cJSON_GetObjectItem(jParam, KEY_RESULT)->valueint;
-    DHLOGD("Notify RPC event: %d, result: %d.", event.type, rpcResult_);
+    DHLOGD("Notify RPC event: %{public}d, result: %{public}d.", event.type, rpcResult_);
     std::map<AudioEventType, uint8_t>::iterator iter = eventNotifyMap_.find(event.type);
     if (iter == eventNotifyMap_.end()) {
         DHLOGE("Invalid eventType.");
@@ -459,7 +459,7 @@ int32_t DAudioSourceDev::HandleRenderStateChange(const AudioEvent &event)
 
 int32_t DAudioSourceDev::HandlePlayStatusChange(const AudioEvent &event)
 {
-    DHLOGD("Play status change, content: %s.", event.content.c_str());
+    DHLOGD("Play status change, content: %{public}s.", event.content.c_str());
     CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
     auto eventParam = std::make_shared<AudioEvent>(event);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_CHANGE_PLAY_STATUS, eventParam, 0);
@@ -473,7 +473,7 @@ int32_t DAudioSourceDev::HandlePlayStatusChange(const AudioEvent &event)
 
 int32_t DAudioSourceDev::HandleSpkMmapStart(const AudioEvent &event)
 {
-    DHLOGI("Spk mmap start, content: %s.", event.content.c_str());
+    DHLOGI("Spk mmap start, content: %{public}s.", event.content.c_str());
     CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
     auto eventParam = std::make_shared<AudioEvent>(event);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_MMAP_SPK_START, eventParam, 0);
@@ -487,7 +487,7 @@ int32_t DAudioSourceDev::HandleSpkMmapStart(const AudioEvent &event)
 
 int32_t DAudioSourceDev::HandleSpkMmapStop(const AudioEvent &event)
 {
-    DHLOGI("Spk mmap stop, content: %s.", event.content.c_str());
+    DHLOGI("Spk mmap stop, content: %{public}s.", event.content.c_str());
     CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
     auto eventParam = std::make_shared<AudioEvent>(event);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_MMAP_SPK_STOP, eventParam, 0);
@@ -501,7 +501,7 @@ int32_t DAudioSourceDev::HandleSpkMmapStop(const AudioEvent &event)
 
 int32_t DAudioSourceDev::HandleMicMmapStart(const AudioEvent &event)
 {
-    DHLOGI("Mic mmap start, content: %s.", event.content.c_str());
+    DHLOGI("Mic mmap start, content: %{public}s.", event.content.c_str());
     CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
     auto eventParam = std::make_shared<AudioEvent>(event);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_MMAP_MIC_START, eventParam, 0);
@@ -515,7 +515,7 @@ int32_t DAudioSourceDev::HandleMicMmapStart(const AudioEvent &event)
 
 int32_t DAudioSourceDev::HandleMicMmapStop(const AudioEvent &event)
 {
-    DHLOGI("Mic mmap stop, content: %s.", event.content.c_str());
+    DHLOGI("Mic mmap stop, content: %{public}s.", event.content.c_str());
     CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
     auto eventParam = std::make_shared<AudioEvent>(event);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_MMAP_MIC_STOP, eventParam, 0);
@@ -530,7 +530,7 @@ int32_t DAudioSourceDev::HandleMicMmapStop(const AudioEvent &event)
 int32_t DAudioSourceDev::WaitForRPC(const AudioEventType type)
 {
     std::unique_lock<std::mutex> lck(rpcWaitMutex_);
-    DHLOGI("Wait sink device notify type: %d.", type);
+    DHLOGI("Wait sink device notify type: %{public}d.", type);
     auto status = rpcWaitCond_.wait_for(lck, std::chrono::seconds(RPC_WAIT_SECONDS), [this, type]() {
         switch (type) {
             case AudioEventType::NOTIFY_OPEN_SPEAKER_RESULT:
@@ -550,7 +550,7 @@ int32_t DAudioSourceDev::WaitForRPC(const AudioEventType type)
         }
     });
     if (!status) {
-        DHLOGE("RPC notify wait timeout(%ds).", RPC_WAIT_SECONDS);
+        DHLOGE("RPC notify wait timeout(%{public}ds).", RPC_WAIT_SECONDS);
         return ERR_DH_AUDIO_SA_WAIT_TIMEOUT;
     }
     if (rpcResult_ != DH_SUCCESS) {
@@ -559,7 +559,7 @@ int32_t DAudioSourceDev::WaitForRPC(const AudioEventType type)
     }
     rpcNotify_ = 0;
     rpcResult_ = ERR_DH_AUDIO_FAILED;
-    DHLOGD("Receive sink device notify type: %d.", type);
+    DHLOGD("Receive sink device notify type: %{public}d.", type);
     return DH_SUCCESS;
 }
 
@@ -598,7 +598,7 @@ int32_t DAudioSourceDev::TaskEnableDAudio(const std::string &args)
             result = EnableDMic(dhId, attrsStr);
             break;
         default:
-            DHLOGE("Unknown audio device. dhId: %d.", dhId);
+            DHLOGE("Unknown audio device. dhId: %{public}d.", dhId);
             result = ERR_DH_AUDIO_NOT_SUPPORT;
     }
     cJSON_Delete(jParam);
@@ -668,16 +668,16 @@ int32_t DAudioSourceDev::TaskDisableDAudio(const std::string &args)
     CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
     int32_t dhId = ParseDhidFromEvent(args);
     CHECK_AND_FREE_RETURN_RET_LOG(dhId == -1, ERR_DH_AUDIO_NULLPTR, jParam,
-        "%s", "Parse dhId error.");
+        "%{public}s", "Parse dhId error.");
     cJSON_Delete(jParam);
-    DHLOGI("Parsed dhId = %d", dhId);
+    DHLOGI("Parsed dhId = %{public}d", dhId);
     switch (GetDevTypeByDHId(dhId)) {
         case AUDIO_DEVICE_TYPE_SPEAKER:
             return DisableDSpeaker(dhId);
         case AUDIO_DEVICE_TYPE_MIC:
             return DisableDMic(dhId);
         default:
-            DHLOGE("Unknown audio device. hdId: %d.", dhId);
+            DHLOGE("Unknown audio device. hdId: %{public}d.", dhId);
             return ERR_DH_AUDIO_NOT_SUPPORT;
     }
 }
@@ -729,7 +729,7 @@ void DAudioSourceDev::OnDisableTaskResult(int32_t resultCode, const std::string 
 int32_t DAudioSourceDev::TaskOpenDSpeaker(const std::string &args)
 {
     DAudioHitrace trace("DAudioSourceDev::TaskOpenDSpeaker");
-    DHLOGI("Task open speaker args: %s.", args.c_str());
+    DHLOGI("Task open speaker args: %{public}s.", args.c_str());
     if (args.length() > DAUDIO_MAX_JSON_LEN || args.empty()) {
         DHLOGE("args length error. 0 or max.");
         return ERR_DH_AUDIO_SA_PARAM_INVALID;
@@ -747,7 +747,7 @@ int32_t DAudioSourceDev::TaskOpenDSpeaker(const std::string &args)
     }
     int32_t ret = speaker->InitSenderEngine(DAudioSourceManager::GetInstance().getSenderProvider());
     if (ret != DH_SUCCESS) {
-        DHLOGE("Speaker init sender Engine, error code %d.", ret);
+        DHLOGE("Speaker init sender Engine, error code %{public}d.", ret);
         NotifyHDF(NOTIFY_OPEN_SPEAKER_RESULT, HDF_EVENT_INIT_ENGINE_FAILED, dhId);
         return ret;
     }
@@ -758,7 +758,7 @@ int32_t DAudioSourceDev::TaskOpenDSpeaker(const std::string &args)
     std::string dhIdString = std::to_string(dhId);
     ret = NotifySinkDev(OPEN_SPEAKER, jAudioParam, dhIdString);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Notify sink open speaker failed, error code %d.", ret);
+        DHLOGE("Notify sink open speaker failed, error code %{public}d.", ret);
         cJSON_Delete(jAudioParam);
         NotifyHDF(NOTIFY_OPEN_SPEAKER_RESULT, HDF_EVENT_NOTIFY_SINK_FAILED, dhId);
         return ret;
@@ -766,7 +766,7 @@ int32_t DAudioSourceDev::TaskOpenDSpeaker(const std::string &args)
     ret = OpenDSpeakerInner(speaker, dhId);
     if (ret != DH_SUCCESS) {
         cJSON_Delete(jAudioParam);
-        DHLOGE("Task Open DSpeaker Execute failed, error code %d.", ret);
+        DHLOGE("Task Open DSpeaker Execute failed, error code %{public}d.", ret);
         return ret;
     }
     cJSON_Delete(jAudioParam);
@@ -775,7 +775,7 @@ int32_t DAudioSourceDev::TaskOpenDSpeaker(const std::string &args)
 
 int32_t DAudioSourceDev::ParseDhidFromEvent(std::string args)
 {
-    DHLOGI("ParseDhidFrom args : %s", args.c_str());
+    DHLOGI("ParseDhidFrom args : %{public}s", args.c_str());
     cJSON *jParam = cJSON_Parse(args.c_str());
     CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_FAILED);
     if (!CJsonParamCheck(jParam, { KEY_DH_ID })) {
@@ -791,14 +791,14 @@ int32_t DAudioSourceDev::ParseDhidFromEvent(std::string args)
     }
     int32_t dhId = ConvertString2Int(std::string(dhIdItem->valuestring));
     cJSON_Delete(jParam);
-    DHLOGI("Parsed dhId is: %d.", dhId);
+    DHLOGI("Parsed dhId is: %{public}d.", dhId);
     return dhId;
 }
 
 int32_t DAudioSourceDev::ConvertString2Int(std::string val)
 {
     if (!CheckIsNum(val)) {
-        DHLOGE("String is not number. str:%s.", val.c_str());
+        DHLOGE("String is not number. str:%{public}s.", val.c_str());
         return ERR_DH_AUDIO_FAILED;
     }
     return std::stoi(val);
@@ -808,13 +808,13 @@ int32_t DAudioSourceDev::OpenDSpeakerInner(std::shared_ptr<DAudioIoDev> &speaker
 {
     int32_t ret = speaker->SetUp();
     if (ret != DH_SUCCESS) {
-        DHLOGE("Speaker setup failed, error code %d.", ret);
+        DHLOGE("Speaker setup failed, error code %{public}d.", ret);
         NotifyHDF(NOTIFY_OPEN_SPEAKER_RESULT, HDF_EVENT_TRANS_SETUP_FAILED, dhId);
         return ret;
     }
     ret = speaker->Start();
     if (ret != DH_SUCCESS) {
-        DHLOGE("Speaker start failed, error code %d.", ret);
+        DHLOGE("Speaker start failed, error code %{public}d.", ret);
         speaker->Stop();
         speaker->Release();
         NotifyHDF(NOTIFY_OPEN_SPEAKER_RESULT, HDF_EVENT_TRANS_START_FAILED, dhId);
@@ -830,7 +830,7 @@ int32_t DAudioSourceDev::CloseSpkNew(const std::string &args)
     cJSON *jAudioParam = nullptr;
     int32_t dhId = ParseDhidFromEvent(args);
     CHECK_AND_RETURN_RET_LOG(dhId == -1, ERR_DH_AUDIO_NULLPTR,
-        "%s", "Parse dhId error.");
+        "%{public}s", "Parse dhId error.");
     NotifySinkDev(CLOSE_SPEAKER, jAudioParam, std::to_string(dhId));
     bool closeStatus = true;
     auto speaker = FindIoDevImpl(args);
@@ -851,7 +851,7 @@ int32_t DAudioSourceDev::CloseSpkNew(const std::string &args)
 
 int32_t DAudioSourceDev::TaskCloseDSpeaker(const std::string &args)
 {
-    DHLOGI("Task close speaker, args: %s.", args.c_str());
+    DHLOGI("Task close speaker, args: %{public}s.", args.c_str());
     int32_t dhId = ParseDhidFromEvent(args);
     if (dhId < 0) {
         DHLOGE("Failed to parse dhardware id.");
@@ -880,12 +880,12 @@ int32_t DAudioSourceDev::TaskCloseDSpeaker(const std::string &args)
 
 int32_t DAudioSourceDev::TaskOpenDMic(const std::string &args)
 {
-    DHLOGI("Task open mic, args: %s.", args.c_str());
+    DHLOGI("Task open mic, args: %{public}s.", args.c_str());
     if (args.length() > DAUDIO_MAX_JSON_LEN || args.empty()) {
         return ERR_DH_AUDIO_SA_PARAM_INVALID;
     }
     int32_t dhId = ParseDhidFromEvent(args);
-    CHECK_AND_RETURN_RET_LOG(dhId < 0, ERR_DH_AUDIO_FAILED, "%s", "Failed to parse dhardware id.");
+    CHECK_AND_RETURN_RET_LOG(dhId < 0, ERR_DH_AUDIO_FAILED, "%{public}s", "Failed to parse dhardware id.");
     auto mic = FindIoDevImpl(args);
     if (mic == nullptr) {
         DHLOGE("Mic device not init");
@@ -910,7 +910,7 @@ int32_t DAudioSourceDev::TaskOpenDMic(const std::string &args)
     to_json(jAudioParam, mic->GetAudioParam());
     ret = NotifySinkDev(OPEN_MIC, jAudioParam, std::to_string(dhId));
     if (ret != DH_SUCCESS) {
-        DHLOGE("Notify sink open mic failed, error code %d.", ret);
+        DHLOGE("Notify sink open mic failed, error code %{public}d.", ret);
         mic->Release();
         NotifyHDF(NOTIFY_OPEN_MIC_RESULT, HDF_EVENT_NOTIFY_SINK_FAILED, dhId);
         cJSON_Delete(jAudioParam);
@@ -919,7 +919,7 @@ int32_t DAudioSourceDev::TaskOpenDMic(const std::string &args)
 
     ret = mic->Start();
     if (ret != DH_SUCCESS) {
-        DHLOGE("Mic start failed, error code %d.", ret);
+        DHLOGE("Mic start failed, error code %{public}d.", ret);
         mic->Stop();
         mic->Release();
         NotifyHDF(NOTIFY_OPEN_MIC_RESULT, HDF_EVENT_TRANS_START_FAILED, dhId);
@@ -937,7 +937,7 @@ int32_t DAudioSourceDev::CloseMicNew(const std::string &args)
     cJSON *jAudioParam = nullptr;
     int32_t dhId = ParseDhidFromEvent(args);
     CHECK_AND_RETURN_RET_LOG(dhId == -1, ERR_DH_AUDIO_NULLPTR,
-        "%s", "Parse dhId error.");
+        "%{public}s", "Parse dhId error.");
     NotifySinkDev(CLOSE_MIC, jAudioParam, std::to_string(dhId));
 
     auto mic = FindIoDevImpl(args);
@@ -950,7 +950,7 @@ int32_t DAudioSourceDev::CloseMicNew(const std::string &args)
 
 int32_t DAudioSourceDev::TaskCloseDMic(const std::string &args)
 {
-    DHLOGI("Task close mic, args: %s.", args.c_str());
+    DHLOGI("Task close mic, args: %{public}s.", args.c_str());
     if (args.length() > DAUDIO_MAX_JSON_LEN || args.empty()) {
         DHLOGE("Args length err. 0 or max.");
         return ERR_DH_AUDIO_SA_PARAM_INVALID;
@@ -978,7 +978,7 @@ int32_t DAudioSourceDev::TaskCloseDMic(const std::string &args)
 
 int32_t DAudioSourceDev::TaskDMicClosed(const std::string &args)
 {
-    DHLOGI("Task dmic closed, args: %s.", args.c_str());
+    DHLOGI("Task dmic closed, args: %{public}s.", args.c_str());
     if (args.length() > DAUDIO_MAX_JSON_LEN || args.empty()) {
         DHLOGE("Args length err. 0 or max.");
         return ERR_DH_AUDIO_SA_PARAM_INVALID;
@@ -996,14 +996,14 @@ int32_t DAudioSourceDev::TaskDMicClosed(const std::string &args)
 
 int32_t DAudioSourceDev::TaskSetVolume(const std::string &args)
 {
-    DHLOGD("Task set volume, args: %s.", args.c_str());
+    DHLOGD("Task set volume, args: %{public}s.", args.c_str());
     AudioEvent event(getEventTypeFromArgs(args), args);
     return SendAudioEventToRemote(event);
 }
 
 int32_t DAudioSourceDev::TaskChangeVolume(const std::string &args)
 {
-    DHLOGD("Task change volume, args: %s.", args.c_str());
+    DHLOGD("Task change volume, args: %{public}s.", args.c_str());
     cJSON *jParam = cJSON_Parse(args.c_str());
     CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
     if (!CJsonParamCheck(jParam, { KEY_DH_ID })) {
@@ -1024,7 +1024,7 @@ int32_t DAudioSourceDev::TaskChangeVolume(const std::string &args)
 
 int32_t DAudioSourceDev::TaskChangeFocus(const std::string &args)
 {
-    DHLOGD("Task change focus, args: %s.", args.c_str());
+    DHLOGD("Task change focus, args: %{public}s.", args.c_str());
     int32_t dhId = ParseDhidFromEvent(args);
     if (dhId < 0) {
         DHLOGE("Failed to parse dhardware id.");
@@ -1035,7 +1035,7 @@ int32_t DAudioSourceDev::TaskChangeFocus(const std::string &args)
 
 int32_t DAudioSourceDev::TaskChangeRenderState(const std::string &args)
 {
-    DHLOGD("Task change render state, args: %s.", args.c_str());
+    DHLOGD("Task change render state, args: %{public}s.", args.c_str());
     cJSON *jParam = cJSON_Parse(args.c_str());
     CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
 
@@ -1057,7 +1057,7 @@ int32_t DAudioSourceDev::TaskChangeRenderState(const std::string &args)
 
 int32_t DAudioSourceDev::TaskPlayStatusChange(const std::string &args)
 {
-    DHLOGD("Task play status change, content: %s.", args.c_str());
+    DHLOGD("Task play status change, content: %{public}s.", args.c_str());
     AudioEvent audioEvent(CHANGE_PLAY_STATUS, args);
     if (SendAudioEventToRemote(audioEvent) != DH_SUCCESS) {
         DHLOGE("Task Play status change failed.");
@@ -1111,19 +1111,19 @@ int32_t DAudioSourceDev::SendAudioEventToRemote(const AudioEvent &event)
 
 int32_t DAudioSourceDev::TaskSpkMmapStart(const std::string &args)
 {
-    DHLOGI("Task spk mmap start, content: %s.", args.c_str());
+    DHLOGI("Task spk mmap start, content: %{public}s.", args.c_str());
     auto speaker = FindIoDevImpl(args);
     CHECK_NULL_RETURN(speaker, ERR_DH_AUDIO_NULLPTR);
     int32_t ret = speaker->MmapStart();
     if (ret != DH_SUCCESS) {
-        DHLOGE("Task spk mmap start fail, error code: %d.", ret);
+        DHLOGE("Task spk mmap start fail, error code: %{public}d.", ret);
     }
     return ret;
 }
 
 int32_t DAudioSourceDev::TaskSpkMmapStop(const std::string &args)
 {
-    DHLOGI("Task spk mmap stop, content: %s.", args.c_str());
+    DHLOGI("Task spk mmap stop, content: %{public}s.", args.c_str());
     auto speaker = FindIoDevImpl(args);
     CHECK_NULL_RETURN(speaker, ERR_DH_AUDIO_NULLPTR);
     speaker->MmapStop();
@@ -1132,19 +1132,19 @@ int32_t DAudioSourceDev::TaskSpkMmapStop(const std::string &args)
 
 int32_t DAudioSourceDev::TaskMicMmapStart(const std::string &args)
 {
-    DHLOGI("Task mic mmap start, content: %s.", args.c_str());
+    DHLOGI("Task mic mmap start, content: %{public}s.", args.c_str());
     auto mic = FindIoDevImpl(args);
     CHECK_NULL_RETURN(mic, ERR_DH_AUDIO_NULLPTR);
     int32_t ret = mic->MmapStart();
     if (ret != DH_SUCCESS) {
-        DHLOGE("Task mic mmap start fail, error code: %d.", ret);
+        DHLOGE("Task mic mmap start fail, error code: %{public}d.", ret);
     }
     return ret;
 }
 
 int32_t DAudioSourceDev::TaskMicMmapStop(const std::string &args)
 {
-    DHLOGI("Task mic mmap stop, content: %s.", args.c_str());
+    DHLOGI("Task mic mmap stop, content: %{public}s.", args.c_str());
     auto mic = FindIoDevImpl(args);
     CHECK_NULL_RETURN(mic, ERR_DH_AUDIO_NULLPTR);
     mic->MmapStop();
@@ -1156,7 +1156,7 @@ void DAudioSourceDev::OnTaskResult(int32_t resultCode, const std::string &result
     (void)resultCode;
     (void)result;
     (void)funcName;
-    DHLOGD("OnTaskResult. resultcode: %d, result: %s, funcName: %s", resultCode, result.c_str(),
+    DHLOGD("OnTaskResult. resultcode: %{public}d, result: %{public}s, funcName: %{public}s", resultCode, result.c_str(),
         funcName.c_str());
 }
 
@@ -1177,12 +1177,12 @@ int32_t DAudioSourceDev::NotifySinkDev(const AudioEventType type, const cJSON *P
     cJSON *jParamCopy = cJSON_Duplicate(Param, 1);
     cJSON_AddItemToObject(jParam, KEY_AUDIO_PARAM, jParamCopy);
     cJSON_AddStringToObject(jParam, KEY_RANDOM_TASK_CODE, std::to_string(randomTaskCode).c_str());
-    DHLOGD("Notify sink dev, new engine, random task code:%s", std::to_string(randomTaskCode).c_str());
+    DHLOGD("Notify sink dev, new engine, random task code:%{public}s", std::to_string(randomTaskCode).c_str());
 
     std::lock_guard<std::mutex> devLck(ioDevMtx_);
     int32_t dhIdInt = ConvertString2Int(dhId);
     if (deviceMap_.find(dhIdInt) == deviceMap_.end()) {
-        DHLOGE("speaker or mic dev is null. find index: %d.", dhIdInt);
+        DHLOGE("speaker or mic dev is null. find index: %{public}d.", dhIdInt);
         cJSON_Delete(jParam);
         return ERR_DH_AUDIO_NULLPTR;
     }
@@ -1212,10 +1212,10 @@ int32_t DAudioSourceDev::NotifySinkDev(const AudioEventType type, const cJSON *P
 
 int32_t DAudioSourceDev::NotifyHDF(const AudioEventType type, const std::string result, const int32_t dhId)
 {
-    DHLOGI("Notify HDF framework the result, event type: %d; result: %s.", type, result.c_str());
+    DHLOGI("Notify HDF framework the result, event type: %{public}d; result: %{public}s.", type, result.c_str());
     std::lock_guard<std::mutex> devLck(ioDevMtx_);
     if (deviceMap_.find(dhId) == deviceMap_.end()) {
-        DHLOGE("Speaker or mic dev is null. dhId: %d", dhId);
+        DHLOGE("Speaker or mic dev is null. dhId: %{public}d", dhId);
         return ERR_DH_AUDIO_NULLPTR;
     }
     auto ioDev = deviceMap_[dhId];
@@ -1289,7 +1289,7 @@ void DAudioSourceDev::SourceEventHandler::ProcessEvent(const AppExecFwk::InnerEv
 {
     auto iter = mapEventFuncs_.find(event->GetInnerEventId());
     if (iter == mapEventFuncs_.end()) {
-        DHLOGE("Event Id is invaild. %d", event->GetInnerEventId());
+        DHLOGE("Event Id is invaild. %{public}d", event->GetInnerEventId());
         return;
     }
     SourceEventFunc &func = iter->second;

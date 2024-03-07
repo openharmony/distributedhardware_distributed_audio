@@ -49,7 +49,7 @@ void DMicDev::OnEngineTransEvent(const AVTransEvent &event)
 void DMicDev::OnEngineTransMessage(const std::shared_ptr<AVTransMessage> &message)
 {
     CHECK_NULL_VOID(message);
-    DHLOGI("On Engine message, type : %s.", GetEventNameByType(message->type_).c_str());
+    DHLOGI("On Engine message, type : %{public}s.", GetEventNameByType(message->type_).c_str());
     DAudioSourceManager::GetInstance().HandleDAudioNotify(message->dstDevId_, message->dstDevId_,
         message->type_, message->content_);
 }
@@ -87,10 +87,10 @@ int32_t DMicDev::InitSenderEngine(IAVEngineProvider *providerPtr)
 
 int32_t DMicDev::EnableDevice(const int32_t dhId, const std::string &capability)
 {
-    DHLOGI("Enable IO device, device pin: %d.", dhId);
+    DHLOGI("Enable IO device, device pin: %{public}d.", dhId);
     int32_t ret = DAudioHdiHandler::GetInstance().RegisterAudioDevice(devId_, dhId, capability, shared_from_this());
     if (ret != DH_SUCCESS) {
-        DHLOGE("Register device failed, ret: %d.", ret);
+        DHLOGE("Register device failed, ret: %{public}d.", ret);
         DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_REGISTER_FAIL, devId_, std::to_string(dhId), ret,
             "daudio register device failed.");
         return ret;
@@ -101,10 +101,10 @@ int32_t DMicDev::EnableDevice(const int32_t dhId, const std::string &capability)
 
 int32_t DMicDev::DisableDevice(const int32_t dhId)
 {
-    DHLOGI("Disable IO device, device pin: %d.", dhId);
+    DHLOGI("Disable IO device, device pin: %{public}d.", dhId);
     int32_t ret = DAudioHdiHandler::GetInstance().UnRegisterAudioDevice(devId_, dhId);
     if (ret != DH_SUCCESS) {
-        DHLOGE("UnRegister failed, ret: %d.", ret);
+        DHLOGE("UnRegister failed, ret: %{public}d.", ret);
         DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_UNREGISTER_FAIL, devId_, std::to_string(dhId), ret,
             "daudio unregister device failed.");
         return ret;
@@ -114,7 +114,7 @@ int32_t DMicDev::DisableDevice(const int32_t dhId)
 
 int32_t DMicDev::OpenDevice(const std::string &devId, const int32_t dhId)
 {
-    DHLOGI("Open mic device devId: %s, dhId: %d.", GetAnonyString(devId).c_str(), dhId);
+    DHLOGI("Open mic device devId: %{public}s, dhId: %{public}d.", GetAnonyString(devId).c_str(), dhId);
     std::shared_ptr<IAudioEventCallback> cbObj = audioEventCallback_.lock();
     CHECK_NULL_RETURN(cbObj, ERR_DH_AUDIO_NULLPTR);
 
@@ -139,7 +139,7 @@ int32_t DMicDev::OpenDevice(const std::string &devId, const int32_t dhId)
 
 int32_t DMicDev::CloseDevice(const std::string &devId, const int32_t dhId)
 {
-    DHLOGI("Close mic device devId: %s, dhId: %d.", GetAnonyString(devId).c_str(), dhId);
+    DHLOGI("Close mic device devId: %{public}s, dhId: %{public}d.", GetAnonyString(devId).c_str(), dhId);
     std::shared_ptr<IAudioEventCallback> cbObj = audioEventCallback_.lock();
     CHECK_NULL_RETURN(cbObj, ERR_DH_AUDIO_NULLPTR);
 
@@ -165,10 +165,9 @@ int32_t DMicDev::CloseDevice(const std::string &devId, const int32_t dhId)
 
 int32_t DMicDev::SetParameters(const std::string &devId, const int32_t dhId, const AudioParamHDF &param)
 {
-    DHLOGD("Set mic parameters {samplerate: %d, channelmask: %d, format: %d, period: %d, "
-        "framesize: %d, ext{%s}}.",
-        param.sampleRate, param.channelMask, param.bitFormat, param.period, param.frameSize,
-        param.ext.c_str());
+    DHLOGD("Set mic parameters {samplerate: %{public}d, channelmask: %{public}d, format: %{public}d, "
+        "period: %{public}d, framesize: %{public}d, ext{%{public}s}}.", param.sampleRate,
+        param.channelMask, param.bitFormat, param.period, param.frameSize, param.ext.c_str());
     curPort_ = dhId;
     paramHDF_ = param;
 
@@ -184,7 +183,7 @@ int32_t DMicDev::SetParameters(const std::string &devId, const int32_t dhId, con
 
 int32_t DMicDev::NotifyEvent(const std::string &devId, const int32_t dhId, const AudioEvent &event)
 {
-    DHLOGD("Notify mic event, type: %d.", event.type);
+    DHLOGD("Notify mic event, type: %{public}d.", event.type);
     std::shared_ptr<IAudioEventCallback> cbObj = audioEventCallback_.lock();
     CHECK_NULL_RETURN(cbObj, ERR_DH_AUDIO_NULLPTR);
     switch (event.type) {
@@ -210,7 +209,7 @@ int32_t DMicDev::SetUp()
     CHECK_NULL_RETURN(micTrans_, ERR_DH_AUDIO_NULLPTR);
     int32_t ret = micTrans_->SetUp(param_, param_, shared_from_this(), CAP_MIC);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Mic trans set up failed. ret: %d.", ret);
+        DHLOGE("Mic trans set up failed. ret: %{public}d.", ret);
         return ret;
     }
     return DH_SUCCESS;
@@ -222,14 +221,14 @@ int32_t DMicDev::Start()
     CHECK_NULL_RETURN(micTrans_, ERR_DH_AUDIO_NULLPTR);
     int32_t ret = micTrans_->Start();
     if (ret != DH_SUCCESS) {
-        DHLOGE("Mic trans start failed, ret: %d.", ret);
+        DHLOGE("Mic trans start failed, ret: %{public}d.", ret);
         return ret;
     }
     std::unique_lock<std::mutex> lck(channelWaitMutex_);
     auto status = channelWaitCond_.wait_for(lck, std::chrono::seconds(CHANNEL_WAIT_SECONDS),
         [this]() { return isTransReady_.load(); });
     if (!status) {
-        DHLOGE("Wait channel open timeout(%ds).", CHANNEL_WAIT_SECONDS);
+        DHLOGE("Wait channel open timeout(%{public}ds).", CHANNEL_WAIT_SECONDS);
         return ERR_DH_AUDIO_SA_WAIT_TIMEOUT;
     }
     isOpened_.store(true);
@@ -256,7 +255,7 @@ int32_t DMicDev::Stop()
     isTransReady_.store(false);
     int32_t ret = micTrans_->Stop();
     if (ret != DH_SUCCESS) {
-        DHLOGE("Stop mic trans failed, ret: %d.", ret);
+        DHLOGE("Stop mic trans failed, ret: %{public}d.", ret);
     }
     return DH_SUCCESS;
 }
@@ -274,7 +273,7 @@ int32_t DMicDev::Release()
 
     int32_t ret = micTrans_->Release();
     if (ret != DH_SUCCESS) {
-        DHLOGE("Release mic trans failed, ret: %d.", ret);
+        DHLOGE("Release mic trans failed, ret: %{public}d.", ret);
         return ret;
     }
     dumpFlag_.store(false);
@@ -306,11 +305,11 @@ int32_t DMicDev::ReadStreamData(const std::string &devId, const int32_t dhId, st
     if (insertFrameCnt_ >= queSize || queSize == 0) {
         ++insertFrameCnt_;
         isExistedEmpty_.store(true);
-        DHLOGD("Data queue is empty, count :%u.", insertFrameCnt_);
+        DHLOGD("Data queue is empty, count :%{public}u.", insertFrameCnt_);
         data = std::make_shared<AudioData>(param_.comParam.frameSize);
     } else {
         while (insertFrameCnt_ > 0) {
-            DHLOGD("Data discard, count: %u", insertFrameCnt_);
+            DHLOGD("Data discard, count: %{public}u", insertFrameCnt_);
             dataQueue_.pop();
             --insertFrameCnt_;
         }
@@ -329,8 +328,8 @@ int32_t DMicDev::ReadStreamData(const std::string &devId, const int32_t dhId, st
 #endif
     int64_t endTime = GetNowTimeUs();
     if (IsOutDurationRange(startTime, endTime, lastReadStartTime_)) {
-        DHLOGE("This time read data spend: %lld us, The interval of read data this time and the last time: %lld us",
-            endTime - startTime, startTime - lastReadStartTime_);
+        DHLOGE("This time read data spend: %{public}" PRId64" us, The interval of read data this time and "
+            "the last time: %{public}" PRId64" us", endTime - startTime, startTime - lastReadStartTime_);
     }
     lastReadStartTime_ = startTime;
     return DH_SUCCESS;
@@ -339,7 +338,7 @@ int32_t DMicDev::ReadStreamData(const std::string &devId, const int32_t dhId, st
 int32_t DMicDev::ReadMmapPosition(const std::string &devId, const int32_t dhId,
     uint64_t &frames, CurrentTimeHDF &time)
 {
-    DHLOGD("Read mmap position. frames: %lu, tvsec: %lu, tvNSec:%lu",
+    DHLOGD("Read mmap position. frames: %{public}" PRIu64", tvsec: %{public}" PRId64", tvNSec:%{public}" PRId64,
         writeNum_, writeTvSec_, writeTvNSec_);
     frames = writeNum_;
     time.tvSec = writeTvSec_;
@@ -350,7 +349,8 @@ int32_t DMicDev::ReadMmapPosition(const std::string &devId, const int32_t dhId,
 int32_t DMicDev::RefreshAshmemInfo(const std::string &devId, const int32_t dhId,
     int32_t fd, int32_t ashmemLength, int32_t lengthPerTrans)
 {
-    DHLOGD("RefreshAshmemInfo: fd:%d, ashmemLength: %d, lengthPerTrans: %d", fd, ashmemLength, lengthPerTrans);
+    DHLOGD("RefreshAshmemInfo: fd:%{public}d, ashmemLength: %{public}d, lengthPerTrans: %{public}d",
+        fd, ashmemLength, lengthPerTrans);
     if (param_.captureOpts.capturerFlags == MMAP_MODE) {
         DHLOGD("DMic dev low-latency mode");
         if (ashmem_ != nullptr) {
@@ -359,7 +359,7 @@ int32_t DMicDev::RefreshAshmemInfo(const std::string &devId, const int32_t dhId,
         ashmem_ = new Ashmem(fd, ashmemLength);
         ashmemLength_ = ashmemLength;
         lengthPerTrans_ = lengthPerTrans;
-        DHLOGD("Create ashmem success. fd:%d, ashmem length: %d, lengthPreTrans: %d",
+        DHLOGD("Create ashmem success. fd:%{public}d, ashmem length: %{public}d, lengthPreTrans: %{public}d",
             fd, ashmemLength_, lengthPerTrans_);
         bool mapRet = ashmem_->MapReadAndWriteAshmem();
         if (!mapRet) {
@@ -388,12 +388,12 @@ void DMicDev::EnqueueThread()
 {
     writeIndex_ = 0;
     writeNum_ = 0;
-    DHLOGD("Enqueue thread start, lengthPerWrite length: %d.", lengthPerTrans_);
+    DHLOGD("Enqueue thread start, lengthPerWrite length: %{public}d.", lengthPerTrans_);
     FillJitterQueue();
     while (ashmem_ != nullptr && isEnqueueRunning_.load()) {
         int64_t timeOffset = UpdateTimeOffset(frameIndex_, LOW_LATENCY_INTERVAL_NS,
             startTime_);
-        DHLOGD("Write frameIndex: %lld, timeOffset: %lld.", frameIndex_, timeOffset);
+        DHLOGD("Write frameIndex: %{public}" PRId64", timeOffset: %{public}" PRId64, frameIndex_, timeOffset);
         std::shared_ptr<AudioData> audioData = nullptr;
         {
             std::lock_guard<std::mutex> lock(dataQueueMtx_);
@@ -412,7 +412,8 @@ void DMicDev::EnqueueThread()
 #endif
         bool writeRet = ashmem_->WriteToAshmem(audioData->Data(), audioData->Size(), writeIndex_);
         if (writeRet) {
-            DHLOGD("Write to ashmem success! write index: %d, writeLength: %d.", writeIndex_, lengthPerTrans_);
+            DHLOGD("Write to ashmem success! write index: %{public}d, writeLength: %{public}d.",
+                writeIndex_, lengthPerTrans_);
         } else {
             DHLOGE("Write data to ashmem failed.");
         }
@@ -461,14 +462,14 @@ int32_t DMicDev::NotifyHdfAudioEvent(const AudioEvent &event, const int32_t port
 {
     int32_t ret = DAudioHdiHandler::GetInstance().NotifyEvent(devId_, portId, event);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Notify event: %d, result: %s.", event.type, event.content.c_str());
+        DHLOGE("Notify event: %{public}d, result: %{public}s.", event.type, event.content.c_str());
     }
     return DH_SUCCESS;
 }
 
 int32_t DMicDev::OnStateChange(const AudioEventType type)
 {
-    DHLOGD("On mic device state change, type: %d", type);
+    DHLOGD("On mic device state change, type: %{public}d", type);
     AudioEvent event;
     switch (type) {
         case AudioEventType::DATA_OPENED:
@@ -494,7 +495,7 @@ int32_t DMicDev::SendMessage(uint32_t type, std::string content, std::string dst
 {
     DHLOGI("Send message to remote.");
     if (type != static_cast<uint32_t>(OPEN_MIC) && type != static_cast<uint32_t>(CLOSE_MIC)) {
-        DHLOGE("Send message to remote. not OPEN_MIC or CLOSE_MIC. type: %u", type);
+        DHLOGE("Send message to remote. not OPEN_MIC or CLOSE_MIC. type: %{public}u", type);
         return ERR_DH_AUDIO_NULLPTR;
     }
     CHECK_NULL_RETURN(micTrans_, ERR_DH_AUDIO_NULLPTR);
@@ -512,12 +513,15 @@ int32_t DMicDev::OnDecodeTransDataDone(const std::shared_ptr<AudioData> &audioDa
     if (isExistedEmpty_.load()) {
         dataQueSize_ = param_.captureOpts.capturerFlags == MMAP_MODE ? dataQueSize_ : DATA_QUEUE_EXT_SIZE;
     }
+    uint64_t queueSize;
     while (dataQueue_.size() > dataQueSize_) {
-        DHLOGD("Data queue overflow. buf current size: %d", dataQueue_.size());
+        queueSize = static_cast<uint64_t>(dataQueue_.size());
+        DHLOGD("Data queue overflow. buf current size: %{public}" PRIu64, queueSize);
         dataQueue_.pop();
     }
     dataQueue_.push(audioData);
-    DHLOGD("Push new mic data, buf len: %d", dataQueue_.size());
+    queueSize = static_cast<uint64_t>(dataQueue_.size());
+    DHLOGD("Push new mic data, buf len: %{public}" PRIu64, queueSize);
     return DH_SUCCESS;
 }
 } // DistributedHardware

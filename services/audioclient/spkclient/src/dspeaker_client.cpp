@@ -47,7 +47,7 @@ void DSpeakerClient::OnEngineTransEvent(const AVTransEvent &event)
 void DSpeakerClient::OnEngineTransMessage(const std::shared_ptr<AVTransMessage> &message)
 {
     CHECK_NULL_VOID(message);
-    DHLOGI("On Engine message, type : %s.", GetEventNameByType(message->type_).c_str());
+    DHLOGI("On Engine message, type : %{public}s.", GetEventNameByType(message->type_).c_str());
     DAudioSinkManager::GetInstance().HandleDAudioNotify(message->dstDevId_, message->dstDevId_,
         static_cast<int32_t>(message->type_), message->content_);
 }
@@ -74,8 +74,8 @@ int32_t DSpeakerClient::InitReceiverEngine(IAVEngineProvider *providerPtr)
 
 int32_t DSpeakerClient::CreateAudioRenderer(const AudioParam &param)
 {
-    DHLOGD("Set up spk client: {sampleRate: %d, bitFormat: %d, channelMask: %d," +
-        "frameSize: %d, contentType: %d, renderFlags: %d, streamUsage: %d}.",
+    DHLOGD("Set up spk client: {sampleRate: %{public}d, bitFormat: %{public}d, channelMask: %{public}d,"
+        "frameSize: %{public}d, contentType: %{public}d, renderFlags: %{public}d, streamUsage: %{public}d}.",
         param.comParam.sampleRate, param.comParam.bitFormat, param.comParam.channelMask, param.comParam.frameSize,
         param.renderOpts.contentType, param.renderOpts.renderFlags, param.renderOpts.streamUsage);
     audioParam_ = param;
@@ -127,12 +127,15 @@ void DSpeakerClient::OnWriteData(size_t length)
         } else {
             audioData = dataQueue_.front();
             dataQueue_.pop();
-            DHLOGI("Pop spk data, dataQueue size: %d.", dataQueue_.size());
+            uint64_t queueSize = static_cast<uint64_t>(dataQueue_.size());
+            DHLOGI("Pop spk data, dataQueue size: %{public}" PRIu64, queueSize);
         }
     }
     if (audioData->Capacity() != bufDesc.bufLength) {
-        DHLOGE("Audio data length is not equal to buflength. datalength: %d, bufLength: %d",
-            audioData->Capacity(), bufDesc.bufLength);
+        uint64_t capacity = static_cast<uint64_t>(audioData->Capacity());
+        uint64_t bufLength = static_cast<uint64_t>(bufDesc.bufLength);
+        DHLOGE("Audio data length is not equal to buflength. datalength: %{public}" PRIu64
+            ", bufLength: %{public}" PRIu64, capacity, bufLength);
     }
     if (memcpy_s(bufDesc.buffer, bufDesc.bufLength, audioData->Data(), audioData->Capacity()) != EOK) {
         DHLOGE("Copy audio data failed.");
@@ -174,7 +177,7 @@ int32_t DSpeakerClient::Release()
     DHLOGI("Release spk client.");
     std::lock_guard<std::mutex> lck(devMtx_);
     if (clientStatus_ != AudioStatus::STATUS_READY && clientStatus_ != AudioStatus::STATUS_STOP) {
-        DHLOGE("Speaker status %d is wrong.", (int32_t)clientStatus_);
+        DHLOGE("Speaker status %{public}d is wrong.", (int32_t)clientStatus_);
         return ERR_DH_AUDIO_SA_STATUS_ERR;
     }
     bool isSucess = true;
@@ -192,7 +195,7 @@ int32_t DSpeakerClient::Release()
 
     int32_t ret = AudioStandard::AudioSystemManager::GetInstance()->UnregisterVolumeKeyEventCallback(getpid());
     if (ret != DH_SUCCESS) {
-        DHLOGE("Failed to unregister volume key event callback, error code %d.", ret);
+        DHLOGE("Failed to unregister volume key event callback, error code %{public}d.", ret);
         isSucess = false;
     }
     if (audioRenderer_ != nullptr && !audioRenderer_->Release()) {
@@ -229,7 +232,7 @@ int32_t DSpeakerClient::StopRender()
     DHLOGI("Stop spk client.");
     std::lock_guard<std::mutex> lck(devMtx_);
     if (clientStatus_ != AudioStatus::STATUS_START) {
-        DHLOGE("Renderer is not start or spk status wrong, status: %d.", (int32_t)clientStatus_);
+        DHLOGE("Renderer is not start or spk status wrong, status: %{public}d.", (int32_t)clientStatus_);
         DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_OPT_FAIL, ERR_DH_AUDIO_SA_STATUS_ERR,
             "daudio renderer is not start or spk status wrong.");
         return ERR_DH_AUDIO_SA_STATUS_ERR;
@@ -283,7 +286,8 @@ void DSpeakerClient::PlayThreadRunning()
             }
             audioData = dataQueue_.front();
             dataQueue_.pop();
-            DHLOGD("Pop spk data, dataqueue size: %d.", dataQueue_.size());
+            uint64_t queueSize = static_cast<uint64_t>(dataQueue_.size());
+            DHLOGD("Pop spk data, dataqueue size: %{public}" PRIu64, queueSize);
         }
 #ifdef DUMP_DSPEAKERCLIENT_FILE
         if (DaudioSinkHidumper::GetInstance().QueryDumpDataFlag()) {
@@ -294,8 +298,9 @@ void DSpeakerClient::PlayThreadRunning()
         while (writeOffSet < static_cast<int32_t>(audioData->Capacity())) {
             int32_t writeLen = audioRenderer_->Write(audioData->Data() + writeOffSet,
                 static_cast<int32_t>(audioData->Capacity()) - writeOffSet);
-            DHLOGD("Write audio render, write len: %d, raw len: %d, offset: %d", writeLen, audioData->Capacity(),
-                writeOffSet);
+            uint64_t capacity = static_cast<uint64_t>(audioData->Capacity());
+            DHLOGD("Write audio render, write len: %{public}d, raw len: %{public}" PRIu64", offset: %{public}d",
+                writeLen, capacity, writeOffSet);
             if (writeLen < 0) {
                 break;
             }
@@ -303,8 +308,8 @@ void DSpeakerClient::PlayThreadRunning()
         }
         int64_t endTime = GetNowTimeUs();
         if (IsOutDurationRange(startTime, endTime, lastPlayStartTime_)) {
-            DHLOGE("This time play spend: %lld us, The interval of play this time and the last time: %lld us",
-                endTime - startTime, startTime - lastPlayStartTime_);
+            DHLOGE("This time play spend: %{public}" PRId64" us, The interval of play this time and "
+                "the last time: %{public}" PRId64" us", endTime - startTime, startTime - lastPlayStartTime_);
         }
         lastPlayStartTime_ = startTime;
     }
@@ -349,11 +354,12 @@ int32_t DSpeakerClient::OnDecodeTransDataDone(const std::shared_ptr<AudioData> &
     }
     dataQueue_.push(audioData);
     dataQueueCond_.notify_all();
-    DHLOGI("Push new spk data, buf len: %d.", dataQueue_.size());
+    uint64_t queueSize = static_cast<uint64_t>(dataQueue_.size());
+    DHLOGI("Push new spk data, buf len: %{public}" PRIu64, queueSize);
     int64_t endTime = GetNowTimeUs();
     if (IsOutDurationRange(startTime, endTime, lastReceiveStartTime_)) {
-        DHLOGE("This time receivce data spend: %lld us, Receivce data this time and the last time: %lld us",
-            endTime - startTime, startTime - lastReceiveStartTime_);
+        DHLOGE("This time receivce data spend: %{public}" PRId64" us, Receivce data this time and "
+            "the last time: %{public}" PRId64" us", endTime - startTime, startTime - lastReceiveStartTime_);
     }
     lastReceiveStartTime_ = startTime;
     return DH_SUCCESS;
@@ -361,7 +367,7 @@ int32_t DSpeakerClient::OnDecodeTransDataDone(const std::shared_ptr<AudioData> &
 
 int32_t DSpeakerClient::OnStateChange(const AudioEventType type)
 {
-    DHLOGD("On state change. type: %d", type);
+    DHLOGD("On state change. type: %{public}d", type);
     AudioEvent event;
     switch (type) {
         case AudioEventType::DATA_OPENED: {
@@ -375,7 +381,7 @@ int32_t DSpeakerClient::OnStateChange(const AudioEventType type)
             break;
         }
         default:
-            DHLOGE("Invalid parameter type: %d.", type);
+            DHLOGE("Invalid parameter type: %{public}d.", type);
             return ERR_DH_AUDIO_NOT_SUPPORT;
     }
 
@@ -413,7 +419,7 @@ string DSpeakerClient::GetVolumeLevel()
     std::string str(jsonData);
     cJSON_Delete(jParam);
     cJSON_free(jsonData);
-    DHLOGD("Get the volume level result, event: %s.", str.c_str());
+    DHLOGD("Get the volume level result, event: %{public}s.", str.c_str());
     return str;
 }
 
@@ -441,7 +447,7 @@ void DSpeakerClient::OnVolumeKeyEvent(AudioStandard::VolumeEvent volumeEvent)
     std::string str(jsonData);
     cJSON_Delete(jParam);
     cJSON_free(jsonData);
-    DHLOGD("Volume change notification result, event: %s.", str.c_str());
+    DHLOGD("Volume change notification result, event: %{public}s.", str.c_str());
 
     AudioEvent audioEvent(VOLUME_CHANGE, str);
     cbObj->NotifyEvent(audioEvent);
@@ -470,7 +476,7 @@ void DSpeakerClient::OnInterrupt(const AudioStandard::InterruptEvent &interruptE
     std::string str(jsonData);
     cJSON_Delete(jParam);
     cJSON_free(jsonData);
-    DHLOGD("Audio focus oninterrupt notification result, event: %s.", str.c_str());
+    DHLOGD("Audio focus oninterrupt notification result, event: %{public}s.", str.c_str());
 
     AudioEvent audioEvent(AUDIO_FOCUS_CHANGE, str);
     cbObj->NotifyEvent(audioEvent);
@@ -479,7 +485,7 @@ void DSpeakerClient::OnInterrupt(const AudioStandard::InterruptEvent &interruptE
 void DSpeakerClient::OnStateChange(const AudioStandard::RendererState state,
     const AudioStandard::StateChangeCmdType __attribute__((unused)) cmdType)
 {
-    DHLOGD("On render state change. state: %d", state);
+    DHLOGD("On render state change. state: %{public}d", state);
     std::shared_ptr<IAudioEventCallback> cbObj = eventCallback_.lock();
     CHECK_NULL_VOID(cbObj);
 
@@ -498,7 +504,7 @@ void DSpeakerClient::OnStateChange(const AudioStandard::RendererState state,
     std::string str(jsonData);
     cJSON_Delete(jParam);
     cJSON_free(jsonData);
-    DHLOGD("Audio render state changes notification result, event: %s.", str.c_str());
+    DHLOGD("Audio render state changes notification result, event: %{public}s.", str.c_str());
 
     AudioEvent audioEvent(AUDIO_RENDER_STATE_CHANGE, str);
     cbObj->NotifyEvent(audioEvent);
@@ -506,7 +512,7 @@ void DSpeakerClient::OnStateChange(const AudioStandard::RendererState state,
 
 int32_t DSpeakerClient::SetAudioParameters(const AudioEvent &event)
 {
-    DHLOGD("Set the volume, arg: %s.", event.content.c_str());
+    DHLOGD("Set the volume, arg: %{public}s.", event.content.c_str());
 
     int32_t audioVolumeType;
     int32_t ret = GetAudioParamInt(event.content, AUDIO_VOLUME_TYPE, audioVolumeType);
@@ -515,7 +521,7 @@ int32_t DSpeakerClient::SetAudioParameters(const AudioEvent &event)
         return ret;
     }
     auto volumeType = static_cast<AudioStandard::AudioVolumeType>(audioVolumeType);
-    DHLOGD("Audio volume type, volumeType = %d.", volumeType);
+    DHLOGD("Audio volume type, volumeType = %{public}d.", volumeType);
     if (event.type != VOLUME_SET) {
         DHLOGE("Invalid parameter.");
         return ERR_DH_AUDIO_CLIENT_PARAM_ERROR;
@@ -527,7 +533,7 @@ int32_t DSpeakerClient::SetAudioParameters(const AudioEvent &event)
         DHLOGE("Get audio volume level failed.");
         return ret;
     }
-    DHLOGD("volume level = %d.", audioVolumeLevel);
+    DHLOGD("volume level = %{public}d.", audioVolumeLevel);
     ret = AudioStandard::AudioSystemManager::GetInstance()->SetVolume(volumeType, audioVolumeLevel);
     if (ret != DH_SUCCESS) {
         DHLOGE("Voloume set failed.");
@@ -538,7 +544,7 @@ int32_t DSpeakerClient::SetAudioParameters(const AudioEvent &event)
 
 int32_t DSpeakerClient::SetMute(const AudioEvent &event)
 {
-    DHLOGD("Set mute, arg: %s.", event.content.c_str());
+    DHLOGD("Set mute, arg: %{public}s.", event.content.c_str());
     int32_t audioVolumeType;
     int32_t ret = GetAudioParamInt(event.content, AUDIO_VOLUME_TYPE, audioVolumeType);
     if (ret != DH_SUCCESS) {
@@ -554,7 +560,7 @@ int32_t DSpeakerClient::SetMute(const AudioEvent &event)
     }
 
     auto volumeType = static_cast<AudioStandard::AudioVolumeType>(audioVolumeType);
-    DHLOGD("Audio volume type, volumeType = %d.", volumeType);
+    DHLOGD("Audio volume type, volumeType = %{public}d.", volumeType);
     if (event.type != VOLUME_MUTE_SET) {
         DHLOGE("Invalid parameter.");
         return ERR_DH_AUDIO_CLIENT_PARAM_ERROR;
@@ -613,7 +619,7 @@ int32_t DSpeakerClient::SendMessage(uint32_t type, std::string content, std::str
         type != static_cast<uint32_t>(VOLUME_CHANGE) &&
         type != static_cast<uint32_t>(AUDIO_FOCUS_CHANGE) &&
         type != static_cast<uint32_t>(AUDIO_RENDER_STATE_CHANGE)) {
-        DHLOGE("event type is not NOTIFY_OPEN_SPK or NOTIFY_CLOSE_SPK. type:%u", type);
+        DHLOGE("event type is not NOTIFY_OPEN_SPK or NOTIFY_CLOSE_SPK. type:%{public}u", type);
         return ERR_DH_AUDIO_NULLPTR;
     }
     CHECK_NULL_RETURN(speakerTrans_, ERR_DH_AUDIO_NULLPTR);
@@ -623,7 +629,7 @@ int32_t DSpeakerClient::SendMessage(uint32_t type, std::string content, std::str
 
 void DSpeakerClient::PlayStatusChange(const std::string &args)
 {
-    DHLOGI("Play status change, args: %s.", args.c_str());
+    DHLOGI("Play status change, args: %{public}s.", args.c_str());
     std::string changeType = ParseStringFromArgs(args, KEY_CHANGE_TYPE);
     if (changeType == AUDIO_EVENT_RESTART) {
         ReStart();

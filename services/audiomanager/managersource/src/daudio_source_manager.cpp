@@ -161,8 +161,8 @@ static bool CheckParams(const std::string &devId, const std::string &dhId)
 int32_t DAudioSourceManager::EnableDAudio(const std::string &devId, const std::string &dhId,
     const std::string &version, const std::string &attrs, const std::string &reqId)
 {
-    DHLOGI("Enable distributed audio, devId: %s, dhId: %s, version: %s, reqId: %s.", GetAnonyString(devId).c_str(),
-        dhId.c_str(), version.c_str(), reqId.c_str());
+    DHLOGI("Enable distributed audio, devId: %{public}s, dhId: %{public}s, version: %{public}s, reqId: %{public}s.",
+        GetAnonyString(devId).c_str(), dhId.c_str(), version.c_str(), reqId.c_str());
     CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
 
     cJSON *jParam = cJSON_CreateObject();
@@ -199,7 +199,7 @@ int32_t DAudioSourceManager::DoEnableDAudio(const std::string &args)
     std::string version = ParseStringFromArgs(args, KEY_VERSION);
     std::string attrs = ParseStringFromArgs(args, KEY_ATTRS);
     std::string reqId = ParseStringFromArgs(args, KEY_REQID);
-    DHLOGI("Do Enable distributed audio, devId: %s, dhId: %s, version:%s, reqId:%s.",
+    DHLOGI("Do Enable distributed audio, devId: %{public}s, dhId: %{public}s, version:%{public}s, reqId:%{public}s.",
         GetAnonyString(devId).c_str(), dhId.c_str(), version.c_str(), reqId.c_str());
     if (!CheckParams(devId, dhId) || attrs.empty()) {
         DHLOGE("Enable params are incorrect.");
@@ -224,8 +224,8 @@ int32_t DAudioSourceManager::DoEnableDAudio(const std::string &args)
 
 int32_t DAudioSourceManager::DisableDAudio(const std::string &devId, const std::string &dhId, const std::string &reqId)
 {
-    DHLOGI("Disable distributed audio, devId: %s, dhId: %s, reqId: %s.", GetAnonyString(devId).c_str(), dhId.c_str(),
-        reqId.c_str());
+    DHLOGI("Disable distributed audio, devId: %{public}s, dhId: %{public}s, reqId: %{public}s.",
+        GetAnonyString(devId).c_str(), dhId.c_str(), reqId.c_str());
     CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
     cJSON *jParam = cJSON_CreateObject();
     CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
@@ -257,7 +257,7 @@ int32_t DAudioSourceManager::DoDisableDAudio(const std::string &args)
     std::string devId = ParseStringFromArgs(args, KEY_DEV_ID);
     std::string dhId = ParseStringFromArgs(args, KEY_DH_ID);
     std::string reqId = ParseStringFromArgs(args, KEY_REQID);
-    DHLOGI("Do Disable distributed audio, devId: %s, dhId: %s, reqId:%s.",
+    DHLOGI("Do Disable distributed audio, devId: %{public}s, dhId: %{public}s, reqId:%{public}s.",
         GetAnonyString(devId).c_str(), dhId.c_str(), reqId.c_str());
     if (!CheckParams(devId, dhId)) {
         DHLOGE("Disable params are incorrect.");
@@ -283,7 +283,7 @@ int32_t DAudioSourceManager::DoDisableDAudio(const std::string &args)
 int32_t DAudioSourceManager::HandleDAudioNotify(const std::string &devId, const std::string &dhId,
     const int32_t eventType, const std::string &eventContent)
 {
-    DHLOGD("Receive audio event from devId: %s, event type: %d. event content: %s.",
+    DHLOGD("Receive audio event from devId: %{public}s, event type: %{public}d. event content: %{public}s.",
         GetAnonyString(devId).c_str(), eventType, eventContent.c_str());
     if (eventContent.length() > DAUDIO_MAX_JSON_LEN || eventContent.empty()) {
         return ERR_DH_AUDIO_FAILED;
@@ -292,7 +292,7 @@ int32_t DAudioSourceManager::HandleDAudioNotify(const std::string &devId, const 
     // now ctrl channel is also goto here, please sure here not crash.
     cJSON *jParam = cJSON_Parse(eventContent.c_str());
     if (CJsonParamCheck(jParam, { KEY_RANDOM_TASK_CODE })) {
-        DHLOGD("Receive audio notify from sink, random task code: %s",
+        DHLOGD("Receive audio notify from sink, random task code: %{public}s",
             cJSON_GetObjectItemCaseSensitive(jParam, KEY_RANDOM_TASK_CODE)->valuestring);
     }
 
@@ -317,8 +317,8 @@ int32_t DAudioSourceManager::HandleDAudioNotify(const std::string &devId, const 
 int32_t DAudioSourceManager::DAudioNotify(const std::string &devId, const std::string &dhId, const int32_t eventType,
     const std::string &eventContent)
 {
-    DHLOGD("Distributed audio notify, devId: %s, dhId: %s, eventType: %d.", GetAnonyString(devId).c_str(),
-        dhId.c_str(), eventType);
+    DHLOGD("Distributed audio notify, devId: %{public}s, dhId: %{public}s, eventType: %{public}d.",
+        GetAnonyString(devId).c_str(), dhId.c_str(), eventType);
     {
         std::lock_guard<std::mutex> lck(remoteSvrMutex_);
         auto sinkProxy = sinkServiceMap_.find(devId);
@@ -346,8 +346,8 @@ int32_t DAudioSourceManager::DAudioNotify(const std::string &devId, const std::s
 
 int32_t DAudioSourceManager::OnEnableDAudio(const std::string &devId, const std::string &dhId, const int32_t result)
 {
-    DHLOGI("On enable distributed audio devId: %s, dhId: %s, ret: %d.", GetAnonyString(devId).c_str(), dhId.c_str(),
-        result);
+    DHLOGI("On enable distributed audio devId: %{public}s, dhId: %{public}s, ret: %{public}d.",
+        GetAnonyString(devId).c_str(), dhId.c_str(), result);
     std::string reqId = GetRequestId(devId, dhId);
     if (reqId.empty()) {
         return ERR_DH_AUDIO_FAILED;
@@ -362,8 +362,8 @@ int32_t DAudioSourceManager::OnEnableDAudio(const std::string &devId, const std:
 
 int32_t DAudioSourceManager::OnDisableDAudio(const std::string &devId, const std::string &dhId, const int32_t result)
 {
-    DHLOGI("On disable distributed audio devId: %s, dhId: %s, ret: %d.", GetAnonyString(devId).c_str(), dhId.c_str(),
-        result);
+    DHLOGI("On disable distributed audio devId: %{public}s, dhId: %{public}s, ret: %{public}d.",
+        GetAnonyString(devId).c_str(), dhId.c_str(), result);
     std::string reqId = GetRequestId(devId, dhId);
     if (reqId.empty()) {
         return ERR_DH_AUDIO_FAILED;
@@ -391,7 +391,7 @@ int32_t DAudioSourceManager::CreateAudioDevice(const std::string &devId)
 
 void DAudioSourceManager::DeleteAudioDevice(const std::string &devId, const std::string &dhId)
 {
-    DHLOGI("Delete audio device, devId = %s, dhId = %s.", GetAnonyString(devId).c_str(), dhId.c_str());
+    DHLOGI("Delete audio device, devId = %{public}s, dhId = %{public}s.", devId.c_str(), dhId.c_str());
     {
         std::lock_guard<std::mutex> lock(devMapMtx_);
         audioDevMap_[devId].ports.erase(dhId);
@@ -428,7 +428,7 @@ std::string DAudioSourceManager::GetRequestId(const std::string &devId, const st
 
 void DAudioSourceManager::ClearAudioDev(const std::string &devId)
 {
-    DHLOGI("ClearAudioDev, devId = %s.", GetAnonyString(devId).c_str());
+    DHLOGI("ClearAudioDev, devId = %{public}s.", GetAnonyString(devId).c_str());
     std::lock_guard<std::mutex> lock(devMapMtx_);
     if (audioDevMap_[devId].ports.empty()) {
         DHLOGI("audioDevMap_[devId].ports is empty.");
@@ -488,7 +488,7 @@ int32_t DAudioSourceManager::LoadAVSenderEngineProvider()
     AVTransProviderClass getEngineFactoryFunc = (AVTransProviderClass)dlsym(pSHandler_,
         GET_SENDER_PROVIDER_FUNC.c_str());
     if (getEngineFactoryFunc == nullptr) {
-        DHLOGE("av transport engine factory function handler is null, failed reason : %s", dlerror());
+        DHLOGE("av transport engine factory function handler is null, failed reason : %{public}s", dlerror());
         dlclose(pSHandler_);
         pSHandler_ = nullptr;
         return ERR_DH_AUDIO_NULLPTR;
@@ -523,7 +523,7 @@ int32_t DAudioSourceManager::LoadAVReceiverEngineProvider()
     AVTransProviderClass getEngineFactoryFunc = (AVTransProviderClass)dlsym(pRHandler_,
         GET_RECEIVER_PROVIDER_FUNC.c_str());
     if (getEngineFactoryFunc == nullptr) {
-        DHLOGE("av transport engine factory function handler is null, failed reason : %s", dlerror());
+        DHLOGE("av transport engine factory function handler is null, failed reason : %{public}s", dlerror());
         dlclose(pRHandler_);
         pRHandler_ = nullptr;
         return ERR_DH_AUDIO_NULLPTR;
@@ -567,7 +567,7 @@ void DAudioSourceManager::SourceManagerHandler::ProcessEvent(const AppExecFwk::I
 {
     auto iter = mapEventFuncs_.find(event->GetInnerEventId());
     if (iter == mapEventFuncs_.end()) {
-        DHLOGE("Event Id is invalid. %d.", event->GetInnerEventId());
+        DHLOGE("Event Id is invalid. %{public}d.", event->GetInnerEventId());
         return;
     }
     SourceManagerFunc &func = iter->second;
@@ -582,7 +582,7 @@ void DAudioSourceManager::SourceManagerHandler::EnableDAudioCallback(const AppEx
         DHLOGE("Failed to get event parameters.");
         return;
     }
-    DHLOGI("Enable audio device, param:%s.", eventParam.c_str());
+    DHLOGI("Enable audio device, param:%{public}s.", eventParam.c_str());
     DAudioSourceManager::GetInstance().DoEnableDAudio(eventParam);
 }
 
@@ -594,7 +594,7 @@ void DAudioSourceManager::SourceManagerHandler::DisableDAudioCallback(const AppE
         DHLOGE("Failed to get event parameters.");
         return;
     }
-    DHLOGI("Disable audio device, param:%s.", eventParam.c_str());
+    DHLOGI("Disable audio device, param:%{public}s.", eventParam.c_str());
     DAudioSourceManager::GetInstance().DoDisableDAudio(eventParam);
 }
 

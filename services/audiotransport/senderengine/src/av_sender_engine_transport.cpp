@@ -104,7 +104,7 @@ int32_t AVTransSenderTransport::FeedAudioData(std::shared_ptr<AudioData> &audioD
 
 int32_t AVTransSenderTransport::SendMessage(uint32_t type, std::string content, std::string dstDevId)
 {
-    DHLOGI("Send message, msg type: %u, msg content: %s.", type, content.c_str());
+    DHLOGI("Send message, msg type: %{public}u, msg content: %{public}s.", type, content.c_str());
     CHECK_NULL_RETURN(senderAdapter_, ERR_DH_AUDIO_NULLPTR);
     auto message = std::make_shared<AVTransMessage>(type, content, dstDevId);
     return senderAdapter_->SendMessageToRemote(message);
