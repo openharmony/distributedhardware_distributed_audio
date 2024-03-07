@@ -50,8 +50,43 @@ using OHOS::HDI::DistributedAudio::Audio::V1_0::IAudioCallback;
 using OHOS::HDI::DistributedAudio::Audio::V1_0::AudioPortPin;
 using OHOS::HDI::DistributedAudio::Audio::V1_0::AudioPortType;
 using OHOS::HDI::DistributedAudio::Audio::V1_0::AudioPortRole;
+using OHOS::HDI::DistributedAudio::Audio::V1_0::AudioCallbackType;
 
 namespace {
+static int32_t ParamEventCallback(AudioExtParamKey key, const char *condition, const char *value, void *reserved,
+    void *cookie);
+
+class AudioParamCallbackImpl final : public IAudioCallback {
+    
+const int32_t SUCCESS = 0;
+
+public:
+    AudioParamCallbackImpl() {}
+    ~AudioParamCallbackImpl() override {}
+
+    int32_t RenderCallback(AudioCallbackType type, int8_t &reserved, int8_t &cookie) override;
+    int32_t ParamCallback(AudioExtParamKey key, const std::string &condition, const std::string &value,
+        int8_t &reserved, int8_t cookie) override;
+};
+
+int32_t AudioParamCallbackImpl::RenderCallback(AudioCallbackType type, int8_t &reserved, int8_t &cookie)
+{
+    (void) type;
+    (void) reserved;
+    (void) cookie;
+    return SUCCESS;
+}
+
+int32_t AudioParamCallbackImpl::ParamCallback(AudioExtParamKey key, const std::string &condition,
+    const std::string &value, int8_t &reserved, int8_t cookie)
+{
+    (void) cookie;
+    void *cookies = nullptr;
+    ParamEventCallback(static_cast<::AudioExtParamKey>(key), condition.c_str(),
+        value.c_str(), static_cast<void *>(&reserved), cookies);
+    return SUCCESS;
+}
+
 using namespace OHOS::DistributedHardware;
 const int32_t CMD_QUIT = 0;
 const int32_t CMD_FIND = 9;
@@ -66,8 +101,11 @@ const int32_t CMD_STOP_MIC = 8;
 const int32_t CMD_SET_VOL = 11;
 const int32_t CMD_GET_VOL = 12;
 
+const char DEV_TYPE_SPK = '1';
+const char DEV_TYPE_MIC = '2';
 const char SPK_FILE_PATH[128] = "/data/test.wav";
 const char MIC_FILE_PATH[128] = "/data/mic.pcm";
+constexpr int32_t TYPE_OFFSET = 12;
 constexpr int32_t AUDIO_SAMPLE_RATE = 48000;
 constexpr int32_t VOLUME_MIN = 0;
 constexpr int32_t VOLUME_MAX = 15;
@@ -85,7 +123,7 @@ static OHOS::sptr<IAudioAdapter> g_adapter = nullptr;
 static OHOS::sptr<IAudioRender> g_render = nullptr;
 static OHOS::sptr<IAudioCapture> g_capture = nullptr;
 static std::vector<AudioAdapterDescriptor> g_devices;
-
+static OHOS::sptr<IAudioCallback> g_callbackStub = nullptr;
 static std::string g_devId = "";
 
 static constexpr const char* PLAY_THREAD = "playThread";
@@ -175,6 +213,38 @@ static int32_t InitTestDemo()
     return DH_SUCCESS;
 }
 
+static void HandleDevError(const char *condition, const char *value)
+{
+    if (condition[TYPE_OFFSET] == DEV_TYPE_SPK && g_spkStatus != DeviceStatus::DEVICE_IDLE) {
+        CloseSpk();
+    }
+
+    if (condition[TYPE_OFFSET] == DEV_TYPE_MIC && g_micStatus == DeviceStatus::DEVICE_IDLE) {
+        CloseMic();
+    }
+
+    std::cout << "Receive abnormal event, Demo quit." << std::endl;
+}
+
+static int32_t ParamEventCallback(AudioExtParamKey key, const char *condition, const char *value, void *reserved,
+    void *cookie)
+{
+    std::string val(value);
+    std::string con(condition);
+    std::cout << std::endl;
+    std::cout << "**********************************************************************************" << std::endl;
+    std::cout << "Event recived: " << key << std::endl;
+    std::cout << "Condition: " << con << std::endl;
+    std::cout << "Value: " << val << std::endl;
+    std::cout << "**********************************************************************************" << std::endl;
+    std::cout << std::endl;
+
+    if (key == AudioExtParamKey::AUDIO_EXT_PARAM_KEY_STATUS && con.rfind("ERR_EVENT", 0) == 0) {
+        HandleDevError(condition, value);
+    }
+    return DH_SUCCESS;
+}
+
 static int32_t LoadSpkDev(const std::string &devId)
 {
     struct AudioAdapterDescriptor dev;
@@ -214,6 +284,13 @@ static void OpenSpk(const std::string &devId)
         return;
     }
 
+    g_callbackStub = new AudioParamCallbackImpl();
+    int32_t ret = g_adapter->RegExtraParamObserver(g_callbackStub, 0);
+    if (ret != DH_SUCCESS) {
+        std::cout << "Register observer failed, ret: " << ret << std::endl;
+        return;
+    }
+
     struct AudioDeviceDescriptor renderDesc;
     renderDesc.pins = AudioPortPin::PIN_OUT_SPEAKER;
     renderDesc.desc = "";
@@ -224,7 +301,7 @@ static void OpenSpk(const std::string &devId)
     g_rattrs.channelCount = RENDER_CHANNEL_MASK;
     g_rattrs.sampleRate = AUDIO_SAMPLE_RATE;
     g_rattrs.format = AudioFormat::AUDIO_FORMAT_TYPE_PCM_16_BIT;
-    int32_t ret = g_adapter->CreateRender(renderDesc, g_rattrs, g_render, g_renderId);
+    ret = g_adapter->CreateRender(renderDesc, g_rattrs, g_render, g_renderId);
     if (ret != DH_SUCCESS || g_render == nullptr) {
         std::cout << "Open SPK device failed, ret: " << ret << std::endl;
         return;
