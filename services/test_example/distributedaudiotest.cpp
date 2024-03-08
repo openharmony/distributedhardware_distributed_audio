@@ -53,13 +53,11 @@ using OHOS::HDI::DistributedAudio::Audio::V1_0::AudioPortRole;
 using OHOS::HDI::DistributedAudio::Audio::V1_0::AudioCallbackType;
 
 namespace {
+using namespace OHOS::DistributedHardware;
 static int32_t ParamEventCallback(AudioExtParamKey key, const char *condition, const char *value, void *reserved,
     void *cookie);
 
 class AudioParamCallbackImpl final : public IAudioCallback {
-    
-const int32_t SUCCESS = 0;
-
 public:
     AudioParamCallbackImpl() {}
     ~AudioParamCallbackImpl() override {}
@@ -74,7 +72,7 @@ int32_t AudioParamCallbackImpl::RenderCallback(AudioCallbackType type, int8_t &r
     (void) type;
     (void) reserved;
     (void) cookie;
-    return SUCCESS;
+    return DH_SUCCESS;
 }
 
 int32_t AudioParamCallbackImpl::ParamCallback(AudioExtParamKey key, const std::string &condition,
@@ -84,10 +82,9 @@ int32_t AudioParamCallbackImpl::ParamCallback(AudioExtParamKey key, const std::s
     void *cookies = nullptr;
     ParamEventCallback(static_cast<::AudioExtParamKey>(key), condition.c_str(),
         value.c_str(), static_cast<void *>(&reserved), cookies);
-    return SUCCESS;
+    return DH_SUCCESS;
 }
 
-using namespace OHOS::DistributedHardware;
 const int32_t CMD_QUIT = 0;
 const int32_t CMD_FIND = 9;
 const int32_t CMD_OPEN_SPK = 1;
