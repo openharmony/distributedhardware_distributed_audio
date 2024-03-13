@@ -55,6 +55,7 @@ public:
     int32_t ResumeDistributedHardware(const std::string &networkId);
     int32_t StopDistributedHardware(const std::string &networkId);
     void JudgeDeviceStatus();
+    void SetDevLevelStatus(bool checkStatus);
 
 private:
     int32_t TaskOpenDSpeaker(const std::string &args);
@@ -100,6 +101,7 @@ private:
 
     std::atomic<bool> isSpkInUse_ = false;
     std::atomic<bool> isMicInUse_ = false;
+    bool isDevLevelStatus_ = false;
 
     class SinkEventHandler : public AppExecFwk::EventHandler {
     public:

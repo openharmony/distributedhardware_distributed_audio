@@ -321,6 +321,10 @@ void DMicClient::OnReadData(size_t length)
     if (memcpy_s(audioData->Data(), audioData->Capacity(), bufDesc.buffer, bufDesc.bufLength) != EOK) {
         DHLOGE("Copy audio data failed.");
     }
+
+    if (isPauseStatus_.load()) {
+        memset_s(audioData->Data(), audioData->Size(), 0, audioData->Size());
+    }
     audioCapturer_->Enqueue(bufDesc);
 
     CHECK_NULL_VOID(micTrans_);
