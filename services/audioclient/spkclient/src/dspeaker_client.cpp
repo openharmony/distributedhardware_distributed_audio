@@ -246,14 +246,11 @@ int32_t DSpeakerClient::StopRender()
 
     if (audioParam_.renderOpts.renderFlags != MMAP_MODE) {
         if (isRenderReady_.load()) {
-            FlushJitterQueue();
             isRenderReady_.store(false);
             if (renderDataThread_.joinable()) {
                 renderDataThread_.join();
             }
         }
-    } else {
-        FlushJitterQueue();
     }
 
     if (!audioRenderer_->Stop()) {
