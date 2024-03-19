@@ -37,6 +37,7 @@ DAudioSinkDev::DAudioSinkDev(const std::string &devId, const sptr<IDAudioSinkIpc
 
 DAudioSinkDev::~DAudioSinkDev()
 {
+    SetDevLevelStatus(false);
     DHLOGD("Distributed audio sink device destructed, devId: %{public}s.", GetAnonyString(devId_).c_str());
 }
 
@@ -224,6 +225,10 @@ int32_t DAudioSinkDev::TaskStartRender(const std::string &args)
 int32_t DAudioSinkDev::TaskOpenDMic(const std::string &args)
 {
     DHLOGI("Open mic device.");
+    if (!isDevLevelStatus_) {
+        DHLOGI("Dev security level status is false.");
+        return ERR_DH_AUDIO_FAILED;
+    }
     if (args.length() > DAUDIO_MAX_JSON_LEN || args.empty()) {
         return ERR_DH_AUDIO_SA_PARAM_INVALID;
     }
@@ -430,6 +435,11 @@ void DAudioSinkDev::JudgeDeviceStatus()
         return;
     }
     DAudioSinkManager::GetInstance().OnSinkDevReleased(devId_);
+}
+
+void DAudioSinkDev::SetDevLevelStatus(bool checkStatus)
+{
+    isDevLevelStatus_ = checkStatus;
 }
 
 int32_t DAudioSinkDev::ConvertString2Int(std::string val)

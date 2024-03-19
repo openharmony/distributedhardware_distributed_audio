@@ -186,13 +186,16 @@ int32_t DAudioSinkManager::CreateAudioDevice(const std::string &devId)
         ret = dev->InitAVTransEngines(ChannelState::SPK_CONTROL_OPENED, rcvProviderPtr_);
     }
     if (channelState_ == ChannelState::MIC_CONTROL_OPENED) {
-        ret = dev->InitAVTransEngines(ChannelState::MIC_CONTROL_OPENED, sendProviderPtr_);
-        if (!ret) {
-            ret = VerifySecurityLevel(devId);
+        ret = VerifySecurityLevel(devId);
+        if (ret != DH_SUCCESS) {
+            DHLOGE("Verify security level failed.");
+            return ERR_DH_AUDIO_FAILED;
         }
+        dev->SetDevLevelStatus(true);
+        ret = dev->InitAVTransEngines(ChannelState::MIC_CONTROL_OPENED, sendProviderPtr_);
     }
     if (ret != DH_SUCCESS) {
-        DHLOGE("Init av transport sender engine failed.");
+        DHLOGE("Init av transport engine failed.");
         dev->JudgeDeviceStatus();
         return ERR_DH_AUDIO_FAILED;
     }
