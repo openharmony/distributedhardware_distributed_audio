@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,16 +16,16 @@
 #ifndef OHOS_AUDIO_TEST_UTILS_H
 #define OHOS_AUDIO_TEST_UTILS_H
 
-#include <v1_0/id_audio_callback.h>
-#include <v1_0/id_audio_manager.h>
+#include <v2_0/id_audio_callback.h>
+#include <v2_0/id_audio_manager.h>
 
 #include "daudio_errorcode.h"
 #include "idaudio_hdi_callback.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-using OHOS::HDI::DistributedAudio::Audioext::V1_0::IDAudioCallback;
-using OHOS::HDI::DistributedAudio::Audioext::V1_0::IDAudioManager;
+using OHOS::HDI::DistributedAudio::Audioext::V2_0::IDAudioCallback;
+using OHOS::HDI::DistributedAudio::Audioext::V2_0::IDAudioManager;
 
 class MockIDAudioManager : public IDAudioManager {
 public:
@@ -33,7 +33,7 @@ public:
     ~MockIDAudioManager() {}
 
     int32_t RegisterAudioDevice(const std::string &adpName, int32_t devId, const std::string &capability,
-        const sptr<OHOS::HDI::DistributedAudio::Audioext::V1_0::IDAudioCallback> &callbackObj) override
+        const sptr<OHOS::HDI::DistributedAudio::Audioext::V2_0::IDAudioCallback> &callbackObj) override
     {
         return DH_SUCCESS;
     }
@@ -44,7 +44,7 @@ public:
     }
 
     int32_t NotifyEvent(const std::string &adpName, int32_t devId, int32_t streamId,
-        const OHOS::HDI::DistributedAudio::Audioext::V1_0::DAudioEvent &event) override
+        const OHOS::HDI::DistributedAudio::Audioext::V2_0::DAudioEvent &event) override
     {
         return DH_SUCCESS;
     }

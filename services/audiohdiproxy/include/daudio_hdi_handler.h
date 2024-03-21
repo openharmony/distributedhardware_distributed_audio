@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,8 +20,8 @@
 #include <mutex>
 #include <set>
 
-#include <v1_0/id_audio_callback.h>
-#include <v1_0/id_audio_manager.h>
+#include <v2_0/id_audio_callback.h>
+#include <v2_0/id_audio_manager.h>
 #include "iremote_object.h"
 
 #include "audio_event.h"
@@ -31,9 +31,9 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-using OHOS::HDI::DistributedAudio::Audioext::V1_0::DAudioEvent;
-using OHOS::HDI::DistributedAudio::Audioext::V1_0::IDAudioCallback;
-using OHOS::HDI::DistributedAudio::Audioext::V1_0::IDAudioManager;
+using OHOS::HDI::DistributedAudio::Audioext::V2_0::DAudioEvent;
+using OHOS::HDI::DistributedAudio::Audioext::V2_0::IDAudioCallback;
+using OHOS::HDI::DistributedAudio::Audioext::V2_0::IDAudioManager;
 class DAudioHdiHandler {
     DECLARE_SINGLE_INSTANCE_BASE(DAudioHdiHandler);
 
