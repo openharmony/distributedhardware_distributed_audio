@@ -29,7 +29,8 @@ int32_t DAudioSinkIpcCallback::OnNotifyResourceInfo(const ResourceEventType &typ
     const std::string &networkId, bool &isSensitive, bool &isSameAccount)
 {
     DHLOGI("On notify the resource info, subType: %{public}s, networkId: %{public}s, isSensitive: "
-        "%{public}d, isSameAccount: %{public}d", subType.c_str(), networkId.c_str(), isSensitive, isSameAccount);
+        "%{public}d, isSameAccount: %{public}d", subType.c_str(), GetAnonyString(networkId).c_str(),
+        isSensitive, isSameAccount);
 
     int32_t ret = DH_SUCCESS;
     std::lock_guard<std::mutex> resourceLck(privacyResMtx_);

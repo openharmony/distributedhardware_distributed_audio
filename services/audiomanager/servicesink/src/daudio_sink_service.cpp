@@ -128,7 +128,7 @@ int DAudioSinkService::Dump(int32_t fd, const std::vector<std::u16string> &args)
         return ERR_DH_AUDIO_BAD_VALUE;
     }
 
-    int ret = dprintf(fd, "%{public}s\n", result.c_str());
+    int ret = dprintf(fd, "%s\n", result.c_str());
     if (ret < 0) {
         DHLOGE("Dprintf error");
         return ERR_DH_AUDIO_BAD_VALUE;
