@@ -41,12 +41,12 @@ ohos_fuzztest("SourceHandlerRegisterDistributedHardwareFuzzTest") {
     "include",
     "${common_path}/include",
     "${innerkits_path}/native_cpp/audio_source/include",
+    "${innerkits_path}/native_cpp/test/include",
     "${fwk_services_path}/distributedhardwarefwkservice/include",
     "${fwk_services_path}/distributedhardwarefwkservice/include/componentmanager",
   ]
 
   deps = [
-    "${fwk_services_path}/distributedhardwarefwkservice:distributedhardwarefwksvr",
     "${innerkits_path}/native_cpp/audio_source:distributed_audio_source_sdk",
   ]
 

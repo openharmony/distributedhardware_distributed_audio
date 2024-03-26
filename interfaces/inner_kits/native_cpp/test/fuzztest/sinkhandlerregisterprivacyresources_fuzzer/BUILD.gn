@@ -46,10 +46,8 @@ ohos_fuzztest("SinkHandlerRegisterPrivacyResourcesFuzzTest") {
     "${fwk_services_path}/distributedhardwarefwkservice/include/componentmanager",
   ]
 
-  deps = [
-    "${fwk_services_path}/distributedhardwarefwkservice:distributedhardwarefwksvr",
-    "${innerkits_path}/native_cpp/audio_sink:distributed_audio_sink_sdk",
-  ]
+  deps =
+      [ "${innerkits_path}/native_cpp/audio_sink:distributed_audio_sink_sdk" ]
 
   external_deps = [
     "c_utils:utils",
