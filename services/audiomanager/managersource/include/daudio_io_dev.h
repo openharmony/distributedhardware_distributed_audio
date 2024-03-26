@@ -34,7 +34,7 @@ namespace OHOS {
 namespace DistributedHardware {
 class DAudioIoDev : public IDAudioHdiCallback {
 public:
-    DAudioIoDev(const std::string &devId)
+    explicit DAudioIoDev(const std::string &devId)
         : devId_(devId) {};
     ~DAudioIoDev() override = default;
     virtual int32_t InitReceiverEngine(IAVEngineProvider *providerPtr) = 0;
