@@ -391,7 +391,7 @@ int32_t DAudioSourceManager::CreateAudioDevice(const std::string &devId)
 
 void DAudioSourceManager::DeleteAudioDevice(const std::string &devId, const std::string &dhId)
 {
-    DHLOGI("Delete audio device, devId = %{public}s, dhId = %{public}s.", devId.c_str(), dhId.c_str());
+    DHLOGI("Delete audio device, devId = %{public}s, dhId = %{public}s.", GetAnonyString(devId).c_str(), dhId.c_str());
     {
         std::lock_guard<std::mutex> lock(devMapMtx_);
         audioDevMap_[devId].ports.erase(dhId);
