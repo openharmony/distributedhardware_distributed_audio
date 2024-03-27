@@ -26,9 +26,8 @@ ohos_shared_library("distributed_audio_sink") {
     ubsan = true
   }
   stack_protector_ret = true
-  include_dirs = [ "//third_party/cJSON" ]
 
-  include_dirs += [
+  include_dirs = [
     "include",
     "${audio_client_path}/interface",
     "${audio_client_path}/micclient/include",
@@ -69,7 +68,6 @@ ohos_shared_library("distributed_audio_sink") {
     "${audio_transport_path}/senderengine:distributed_audio_encode_transport",
     "${innerkits_path}/native_cpp/audio_sink:distributed_audio_sink_sdk",
     "${services_path}/common:distributed_audio_utils",
-    "${third_party_path}/cJSON:cjson",
   ]
 
   external_deps = [
@@ -78,6 +76,7 @@ ohos_shared_library("distributed_audio_sink") {
     "audio_framework:audio_capturer",
     "audio_framework:audio_client",
     "audio_framework:audio_renderer",
+    "cJSON:cjson",
     "c_utils:utils",
     "device_manager:devicemanagersdk",
     "device_security_level:dslm_sdk",

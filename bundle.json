@@ -29,6 +29,7 @@
                 "access_token",
                 "accessibility",
                 "audio_framework",
+                "cJSON",
                 "c_utils",
                 "device_security_level",
                 "device_manager",
@@ -47,9 +48,6 @@
                 "player_framework",
                 "safwk",
                 "samgr"
-            ],
-            "third_party": [
-                "cJSON"
             ]
         },
         "build": {

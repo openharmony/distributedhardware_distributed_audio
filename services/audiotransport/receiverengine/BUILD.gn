@@ -58,6 +58,7 @@ ohos_shared_library("distributed_audio_decode_transport") {
   deps = [ "${services_path}/common:distributed_audio_utils" ]
 
   external_deps = [
+    "cJSON:cjson",
     "c_utils:utils",
     "distributed_hardware_fwk:distributed_av_receiver",
     "dsoftbus:softbus_client",

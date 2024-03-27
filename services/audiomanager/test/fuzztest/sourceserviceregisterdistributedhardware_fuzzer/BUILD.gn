@@ -48,13 +48,10 @@ ohos_fuzztest("SourceServiceRegisterDistributedHardwareFuzzTest") {
     "${innerkits_path}/native_cpp/audio_source/include",
     "${distributedaudio_path}/audiohandler/include",
     "${services_path}/audiomanager/servicesource/include",
-    "//third_party/cJSON",
   ]
 
-  deps = [
-    "${services_path}/audiomanager/servicesource:distributed_audio_source",
-    "${third_party_path}/cJSON:cjson",
-  ]
+  deps =
+      [ "${services_path}/audiomanager/servicesource:distributed_audio_source" ]
 
   defines = [
     "HI_LOG_ENABLE",
@@ -64,6 +61,7 @@ ohos_fuzztest("SourceServiceRegisterDistributedHardwareFuzzTest") {
 
   external_deps = [
     "audio_framework:audio_renderer",
+    "cJSON:cjson",
     "c_utils:utils",
     "drivers_interface_distributed_audio:libdaudio_proxy_1.0",
     "ipc:ipc_core",

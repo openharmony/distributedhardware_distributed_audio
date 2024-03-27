@@ -21,10 +21,7 @@ module_output_path = "distributed_audio/common/daudio_util_test"
 config("module_private_config") {
   visibility = [ ":*" ]
 
-  include_dirs = [
-    "${fwk_common_path}/utils/include",
-    "//third_party/cJSON",
-  ]
+  include_dirs = [ "${fwk_common_path}/utils/include" ]
 
   include_dirs += [
     "${common_path}/include",
@@ -41,11 +38,11 @@ ohos_unittest("DaudioUtilsTest") {
 
   deps = [
     "${services_path}/common:distributed_audio_utils",
-    "${third_party_path}/cJSON:cjson",
     "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
+    "cJSON:cjson",
     "c_utils:utils",
     "hilog:libhilog",
   ]

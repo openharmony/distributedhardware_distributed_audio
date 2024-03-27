@@ -22,7 +22,6 @@ config("daudio_common_pub_config") {
     "audioparam",
     "${common_path}/dfxutils/include",
     "${common_path}/include",
-    "//third_party/cJSON",
   ]
 }
 
@@ -56,8 +55,8 @@ ohos_shared_library("distributed_audio_utils") {
     "audiodata/src/audio_data.cpp",
   ]
 
-  deps = [ "${third_party_path}/cJSON:cjson" ]
   external_deps = [
+    "cJSON:cjson",
     "c_utils:utils",
     "distributed_hardware_fwk:distributedhardwareutils",
     "dsoftbus:softbus_client",

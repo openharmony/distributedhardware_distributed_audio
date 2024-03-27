@@ -49,13 +49,11 @@ ohos_fuzztest("SourceServiceInitSourceFuzzTest") {
     "${innerkits_path}/native_cpp/audio_source/include",
     "${distributedaudio_path}/audiohandler/include",
     "${services_path}/audiomanager/servicesource/include",
-    "//third_party/cJSON",
   ]
 
   deps = [
     "${innerkits_path}/native_cpp/audio_source:distributed_audio_source_sdk",
     "${services_path}/audiomanager/servicesource:distributed_audio_source",
-    "${third_party_path}/cJSON:cjson",
   ]
 
   defines = [
@@ -66,6 +64,7 @@ ohos_fuzztest("SourceServiceInitSourceFuzzTest") {
 
   external_deps = [
     "audio_framework:audio_renderer",
+    "cJSON:cjson",
     "c_utils:utils",
     "drivers_interface_distributed_audio:libdaudio_proxy_1.0",
     "ipc:ipc_core",

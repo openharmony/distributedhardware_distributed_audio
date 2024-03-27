@@ -56,6 +56,7 @@ ohos_unittest("AVTransReceiverAdapterTest") {
   ]
 
   external_deps = [
+    "cJSON:cjson",
     "distributed_hardware_fwk:distributed_av_receiver",
     "dsoftbus:softbus_client",
   ]
