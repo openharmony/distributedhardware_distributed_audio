@@ -48,27 +48,56 @@ int32_t DAudioHandler::Initialize()
     return QueryAudioInfo();
 }
 
-void DAudioHandler::AddItemsToObject(DHItem &dhItem, cJSON* infoJson, const int32_t &dhId)
+bool DAudioHandler::AddItemsToObject(DHItem &dhItem, cJSON* infoJson, const int32_t &dhId)
 {
     DHLOGD("Get dhId and then add other items into cjson object");
     int32_t deviceType = GetDevTypeByDHId(dhId);
     if (deviceType == AUDIO_DEVICE_TYPE_MIC) {
         dhItem.subtype = "mic";
-        cJSON_AddItemToObject(infoJson, "SampleRates",
-            cJSON_CreateIntArray(reinterpret_cast<int*>(micInfos_.sampleRates.data()), micInfos_.sampleRates.size()));
-        cJSON_AddItemToObject(infoJson, "ChannelMasks",
-            cJSON_CreateIntArray(reinterpret_cast<int*>(micInfos_.channels.data()), micInfos_.channels.size()));
-        cJSON_AddItemToObject(infoJson, "Formats",
-            cJSON_CreateIntArray(reinterpret_cast<int*>(micInfos_.formats.data()), micInfos_.formats.size()));
+        cJSON *sampleArray = cJSON_CreateArray();
+        CHECK_NULL_RETURN(sampleArray, false);
+        cJSON_AddItemToObject(infoJson, "SampleRates", sampleArray);
+        for (const auto &value : micInfos_.sampleRates) {
+            cJSON_AddItemToArray(sampleArray, cJSON_CreateNumber(static_cast<uint32_t>(value)));
+        }
+
+        cJSON *channelArray = cJSON_CreateArray();
+        CHECK_NULL_RETURN(channelArray, false);
+        cJSON_AddItemToObject(infoJson, "ChannelMasks", channelArray);
+        for (const auto &value : micInfos_.channels) {
+            cJSON_AddItemToArray(channelArray, cJSON_CreateNumber(static_cast<uint32_t>(value)));
+        }
+
+        cJSON *formatsArray = cJSON_CreateArray();
+        CHECK_NULL_RETURN(formatsArray, false);
+        cJSON_AddItemToObject(infoJson, "Formats", formatsArray);
+        for (const auto &value : micInfos_.formats) {
+            cJSON_AddItemToArray(formatsArray, cJSON_CreateNumber(static_cast<uint32_t>(value)));
+        }
     } else if (deviceType == AUDIO_DEVICE_TYPE_SPEAKER) {
         dhItem.subtype = "speaker";
-        cJSON_AddItemToObject(infoJson, "SampleRates",
-            cJSON_CreateIntArray(reinterpret_cast<int*>(spkInfos_.sampleRates.data()), spkInfos_.sampleRates.size()));
-        cJSON_AddItemToObject(infoJson, "ChannelMasks",
-            cJSON_CreateIntArray(reinterpret_cast<int*>(spkInfos_.channels.data()), spkInfos_.channels.size()));
-        cJSON_AddItemToObject(infoJson, "Formats",
-            cJSON_CreateIntArray(reinterpret_cast<int*>(spkInfos_.formats.data()), spkInfos_.formats.size()));
+        cJSON *sampleArray = cJSON_CreateArray();
+        CHECK_NULL_RETURN(sampleArray, false);
+        cJSON_AddItemToObject(infoJson, "SampleRates", sampleArray);
+        for (const auto &value : spkInfos_.sampleRates) {
+            cJSON_AddItemToArray(sampleArray, cJSON_CreateNumber(static_cast<uint32_t>(value)));
+        }
+
+        cJSON *channelArray = cJSON_CreateArray();
+        CHECK_NULL_RETURN(channelArray, false);
+        cJSON_AddItemToObject(infoJson, "ChannelMasks", channelArray);
+        for (const auto &value : spkInfos_.channels) {
+            cJSON_AddItemToArray(channelArray, cJSON_CreateNumber(static_cast<uint32_t>(value)));
+        }
+
+        cJSON *formatsArray = cJSON_CreateArray();
+        CHECK_NULL_RETURN(formatsArray, false);
+        cJSON_AddItemToObject(infoJson, "Formats", formatsArray);
+        for (const auto &value : spkInfos_.formats) {
+            cJSON_AddItemToArray(formatsArray, cJSON_CreateNumber(static_cast<uint32_t>(value)));
+        }
     }
+    return true;
 }
 
 std::vector<DHItem> DAudioHandler::Query()
@@ -91,7 +120,10 @@ std::vector<DHItem> DAudioHandler::Query()
             return dhItemVec;
         }
         DHItem dhItem;
-        AddItemsToObject(dhItem, infoJson, dhId);
+        if (!AddItemsToObject(dhItem, infoJson, dhId)) {
+            cJSON_Delete(infoJson);
+            return dhItemVec;
+        }
         cJSON_AddNumberToObject(infoJson, "INTERRUPT_GROUP_ID", dev->interruptGroupId_);
         cJSON_AddNumberToObject(infoJson, "VOLUME_GROUP_ID", dev->volumeGroupId_);
         dhItem.dhId = std::to_string(dhId);

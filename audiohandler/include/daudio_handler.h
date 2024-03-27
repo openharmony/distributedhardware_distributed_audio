@@ -50,7 +50,7 @@ private:
     DAudioHandler();
     ~DAudioHandler();
     int32_t QueryAudioInfo();
-    void AddItemsToObject(DHItem &dhItem, cJSON *infoJson, const int32_t &dhId);
+    bool AddItemsToObject(DHItem &dhItem, cJSON *infoJson, const int32_t &dhId);
 private:
     AudioInfo spkInfos_;
     AudioInfo micInfos_;
