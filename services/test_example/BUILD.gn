@@ -31,6 +31,7 @@ ohos_executable("audio_distributed_test") {
   deps = [ "${services_path}/common:distributed_audio_utils" ]
 
   external_deps = [
+    "cJSON:cjson",
     "c_utils:utils",
     "distributed_hardware_fwk:distributedhardwareutils",
     "drivers_interface_distributed_audio:libdaudio_proxy_1.0",

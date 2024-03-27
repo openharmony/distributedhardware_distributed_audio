@@ -22,7 +22,6 @@ config("module_private_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "//third_party/cJSON",
     "${audio_framework_path}/audiopolicy/include",
     "${driver_audio_path}/include",
     "${fwk_common_path}/utils/include",
@@ -70,7 +69,6 @@ ohos_unittest("DaudioSourceServiceTest") {
 
   deps = [
     "${services_path}/audiomanager/servicesource:distributed_audio_source",
-    "${third_party_path}/cJSON:cjson",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
   ]
@@ -79,6 +77,7 @@ ohos_unittest("DaudioSourceServiceTest") {
     "audio_framework:audio_capturer",
     "audio_framework:audio_client",
     "audio_framework:audio_renderer",
+    "cJSON:cjson",
     "c_utils:utils",
     "drivers_interface_distributed_audio:libdaudio_proxy_1.0",
     "dsoftbus:softbus_client",

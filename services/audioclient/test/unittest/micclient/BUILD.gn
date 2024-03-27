@@ -37,7 +37,6 @@ config("module_private_config") {
     "${services_path}/common/audioeventcallback",
     "${services_path}/common/audiodata/include",
     "${services_path}/common/audioparam",
-    "//third_party/cJSON",
   ]
 }
 
@@ -53,13 +52,13 @@ ohos_unittest("MicClientTest") {
 
   deps = [
     "${services_path}/audiomanager/servicesink:distributed_audio_sink",
-    "${third_party_path}/cJSON:cjson",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
     "audio_framework:audio_capturer",
+    "cJSON:cjson",
     "distributed_hardware_fwk:distributed_av_receiver",
     "distributed_hardware_fwk:distributed_av_sender",
   ]

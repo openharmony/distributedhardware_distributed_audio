@@ -64,7 +64,6 @@ ohos_unittest("DaudioSinkDevTest") {
     "${innerkits_path}/native_cpp/audio_sink:distributed_audio_sink_sdk",
     "${services_path}/audiomanager/servicesink:distributed_audio_sink",
     "${services_path}/common:distributed_audio_utils",
-    "${third_party_path}/cJSON:cjson",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
   ]
@@ -73,6 +72,7 @@ ohos_unittest("DaudioSinkDevTest") {
     "audio_framework:audio_capturer",
     "audio_framework:audio_client",
     "audio_framework:audio_renderer",
+    "cJSON:cjson",
     "c_utils:utils",
     "device_manager:devicemanagersdk",
     "device_security_level:dslm_sdk",
@@ -101,7 +101,6 @@ ohos_unittest("DAudioSinkManagerTest") {
   deps = [
     "${innerkits_path}/native_cpp/audio_sink:distributed_audio_sink_sdk",
     "${services_path}/audiomanager/servicesink:distributed_audio_sink",
-    "${third_party_path}/cJSON:cjson",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
   ]
@@ -110,6 +109,7 @@ ohos_unittest("DAudioSinkManagerTest") {
     "audio_framework:audio_capturer",
     "audio_framework:audio_client",
     "audio_framework:audio_renderer",
+    "cJSON:cjson",
     "c_utils:utils",
     "device_manager:devicemanagersdk",
     "device_security_level:dslm_sdk",

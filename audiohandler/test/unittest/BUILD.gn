@@ -46,12 +46,12 @@ ohos_unittest("AudioHandlerTest") {
 
   deps = [
     "${distributedaudio_path}/audiohandler:distributed_audio_handler",
-    "${third_party_path}/cJSON:cjson",
     "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
     "audio_framework:audio_renderer",
+    "cJSON:cjson",
     "c_utils:utils",
     "hilog:libhilog",
   ]
