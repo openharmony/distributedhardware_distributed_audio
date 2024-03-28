@@ -20,7 +20,7 @@
 
 #include "daudio_source_handler.h"
 #include "daudio_constants.h"
-#include "component_enable.h"
+#include "mock_component_enable.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -36,7 +36,7 @@ void SourceHandlerRegisterDistributedHardwareFuzzTest(const uint8_t* data, size_
     EnableParam param;
     param.sinkVersion = version;
     param.sinkAttrs = attrs;
-    std::shared_ptr<RegisterCallback> callback = std::make_shared<ComponentEnable>();
+    std::shared_ptr<RegisterCallback> callback = std::make_shared<MockComponentEnable>();
 
     DAudioSourceHandler::GetInstance().RegisterDistributedHardware(devId, dhId, param, callback);
 }

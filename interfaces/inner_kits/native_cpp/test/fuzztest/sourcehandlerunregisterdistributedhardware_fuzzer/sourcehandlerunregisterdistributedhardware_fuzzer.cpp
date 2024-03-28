@@ -20,7 +20,7 @@
 
 #include "daudio_source_handler.h"
 #include "daudio_constants.h"
-#include "component_disable.h"
+#include "mock_component_disable.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -31,7 +31,7 @@ void SourceHandlerUnregisterDistributedHardwareFuzzTest(const uint8_t* data, siz
     }
     std::string devId(reinterpret_cast<const char*>(data), size);
     std::string dhId(reinterpret_cast<const char*>(data), size);
-    std::shared_ptr<UnregisterCallback> callback = std::make_shared<ComponentDisable>();
+    std::shared_ptr<UnregisterCallback> callback = std::make_shared<MockComponentDisable>();
 
     DAudioSourceHandler::GetInstance().UnregisterDistributedHardware(devId, dhId, callback);
 }
