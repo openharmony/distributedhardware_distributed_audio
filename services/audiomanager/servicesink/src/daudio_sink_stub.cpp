@@ -24,6 +24,7 @@
 #include "daudio_ipc_interface_code.h"
 #include "daudio_log.h"
 #include "daudio_sink_ipc_callback_proxy.h"
+#include "daudio_util.h"
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DAudioSinkStub"
@@ -113,7 +114,7 @@ int32_t DAudioSinkStub::ReleaseSinkInner(MessageParcel &data, MessageParcel &rep
 
 int32_t DAudioSinkStub::SubscribeLocalHardwareInner(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    std::string dhId = data.ReadString();
+    std::string dhId = ReduceDhIdPrefix(data.ReadString());
     std::string param = data.ReadString();
     int32_t ret = SubscribeLocalHardware(dhId, param);
     reply.WriteInt32(ret);
@@ -122,7 +123,7 @@ int32_t DAudioSinkStub::SubscribeLocalHardwareInner(MessageParcel &data, Message
 
 int32_t DAudioSinkStub::UnsubscribeLocalHardwareInner(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    std::string dhId = data.ReadString();
+    std::string dhId = ReduceDhIdPrefix(data.ReadString());
     int32_t ret = UnsubscribeLocalHardware(dhId);
     reply.WriteInt32(ret);
     return DH_SUCCESS;
@@ -131,7 +132,7 @@ int32_t DAudioSinkStub::UnsubscribeLocalHardwareInner(MessageParcel &data, Messa
 int32_t DAudioSinkStub::DAudioNotifyInner(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     std::string networkId = data.ReadString();
-    std::string dhId = data.ReadString();
+    std::string dhId = ReduceDhIdPrefix(data.ReadString());
     int32_t eventType = data.ReadInt32();
     std::string eventContent = data.ReadString();
 

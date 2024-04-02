@@ -487,6 +487,26 @@ std::string ParseStringFromArgs(std::string args, const char *key)
     return content;
 }
 
+std::string AddDhIdPrefix(const std::string &dhId)
+{
+    std::string prefix = "Audio_";
+    DHLOGD("Load \"Audio_\" prefix.");
+    prefix.append(dhId);
+    return prefix;
+}
+
+std::string ReduceDhIdPrefix(const std::string &dhId)
+{
+    std::string prefix = "Audio_";
+    size_t pos = dhId.find(prefix);
+    DHLOGD("Uninstall the \"Audio_\" prefix.");
+    if (pos != std::string::npos) {
+        return dhId.substr(prefix.size());
+    } else {
+        return dhId;
+    }
+}
+
 template <typename T>
 bool GetSysPara(const char *key, T &value)
 {
