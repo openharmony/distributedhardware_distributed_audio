@@ -799,7 +799,8 @@ HWTEST_F(DAudioSourceDevTest, TaskSetVolume_001, TestSize.Level1)
     auto speaker = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
     sourceDev_->deviceMap_[dhId] = speaker;
     speaker->speakerTrans_ = std::make_shared<AVTransSenderTransport>(DEV_ID, speaker);
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskSetVolume(std::string(jsonString)));
+    std::string param = "dhId=3;" + std::string(jsonString);
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskSetVolume(param));
     cJSON_Delete(jParam);
     cJSON_free(jsonString);
 }
