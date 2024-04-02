@@ -1087,7 +1087,7 @@ int32_t DAudioSourceDev::SendAudioEventToRemote(const AudioEvent &event)
 {
     // because: type: CHANGE_PLAY_STATUS / VOLUME_MUTE_SET / VOLUME_SET, so speaker
     std::shared_ptr<DAudioIoDev> speaker = nullptr;
-    if (event.type == VOLUME_SET) {
+    if (event.type == VOLUME_SET || event.type == VOLUME_MUTE_SET) {
         int32_t dhId = 0;
         if (GetAudioParamInt(event.content, "dhId", dhId) != DH_SUCCESS) {
             DHLOGE("Get key of dhId failed.");
