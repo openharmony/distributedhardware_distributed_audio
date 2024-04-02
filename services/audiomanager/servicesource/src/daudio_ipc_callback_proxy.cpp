@@ -34,7 +34,7 @@ int32_t DAudioIpcCallbackProxy::OnNotifyRegResult(const std::string &devId, cons
     }
 
     std::string handleDhId = ReduceDhIdPrefix(dhId);
-    if (!data.WriteString(devId) || !data.WriteString(handleDhId) || !data.WriteString(reqId) || 
+    if (!data.WriteString(devId) || !data.WriteString(handleDhId) || !data.WriteString(reqId) ||
         !data.WriteInt32(status) || !data.WriteString(resultData)) {
         return ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED;
     }
@@ -56,7 +56,7 @@ int32_t DAudioIpcCallbackProxy::OnNotifyUnregResult(const std::string &devId, co
     }
 
     std::string handleDhId = ReduceDhIdPrefix(dhId);
-    if (!data.WriteString(devId) || !data.WriteString(handleDhId) || !data.WriteString(reqId) || 
+    if (!data.WriteString(devId) || !data.WriteString(handleDhId) || !data.WriteString(reqId) ||
         !data.WriteInt32(status) || !data.WriteString(resultData)) {
         return ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED;
     }
