@@ -126,7 +126,7 @@ std::vector<DHItem> DAudioHandler::Query()
         }
         cJSON_AddNumberToObject(infoJson, "INTERRUPT_GROUP_ID", dev->interruptGroupId_);
         cJSON_AddNumberToObject(infoJson, "VOLUME_GROUP_ID", dev->volumeGroupId_);
-        dhItem.dhId = std::to_string(dhId);
+        dhItem.dhId = AddDhIdPrefix(std::to_string(dhId));
         char *jsonInfo = cJSON_Print(infoJson);
         if (jsonInfo == NULL) {
             DHLOGE("Failed to create JSON data.");
