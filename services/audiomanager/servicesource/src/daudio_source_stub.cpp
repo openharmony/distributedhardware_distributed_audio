@@ -24,7 +24,6 @@
 #include "daudio_ipc_callback_proxy.h"
 #include "daudio_ipc_interface_code.h"
 #include "daudio_log.h"
-#include "daudio_util.h"
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DAudioSourceStub"
@@ -110,7 +109,7 @@ int32_t DAudioSourceStub::RegisterDistributedHardwareInner(MessageParcel &data, 
         return ERR_DH_AUDIO_SA_PERMISSION_FAIED;
     }
     std::string networkId = data.ReadString();
-    std::string dhId = ReduceDhIdPrefix(data.ReadString());
+    std::string dhId = data.ReadString();
     std::string version = data.ReadString();
     std::string attrs = data.ReadString();
     std::string reqId = data.ReadString();
@@ -131,7 +130,7 @@ int32_t DAudioSourceStub::UnregisterDistributedHardwareInner(MessageParcel &data
         return ERR_DH_AUDIO_SA_PERMISSION_FAIED;
     }
     std::string networkId = data.ReadString();
-    std::string dhId = ReduceDhIdPrefix(data.ReadString());
+    std::string dhId = data.ReadString();
     std::string reqId = data.ReadString();
 
     int32_t ret = UnregisterDistributedHardware(networkId, dhId, reqId);
@@ -143,7 +142,7 @@ int32_t DAudioSourceStub::ConfigDistributedHardwareInner(MessageParcel &data, Me
     MessageOption &option)
 {
     std::string networkId = data.ReadString();
-    std::string dhId = ReduceDhIdPrefix(data.ReadString());
+    std::string dhId = data.ReadString();
     std::string key = data.ReadString();
     std::string value = data.ReadString();
 
@@ -155,7 +154,7 @@ int32_t DAudioSourceStub::ConfigDistributedHardwareInner(MessageParcel &data, Me
 int32_t DAudioSourceStub::DAudioNotifyInner(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     std::string networkId = data.ReadString();
-    std::string dhId = ReduceDhIdPrefix(data.ReadString());
+    std::string dhId = data.ReadString();
     int32_t eventType = data.ReadInt32();
     std::string eventContent = data.ReadString();
 

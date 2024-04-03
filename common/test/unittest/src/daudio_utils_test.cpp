@@ -321,5 +321,19 @@ HWTEST_F(DAudioUtilsTest, DAudioUtilTest_008, TestSize.Level1)
     cJSON_AddNumberToObject(jsonObj, "two", 2);
     CJsonParamCheck(jsonObj, keys);
 }
+
+/**
+ * @tc.name: DAudioLogTest_009
+ * @tc.desc: Verify the AddDhIdPrefix and ReduceDhIdPrefix function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5U
+ */
+HWTEST_F(DAudioUtilsTest, DAudioUtilTest_009, TestSize.Level1)
+{
+    EXPECT_EQ(AddDhIdPrefix("1394302"), "Audio_1394302");
+    EXPECT_EQ(AddDhIdPrefix("Audio_1394302"), "Audio_1394302");
+    EXPECT_EQ(ReduceDhIdPrefix("Audio_1394302"), "1394302");
+    EXPECT_EQ(ReduceDhIdPrefix("1394302"), "1394302");
+}
 } // namespace DistributedHardware
 } // namespace OHOS

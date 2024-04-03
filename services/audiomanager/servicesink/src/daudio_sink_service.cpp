@@ -111,8 +111,7 @@ void DAudioSinkService::DAudioNotify(const std::string &devId, const std::string
 {
     DHLOGI("DAudioNotify devId:%{public}s, dhId:%{public}s, eventType:%{public}d.", GetAnonyString(devId).c_str(),
         dhId.c_str(), eventType);
-    std::string handleDhId = ReduceDhIdPrefix(dhId);
-    DAudioSinkManager::GetInstance().HandleDAudioNotify(devId, handleDhId, eventType, eventContent);
+    DAudioSinkManager::GetInstance().HandleDAudioNotify(devId, dhId, eventType, eventContent);
 }
 
 int DAudioSinkService::Dump(int32_t fd, const std::vector<std::u16string> &args)

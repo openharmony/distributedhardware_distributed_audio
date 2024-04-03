@@ -490,19 +490,28 @@ std::string ParseStringFromArgs(std::string args, const char *key)
 std::string AddDhIdPrefix(const std::string &dhId)
 {
     std::string prefix = "Audio_";
-    DHLOGD("Load \"Audio_\" prefix.");
-    prefix.append(dhId);
-    return prefix;
+    size_t pos = dhId.find(prefix);
+    DHLOGD("Append the prefix. The current dhId is %{public}s.", dhId.c_str());
+    if (pos != std::string::npos) {
+        DHLOGD("No need to add prefix.");
+        return dhId;
+    } else {
+        prefix.append(dhId);
+        DHLOGD("After append the prefix. The current dhId is %{public}s.", prefix.c_str());
+        return prefix;
+    }
 }
 
 std::string ReduceDhIdPrefix(const std::string &dhId)
 {
     std::string prefix = "Audio_";
     size_t pos = dhId.find(prefix);
-    DHLOGD("Uninstall the \"Audio_\" prefix.");
+    DHLOGD("Delete the prefix. The current dhId is %{public}s.", dhId.c_str());
     if (pos != std::string::npos) {
+        DHLOGD("After delete the prefix. The current dhId is %{public}s.", dhId.substr(prefix.size()).c_str());
         return dhId.substr(prefix.size());
     } else {
+        DHLOGD("No need to delete prefix.");
         return dhId;
     }
 }

@@ -101,8 +101,7 @@ int32_t DAudioSourceService::RegisterDistributedHardware(const std::string &devI
         dhId.c_str());
     std::string version = param.sinkVersion;
     std::string attrs = param.sinkAttrs;
-    std::string handleDhId = ReduceDhIdPrefix(dhId);
-    return DAudioSourceManager::GetInstance().EnableDAudio(devId, handleDhId, version, attrs, reqId);
+    return DAudioSourceManager::GetInstance().EnableDAudio(devId, dhId, version, attrs, reqId);
 }
 
 int32_t DAudioSourceService::UnregisterDistributedHardware(const std::string &devId, const std::string &dhId,
@@ -110,8 +109,7 @@ int32_t DAudioSourceService::UnregisterDistributedHardware(const std::string &de
 {
     DHLOGI("Unregister distributed audio device, devId: %{public}s, dhId: %{public}s.", GetAnonyString(devId).c_str(),
         dhId.c_str());
-    std::string handleDhId = ReduceDhIdPrefix(dhId);
-    return DAudioSourceManager::GetInstance().DisableDAudio(devId, handleDhId, reqId);
+    return DAudioSourceManager::GetInstance().DisableDAudio(devId, dhId, reqId);
 }
 
 int32_t DAudioSourceService::ConfigDistributedHardware(const std::string &devId, const std::string &dhId,
@@ -127,8 +125,7 @@ void DAudioSourceService::DAudioNotify(const std::string &devId, const std::stri
 {
     DHLOGD("Notify distributed audio device, devId: %{public}s, dhId: %{public}s.", GetAnonyString(devId).c_str(),
         dhId.c_str());
-    std::string handleDhId = ReduceDhIdPrefix(dhId);
-    DAudioSourceManager::GetInstance().HandleDAudioNotify(devId, handleDhId, eventType, eventContent);
+    DAudioSourceManager::GetInstance().HandleDAudioNotify(devId, dhId, eventType, eventContent);
 }
 
 int DAudioSourceService::Dump(int32_t fd, const std::vector<std::u16string>& args)
