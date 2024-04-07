@@ -116,6 +116,19 @@ HWTEST_F(DAudioSinkManagerTest, DAudioNotify_001, TestSize.Level1)
 HWTEST_F(DAudioSinkManagerTest, CreateAudioDevice_001, TestSize.Level1)
 {
     std::string devId = "devId";
+    std::string params = "params";
+    auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgr == nullptr) {
+        return;
+    }
+    sptr<DAudioSinkLoadCallback> loadCallback(new DAudioSinkLoadCallback(params));
+    samgr->LoadSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID, loadCallback);
+    sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID);
+    if (remoteObject == nullptr) {
+        return;
+    }
+    sptr<DAudioSinkIpcCallbackProxy> dAudioSinkIpcCallbackProxy(new DAudioSinkIpcCallbackProxy(remoteObject));
+    daudioSinkManager.ipcSinkCallback_ = dAudioSinkIpcCallbackProxy;
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, daudioSinkManager.CreateAudioDevice(devId));
     daudioSinkManager.audioDevMap_.emplace(devId, nullptr);
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, daudioSinkManager.CreateAudioDevice(devId));
