@@ -180,7 +180,8 @@ int32_t DAudioSourceDev::DisableDAudio(const std::string &dhId)
     }
     AudioEvent event(AudioEventType::EVENT_UNKNOWN, std::string(data));
     int32_t dhIdNum = ConvertString2Int(dhId);
-    CHECK_AND_FREECHAR_RETURN_RET_LOG(dhIdNum == -1, ERR_DH_AUDIO_NOT_SUPPORT, data, "%{public}s", "Parse dhId error.");
+    CHECK_AND_FREECHAR_RETURN_RET_LOG(dhIdNum == ERR_DH_AUDIO_FAILED, ERR_DH_AUDIO_NOT_SUPPORT, data,
+        "%{public}s", "Parse dhId error.");
     switch (GetDevTypeByDHId(dhIdNum)) {
         case AUDIO_DEVICE_TYPE_SPEAKER:
             event.type = CLOSE_SPEAKER;
@@ -577,7 +578,7 @@ int32_t DAudioSourceDev::TaskEnableDAudio(const std::string &args)
         return ERR_DH_AUDIO_SA_PARAM_INVALID;
     }
     int32_t dhId = ParseDhidFromEvent(args);
-    if (dhId == -1) {
+    if (dhId == ERR_DH_AUDIO_FAILED) {
         DHLOGE("Parse dhId error.");
         cJSON_Delete(jParam);
         return ERR_DH_AUDIO_NOT_SUPPORT;
@@ -667,7 +668,7 @@ int32_t DAudioSourceDev::TaskDisableDAudio(const std::string &args)
     cJSON *jParam = cJSON_Parse(args.c_str());
     CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
     int32_t dhId = ParseDhidFromEvent(args);
-    CHECK_AND_FREE_RETURN_RET_LOG(dhId == -1, ERR_DH_AUDIO_NULLPTR, jParam,
+    CHECK_AND_FREE_RETURN_RET_LOG(dhId == ERR_DH_AUDIO_FAILED, ERR_DH_AUDIO_NULLPTR, jParam,
         "%{public}s", "Parse dhId error.");
     cJSON_Delete(jParam);
     DHLOGI("Parsed dhId = %{public}d", dhId);
@@ -829,7 +830,7 @@ int32_t DAudioSourceDev::CloseSpkNew(const std::string &args)
     DHLOGI("Close speaker new");
     cJSON *jAudioParam = nullptr;
     int32_t dhId = ParseDhidFromEvent(args);
-    CHECK_AND_RETURN_RET_LOG(dhId == -1, ERR_DH_AUDIO_NULLPTR,
+    CHECK_AND_RETURN_RET_LOG(dhId == ERR_DH_AUDIO_FAILED, ERR_DH_AUDIO_NULLPTR,
         "%{public}s", "Parse dhId error.");
     NotifySinkDev(CLOSE_SPEAKER, jAudioParam, std::to_string(dhId));
     bool closeStatus = true;
@@ -936,7 +937,7 @@ int32_t DAudioSourceDev::CloseMicNew(const std::string &args)
     DHLOGI("Close mic new.");
     cJSON *jAudioParam = nullptr;
     int32_t dhId = ParseDhidFromEvent(args);
-    CHECK_AND_RETURN_RET_LOG(dhId == -1, ERR_DH_AUDIO_NULLPTR,
+    CHECK_AND_RETURN_RET_LOG(dhId == ERR_DH_AUDIO_FAILED, ERR_DH_AUDIO_NULLPTR,
         "%{public}s", "Parse dhId error.");
     NotifySinkDev(CLOSE_MIC, jAudioParam, std::to_string(dhId));
 
