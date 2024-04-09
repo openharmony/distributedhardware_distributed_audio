@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -112,15 +112,15 @@ int32_t DMicDev::DisableDevice(const int32_t dhId)
     return DH_SUCCESS;
 }
 
-int32_t DMicDev::OpenDevice(const std::string &devId, const int32_t dhId)
+int32_t DMicDev::CreateStream(const int32_t streamId)
 {
-    DHLOGI("Open mic device devId: %{public}s, dhId: %{public}d.", GetAnonyString(devId).c_str(), dhId);
+    DHLOGI("Open stream of mic device streamId: %{public}d.", streamId);
     std::shared_ptr<IAudioEventCallback> cbObj = audioEventCallback_.lock();
     CHECK_NULL_RETURN(cbObj, ERR_DH_AUDIO_NULLPTR);
 
     cJSON *jParam = cJSON_CreateObject();
     CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
-    cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId).c_str());
+    cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId_).c_str());
     char *jsonData = cJSON_PrintUnformatted(jParam);
     if (jsonData == nullptr) {
         cJSON_Delete(jParam);
@@ -130,22 +130,22 @@ int32_t DMicDev::OpenDevice(const std::string &devId, const int32_t dhId)
     std::string jsonDataStr(jsonData);
     AudioEvent event(AudioEventType::OPEN_MIC, jsonDataStr);
     cbObj->NotifyEvent(event);
-    DAudioHisysevent::GetInstance().SysEventWriteBehavior(DAUDIO_OPEN, devId, std::to_string(dhId),
+    DAudioHisysevent::GetInstance().SysEventWriteBehavior(DAUDIO_OPEN, devId_, std::to_string(dhId_),
         "daudio mic device open success.");
     cJSON_Delete(jParam);
     cJSON_free(jsonData);
     return DH_SUCCESS;
 }
 
-int32_t DMicDev::CloseDevice(const std::string &devId, const int32_t dhId)
+int32_t DMicDev::DestroyStream(const int32_t streamId)
 {
-    DHLOGI("Close mic device devId: %{public}s, dhId: %{public}d.", GetAnonyString(devId).c_str(), dhId);
+    DHLOGI("Close stream of mic device streamId: %{public}d.", streamId);
     std::shared_ptr<IAudioEventCallback> cbObj = audioEventCallback_.lock();
     CHECK_NULL_RETURN(cbObj, ERR_DH_AUDIO_NULLPTR);
 
     cJSON *jParam = cJSON_CreateObject();
     CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
-    cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId).c_str());
+    cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId_).c_str());
     char *jsonData = cJSON_PrintUnformatted(jParam);
     if (jsonData == nullptr) {
         cJSON_Delete(jParam);
@@ -155,7 +155,7 @@ int32_t DMicDev::CloseDevice(const std::string &devId, const int32_t dhId)
     std::string jsonDataStr(jsonData);
     AudioEvent event(AudioEventType::CLOSE_MIC, jsonDataStr);
     cbObj->NotifyEvent(event);
-    DAudioHisysevent::GetInstance().SysEventWriteBehavior(DAUDIO_CLOSE, devId, std::to_string(dhId),
+    DAudioHisysevent::GetInstance().SysEventWriteBehavior(DAUDIO_CLOSE, devId_, std::to_string(dhId_),
         "daudio mic device close success.");
     cJSON_Delete(jParam);
     cJSON_free(jsonData);
@@ -163,12 +163,12 @@ int32_t DMicDev::CloseDevice(const std::string &devId, const int32_t dhId)
     return DH_SUCCESS;
 }
 
-int32_t DMicDev::SetParameters(const std::string &devId, const int32_t dhId, const AudioParamHDF &param)
+int32_t DMicDev::SetParameters(const int32_t streamId, const AudioParamHDF &param)
 {
     DHLOGD("Set mic parameters {samplerate: %{public}d, channelmask: %{public}d, format: %{public}d, "
         "period: %{public}d, framesize: %{public}d, ext{%{public}s}}.", param.sampleRate,
         param.channelMask, param.bitFormat, param.period, param.frameSize, param.ext.c_str());
-    curPort_ = dhId;
+    curPort_ = dhId_;
     paramHDF_ = param;
 
     param_.comParam.sampleRate = paramHDF_.sampleRate;
@@ -181,7 +181,7 @@ int32_t DMicDev::SetParameters(const std::string &devId, const int32_t dhId, con
     return DH_SUCCESS;
 }
 
-int32_t DMicDev::NotifyEvent(const std::string &devId, const int32_t dhId, const AudioEvent &event)
+int32_t DMicDev::NotifyEvent(const int32_t streamId, const AudioEvent &event)
 {
     DHLOGD("Notify mic event, type: %{public}d.", event.type);
     std::shared_ptr<IAudioEventCallback> cbObj = audioEventCallback_.lock();
@@ -285,15 +285,14 @@ bool DMicDev::IsOpened()
     return isOpened_.load();
 }
 
-int32_t DMicDev::WriteStreamData(const std::string& devId, const int32_t dhId, std::shared_ptr<AudioData> &data)
+int32_t DMicDev::WriteStreamData(const int32_t streamId, std::shared_ptr<AudioData> &data)
 {
-    (void)devId;
-    (void)dhId;
+    (void)streamId;
     (void)data;
     return DH_SUCCESS;
 }
 
-int32_t DMicDev::ReadStreamData(const std::string &devId, const int32_t dhId, std::shared_ptr<AudioData> &data)
+int32_t DMicDev::ReadStreamData(const int32_t streamId, std::shared_ptr<AudioData> &data)
 {
     int64_t startTime = GetNowTimeUs();
     if (curStatus_ != AudioStatus::STATUS_START) {
@@ -320,7 +319,7 @@ int32_t DMicDev::ReadStreamData(const std::string &devId, const int32_t dhId, st
     if (DaudioHidumper::GetInstance().QueryDumpDataFlag()) {
         if (!dumpFlag_) {
             AudioEvent event(NOTIFY_HDF_MIC_DUMP, "");
-            NotifyHdfAudioEvent(event, dhId);
+            NotifyHdfAudioEvent(event, dhId_);
             dumpFlag_.store(true);
         }
         SaveFile(MIC_DEV_FILENAME, const_cast<uint8_t*>(data->Data()), data->Size());
@@ -335,8 +334,7 @@ int32_t DMicDev::ReadStreamData(const std::string &devId, const int32_t dhId, st
     return DH_SUCCESS;
 }
 
-int32_t DMicDev::ReadMmapPosition(const std::string &devId, const int32_t dhId,
-    uint64_t &frames, CurrentTimeHDF &time)
+int32_t DMicDev::ReadMmapPosition(const int32_t streamId, uint64_t &frames, CurrentTimeHDF &time)
 {
     DHLOGD("Read mmap position. frames: %{public}" PRIu64", tvsec: %{public}" PRId64", tvNSec:%{public}" PRId64,
         writeNum_, writeTvSec_, writeTvNSec_);
@@ -346,7 +344,7 @@ int32_t DMicDev::ReadMmapPosition(const std::string &devId, const int32_t dhId,
     return DH_SUCCESS;
 }
 
-int32_t DMicDev::RefreshAshmemInfo(const std::string &devId, const int32_t dhId,
+int32_t DMicDev::RefreshAshmemInfo(const int32_t streamId,
     int32_t fd, int32_t ashmemLength, int32_t lengthPerTrans)
 {
     DHLOGD("RefreshAshmemInfo: fd:%{public}d, ashmemLength: %{public}d, lengthPerTrans: %{public}d",
@@ -460,7 +458,7 @@ AudioParam DMicDev::GetAudioParam() const
 
 int32_t DMicDev::NotifyHdfAudioEvent(const AudioEvent &event, const int32_t portId)
 {
-    int32_t ret = DAudioHdiHandler::GetInstance().NotifyEvent(devId_, portId, event);
+    int32_t ret = DAudioHdiHandler::GetInstance().NotifyEvent(devId_, portId, 0, event);
     if (ret != DH_SUCCESS) {
         DHLOGE("Notify event: %{public}d, result: %{public}s.", event.type, event.content.c_str());
     }

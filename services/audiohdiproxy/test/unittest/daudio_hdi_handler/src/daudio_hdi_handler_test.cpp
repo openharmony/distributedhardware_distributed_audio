@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -92,7 +92,7 @@ HWTEST_F(DAudioHdiHandlerTest, NotifyEvent_001, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, hdiHandler_->InitHdiHandler());
     hdiHandler_->audioSrvHdf_ = nullptr;
     AudioEvent audioEvent;
-    EXPECT_NE(HDF_SUCCESS, hdiHandler_->NotifyEvent(devId_, dhId_, audioEvent));
+    EXPECT_NE(HDF_SUCCESS, hdiHandler_->NotifyEvent(devId_, dhId_, streamId_, audioEvent));
 }
 
 /**
@@ -106,25 +106,25 @@ HWTEST_F(DAudioHdiHandlerTest, NotifyEvent_002, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, hdiHandler_->InitHdiHandler());
     hdiHandler_->audioSrvHdf_ = new MockIDAudioManager();
     AudioEvent audioEvent1(AudioEventType::NOTIFY_OPEN_SPEAKER_RESULT, "");
-    EXPECT_EQ(HDF_SUCCESS, hdiHandler_->NotifyEvent(devId_, dhId_, audioEvent1));
+    EXPECT_EQ(HDF_SUCCESS, hdiHandler_->NotifyEvent(devId_, dhId_, streamId_, audioEvent1));
     AudioEvent audioEvent2(AudioEventType::NOTIFY_CLOSE_SPEAKER_RESULT, "");
-    EXPECT_EQ(HDF_SUCCESS, hdiHandler_->NotifyEvent(devId_, dhId_, audioEvent2));
+    EXPECT_EQ(HDF_SUCCESS, hdiHandler_->NotifyEvent(devId_, dhId_, streamId_, audioEvent2));
     AudioEvent audioEvent3(AudioEventType::NOTIFY_OPEN_MIC_RESULT, "");
-    EXPECT_EQ(HDF_SUCCESS, hdiHandler_->NotifyEvent(devId_, dhId_, audioEvent3));
+    EXPECT_EQ(HDF_SUCCESS, hdiHandler_->NotifyEvent(devId_, dhId_, streamId_, audioEvent3));
     AudioEvent audioEvent4(AudioEventType::NOTIFY_CLOSE_MIC_RESULT, "");
-    EXPECT_EQ(HDF_SUCCESS, hdiHandler_->NotifyEvent(devId_, dhId_, audioEvent4));
+    EXPECT_EQ(HDF_SUCCESS, hdiHandler_->NotifyEvent(devId_, dhId_, streamId_, audioEvent4));
     AudioEvent audioEvent5(AudioEventType::VOLUME_CHANGE, "");
-    EXPECT_EQ(HDF_SUCCESS, hdiHandler_->NotifyEvent(devId_, dhId_, audioEvent5));
+    EXPECT_EQ(HDF_SUCCESS, hdiHandler_->NotifyEvent(devId_, dhId_, streamId_, audioEvent5));
     AudioEvent audioEvent6(AudioEventType::SPEAKER_CLOSED, "");
-    EXPECT_EQ(HDF_SUCCESS, hdiHandler_->NotifyEvent(devId_, dhId_, audioEvent6));
+    EXPECT_EQ(HDF_SUCCESS, hdiHandler_->NotifyEvent(devId_, dhId_, streamId_, audioEvent6));
     AudioEvent audioEvent7(AudioEventType::MIC_CLOSED, "");
-    EXPECT_EQ(HDF_SUCCESS, hdiHandler_->NotifyEvent(devId_, dhId_, audioEvent7));
+    EXPECT_EQ(HDF_SUCCESS, hdiHandler_->NotifyEvent(devId_, dhId_, streamId_, audioEvent7));
     AudioEvent audioEvent8(AudioEventType::AUDIO_FOCUS_CHANGE, "");
-    EXPECT_EQ(HDF_SUCCESS, hdiHandler_->NotifyEvent(devId_, dhId_, audioEvent8));
+    EXPECT_EQ(HDF_SUCCESS, hdiHandler_->NotifyEvent(devId_, dhId_, streamId_, audioEvent8));
     AudioEvent audioEvent9(AudioEventType::AUDIO_RENDER_STATE_CHANGE, "");
-    EXPECT_EQ(HDF_SUCCESS, hdiHandler_->NotifyEvent(devId_, dhId_, audioEvent9));
+    EXPECT_EQ(HDF_SUCCESS, hdiHandler_->NotifyEvent(devId_, dhId_, streamId_, audioEvent9));
     AudioEvent audioEvent(-1, "");
-    EXPECT_EQ(HDF_SUCCESS, hdiHandler_->NotifyEvent(devId_, dhId_, audioEvent));
+    EXPECT_EQ(HDF_SUCCESS, hdiHandler_->NotifyEvent(devId_, dhId_, streamId_, audioEvent));
 }
 
 /**

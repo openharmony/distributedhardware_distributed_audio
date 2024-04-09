@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,22 +26,21 @@ class IDAudioHdiCallback {
 public:
     virtual ~IDAudioHdiCallback() = default;
 
-    virtual int32_t OpenDevice(const std::string &devId, const int32_t dhId) = 0;
+    virtual int32_t CreateStream(const int32_t streamId) = 0;
 
-    virtual int32_t CloseDevice(const std::string &devId, const int32_t dhId) = 0;
+    virtual int32_t DestroyStream(const int32_t streamId) = 0;
 
-    virtual int32_t SetParameters(const std::string &devId, const int32_t dhId, const AudioParamHDF &param) = 0;
+    virtual int32_t SetParameters(const int32_t streamId, const AudioParamHDF &param) = 0;
 
-    virtual int32_t NotifyEvent(const std::string &devId, const int32_t dhId, const AudioEvent &event) = 0;
+    virtual int32_t NotifyEvent(const int32_t streamId, const AudioEvent &event) = 0;
 
-    virtual int32_t WriteStreamData(const std::string &devId, const int32_t dhId, std::shared_ptr<AudioData> &data) = 0;
+    virtual int32_t WriteStreamData(const int32_t streamId, std::shared_ptr<AudioData> &data) = 0;
 
-    virtual int32_t ReadStreamData(const std::string &devId, const int32_t dhId, std::shared_ptr<AudioData> &data) = 0;
+    virtual int32_t ReadStreamData(const int32_t streamId, std::shared_ptr<AudioData> &data) = 0;
 
-    virtual int32_t ReadMmapPosition(const std::string &devId, const int32_t dhId,
-        uint64_t &frames, CurrentTimeHDF &time) = 0;
+    virtual int32_t ReadMmapPosition(const int32_t streamId, uint64_t &frames, CurrentTimeHDF &time) = 0;
 
-    virtual int32_t RefreshAshmemInfo(const std::string &devId, const int32_t dhId,
+    virtual int32_t RefreshAshmemInfo(const int32_t streamId,
         int32_t fd, int32_t ashmemLength, int32_t lengthPerTrans) = 0;
 };
 } // DistributedHardware

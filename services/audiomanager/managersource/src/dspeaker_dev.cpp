@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -106,15 +106,15 @@ void DSpeakerDev::OnEngineTransMessage(const std::shared_ptr<AVTransMessage> &me
         message->type_, message->content_);
 }
 
-int32_t DSpeakerDev::OpenDevice(const std::string &devId, const int32_t dhId)
+int32_t DSpeakerDev::CreateStream(const int32_t streamId)
 {
-    DHLOGI("Open speaker device devId: %{public}s, dhId: %{public}d.", GetAnonyString(devId).c_str(), dhId);
+    DHLOGI("Open stream of speaker device, streamId: %{public}d.", streamId);
     std::shared_ptr<IAudioEventCallback> cbObj = audioEventCallback_.lock();
     CHECK_NULL_RETURN(cbObj, ERR_DH_AUDIO_NULLPTR);
 
     cJSON *jParam = cJSON_CreateObject();
     CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
-    cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId).c_str());
+    cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId_).c_str());
     char *jsonData = cJSON_PrintUnformatted(jParam);
     if (jsonData == nullptr) {
         DHLOGE("Failed to create JSON data.");
@@ -124,22 +124,22 @@ int32_t DSpeakerDev::OpenDevice(const std::string &devId, const int32_t dhId)
     std::string jsonDataStr(jsonData);
     AudioEvent event(AudioEventType::OPEN_SPEAKER, jsonDataStr);
     cbObj->NotifyEvent(event);
-    DAudioHisysevent::GetInstance().SysEventWriteBehavior(DAUDIO_OPEN, devId, std::to_string(dhId),
+    DAudioHisysevent::GetInstance().SysEventWriteBehavior(DAUDIO_OPEN, devId_, std::to_string(dhId_),
         "daudio spk device open success.");
     cJSON_Delete(jParam);
     cJSON_free(jsonData);
     return DH_SUCCESS;
 }
 
-int32_t DSpeakerDev::CloseDevice(const std::string &devId, const int32_t dhId)
+int32_t DSpeakerDev::DestroyStream(const int32_t streamId)
 {
-    DHLOGI("Close speaker device devId: %{public}s, dhId: %{public}d.", GetAnonyString(devId).c_str(), dhId);
+    DHLOGI("Close stream of speaker device streamId: %{public}d.",  streamId);
     std::shared_ptr<IAudioEventCallback> cbObj = audioEventCallback_.lock();
     CHECK_NULL_RETURN(cbObj, ERR_DH_AUDIO_NULLPTR);
 
     cJSON *jParam = cJSON_CreateObject();
     CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
-    cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId).c_str());
+    cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId_).c_str());
     char *jsonData = cJSON_PrintUnformatted(jParam);
     if (jsonData == nullptr) {
         DHLOGE("Failed to create JSON data.");
@@ -149,7 +149,7 @@ int32_t DSpeakerDev::CloseDevice(const std::string &devId, const int32_t dhId)
     std::string jsonDataStr(jsonData);
     AudioEvent event(AudioEventType::CLOSE_SPEAKER, jsonDataStr);
     cbObj->NotifyEvent(event);
-    DAudioHisysevent::GetInstance().SysEventWriteBehavior(DAUDIO_CLOSE, devId, std::to_string(dhId),
+    DAudioHisysevent::GetInstance().SysEventWriteBehavior(DAUDIO_CLOSE, devId_, std::to_string(dhId_),
         "daudio spk device close success.");
     curPort_ = 0;
     cJSON_Delete(jParam);
@@ -157,13 +157,13 @@ int32_t DSpeakerDev::CloseDevice(const std::string &devId, const int32_t dhId)
     return DH_SUCCESS;
 }
 
-int32_t DSpeakerDev::SetParameters(const std::string &devId, const int32_t dhId, const AudioParamHDF &param)
+int32_t DSpeakerDev::SetParameters(const int32_t streamId, const AudioParamHDF &param)
 {
     DHLOGD("Set speaker parameters {samplerate: %{public}d, channelmask: %{public}d, format: %{public}d, "
         "streamusage: %{public}d, period: %{public}d, framesize: %{public}d, renderFlags: %{public}d, "
         "ext{%{public}s}}.", param.sampleRate, param.channelMask, param.bitFormat, param.streamUsage,
         param.period, param.frameSize, param.renderFlags, param.ext.c_str());
-    curPort_ = dhId;
+    curPort_ = dhId_;
     paramHDF_ = param;
 
     param_.comParam.sampleRate = paramHDF_.sampleRate;
@@ -177,7 +177,7 @@ int32_t DSpeakerDev::SetParameters(const std::string &devId, const int32_t dhId,
     return DH_SUCCESS;
 }
 
-int32_t DSpeakerDev::NotifyEvent(const std::string &devId, int32_t dhId, const AudioEvent &event)
+int32_t DSpeakerDev::NotifyEvent(const int32_t streamId, const AudioEvent &event)
 {
     DHLOGD("Notify speaker event.");
     std::shared_ptr<IAudioEventCallback> cbObj = audioEventCallback_.lock();
@@ -283,25 +283,24 @@ bool DSpeakerDev::IsOpened()
     return isOpened_.load();
 }
 
-int32_t DSpeakerDev::ReadStreamData(const std::string &devId, const int32_t dhId, std::shared_ptr<AudioData> &data)
+int32_t DSpeakerDev::ReadStreamData(const int32_t streamId, std::shared_ptr<AudioData> &data)
 {
-    (void)devId;
-    (void)dhId;
+    (void)streamId;
     (void)data;
     DHLOGI("Dspeaker dev not support read stream data.");
     return DH_SUCCESS;
 }
 
-int32_t DSpeakerDev::WriteStreamData(const std::string &devId, const int32_t dhId, std::shared_ptr<AudioData> &data)
+int32_t DSpeakerDev::WriteStreamData(const int32_t streamId, std::shared_ptr<AudioData> &data)
 {
-    DHLOGD("Write stream data, dhId:%{public}d", dhId);
+    DHLOGD("Write stream data, streamId:%{public}d", streamId);
     int64_t startTime = GetNowTimeUs();
     CHECK_NULL_RETURN(speakerTrans_, ERR_DH_AUDIO_NULLPTR);
 #ifdef DUMP_DSPEAKERDEV_FILE
     if (DaudioHidumper::GetInstance().QueryDumpDataFlag()) {
         if (!dumpFlag_) {
             AudioEvent event(NOTIFY_HDF_SPK_DUMP, "");
-            NotifyHdfAudioEvent(event, dhId);
+            NotifyHdfAudioEvent(event, dhId_);
             dumpFlag_.store(true);
         }
         SaveFile(SPK_DEV_FILENAME, const_cast<uint8_t*>(data->Data()), data->Size());
@@ -321,7 +320,7 @@ int32_t DSpeakerDev::WriteStreamData(const std::string &devId, const int32_t dhI
     return DH_SUCCESS;
 }
 
-int32_t DSpeakerDev::ReadMmapPosition(const std::string &devId, const int32_t dhId,
+int32_t DSpeakerDev::ReadMmapPosition(const int32_t streamId,
     uint64_t &frames, CurrentTimeHDF &time)
 {
     DHLOGD("Read mmap position. frames: %{public}" PRIu64", tvsec: %{public}" PRId64", tvNSec:%{public}" PRId64,
@@ -332,7 +331,7 @@ int32_t DSpeakerDev::ReadMmapPosition(const std::string &devId, const int32_t dh
     return DH_SUCCESS;
 }
 
-int32_t DSpeakerDev::RefreshAshmemInfo(const std::string &devId, const int32_t dhId,
+int32_t DSpeakerDev::RefreshAshmemInfo(const int32_t streamId,
     int32_t fd, int32_t ashmemLength, int32_t lengthPerTrans)
 {
     DHLOGD("RefreshAshmemInfo: fd:%{public}d, ashmemLength: %{public}d, lengthPerTrans: %{public}d",
@@ -439,7 +438,7 @@ int32_t DSpeakerDev::SendMessage(uint32_t type, std::string content, std::string
 
 int32_t DSpeakerDev::NotifyHdfAudioEvent(const AudioEvent &event, const int32_t portId)
 {
-    int32_t ret = DAudioHdiHandler::GetInstance().NotifyEvent(devId_, portId, event);
+    int32_t ret = DAudioHdiHandler::GetInstance().NotifyEvent(devId_, portId, 0, event);
     if (ret != DH_SUCCESS) {
         DHLOGE("Notify event: %{public}d, result: %{public}s.", event.type, event.content.c_str());
     }

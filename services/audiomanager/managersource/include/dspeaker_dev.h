@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -51,15 +51,14 @@ public:
 
     int32_t EnableDevice(const int32_t dhId, const std::string &capability) override;
     int32_t DisableDevice(const int32_t dhId) override;
-    int32_t OpenDevice(const std::string &devId, const int32_t dhId) override;
-    int32_t CloseDevice(const std::string &devId, const int32_t dhId) override;
-    int32_t SetParameters(const std::string &devId, const int32_t dhId, const AudioParamHDF &param) override;
-    int32_t WriteStreamData(const std::string &devId, const int32_t dhId, std::shared_ptr<AudioData> &data) override;
-    int32_t ReadStreamData(const std::string &devId, const int32_t dhId, std::shared_ptr<AudioData> &data) override;
-    int32_t NotifyEvent(const std::string &devId, const int32_t dhId, const AudioEvent &event) override;
-    int32_t ReadMmapPosition(const std::string &devId, const int32_t dhId,
-        uint64_t &frames, CurrentTimeHDF &time) override;
-    int32_t RefreshAshmemInfo(const std::string &devId, const int32_t dhId,
+    int32_t CreateStream(const int32_t streamId) override;
+    int32_t DestroyStream(const int32_t streamId) override;
+    int32_t SetParameters(const int32_t streamId, const AudioParamHDF &param) override;
+    int32_t WriteStreamData(const int32_t streamId, std::shared_ptr<AudioData> &data) override;
+    int32_t ReadStreamData(const int32_t streamId, std::shared_ptr<AudioData> &data) override;
+    int32_t NotifyEvent(const int32_t streamId, const AudioEvent &event) override;
+    int32_t ReadMmapPosition(const int32_t streamId, uint64_t &frames, CurrentTimeHDF &time) override;
+    int32_t RefreshAshmemInfo(const int32_t streamId,
         int32_t fd, int32_t ashmemLength, int32_t lengthPerTrans) override;
     
     int32_t MmapStart() override;
