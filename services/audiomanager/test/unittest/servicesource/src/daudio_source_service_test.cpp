@@ -107,6 +107,18 @@ HWTEST_F(DAudioSourceServiceTest, Dump_001, TestSize.Level1)
     std::u16string order = u"--sourceDevId";
     args.push_back(order);
     EXPECT_EQ(ERR_DH_AUDIO_BAD_VALUE, sourceSrv_->Dump(fd, args));
+    args.pop_back();
+    order = u"-h";
+    args.push_back(order);
+    EXPECT_EQ(DH_SUCCESS, sourceSrv_->Dump(fd, args));
+    args.pop_back();
+    order = u"--stopDump";
+    args.push_back(order);
+    EXPECT_EQ(DH_SUCCESS, sourceSrv_->Dump(fd, args));
+    args.pop_back();
+    order = u"--illegal";
+    args.push_back(order);
+    EXPECT_EQ(DH_SUCCESS, sourceSrv_->Dump(fd, args));
 }
 } // DistributedHardware
 } // OHOS
