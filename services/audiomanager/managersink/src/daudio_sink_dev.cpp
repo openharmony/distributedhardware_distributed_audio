@@ -128,7 +128,12 @@ int32_t DAudioSinkDev::TaskOpenDSpeaker(const std::string &args)
         DHLOGE("Not found the keys.");
         return ERR_DH_AUDIO_FAILED;
     }
-    int32_t dhId = ConvertString2Int(std::string(cJSON_GetObjectItem(jParam, KEY_DH_ID)->valuestring));
+    cJSON *temp = cJSON_GetObjectItem(jParam, KEY_DH_ID);
+    if (temp == NULL || !cJSON_IsString(temp)) {
+        cJSON_Delete(jParam);
+        return ERR_DH_AUDIO_FAILED;
+    }
+    int32_t dhId = ConvertString2Int(std::string(temp->valuestring));
     CHECK_AND_FREE_RETURN_RET_LOG(dhId == -1, ERR_DH_AUDIO_NULLPTR, jParam,
         "%{public}s", "Parse dhId error.");
     std::shared_ptr<ISpkClient> speakerClient = nullptr;
@@ -708,8 +713,13 @@ void DAudioSinkDev::SinkEventHandler::NotifyOpenMic(const AppExecFwk::InnerEvent
         return;
     }
     int32_t ret = sinkDevObj->TaskOpenDMic(eventParam);
+    cJSON *temp = cJSON_GetObjectItem(jParam, KEY_DH_ID);
+    if (temp == NULL || !cJSON_IsString(temp)) {
+        cJSON_Delete(jParam);
+        return;
+    }
     sinkDevObj->NotifySourceDev(NOTIFY_OPEN_MIC_RESULT,
-        std::string(cJSON_GetObjectItem(jParam, KEY_DH_ID)->valuestring), ret);
+        std::string(temp->valuestring), ret);
     DHLOGI("Open mic device task end, notify source ret %{public}d.", ret);
     CHECK_AND_FREE_RETURN_LOG(ret != DH_SUCCESS, jParam, "%{public}s", "Open mic failed.");
     cJSON_Delete(jParam);
