@@ -108,7 +108,8 @@ int32_t DAudioSourceHandler::RegisterDistributedHardware(const std::string &devI
 
     std::string reqId = GetRandomID();
     dAudioIpcCallback_->PushRegisterCallback(reqId, callback);
-    return dAudioSourceProxy_->RegisterDistributedHardware(devId, dhId, param, reqId);
+    std::string reduceDhId = ReduceDhIdPrefix(dhId);
+    return dAudioSourceProxy_->RegisterDistributedHardware(devId, reduceDhId, param, reqId);
 }
 
 int32_t DAudioSourceHandler::UnregisterDistributedHardware(const std::string &devId, const std::string &dhId,
@@ -125,7 +126,8 @@ int32_t DAudioSourceHandler::UnregisterDistributedHardware(const std::string &de
 
     std::string reqId = GetRandomID();
     dAudioIpcCallback_->PushUnregisterCallback(reqId, callback);
-    return dAudioSourceProxy_->UnregisterDistributedHardware(devId, dhId, reqId);
+    std::string reduceDhId = ReduceDhIdPrefix(dhId);
+    return dAudioSourceProxy_->UnregisterDistributedHardware(devId, reduceDhId, reqId);
 }
 
 int32_t DAudioSourceHandler::ConfigDistributedHardware(const std::string &devId, const std::string &dhId,
@@ -138,7 +140,8 @@ int32_t DAudioSourceHandler::ConfigDistributedHardware(const std::string &devId,
     if (devId.length() > DAUDIO_MAX_DEVICE_ID_LEN || dhId.length() > DAUDIO_MAX_DEVICE_ID_LEN) {
         return ERR_DH_AUDIO_SA_DEVID_ILLEGAL;
     }
-    return dAudioSourceProxy_->ConfigDistributedHardware(devId, dhId, key, value);
+    std::string reduceDhId = ReduceDhIdPrefix(dhId);
+    return dAudioSourceProxy_->ConfigDistributedHardware(devId, reduceDhId, key, value);
 }
 
 void DAudioSourceHandler::OnRemoteSourceSvrDied(const wptr<IRemoteObject> &remote)

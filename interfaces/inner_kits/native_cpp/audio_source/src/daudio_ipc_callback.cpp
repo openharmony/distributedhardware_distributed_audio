@@ -39,7 +39,8 @@ int32_t DAudioIpcCallback::OnNotifyRegResult(const std::string &devId, const std
     std::lock_guard<std::mutex> registerLck(registerMapMtx_);
     auto iter = registerCallbackMap_.find(reqId);
     if (iter != registerCallbackMap_.end()) {
-        iter->second->OnRegisterResult(devId, dhId, status, resultData);
+        std::string reduceDhId = AddDhIdPrefix(dhId);
+        iter->second->OnRegisterResult(devId, reduceDhId, status, resultData);
         registerCallbackMap_.erase(reqId);
         return DH_SUCCESS;
     }
@@ -61,7 +62,8 @@ int32_t DAudioIpcCallback::OnNotifyUnregResult(const std::string &devId, const s
     std::lock_guard<std::mutex> registerLck(unregisterMapMtx_);
     auto iter = unregisterCallbackMap_.find(reqId);
     if (iter != unregisterCallbackMap_.end()) {
-        iter->second->OnUnregisterResult(devId, dhId, status, resultData);
+        std::string reduceDhId = AddDhIdPrefix(dhId);
+        iter->second->OnUnregisterResult(devId, reduceDhId, status, resultData);
         unregisterCallbackMap_.erase(reqId);
         return DH_SUCCESS;
     }

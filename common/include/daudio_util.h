@@ -51,6 +51,8 @@ void SaveFile(std::string fileName, uint8_t *audioData, int32_t size);
 std::string GetCJsonString(const char *key, const char *value);
 std::string ParseStringFromArgs(std::string args, const char *key);
 std::string GetEventNameByType(const int32_t eventType);
+std::string AddDhIdPrefix(const std::string &dhId);
+std::string ReduceDhIdPrefix(const std::string &dhId);
 
 template <typename T>
 bool GetSysPara(const char *key, T &value);

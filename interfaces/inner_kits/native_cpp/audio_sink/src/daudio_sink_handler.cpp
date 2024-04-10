@@ -24,6 +24,7 @@
 #include "daudio_hitrace.h"
 #include "daudio_log.h"
 #include "daudio_sink_load_callback.h"
+#include "daudio_util.h"
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DAudioSinkHandler"
@@ -97,7 +98,8 @@ int32_t DAudioSinkHandler::SubscribeLocalHardware(const std::string &dhId, const
     if (dhId.length() > DAUDIO_MAX_DEVICE_ID_LEN) {
         return ERR_DH_AUDIO_SA_DEVID_ILLEGAL;
     }
-    int32_t ret = dAudioSinkProxy_->SubscribeLocalHardware(dhId, param);
+    std::string reduceDhId = ReduceDhIdPrefix(dhId);
+    int32_t ret = dAudioSinkProxy_->SubscribeLocalHardware(reduceDhId, param);
     return ret;
 }
 
@@ -109,7 +111,8 @@ int32_t DAudioSinkHandler::UnsubscribeLocalHardware(const std::string &dhId)
     if (dhId.length() > DAUDIO_MAX_DEVICE_ID_LEN) {
         return ERR_DH_AUDIO_SA_DEVID_ILLEGAL;
     }
-    int32_t ret = dAudioSinkProxy_->UnsubscribeLocalHardware(dhId);
+    std::string reduceDhId = ReduceDhIdPrefix(dhId);
+    int32_t ret = dAudioSinkProxy_->UnsubscribeLocalHardware(reduceDhId);
     return ret;
 }
 
