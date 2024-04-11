@@ -51,6 +51,12 @@ HWTEST_F(DSpeakerDevTest, InitSenderEngine_001, TestSize.Level1)
     IAVEngineProvider *providerPtr = nullptr;
     AVTransEvent event = { EventType::EVENT_START_SUCCESS, "", "" };
     spk_->OnEngineTransEvent(event);
+    event.type = EventType::EVENT_STOP_SUCCESS;
+    spk_->OnEngineTransEvent(event);
+    event.type = EventType::EVENT_CHANNEL_CLOSED;
+    spk_->OnEngineTransEvent(event);
+    event.type = EventType::EVENT_START_FAIL;
+    spk_->OnEngineTransEvent(event);
     std::shared_ptr<AVTransMessage> message = nullptr;
     spk_->OnEngineTransMessage(message);
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, spk_->InitSenderEngine(providerPtr));
@@ -311,6 +317,14 @@ HWTEST_F(DSpeakerDevTest, Release_001, TestSize.Level1)
 
     spk_->speakerTrans_ = std::make_shared<MockIAudioDataTransport>();
     EXPECT_EQ(DH_SUCCESS, spk_->Release());
+
+    int32_t fd = 1;
+    int32_t ashmemLength = 10;
+    int32_t streamId = 1;
+    int32_t lengthPerTrans = 10;
+    EXPECT_EQ(DH_SUCCESS, spk_->RefreshAshmemInfo(streamId, fd, ashmemLength, lengthPerTrans));
+    spk_->param_.renderOpts.renderFlags = MMAP_MODE;
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, spk_->RefreshAshmemInfo(streamId, fd, ashmemLength, lengthPerTrans));
 }
 
 /**

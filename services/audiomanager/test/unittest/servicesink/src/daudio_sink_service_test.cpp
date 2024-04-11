@@ -134,6 +134,17 @@ HWTEST_F(DAudioSinkServiceTest, Dump_001, TestSize.Level1)
     int32_t fd = 1;
     std::vector<std::u16string> args;
     EXPECT_EQ(DH_SUCCESS, sinkSrv_->Dump(fd, args));
+    std::u16string order = u"-h";
+    args.push_back(order);
+    EXPECT_EQ(DH_SUCCESS, sinkSrv_->Dump(fd, args));
+    args.pop_back();
+    order = u"--stopDump";
+    args.push_back(order);
+    EXPECT_EQ(DH_SUCCESS, sinkSrv_->Dump(fd, args));
+    args.pop_back();
+    order = u"--illegal";
+    args.push_back(order);
+    EXPECT_EQ(DH_SUCCESS, sinkSrv_->Dump(fd, args));
 }
 } // DistributedHardware
 } // OHOS
