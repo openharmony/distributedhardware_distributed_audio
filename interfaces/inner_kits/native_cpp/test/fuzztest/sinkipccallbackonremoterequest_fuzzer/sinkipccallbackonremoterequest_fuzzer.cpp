@@ -55,6 +55,7 @@ void SinkIpcCallbackOnRemoteRequestFuzzTest(const uint8_t* data, size_t size)
     pdata.ReadBool(isSensitive);
     pdata.ReadBool(isSameAccout);
     std::shared_ptr<DAudioSinkIpcCallback> callback = std::make_shared<DAudioSinkIpcCallback>();
+    callback->memberFuncMap_[code] = &DAudioSinkIpcCallbackStub::OnNotifyResourceInfoInner;
 
     callback->OnRemoteRequest(code, pdata, reply, option);
 }
