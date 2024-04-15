@@ -89,8 +89,8 @@ private:
     IAVEngineProvider *rcvProviderPtr_ = nullptr;
     void *pSHandler_ = nullptr;
     void *pRHandler_ = nullptr;
-    bool isSensitive_;
-    bool isSameAccount_;
+    bool isSensitive_ = false;
+    bool isSameAccount_ = false;
     sptr<IDAudioSinkIpcCallback> ipcSinkCallback_ = nullptr;
     std::shared_ptr<DmInitCallback> initCallback_;
 };

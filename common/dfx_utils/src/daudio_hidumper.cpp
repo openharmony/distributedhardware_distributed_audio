@@ -138,7 +138,7 @@ int32_t DaudioHidumper::GetSinkInfo(std::string &result)
         DHLOGE("Get all adapters failed.");
         return ERR_DH_AUDIO_NULLPTR;
     }
-    for (int32_t index = 0; index < adapterdesc_.size(); index++) {
+    for (uint32_t index = 0; index < adapterdesc_.size(); index++) {
         AudioAdapterDescriptor desc = adapterdesc_[index];
         result.append("sinkDevId: ").append(GetAnonyString(desc.adapterName)).append("    portId: ");
         for (uint32_t i = 0; i < desc.ports.size(); i++) {
