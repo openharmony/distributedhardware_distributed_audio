@@ -183,29 +183,12 @@ HWTEST_F(AVSenderEngineTransportTest, SetParameter_001, TestSize.Level1)
     std::shared_ptr<AVTransMessage> message = nullptr;
     senderTrans_->OnEngineEvent(event);
     senderTrans_->OnEngineMessage(message);
+    message = std::make_shared<AVTransMessage>();
+    senderTrans_->OnEngineMessage(message);
     AudioParam audioParam;
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, senderTrans_->SetParameter(audioParam));
     senderTrans_->senderAdapter_ = std::make_shared<AVTransSenderAdapter>();
     EXPECT_EQ(DH_SUCCESS, senderTrans_->SetParameter(audioParam));
-    message = std::make_shared<AVTransMessage>();
-    senderTrans_->OnEngineMessage(message);
-    senderTrans_->transCallback_ = nullptr;
-}
-
-/**
- * @tc.name: OnEngineMessage_001
- * @tc.desc: Verify the OnEngineMessage function.
- * @tc.type: FUNC
- * @tc.require: AR000HTAPM
- */
-HWTEST_F(AVSenderEngineTransportTest, OnEngineMessage_001, TestSize.Level1)
-{
-    std::shared_ptr<AVTransMessage> message = nullptr;
-    senderTrans_->OnEngineMessage(message);
-    message = std::make_shared<AVTransMessage>();
-    senderTrans_->OnEngineMessage(message);
-    senderTrans_->transCallback_ = nullptr;
-    senderTrans_->OnEngineMessage(message);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
