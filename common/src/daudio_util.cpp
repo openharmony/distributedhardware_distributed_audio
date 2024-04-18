@@ -228,9 +228,6 @@ int32_t GetAudioParamStr(const std::string &params, const std::string &key, std:
     }
     size_t splitPosEnd = params.find(';', pos);
     if (splitPosEnd != params.npos) {
-        if (pos + step + 1 > splitPosEnd) {
-            return ERR_DH_AUDIO_FAILED;
-        }
         value = params.substr(pos + step + 1, splitPosEnd - pos - step - 1);
     } else {
         value = params.substr(pos + step + 1);

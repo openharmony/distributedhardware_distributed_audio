@@ -292,13 +292,8 @@ int32_t DAudioSourceManager::HandleDAudioNotify(const std::string &devId, const 
     // now ctrl channel is also goto here, please sure here not crash.
     cJSON *jParam = cJSON_Parse(eventContent.c_str());
     if (CJsonParamCheck(jParam, { KEY_RANDOM_TASK_CODE })) {
-        cJSON *temp = cJSON_GetObjectItem(jParam, KEY_RANDOM_TASK_CODE);
-        if (temp == NULL || !cJSON_IsString(temp)) {
-            cJSON_Delete(jParam);
-            return ERR_DH_AUDIO_FAILED;
-        }
         DHLOGD("Receive audio notify from sink, random task code: %{public}s",
-            temp->valuestring);
+            cJSON_GetObjectItemCaseSensitive(jParam, KEY_RANDOM_TASK_CODE)->valuestring);
     }
 
     std::shared_ptr<DAudioSourceDev> sourceDev = nullptr;

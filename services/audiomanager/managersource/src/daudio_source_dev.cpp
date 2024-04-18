@@ -387,12 +387,8 @@ int32_t DAudioSourceDev::HandleNotifyRPC(const AudioEvent &event)
         cJSON_Delete(jParam);
         return ERR_DH_AUDIO_FAILED;
     }
-    cJSON *temp = cJSON_GetObjectItem(jParam, KEY_RESULT);
-    if (temp == NULL || !cJSON_IsString(temp)) {
-        cJSON_Delete(jParam);
-        return ERR_DH_AUDIO_FAILED;
-    }
-    rpcResult_ = temp->valueint;
+    
+    rpcResult_ = cJSON_GetObjectItem(jParam, KEY_RESULT)->valueint;
     DHLOGD("Notify RPC event: %{public}d, result: %{public}d.", event.type, rpcResult_);
     std::map<AudioEventType, uint8_t>::iterator iter = eventNotifyMap_.find(event.type);
     if (iter == eventNotifyMap_.end()) {
@@ -658,18 +654,8 @@ void DAudioSourceDev::OnEnableTaskResult(int32_t resultCode, const std::string &
         cJSON_Delete(jParam);
         return;
     }
-    cJSON *temp = cJSON_GetObjectItem(jParam, KEY_DEV_ID);
-    if (temp == NULL || !cJSON_IsString(temp)) {
-        cJSON_Delete(jParam);
-        return;
-    }
-    cJSON *temporary = cJSON_GetObjectItem(jParam, KEY_DH_ID);
-    if (temporary == NULL || !cJSON_IsString(temporary)) {
-        cJSON_Delete(jParam);
-        return;
-    }
-    mgrCallback_->OnEnableAudioResult(std::string(temp->valuestring),
-        std::string(temporary->valuestring), resultCode);
+    mgrCallback_->OnEnableAudioResult(std::string(cJSON_GetObjectItem(jParam, KEY_DEV_ID)->valuestring),
+        std::string(cJSON_GetObjectItem(jParam, KEY_DH_ID)->valuestring), resultCode);
     cJSON_Delete(jParam);
 }
 
@@ -736,18 +722,8 @@ void DAudioSourceDev::OnDisableTaskResult(int32_t resultCode, const std::string 
         cJSON_Delete(jParam);
         return;
     }
-    cJSON *temp = cJSON_GetObjectItem(jParam, KEY_DEV_ID);
-    if (temp == NULL || !cJSON_IsString(temp)) {
-        cJSON_Delete(jParam);
-        return;
-    }
-    cJSON *temporary = cJSON_GetObjectItem(jParam, KEY_DH_ID);
-    if (temporary == NULL || !cJSON_IsString(temporary)) {
-        cJSON_Delete(jParam);
-        return;
-    }
-    mgrCallback_->OnDisableAudioResult(std::string(temp->valuestring),
-        std::string(temporary->valuestring), resultCode);
+    mgrCallback_->OnDisableAudioResult(std::string(cJSON_GetObjectItem(jParam, KEY_DEV_ID)->valuestring),
+        std::string(cJSON_GetObjectItem(jParam, KEY_DH_ID)->valuestring), resultCode);
     cJSON_Delete(jParam);
 }
 
