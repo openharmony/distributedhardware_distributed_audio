@@ -58,19 +58,6 @@ HWTEST_F(DAudioSinkManagerTest, Init_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: OnSinkDevReleased_001
- * @tc.desc: Verify the OnSinkDevReleased function.
- * @tc.type: FUNC
- * @tc.require: AR000H0E5F
- */
-HWTEST_F(DAudioSinkManagerTest, OnSinkDevReleased_001, TestSize.Level1)
-{
-    std::string devId = "1";
-    daudioSinkManager.devClearThread_ = std::thread(&DAudioSinkManager::ClearAudioDev, &daudioSinkManager, devId);
-    daudioSinkManager.OnSinkDevReleased(devId);
-}
-
-/**
  * @tc.name: HandleDAudioNotify_001
  * @tc.desc: Verify the HandleDAudioNotify function.
  * @tc.type: FUNC
@@ -240,6 +227,9 @@ HWTEST_F(DAudioSinkManagerTest, GetDeviceSecurityLevel_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSinkManagerTest, CheckDeviceSecurityLevel_001, TestSize.Level1)
 {
+    std::string devId = "1";
+    daudioSinkManager.devClearThread_ = std::thread(&DAudioSinkManager::ClearAudioDev, &daudioSinkManager, devId);
+    daudioSinkManager.OnSinkDevReleased(devId);
     std::string srcDeviceId = "srcDeviceId";
     std::string dstDeviceId = "dstDeviceId";
     EXPECT_EQ(false, daudioSinkManager.CheckDeviceSecurityLevel(srcDeviceId, dstDeviceId));

@@ -155,13 +155,21 @@ HWTEST_F(DAudioUtilsTest, DAudioUtilTest_001, TestSize.Level1)
  */
 HWTEST_F(DAudioUtilsTest, DAudioUtilTest_002, TestSize.Level1)
 {
+    int32_t eventType = 200;
+    GetEventNameByType(eventType);
+    cJSON * jsonObj = nullptr;
+    std::initializer_list<std::string> keys = { "one", "two" };
+    CJsonParamCheck(jsonObj, keys);
+    jsonObj = cJSON_CreateObject();
+    cJSON_AddStringToObject(jsonObj, "one", "one");
+    cJSON_AddNumberToObject(jsonObj, "two", 2);
+    CJsonParamCheck(jsonObj, keys);
+
     int64_t tvSec;
     int64_t tvNSec;
     GetCurrentTime(tvSec, tvNSec);
-
     int64_t curNano = GetCurNano();
     EXPECT_NE(0, curNano);
-
     int32_t ret = AbsoluteSleep(curNano);
     EXPECT_EQ(0, ret);
 }
@@ -301,25 +309,6 @@ HWTEST_F(DAudioUtilsTest, DAudioUtilTest_007, TestSize.Level1)
 
     tempDevIdStr = "Test1";
     EXPECT_EQ(true, CheckDevIdIsLegal(tempDevIdStr));
-}
-
-/**
- * @tc.name: DAudioLogTest_008
- * @tc.desc: Verify the GetEventNameByType function.
- * @tc.type: FUNC
- * @tc.require: AR000H0E5U
- */
-HWTEST_F(DAudioUtilsTest, DAudioUtilTest_008, TestSize.Level1)
-{
-    int32_t eventType = 200;
-    GetEventNameByType(eventType);
-    cJSON * jsonObj = nullptr;
-    std::initializer_list<std::string> keys = { "one", "two" };
-    CJsonParamCheck(jsonObj, keys);
-    jsonObj = cJSON_CreateObject();
-    cJSON_AddStringToObject(jsonObj, "one", "one");
-    cJSON_AddNumberToObject(jsonObj, "two", 2);
-    CJsonParamCheck(jsonObj, keys);
 }
 
 /**
