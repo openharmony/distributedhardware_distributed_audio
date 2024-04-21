@@ -66,7 +66,6 @@ constexpr uint32_t DAUDIO_MAX_RECV_DATA_LEN = 104857600;
 constexpr uint32_t DAUDIO_MAX_JSON_LEN = 1024;
 
 static constexpr int64_t AUDIO_OFFSET_FRAME_NUM = 10;
-static constexpr int64_t LOW_LATENCY_INTERVAL_NS = 5000000;
 static constexpr int64_t LOW_LATENCY_CLIENT_INTERVAL_NS = 20000000;
 static constexpr int64_t MAX_TIME_INTERVAL_US = 23000;
 

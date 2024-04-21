@@ -176,7 +176,11 @@ int32_t DMicDev::SetParameters(const int32_t streamId, const AudioParamHDF &para
     param_.comParam.bitFormat = paramHDF_.bitFormat;
     param_.comParam.codecType = AudioCodecType::AUDIO_CODEC_AAC;
     param_.comParam.frameSize = paramHDF_.frameSize;
-    param_.captureOpts.sourceType = SOURCE_TYPE_MIC;
+    if (paramHDF_.streamUsage == StreamUsage::STREAM_USAGE_VOICE_COMMUNICATION) {
+        param_.captureOpts.sourceType = SOURCE_TYPE_VOICE_COMMUNICATION;
+    } else {
+        param_.captureOpts.sourceType = SOURCE_TYPE_MIC;
+    }
     param_.captureOpts.capturerFlags = paramHDF_.capturerFlags;
     return DH_SUCCESS;
 }
@@ -386,11 +390,12 @@ void DMicDev::EnqueueThread()
 {
     writeIndex_ = 0;
     writeNum_ = 0;
-    DHLOGD("Enqueue thread start, lengthPerWrite length: %{public}d.", lengthPerTrans_);
+    int64_t timeIntervalns = paramHDF_.period * AUDIO_NS_PER_SECOND / AUDIO_MS_PER_SECOND;
+    DHLOGD("Enqueue thread start, lengthPerWrite length: %{public}d, interval: %{public}d.", lengthPerTrans_,
+        paramHDF_.period);
     FillJitterQueue();
     while (ashmem_ != nullptr && isEnqueueRunning_.load()) {
-        int64_t timeOffset = UpdateTimeOffset(frameIndex_, LOW_LATENCY_INTERVAL_NS,
-            startTime_);
+        int64_t timeOffset = UpdateTimeOffset(frameIndex_, timeIntervalns, startTime_);
         DHLOGD("Write frameIndex: %{public}" PRId64", timeOffset: %{public}" PRId64, frameIndex_, timeOffset);
         std::shared_ptr<AudioData> audioData = nullptr;
         {
@@ -419,10 +424,10 @@ void DMicDev::EnqueueThread()
         if (writeIndex_ >= ashmemLength_) {
             writeIndex_ = 0;
         }
-        writeNum_ += static_cast<uint64_t>(CalculateSampleNum(param_.comParam.sampleRate, timeInterval_));
+        writeNum_ += static_cast<uint64_t>(CalculateSampleNum(param_.comParam.sampleRate, paramHDF_.period));
         GetCurrentTime(writeTvSec_, writeTvNSec_);
         frameIndex_++;
-        AbsoluteSleep(startTime_ + frameIndex_ * LOW_LATENCY_INTERVAL_NS - timeOffset);
+        AbsoluteSleep(startTime_ + frameIndex_ * timeIntervalns - timeOffset);
     }
 }
 
@@ -431,7 +436,7 @@ void DMicDev::FillJitterQueue()
     while (isEnqueueRunning_.load()) {
         {
             std::lock_guard<std::mutex> lock(dataQueueMtx_);
-            if (dataQueue_.size() >= LOW_LATENCY_DATA_QUEUE_HALF_SIZE) {
+            if (dataQueue_.size() >= (LOW_LATENCY_JITTER_TIME_MS / paramHDF_.period)) {
                 break;
             }
         }

@@ -100,7 +100,6 @@ private:
     AudioParamHDF paramHDF_;
     AudioParam param_;
 
-    uint32_t timeInterval_ = 5;
     sptr<Ashmem> ashmem_ = nullptr;
     std::atomic<bool> isEnqueueRunning_ = false;
     int32_t ashmemLength_ = -1;

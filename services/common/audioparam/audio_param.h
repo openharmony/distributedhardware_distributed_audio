@@ -37,7 +37,8 @@ typedef enum {
 typedef enum {
     SOURCE_TYPE_INVALID = -1,
     SOURCE_TYPE_MIC,
-    SOURCE_TYPE_VOICE_CALL
+    SOURCE_TYPE_VOICE_CALL = 4,
+    SOURCE_TYPE_VOICE_COMMUNICATION = 7
 } SourceType;
 
 typedef enum {

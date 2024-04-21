@@ -118,6 +118,7 @@ enum AudioCategory {
     AUDIO_IN_RINGTONE,      /**< Ringtone */
     AUDIO_IN_CALL,          /**< Call */
     AUDIO_MMAP_NOIRQ,       /**< Mmap mode */
+    AUDIO_MMAP_VOIP = 8,    /**< Mmap Voip mode */
 };
 
 /**
