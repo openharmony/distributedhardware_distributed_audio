@@ -371,10 +371,11 @@ void DSpeakerDev::EnqueueThread()
     readIndex_ = 0;
     readNum_ = 0;
     frameIndex_ = 0;
-    DHLOGI("Enqueue thread start, lengthPerRead length: %{public}d.", lengthPerTrans_);
+    int64_t timeIntervalns = paramHDF_.period * AUDIO_NS_PER_SECOND / AUDIO_MS_PER_SECOND;
+    DHLOGI("Enqueue thread start, lengthPerRead length: %{public}d, interval: %{pubic}d.", lengthPerTrans_,
+        paramHDF_.period);
     while (ashmem_ != nullptr && isEnqueueRunning_.load()) {
-        int64_t timeOffset = UpdateTimeOffset(frameIndex_, LOW_LATENCY_INTERVAL_NS,
-            startTime_);
+        int64_t timeOffset = UpdateTimeOffset(frameIndex_, timeIntervalns, startTime_);
         DHLOGD("Read frameIndex: %{public}" PRId64", timeOffset: %{public}" PRId64, frameIndex_, timeOffset);
         auto readData = ashmem_->ReadFromAshmem(lengthPerTrans_, readIndex_);
         DHLOGI("Read from ashmem success! read index: %{public}d, readLength: %{public}d.",
@@ -400,10 +401,10 @@ void DSpeakerDev::EnqueueThread()
         if (readIndex_ >= ashmemLength_) {
             readIndex_ = 0;
         }
-        readNum_ += static_cast<uint64_t>(CalculateSampleNum(param_.comParam.sampleRate, timeInterval_));
+        readNum_ += static_cast<uint64_t>(CalculateSampleNum(param_.comParam.sampleRate, paramHDF_.period));
         GetCurrentTime(readTvSec_, readTvNSec_);
         frameIndex_++;
-        AbsoluteSleep(startTime_ + frameIndex_ * LOW_LATENCY_INTERVAL_NS - timeOffset);
+        AbsoluteSleep(startTime_ + frameIndex_ * timeIntervalns - timeOffset);
     }
 }
 

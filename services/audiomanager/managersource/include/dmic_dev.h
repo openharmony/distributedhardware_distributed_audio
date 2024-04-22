@@ -91,6 +91,7 @@ private:
     static constexpr size_t DATA_QUEUE_HALF_SIZE = DATA_QUEUE_MAX_SIZE >> 1U;
     static constexpr size_t LOW_LATENCY_DATA_QUEUE_MAX_SIZE = 30;
     static constexpr size_t LOW_LATENCY_DATA_QUEUE_HALF_SIZE = 10;
+    static constexpr size_t LOW_LATENCY_JITTER_TIME_MS = 50;
     static constexpr uint32_t MMAP_WAIT_FRAME_US = 5000;
     static constexpr const char* ENQUEUE_THREAD = "micEnqueueTh";
     const std::string MIC_DEV_FILENAME = DUMP_FILE_PATH + "/source_mic_read_from_trans.pcm";
@@ -111,7 +112,6 @@ private:
     AudioParamHDF paramHDF_;
     AudioParam param_;
 
-    uint32_t timeInterval_ = 5;
     uint32_t insertFrameCnt_ = 0;
     std::atomic<bool> isExistedEmpty_ = false;
     size_t dataQueSize_ = 0;

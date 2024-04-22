@@ -77,6 +77,7 @@ int32_t DAudioManagerCallback::GetAudioParamHDF(const AudioParameter& param, Aud
             paramHDF.streamUsage = StreamUsage::STREAM_USAGE_MEDIA;
             break;
         case AUDIO_IN_COMMUNICATION:
+        case AUDIO_MMAP_VOIP:
             paramHDF.streamUsage = StreamUsage::STREAM_USAGE_VOICE_COMMUNICATION;
             break;
         case AUDIO_IN_RINGTONE:
