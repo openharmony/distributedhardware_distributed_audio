@@ -100,6 +100,11 @@ bool DAudioHandler::AddItemsToObject(DHItem &dhItem, cJSON* infoJson, const int3
     return true;
 }
 
+std::vector<DHItem> DAudioHandler::QueryMeta()
+{
+    return {};
+}
+
 std::vector<DHItem> DAudioHandler::Query()
 {
     DHLOGI("Query distributed hardware information.");

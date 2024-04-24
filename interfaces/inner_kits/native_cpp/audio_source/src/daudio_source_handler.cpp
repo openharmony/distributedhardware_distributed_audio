@@ -144,6 +144,24 @@ int32_t DAudioSourceHandler::ConfigDistributedHardware(const std::string &devId,
     return dAudioSourceProxy_->ConfigDistributedHardware(devId, reduceDhId, key, value);
 }
 
+void DAudioSourceHandler::RegisterBusinessStateListener(std::shared_ptr<BusinessStateListener> listener)
+{
+    (void)listener;
+}
+
+void DAudioSourceHandler::UnRegisterBusinessStateListener()
+{
+}
+
+void DAudioSourceHandler::RegisterDataSyncTriggerListener(std::shared_ptr<DataSyncTriggerListener> listener)
+{
+    (void)listener;
+}
+
+void DAudioSourceHandler::UnRegisterDataSyncTriggerListener()
+{
+}
+
 void DAudioSourceHandler::OnRemoteSourceSvrDied(const wptr<IRemoteObject> &remote)
 {
     DHLOGI("The daudio source service died.");
