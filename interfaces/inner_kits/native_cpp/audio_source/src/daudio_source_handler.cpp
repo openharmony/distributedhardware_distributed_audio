@@ -144,12 +144,12 @@ int32_t DAudioSourceHandler::ConfigDistributedHardware(const std::string &devId,
     return dAudioSourceProxy_->ConfigDistributedHardware(devId, reduceDhId, key, value);
 }
 
-void DAudioSourceHandler::RegisterBusinessStateListener(std::shared_ptr<BusinessStateListener> listener)
+void DAudioSourceHandler::RegisterDistributedHardwareStateListener(std::shared_ptr<BusinessStateListener> listener)
 {
     (void)listener;
 }
 
-void DAudioSourceHandler::UnRegisterBusinessStateListener()
+void DAudioSourceHandler::UnregisterDistributedHardwareStateListener()
 {
 }
 
@@ -158,7 +158,7 @@ void DAudioSourceHandler::RegisterDataSyncTriggerListener(std::shared_ptr<DataSy
     (void)listener;
 }
 
-void DAudioSourceHandler::UnRegisterDataSyncTriggerListener()
+void DAudioSourceHandler::UnregisterDataSyncTriggerListener()
 {
 }
 
