@@ -35,6 +35,10 @@ public:
         std::shared_ptr<UnregisterCallback> callback) override;
     int32_t ConfigDistributedHardware(const std::string &devId, const std::string &dhId, const std::string &key,
         const std::string &value) override;
+    void RegisterDistributedHardwareStateListener(std::shared_ptr<DistributedHardwareStateListener> listener) override;
+    void UnregisterDistributedHardwareStateListener() override;
+    void RegisterDataSyncTriggerListener(std::shared_ptr<DataSyncTriggerListener> listener) override;
+    void UnregisterDataSyncTriggerListener() override;
     void OnRemoteSourceSvrDied(const wptr<IRemoteObject> &remote);
     void FinishStartSA(const std::string &param, const sptr<IRemoteObject> &remoteObject);
 
