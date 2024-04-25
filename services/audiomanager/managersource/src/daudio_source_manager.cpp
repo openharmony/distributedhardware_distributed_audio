@@ -360,6 +360,24 @@ int32_t DAudioSourceManager::OnEnableDAudio(const std::string &devId, const std:
     return ipcCallback_->OnNotifyRegResult(devId, dhId, reqId, result, "");
 }
 
+int32_t DAudioSourceManager::OnHardwareStateChanged(const std::string &devId, const std::string &dhId,
+    const int32_t state)
+{
+    DHLOGI("On distributed hardware state changed devId: %{public}s, dhId: %{public}s, ret: %{public}d.",
+        GetAnonyString(devId).c_str(), dhId.c_str(), state);
+
+    CHECK_NULL_RETURN(ipcCallback_, ERR_DH_AUDIO_NULLPTR);
+    return ipcCallback_->OnHardwareStateChanged(devId, dhId, state);
+}
+
+int32_t DAudioSourceManager::OnDataSyncTrigger(const std::string &devId)
+{
+    DHLOGI("On data sync trigger devId: %{public}s.", GetAnonyString(devId).c_str());
+
+    CHECK_NULL_RETURN(ipcCallback_, ERR_DH_AUDIO_NULLPTR);
+    return ipcCallback_->OnDataSyncTrigger(devId);
+}
+
 int32_t DAudioSourceManager::OnDisableDAudio(const std::string &devId, const std::string &dhId, const int32_t result)
 {
     DHLOGI("On disable distributed audio devId: %{public}s, dhId: %{public}s, ret: %{public}d.",

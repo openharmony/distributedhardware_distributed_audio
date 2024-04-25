@@ -147,20 +147,26 @@ int32_t DAudioSourceHandler::ConfigDistributedHardware(const std::string &devId,
 void DAudioSourceHandler::RegisterDistributedHardwareStateListener(
     std::shared_ptr<DistributedHardwareStateListener> listener)
 {
-    (void)listener;
+    CHECK_AND_RETURN_LOG(dAudioIpcCallback_ == nullptr, "%{public}s", "ipc callback is null.");
+    dAudioIpcCallback_->RegisterStateListener(listener);
 }
 
 void DAudioSourceHandler::UnregisterDistributedHardwareStateListener()
 {
+    CHECK_AND_RETURN_LOG(dAudioIpcCallback_ == nullptr, "%{public}s", "ipc callback is null.");
+    dAudioIpcCallback_->UnRegisterStateListener();
 }
 
 void DAudioSourceHandler::RegisterDataSyncTriggerListener(std::shared_ptr<DataSyncTriggerListener> listener)
 {
-    (void)listener;
+    CHECK_AND_RETURN_LOG(dAudioIpcCallback_ == nullptr, "%{public}s", "ipc callback is null.");
+    dAudioIpcCallback_->RegisterTriggerListener(listener);
 }
 
 void DAudioSourceHandler::UnregisterDataSyncTriggerListener()
 {
+    CHECK_AND_RETURN_LOG(dAudioIpcCallback_ == nullptr, "%{public}s", "ipc callback is null.");
+    dAudioIpcCallback_->UnRegisterTriggerListener();
 }
 
 void DAudioSourceHandler::OnRemoteSourceSvrDied(const wptr<IRemoteObject> &remote)

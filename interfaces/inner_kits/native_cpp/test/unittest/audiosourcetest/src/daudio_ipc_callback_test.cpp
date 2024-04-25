@@ -224,5 +224,40 @@ HWTEST_F(DAudioIpcCallbackTest, PopUnregRegisterCallback_001, TestSize.Level1)
     int32_t sizeEnd = dAudioIpcCallback_->unregisterCallbackMap_.size();
     EXPECT_GT(sizeFront, sizeEnd);
 }
+
+/**
+ * @tc.name: OnNotifyRegResult_001
+ * @tc.desc: Verify the OnNotifyRegResult function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioIpcCallbackTest, OnHardwareStateChanged_001, TestSize.Level1)
+{
+    const std::string devId = "123";
+    const std::string dhId = "1";
+    int32_t status = 0;
+    std::shared_ptr<DistributedHardwareStateListener> callback =
+        std::make_shared<DistributedHardwareStateListenerTest>();
+    dAudioIpcCallback_->RegisterStateListener(callback);
+    int32_t ret = dAudioIpcCallback_->OnHardwareStateChanged(devId, dhId, status);
+    dAudioIpcCallback_->UnRegisterStateListener();
+    EXPECT_EQ(DH_SUCCESS, ret);
+}
+
+/**
+ * @tc.name: OnNotifyRegResult_001
+ * @tc.desc: Verify the OnNotifyRegResult function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioIpcCallbackTest, OnDataSyncTrigger_001, TestSize.Level1)
+{
+    const std::string devId = "123";
+    std::shared_ptr<DataSyncTriggerListener> callback = std::make_shared<DataSyncTriggerListenerTest>();
+    dAudioIpcCallback_->RegisterTriggerListener(callback);
+    int32_t ret = dAudioIpcCallback_->OnDataSyncTrigger(devId);
+    dAudioIpcCallback_->UnRegisterTriggerListener();
+    EXPECT_EQ(DH_SUCCESS, ret);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

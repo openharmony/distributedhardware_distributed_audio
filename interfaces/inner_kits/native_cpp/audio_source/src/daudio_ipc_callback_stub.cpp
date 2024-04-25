@@ -27,6 +27,8 @@ DAudioIpcCallbackStub::DAudioIpcCallbackStub() : IRemoteStub(true)
 {
     memberFuncMap_[NOTIFY_REGRESULT] = &DAudioIpcCallbackStub::OnNotifyRegResultInner;
     memberFuncMap_[NOTIFY_UNREGRESULT] = &DAudioIpcCallbackStub::OnNotifyUnregResultInner;
+    memberFuncMap_[NOTIFY_STATE_CHANGED] = &DAudioIpcCallbackStub::OnHardwareStateChangedInner;
+    memberFuncMap_[NOTIFY_DATASYNC_TRIGGER] = &DAudioIpcCallbackStub::OnDataSyncTriggerInner;
 }
 
 int32_t DAudioIpcCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
@@ -69,6 +71,24 @@ int32_t DAudioIpcCallbackStub::OnNotifyUnregResultInner(MessageParcel &data, Mes
     int32_t status = data.ReadInt32();
     std::string resultData = data.ReadString();
     int32_t ret = OnNotifyUnregResult(networkId, dhId, reqId, status, resultData);
+    return ret;
+}
+
+int32_t DAudioIpcCallbackStub::OnHardwareStateChangedInner(MessageParcel &data, MessageParcel &reply,
+    MessageOption &option)
+{
+    std::string networkId = data.ReadString();
+    std::string dhId = data.ReadString();
+    int32_t status = data.ReadInt32();
+    int32_t ret = OnHardwareStateChanged(networkId, dhId, status);
+    return ret;
+}
+
+int32_t DAudioIpcCallbackStub::OnDataSyncTriggerInner(MessageParcel &data, MessageParcel &reply,
+    MessageOption &option)
+{
+    std::string networkId = data.ReadString();
+    int32_t ret = OnDataSyncTrigger(networkId);
     return ret;
 }
 } // DistributedHardware

@@ -45,6 +45,8 @@ public:
         const std::string &eventContent);
     int32_t OnEnableDAudio(const std::string &devId, const std::string &dhId, const int32_t result);
     int32_t OnDisableDAudio(const std::string &devId, const std::string &dhId, const int32_t result);
+    int32_t OnHardwareStateChanged(const std::string &devId, const std::string &dhId, const int32_t state);
+    int32_t OnDataSyncTrigger(const std::string &devId);
     int32_t LoadAVSenderEngineProvider();
     int32_t UnloadAVSenderEngineProvider();
     int32_t LoadAVReceiverEngineProvider();

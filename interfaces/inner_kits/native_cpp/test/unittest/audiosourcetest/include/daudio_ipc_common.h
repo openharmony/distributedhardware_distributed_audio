@@ -51,6 +51,28 @@ public:
     }
 };
 
+class DistributedHardwareStateListenerTest : public DistributedHardwareStateListener {
+public:
+    DistributedHardwareStateListenerTest() = default;
+    virtual ~DistributedHardwareStateListenerTest() = default;
+
+    void OnStateChanged(const std::string &uuid, const std::string &dhId, const BusinessState state)
+    {
+        return;
+    }
+};
+
+class DataSyncTriggerListenerTest : public DataSyncTriggerListener {
+public:
+    DataSyncTriggerListenerTest() = default;
+    virtual ~DataSyncTriggerListenerTest() = default;
+
+    void OnDataSyncTrigger(const std::string &uuid)
+    {
+        return;
+    }
+};
+
 class MockIDAudioSource : public IDAudioSource {
 public:
     ~MockIDAudioSource() = default;
