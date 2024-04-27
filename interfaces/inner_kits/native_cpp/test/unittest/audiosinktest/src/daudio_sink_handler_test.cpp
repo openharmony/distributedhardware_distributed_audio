@@ -17,6 +17,8 @@
 #include "daudio_sink_handler_test.h"
 #undef private
 
+#include "daudio_sink_proxy.h"
+
 using namespace testing;
 using namespace testing::ext;
 
@@ -89,8 +91,74 @@ HWTEST_F(DAudioSinkHandlerTest, LocalHardware_003, TestSize.Level1)
     DAudioSinkHandler::GetInstance().OnRemoteSinkSvrDied(remote);
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID);
+    sptr<IDAudioSink> proxy(new DAudioSinkProxy(remoteObject));
     wptr<IRemoteObject> remoteobject (remoteObject);
     DAudioSinkHandler::GetInstance().OnRemoteSinkSvrDied(remoteobject);
+    DAudioSinkHandler::GetInstance().sinkSvrRecipient_ = sptr<DAudioSinkHandler::DAudioSinkSvrRecipient>(
+        new DAudioSinkHandler::DAudioSinkSvrRecipient());
+    DAudioSinkHandler::GetInstance().sinkSvrRecipient_->OnRemoteDied(remoteobject);
+    DAudioSinkHandler::GetInstance().sinkSvrRecipient_ = nullptr;
+    DAudioSinkHandler::GetInstance().dAudioSinkProxy_ = proxy;
+    DAudioSinkHandler::GetInstance().OnRemoteSinkSvrDied(remoteobject);
+}
+
+/**
+ * @tc.name: LocalHardware_004
+ * @tc.desc: Verify the RegisterPrivacyResources function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkHandlerTest, LocalHardware_004, TestSize.Level1)
+{
+    std::shared_ptr<PrivacyResourcesListener> listener = nullptr;
+    sptr<DAudioSinkIpcCallback> dAudioSinkIpcCallback_ = nullptr;
+    int32_t ret = DAudioSinkHandler::GetInstance().RegisterPrivacyResources(listener);
+    EXPECT_EQ(ERR_DH_AUDIO_SA_PROXY_NOT_INIT, ret);
+    dAudioSinkIpcCallback_ = sptr<DAudioSinkIpcCallback>(new DAudioSinkIpcCallback());
+    ret = DAudioSinkHandler::GetInstance().RegisterPrivacyResources(listener);
+    EXPECT_EQ(DH_SUCCESS, ret);
+}
+
+/**
+ * @tc.name: LocalHardware_005
+ * @tc.desc: Verify the PauseDistributedHardware function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkHandlerTest, LocalHardware_005, TestSize.Level1)
+{
+    std::string networkId = "networkId";
+    DAudioSinkHandler::GetInstance().dAudioSinkProxy_ = nullptr;
+    int32_t ret = DAudioSinkHandler::GetInstance().PauseDistributedHardware(networkId);
+    EXPECT_EQ(ERR_DH_AUDIO_SA_PROXY_NOT_INIT, ret);
+    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID);
+    sptr<IDAudioSink> proxy(new DAudioSinkProxy(remoteObject));
+    DAudioSinkHandler::GetInstance().dAudioSinkProxy_ = proxy;
+    ret = DAudioSinkHandler::GetInstance().PauseDistributedHardware(networkId);
+    EXPECT_NE(DH_SUCCESS, ret);
+}
+
+/**
+ * @tc.name: LocalHardware_006
+ * @tc.desc: Verify the ResumeDistributedHardware function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkHandlerTest, LocalHardware_006, TestSize.Level1)
+{
+    std::string networkId = "networkId";
+    DAudioSinkHandler::GetInstance().dAudioSinkProxy_ = nullptr;
+    int32_t ret = DAudioSinkHandler::GetInstance().ResumeDistributedHardware(networkId);
+    EXPECT_EQ(ERR_DH_AUDIO_SA_PROXY_NOT_INIT, ret);
+    EXPECT_EQ(ERR_DH_AUDIO_SA_PROXY_NOT_INIT, DAudioSinkHandler::GetInstance().StopDistributedHardware(networkId));
+    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID);
+    sptr<IDAudioSink> proxy(new DAudioSinkProxy(remoteObject));
+    DAudioSinkHandler::GetInstance().dAudioSinkProxy_ = proxy;
+    ret = DAudioSinkHandler::GetInstance().ResumeDistributedHardware(networkId);
+    EXPECT_NE(DH_SUCCESS, ret);
+    EXPECT_NE(DH_SUCCESS, DAudioSinkHandler::GetInstance().StopDistributedHardware(networkId));
 }
 } // namespace DistributedHardware
 } // namespace OHOS

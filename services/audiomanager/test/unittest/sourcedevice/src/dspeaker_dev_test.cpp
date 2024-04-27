@@ -65,6 +65,18 @@ HWTEST_F(DSpeakerDevTest, InitSenderEngine_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: InitReceiverEngine_001
+ * @tc.desc: Verify InitReceiverEngine function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DSpeakerDevTest, InitReceiverEngine_001, TestSize.Level1)
+{
+    IAVEngineProvider *providerPtr = nullptr;
+    EXPECT_EQ(DH_SUCCESS, spk_->InitReceiverEngine(providerPtr));;
+}
+
+/**
  * @tc.name: EnableDSpeaker_001
  * @tc.desc: Verify EnableDSpeaker and EnableDevice function.
  * @tc.type: FUNC
@@ -361,6 +373,32 @@ HWTEST_F(DSpeakerDevTest, WriteStreamData_002, TestSize.Level1)
 
     spk_->speakerTrans_ = std::make_shared<MockIAudioDataTransport>();
     EXPECT_EQ(DH_SUCCESS, spk_->WriteStreamData(streamId_, writeData));
+}
+
+/**
+ * @tc.name: NotifyHdfAudioEvent_001
+ * @tc.desc: Verify NotifyHdfAudioEvent function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DSpeakerDevTest, ReadMmapPosition_001, TestSize.Level1)
+{
+    int32_t streamId = 0;
+    uint64_t frames = 0;
+    CurrentTimeHDF time;
+    EXPECT_EQ(DH_SUCCESS, spk_->ReadMmapPosition(streamId, frames, time));
+}
+
+/**
+ * @tc.name: MmapStart_001
+ * @tc.desc: Verify MmapStart function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DSpeakerDevTest, MmapStart_001, TestSize.Level1)
+{
+    spk_->ashmem_ = nullptr;
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, spk_->MmapStart());
 }
 
 /**
