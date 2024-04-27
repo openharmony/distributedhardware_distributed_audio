@@ -32,6 +32,8 @@ public:
 private:
     int32_t OnNotifyRegResultInner(MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int32_t OnNotifyUnregResultInner(MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    int32_t OnHardwareStateChangedInner(MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    int32_t OnDataSyncTriggerInner(MessageParcel &data, MessageParcel &reply, MessageOption &option);
 
     using DAudioCallbackFunc = int32_t (DAudioIpcCallbackStub::*)(MessageParcel &data, MessageParcel &reply,
         MessageOption &option);

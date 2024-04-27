@@ -62,5 +62,44 @@ int32_t DAudioIpcCallbackProxy::OnNotifyUnregResult(const std::string &devId, co
     int32_t ret = reply.ReadInt32();
     return ret;
 }
+
+int32_t DAudioIpcCallbackProxy::OnHardwareStateChanged(const std::string &devId, const std::string &dhId,
+    int32_t status)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        return ERR_DH_AUDIO_SA_WRITE_INTERFACE_TOKEN_FAILED;
+    }
+
+    if (!data.WriteString(devId) || !data.WriteString(dhId) || !data.WriteInt32(status)) {
+        return ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED;
+    }
+
+    Remote()->SendRequest(NOTIFY_STATE_CHANGED, data, reply, option);
+    int32_t ret = reply.ReadInt32();
+    return ret;
+}
+
+int32_t DAudioIpcCallbackProxy::OnDataSyncTrigger(const std::string &devId)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        return ERR_DH_AUDIO_SA_WRITE_INTERFACE_TOKEN_FAILED;
+    }
+
+    if (!data.WriteString(devId)) {
+        return ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED;
+    }
+
+    Remote()->SendRequest(NOTIFY_DATASYNC_TRIGGER, data, reply, option);
+    int32_t ret = reply.ReadInt32();
+    return ret;
+}
 } // namespace DistributedHardware
 } // namespace OHOS
