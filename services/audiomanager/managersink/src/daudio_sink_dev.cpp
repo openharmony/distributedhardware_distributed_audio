@@ -78,6 +78,7 @@ int32_t DAudioSinkDev::InitAVTransEngines(const ChannelState channelState, IAVEn
     }
 
     if (channelState == ChannelState::SPK_CONTROL_OPENED) {
+        std::lock_guard<std::mutex> devLck(spkClientMutex_);
         spkClientMap_[DEFAULT_RENDER_ID] =
             std::make_shared<DSpeakerClient>(devId_, DEFAULT_RENDER_ID, shared_from_this());
         spkClientMap_[DEFAULT_RENDER_ID]->InitReceiverEngine(providerPtr);
