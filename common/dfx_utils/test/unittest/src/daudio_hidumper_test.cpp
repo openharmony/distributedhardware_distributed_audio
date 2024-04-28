@@ -56,5 +56,29 @@ HWTEST_F(DAudioHidumperTest, Dump_001, TestSize.Level1)
     args = {"-h", "--ability"};
     EXPECT_EQ(true, hidumper_->Dump(args, result));
 }
+
+/**
+ * @tc.name: GetSourceDevId_001
+ * @tc.desc: Verify the GetSourceDevId function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6G
+ */
+HWTEST_F(DAudioHidumperTest, GetSourceDevId_001, TestSize.Level1)
+{
+    std::string result = "123";
+    EXPECT_NE(HDF_SUCCESS, hidumper_->GetSourceDevId(result));
+}
+
+/**
+ * @tc.name: GetSinkInfo_001
+ * @tc.desc: Verify the GetSinkInfo function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6G
+ */
+HWTEST_F(DAudioHidumperTest, GetSinkInfo_001, TestSize.Level1)
+{
+    std::string result = "123";
+    EXPECT_NE(HDF_SUCCESS, hidumper_->GetSinkInfo(result));
+}
 } // DistributedHardware
 } // OHOS

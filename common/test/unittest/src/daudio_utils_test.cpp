@@ -324,5 +324,116 @@ HWTEST_F(DAudioUtilsTest, DAudioUtilTest_009, TestSize.Level1)
     EXPECT_EQ(ReduceDhIdPrefix("Audio_1394302"), "1394302");
     EXPECT_EQ(ReduceDhIdPrefix("1394302"), "1394302");
 }
+
+/**
+ * @tc.name: DAudioLogTest_010
+ * @tc.desc: Verify the AddDhIdPrefix and ReduceDhIdPrefix function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5U
+ */
+HWTEST_F(DAudioUtilsTest, DAudioUtilTest_010, TestSize.Level1)
+{
+    std::string key = "123";
+    cJSON *jsonObject = nullptr;
+    EXPECT_EQ(false, IsString(jsonObject, key));
+    jsonObject = cJSON_CreateObject();
+    CHECK_NULL_VOID(jsonObject);
+    EXPECT_EQ(false, IsString(jsonObject, key));
+    cJSON_AddStringToObject(jsonObject, "key", key.c_str());
+    EXPECT_EQ(false, IsString(jsonObject, key));
+    cJSON_Delete(jsonObject);
+    cJSON *jsonObject1 = cJSON_CreateObject();
+    CHECK_NULL_VOID(jsonObject1);
+    cJSON_AddStringToObject(jsonObject1, "key", key.c_str());
+    EXPECT_EQ(false, IsString(jsonObject1, key));
+    cJSON_Delete(jsonObject1);
+}
+
+/**
+ * @tc.name: DAudioLogTest_011
+ * @tc.desc: Verify the AddDhIdPrefix and ReduceDhIdPrefix function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5U
+ */
+HWTEST_F(DAudioUtilsTest, DAudioUtilTest_011, TestSize.Level1)
+{
+    std::string key = "123";
+    cJSON *jsonObject = nullptr;
+    EXPECT_EQ(false, IsInt32(jsonObject, key));
+    jsonObject = cJSON_CreateObject();
+    CHECK_NULL_VOID(jsonObject);
+    EXPECT_EQ(false, IsInt32(jsonObject, key));
+    cJSON_AddStringToObject(jsonObject, "key", key.c_str());
+    EXPECT_EQ(false, IsInt32(jsonObject, key));
+    cJSON_Delete(jsonObject);
+    cJSON *jsonObject1 = cJSON_CreateObject();
+    CHECK_NULL_VOID(jsonObject1);
+    cJSON_AddNumberToObject(jsonObject1, "key", INT32_MAX);
+    EXPECT_EQ(false, IsInt32(jsonObject1, key));
+    cJSON_Delete(jsonObject1);
+}
+
+/**
+ * @tc.name: DAudioLogTest_012
+ * @tc.desc: Verify the AddDhIdPrefix and ReduceDhIdPrefix function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5U
+ */
+HWTEST_F(DAudioUtilsTest, DAudioUtilTest_012, TestSize.Level1)
+{
+    std::string key = "123";
+    cJSON *jsonObject = nullptr;
+    EXPECT_EQ(false, IsAudioParam(jsonObject, key));
+    jsonObject = cJSON_CreateObject();
+    CHECK_NULL_VOID(jsonObject);
+    EXPECT_EQ(false, IsAudioParam(jsonObject, key));
+    cJSON *jsonObj = cJSON_CreateArray();
+    CHECK_NULL_VOID(jsonObj);
+    cJSON_AddItemToObject(jsonObject, key.c_str(), jsonObj);
+    EXPECT_EQ(false, IsAudioParam(jsonObject, key));
+    cJSON_Delete(jsonObject);
+}
+
+/**
+ * @tc.name: DAudioLogTest_013
+ * @tc.desc: Verify the AddDhIdPrefix and ReduceDhIdPrefix function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5U
+ */
+HWTEST_F(DAudioUtilsTest, DAudioUtilTest_013, TestSize.Level1)
+{
+    std::string key = "123";
+    bool isEnabled = false;
+    EXPECT_EQ(false, IsParamEnabled(key, isEnabled));
+}
+
+/**
+ * @tc.name: DAudioLogTest_014
+ * @tc.desc: Verify the AddDhIdPrefix and ReduceDhIdPrefix function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5U
+ */
+HWTEST_F(DAudioUtilsTest, DAudioUtilTest_014, TestSize.Level1)
+{
+    char *key = nullptr;
+    int32_t value = 0;
+    EXPECT_EQ(false, GetSysPara(key, value));
+    std::string str = "123";
+    EXPECT_EQ(true, GetSysPara(str.c_str(), value));
+}
+
+/**
+ * @tc.name: DAudioLogTest_015
+ * @tc.desc: Verify the AddDhIdPrefix and ReduceDhIdPrefix function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5U
+ */
+HWTEST_F(DAudioUtilsTest, DAudioUtilTest_015, TestSize.Level1)
+{
+    int64_t nanoTime = 0;
+    EXPECT_NE(DH_SUCCESS, AbsoluteSleep(nanoTime));
+    nanoTime = 123456;
+    EXPECT_EQ(DH_SUCCESS, AbsoluteSleep(nanoTime));
+}
 } // namespace DistributedHardware
 } // namespace OHOS
