@@ -553,7 +553,7 @@ bool IsParamEnabled(const std::string &key, bool &isEnabled)
     return false;
 }
 
-void SaveFile(std::string fileName, uint8_t *audioData, int32_t size)
+void SaveFile(const std::string fileName, uint8_t *audioData, int32_t size)
 {
     char path[PATH_MAX + 1] = {0x00};
     if (fileName.length() > PATH_MAX || realpath(fileName.c_str(), path) == nullptr) {
