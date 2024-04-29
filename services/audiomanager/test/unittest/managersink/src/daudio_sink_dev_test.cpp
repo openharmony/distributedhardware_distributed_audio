@@ -135,6 +135,18 @@ HWTEST_F(DAudioSinkDevTest, TaskOpenDSpeaker_002, TestSize.Level1)
 }
 
 /**
+ * @tc.name: TaskOpenDSpeaker_003
+ * @tc.desc: Verify the TaskOpenDSpeaker function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkDevTest, TaskOpenDSpeaker_003, TestSize.Level1)
+{
+    std::string args = "{\"KEY_DH_ID\":\"1\", \"KEY_AUDIO_PARAM\":\"param\"}}";
+    EXPECT_NE(DH_SUCCESS, sinkDev_->TaskOpenDSpeaker(args));
+}
+
+/**
  * @tc.name: TaskCloseDSpeaker_001
  * @tc.desc: Verify the TaskCloseDSpeaker function.
  * @tc.type: FUNC
@@ -157,8 +169,9 @@ HWTEST_F(DAudioSinkDevTest, TaskCloseDSpeaker_002, TestSize.Level1)
     std::string args = "{\"dhId\":\"1\"}";
     std::string devId = "devId";
     int32_t dhId = 1;
+    EXPECT_EQ(DH_SUCCESS, sinkDev_->TaskCloseDSpeaker(args));
     auto spkClient = std::make_shared<DSpeakerClient>(devId, dhId, sinkDev_);
-    sinkDev_->spkClientMap_.insert(std::make_pair(DEFAULT_RENDER_ID, spkClient));
+    sinkDev_->spkClientMap_.insert(std::make_pair(dhId, spkClient));
     EXPECT_EQ(DH_SUCCESS, sinkDev_->TaskCloseDSpeaker(args));
 }
 
@@ -189,7 +202,7 @@ HWTEST_F(DAudioSinkDevTest, TaskStartRender_001, TestSize.Level1)
     std::string args = "{\"dhId\":\"1\"}";
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sinkDev_->TaskStartRender(args));
     auto spkClient = std::make_shared<DSpeakerClient>(devId, dhId, sinkDev_);
-    sinkDev_->spkClientMap_.insert(std::make_pair(DEFAULT_RENDER_ID, spkClient));
+    sinkDev_->spkClientMap_.insert(std::make_pair(dhId, spkClient));
     EXPECT_NE(DH_SUCCESS, sinkDev_->TaskStartRender(args));
     std::string devIdArgs = "{\"devId\":\"1\"}";
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, sinkDev_->TaskStartRender(devIdArgs));
@@ -216,6 +229,23 @@ HWTEST_F(DAudioSinkDevTest, TaskOpenDMic_001, TestSize.Level1)
 HWTEST_F(DAudioSinkDevTest, TaskOpenDMic_002, TestSize.Level1)
 {
     std::string args = "args";
+    EXPECT_NE(DH_SUCCESS, sinkDev_->TaskOpenDMic(args));
+}
+
+/**
+ * @tc.name: TaskOpenDMic_003
+ * @tc.desc: Verify the TaskOpenDMic function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkDevTest, TaskOpenDMic_003, TestSize.Level1)
+{
+    std::string args;
+    sinkDev_->isDevLevelStatus_ = true;
+    EXPECT_EQ(ERR_DH_AUDIO_SA_PARAM_INVALID, sinkDev_->TaskOpenDMic(args));
+    args = "{\"dhId\":\"1\"}";
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sinkDev_->TaskOpenDMic(args));
+    args = "{\"KEY_DH_ID\":\"1\", \"KEY_AUDIO_PARAM\":\"param\"}}";
     EXPECT_NE(DH_SUCCESS, sinkDev_->TaskOpenDMic(args));
 }
 
@@ -250,6 +280,25 @@ HWTEST_F(DAudioSinkDevTest, TaskCloseDMic_002, TestSize.Level1)
 }
 
 /**
+ * @tc.name: TaskCloseDMic_003
+ * @tc.desc: Verify the TaskCloseDMic function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkDevTest, TaskCloseDMic_003, TestSize.Level1)
+{
+    std::string args = "{\"dhId\":\"-1\"}";
+    std::string devId;
+    int32_t dhId = 1;
+    sinkDev_->isPageStatus_ = true;
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sinkDev_->TaskCloseDMic(args));
+    args = "{\"dhId\":\"1\"}";
+    auto micClient = std::make_shared<DMicClient>(devId, dhId, sinkDev_);
+    sinkDev_->micClientMap_.insert(std::make_pair(dhId, micClient));
+    EXPECT_EQ(DH_SUCCESS, sinkDev_->TaskCloseDMic(args));
+}
+
+/**
  * @tc.name: TaskSetParameter_001
  * @tc.desc: Verify the TaskSetParameter function.
  * @tc.type: FUNC
@@ -264,7 +313,7 @@ HWTEST_F(DAudioSinkDevTest, TaskSetParameter_001, TestSize.Level1)
     args += "{\"dhId\":\"1\"}";
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sinkDev_->TaskSetParameter(args));
     auto spkClient = std::make_shared<DSpeakerClient>(devId, dhId, sinkDev_);
-    sinkDev_->spkClientMap_.insert(std::make_pair(DEFAULT_RENDER_ID, spkClient));
+    sinkDev_->spkClientMap_.insert(std::make_pair(dhId, spkClient));
     EXPECT_NE(DH_SUCCESS, sinkDev_->TaskSetParameter(args));
 }
 
@@ -307,8 +356,9 @@ HWTEST_F(DAudioSinkDevTest, TaskSetVolume_002, TestSize.Level1)
     std::string args = "{\"dhId\":\"1\"}";
     std::string devId;
     int32_t dhId = 1;
+    EXPECT_NE(DH_SUCCESS, sinkDev_->TaskSetVolume(args));
     auto spkClient = std::make_shared<DSpeakerClient>(devId, dhId, sinkDev_);
-    sinkDev_->spkClientMap_.insert(std::make_pair(DEFAULT_RENDER_ID, spkClient));
+    sinkDev_->spkClientMap_.insert(std::make_pair(dhId, spkClient));
     EXPECT_NE(DH_SUCCESS, sinkDev_->TaskSetVolume(args));
     std::string args1 = "dhId=1";
     EXPECT_NE(DH_SUCCESS, sinkDev_->TaskSetVolume(args1));
@@ -456,10 +506,10 @@ HWTEST_F(DAudioSinkDevTest, SendAudioEventToRemote_002, TestSize.Level1)
     std::string devId = "devId";
     int32_t dhId = 1;
     AudioEvent event;
-    event.content = "{\"dhId\":\"123\"}";
+    event.content = "{\"dhId\":\"1\"}";
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sinkDev_->SendAudioEventToRemote(event));
     auto spkClient = std::make_shared<DSpeakerClient>(devId, dhId, sinkDev_);
-    sinkDev_->spkClientMap_.insert(std::make_pair(DEFAULT_RENDER_ID, spkClient));
+    sinkDev_->spkClientMap_.insert(std::make_pair(dhId, spkClient));
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sinkDev_->SendAudioEventToRemote(event));
 }
 
@@ -472,6 +522,7 @@ HWTEST_F(DAudioSinkDevTest, SendAudioEventToRemote_002, TestSize.Level1)
 HWTEST_F(DAudioSinkDevTest, PauseDistributedHardware_001, TestSize.Level1)
 {
     std::string networkId = "networkId";
+    sinkDev_->PullUpPage();
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sinkDev_->PauseDistributedHardware(networkId));
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sinkDev_->ResumeDistributedHardware(networkId));
     EXPECT_EQ(DH_SUCCESS, sinkDev_->StopDistributedHardware(networkId));

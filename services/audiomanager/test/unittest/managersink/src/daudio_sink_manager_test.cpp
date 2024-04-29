@@ -167,6 +167,10 @@ HWTEST_F(DAudioSinkManagerTest, PauseDistributedHardware_001, TestSize.Level1)
     EXPECT_EQ(DH_SUCCESS, daudioSinkManager.PauseDistributedHardware(networkId));
     EXPECT_EQ(DH_SUCCESS, daudioSinkManager.ResumeDistributedHardware(networkId));
     EXPECT_EQ(DH_SUCCESS, daudioSinkManager.StopDistributedHardware(networkId));
+    daudioSinkManager.audioDevMap_.emplace(networkId, dev);
+    EXPECT_EQ(DH_SUCCESS, daudioSinkManager.PauseDistributedHardware(networkId));
+    EXPECT_EQ(DH_SUCCESS, daudioSinkManager.ResumeDistributedHardware(networkId));
+    EXPECT_EQ(DH_SUCCESS, daudioSinkManager.StopDistributedHardware(networkId));
 }
 
 /**
@@ -233,6 +237,20 @@ HWTEST_F(DAudioSinkManagerTest, CheckDeviceSecurityLevel_001, TestSize.Level1)
     std::string srcDeviceId = "srcDeviceId";
     std::string dstDeviceId = "dstDeviceId";
     EXPECT_EQ(false, daudioSinkManager.CheckDeviceSecurityLevel(srcDeviceId, dstDeviceId));
+}
+
+/**
+ * @tc.name: GetUdidByNetworkId_001
+ * @tc.desc: Verify the GetUdidByNetworkId function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkManagerTest, GetUdidByNetworkId_001, TestSize.Level1)
+{
+    std::string networkId = "";
+    EXPECT_EQ("", daudioSinkManager.GetUdidByNetworkId(networkId));
+    networkId = "123";
+    EXPECT_EQ("", daudioSinkManager.GetUdidByNetworkId(networkId));
 }
 } // DistributedHardware
 } // OHOS
