@@ -472,6 +472,9 @@ void DAudioSourceManager::ListenAudioDev()
     auto taskFunc = [this]() {
         std::lock_guard<std::mutex> lock(devMapMtx_);
         for (auto &iter : audioDevMap_) {
+            if (iter.second.dev == nullptr) {
+                continue;
+            }
             if (iter.second.dev->GetThreadStatusFlag()) {
                 iter.second.dev->SetThreadStatusFlag();
             } else {
