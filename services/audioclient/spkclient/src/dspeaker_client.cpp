@@ -79,6 +79,9 @@ int32_t DSpeakerClient::CreateAudioRenderer(const AudioParam &param)
         param.comParam.sampleRate, param.comParam.bitFormat, param.comParam.channelMask, param.comParam.frameSize,
         param.renderOpts.contentType, param.renderOpts.renderFlags, param.renderOpts.streamUsage);
     audioParam_ = param;
+    if (audioParam_.renderOpts.streamUsage == STREAM_USAGE_VOICE_COMMUNICATION) {
+        audioParam_.renderOpts.renderFlags = NORMAL_MODE;
+    }
     AudioStandard::AudioRendererOptions rendererOptions = {
         {
             static_cast<AudioStandard::AudioSamplingRate>(audioParam_.comParam.sampleRate),
