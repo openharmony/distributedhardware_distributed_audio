@@ -82,6 +82,8 @@ HWTEST_F(DAudioSinkServiceTest, OnStart_001, TestSize.Level1)
 HWTEST_F(DAudioSinkServiceTest, Init_001, TestSize.Level1)
 {
     sinkSrv_->isServiceStarted_ = false;
+    EXPECT_NE(true, sinkSrv_->Init());
+    sinkSrv_->isServiceStarted_ = true;
     EXPECT_EQ(true, sinkSrv_->Init());
 }
 

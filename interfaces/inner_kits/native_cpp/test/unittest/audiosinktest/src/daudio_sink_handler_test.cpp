@@ -111,7 +111,7 @@ HWTEST_F(DAudioSinkHandlerTest, LocalHardware_003, TestSize.Level1)
 HWTEST_F(DAudioSinkHandlerTest, LocalHardware_004, TestSize.Level1)
 {
     std::shared_ptr<PrivacyResourcesListener> listener = nullptr;
-    sptr<DAudioSinkIpcCallback> dAudioSinkIpcCallback_ = nullptr;
+    DAudioSinkHandler::GetInstance().dAudioSinkIpcCallback_ = nullptr;
     int32_t ret = DAudioSinkHandler::GetInstance().RegisterPrivacyResources(listener);
     EXPECT_EQ(ERR_DH_AUDIO_SA_PROXY_NOT_INIT, ret);
     dAudioSinkIpcCallback_ = sptr<DAudioSinkIpcCallback>(new DAudioSinkIpcCallback());
@@ -136,7 +136,7 @@ HWTEST_F(DAudioSinkHandlerTest, LocalHardware_005, TestSize.Level1)
     sptr<IDAudioSink> proxy(new DAudioSinkProxy(remoteObject));
     DAudioSinkHandler::GetInstance().dAudioSinkProxy_ = proxy;
     ret = DAudioSinkHandler::GetInstance().PauseDistributedHardware(networkId);
-    EXPECT_NE(DH_SUCCESS, ret);
+    EXPECT_EQ(DH_SUCCESS, ret);
 }
 
 /**
@@ -157,7 +157,7 @@ HWTEST_F(DAudioSinkHandlerTest, LocalHardware_006, TestSize.Level1)
     sptr<IDAudioSink> proxy(new DAudioSinkProxy(remoteObject));
     DAudioSinkHandler::GetInstance().dAudioSinkProxy_ = proxy;
     ret = DAudioSinkHandler::GetInstance().ResumeDistributedHardware(networkId);
-    EXPECT_NE(DH_SUCCESS, ret);
+    EXPECT_EQ(DH_SUCCESS, ret);
     EXPECT_NE(DH_SUCCESS, DAudioSinkHandler::GetInstance().StopDistributedHardware(networkId));
 }
 } // namespace DistributedHardware

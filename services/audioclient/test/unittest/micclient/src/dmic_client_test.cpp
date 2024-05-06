@@ -59,6 +59,7 @@ HWTEST_F(DMicClientTest, InitSenderEngine_001, TestSize.Level1)
     micClient_->OnEngineTransMessage(message);
     AVTransEvent event;
     event.type = EventType::EVENT_START_SUCCESS;
+    micClient_->audioParam_.captureOpts.capturerFlags = NORMAL_MODE;
     micClient_->OnEngineTransEvent(event);
     EXPECT_EQ(DH_SUCCESS, micClient_->InitSenderEngine(providerPtr));
 }
