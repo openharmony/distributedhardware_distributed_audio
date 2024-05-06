@@ -142,7 +142,28 @@ HWTEST_F(DAudioSinkDevTest, TaskOpenDSpeaker_002, TestSize.Level1)
  */
 HWTEST_F(DAudioSinkDevTest, TaskOpenDSpeaker_003, TestSize.Level1)
 {
-    std::string args = "{\"KEY_DH_ID\":\"1\", \"KEY_AUDIO_PARAM\":\"param\"}}";
+    std::string devId = "1";
+    int32_t dhId = 1;
+    cJSON *jobject = cJSON_CreateObject();
+    CHECK_NULL_VOID(jobject);
+    cJSON_AddStringToObject(jobject, KEY_DH_ID, "1");
+    cJSON_AddNumberToObject(jobject, KEY_SAMPLING_RATE, 0);
+    cJSON_AddNumberToObject(jobject, KEY_FORMAT, 0);
+    cJSON_AddNumberToObject(jobject, KEY_CHANNELS, 0);
+    cJSON_AddNumberToObject(jobject, KEY_CONTENT_TYPE, 0);
+    cJSON_AddNumberToObject(jobject, KEY_STREAM_USAGE, 0);
+    cJSON_AddNumberToObject(jobject, KEY_SOURCE_TYPE, 0);
+    char *jsonData = cJSON_PrintUnformatted(jobject);
+    if (jsonData == nullptr) {
+        cJSON_Delete(jobject);
+        return;
+    }
+    std::string args(jsonData);
+    cJSON_free(jsonData);
+    cJSON_Delete(jobject);
+    EXPECT_NE(DH_SUCCESS, sinkDev_->TaskOpenDSpeaker(args));
+    auto spkClient = std::make_shared<DSpeakerClient>(devId, dhId, sinkDev_);
+    sinkDev_->spkClientMap_.insert(std::make_pair(dhId, spkClient));
     EXPECT_NE(DH_SUCCESS, sinkDev_->TaskOpenDSpeaker(args));
 }
 
@@ -228,7 +249,29 @@ HWTEST_F(DAudioSinkDevTest, TaskOpenDMic_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSinkDevTest, TaskOpenDMic_002, TestSize.Level1)
 {
-    std::string args = "args";
+    sinkDev_->isDevLevelStatus_ = true;
+    std::string devId = "1";
+    int32_t dhId = 1;
+    cJSON *jobject = cJSON_CreateObject();
+    CHECK_NULL_VOID(jobject);
+    cJSON_AddStringToObject(jobject, KEY_DH_ID, "1");
+    cJSON_AddNumberToObject(jobject, KEY_SAMPLING_RATE, 0);
+    cJSON_AddNumberToObject(jobject, KEY_FORMAT, 0);
+    cJSON_AddNumberToObject(jobject, KEY_CHANNELS, 0);
+    cJSON_AddNumberToObject(jobject, KEY_CONTENT_TYPE, 0);
+    cJSON_AddNumberToObject(jobject, KEY_STREAM_USAGE, 0);
+    cJSON_AddNumberToObject(jobject, KEY_SOURCE_TYPE, 0);
+    char *jsonData = cJSON_PrintUnformatted(jobject);
+    if (jsonData == nullptr) {
+        cJSON_Delete(jobject);
+        return;
+    }
+    std::string args(jsonData);
+    cJSON_free(jsonData);
+    cJSON_Delete(jobject);
+    EXPECT_NE(DH_SUCCESS, sinkDev_->TaskOpenDMic(args));
+    auto micClient = std::make_shared<DMicClient>(devId, dhId, sinkDev_);
+    sinkDev_->micClientMap_.insert(std::make_pair(DEFAULT_CAPTURE_ID, micClient));
     EXPECT_NE(DH_SUCCESS, sinkDev_->TaskOpenDMic(args));
 }
 

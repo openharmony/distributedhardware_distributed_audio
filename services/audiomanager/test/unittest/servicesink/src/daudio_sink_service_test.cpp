@@ -141,10 +141,23 @@ HWTEST_F(DAudioSinkServiceTest, Dump_001, TestSize.Level1)
     order = u"--stopDump";
     args.push_back(order);
     EXPECT_EQ(DH_SUCCESS, sinkSrv_->Dump(fd, args));
-    args.pop_back();
     order = u"--illegal";
     args.push_back(order);
     EXPECT_EQ(DH_SUCCESS, sinkSrv_->Dump(fd, args));
+}
+
+/**
+ * @tc.name: PauseDistributedHardware_001
+ * @tc.desc: Verify the PauseDistributedHardware function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkServiceTest, PauseDistributedHardware_001, TestSize.Level1)
+{
+    std::string networkId = "1";
+    EXPECT_EQ(DH_SUCCESS, sinkSrv_->PauseDistributedHardware(networkId));
+    EXPECT_EQ(DH_SUCCESS, sinkSrv_->ResumeDistributedHardware(networkId));
+    EXPECT_EQ(DH_SUCCESS, sinkSrv_->StopDistributedHardware(networkId));
 }
 } // DistributedHardware
 } // OHOS

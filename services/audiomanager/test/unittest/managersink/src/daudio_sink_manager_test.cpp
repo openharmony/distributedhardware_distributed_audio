@@ -163,7 +163,6 @@ HWTEST_F(DAudioSinkManagerTest, PauseDistributedHardware_001, TestSize.Level1)
     }
     sptr<DAudioSinkIpcCallbackProxy> dAudioSinkIpcCallbackProxy(new DAudioSinkIpcCallbackProxy(remoteObject));
     auto dev = std::make_shared<DAudioSinkDev>(networkId, dAudioSinkIpcCallbackProxy);
-    daudioSinkManager.audioDevMap_.emplace(devId, dev);
     EXPECT_EQ(DH_SUCCESS, daudioSinkManager.PauseDistributedHardware(networkId));
     EXPECT_EQ(DH_SUCCESS, daudioSinkManager.ResumeDistributedHardware(networkId));
     EXPECT_EQ(DH_SUCCESS, daudioSinkManager.StopDistributedHardware(networkId));
@@ -247,10 +246,27 @@ HWTEST_F(DAudioSinkManagerTest, CheckDeviceSecurityLevel_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSinkManagerTest, GetUdidByNetworkId_001, TestSize.Level1)
 {
-    std::string networkId = "";
+    std::string networkId;
     EXPECT_EQ("", daudioSinkManager.GetUdidByNetworkId(networkId));
     networkId = "123";
     EXPECT_EQ("", daudioSinkManager.GetUdidByNetworkId(networkId));
+}
+
+/**
+ * @tc.name: OnProviderEvent_001
+ * @tc.desc: Verify the OnProviderEvent function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkManagerTest, OnProviderEvent_001, TestSize.Level1)
+{
+    AVTransEvent event1 = { EventType::EVENT_CHANNEL_OPENED, "", ""};
+    daudioSinkManager.providerListener_ = std::make_shared<EngineProviderListener>();
+    EXPECT_EQ(DH_SUCCESS, daudioSinkManager.providerListener_->OnProviderEvent(event1));
+    AVTransEvent event2 = { EventType::EVENT_CHANNEL_CLOSED, "", ""};
+    EXPECT_EQ(DH_SUCCESS, daudioSinkManager.providerListener_->OnProviderEvent(event2));
+    AVTransEvent event3 = { EventType::EVENT_REMOVE_STREAM, "", ""};
+    EXPECT_EQ(DH_SUCCESS, daudioSinkManager.providerListener_->OnProviderEvent(event3));
 }
 } // DistributedHardware
 } // OHOS

@@ -56,9 +56,19 @@ config("module_private_config") {
 ohos_unittest("DAudioDfxTest") {
   module_out_path = module_out_path
 
-  sources =
-      [ "${common_path}/dfx_utils/test/unittest/src/daudio_hidumper_test.cpp" ]
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
 
+  sources = [
+    "${common_path}/dfx_utils/test/unittest/src/daudio_hidumper_test.cpp",
+    "${common_path}/dfx_utils/test/unittest/src/daudio_hitrace_test.cpp",
+  ]
   configs = [ ":module_private_config" ]
 
   deps = [
