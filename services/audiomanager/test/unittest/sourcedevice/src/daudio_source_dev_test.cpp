@@ -516,13 +516,14 @@ HWTEST_F(DAudioSourceDevTest, OnEnableTaskResult_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, EnableDSpeaker_001, TestSize.Level1)
 {
-    auto speaker = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
     int32_t dhId = DEFAULT_RENDER_ID;
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->EnableDSpeaker(dhId, ATTRS));
+    auto speaker = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
     sourceDev_->deviceMap_[dhId] = speaker;
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->EnableDSpeaker(dhId, ATTRS));
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->EnableDSpeaker(dhId, ATTRS));
     sourceDev_->deviceMap_[dhId] = nullptr;
 
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->EnableDSpeaker(dhId, ATTRS));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->EnableDSpeaker(dhId, ATTRS));
 }
 
 /**
@@ -533,12 +534,14 @@ HWTEST_F(DAudioSourceDevTest, EnableDSpeaker_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, EnableDMic_001, TestSize.Level1)
 {
-    int32_t dhId = 0;
-    sourceDev_->mic_ = std::make_shared<DMicDev>(DEV_ID, sourceDev_);
-    EXPECT_NE(DH_SUCCESS, sourceDev_->EnableDMic(dhId, ATTRS));
-    sourceDev_->mic_ = nullptr;
+    int32_t dhId = DEFAULT_CAPTURE_ID;
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->EnableDMic(dhId, ATTRS));
+    auto mic = std::make_shared<DMicDev>(DEV_ID, sourceDev_);
+    sourceDev_->deviceMap_[dhId] = mic;
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->EnableDMic(dhId, ATTRS));
+    sourceDev_->deviceMap_[dhId] = nullptr;
 
-    EXPECT_NE(DH_SUCCESS, sourceDev_->EnableDMic(dhId, ATTRS));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->EnableDMic(dhId, ATTRS));
 }
 
 /**
@@ -1109,7 +1112,7 @@ HWTEST_F(DAudioSourceDevTest, EnableDMic_002, TestSize.Level1)
     sourceDev_->SleepAudioDev();
     auto mic = std::make_shared<DMicDev>(devId, sourceDev_);
     sourceDev_->deviceMap_.insert(std::make_pair(dhId, mic));
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->EnableDMic(dhId, attrs));
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->EnableDMic(dhId, attrs));
 }
 
 /**

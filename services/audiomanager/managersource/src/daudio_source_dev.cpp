@@ -611,12 +611,17 @@ int32_t DAudioSourceDev::EnableDSpeaker(const int32_t dhId, const std::string &a
 {
     std::lock_guard<std::mutex> devLck(ioDevMtx_);
     if (deviceMap_.find(dhId) != deviceMap_.end()) {
-        DHLOGI("The speaker device is already enabled.");
+        DHLOGI("The speaker device is enabled, enable it with new data this time.");
+        CHECK_NULL_RETURN(deviceMap_[dhId], ERR_DH_AUDIO_NULLPTR);
+        if (deviceMap_[dhId]->EnableDevice(dhId, attrs) != DH_SUCCESS) {
+            DHLOGI("Failed to enable speaker device with new data.");
+            return ERR_DH_AUDIO_FAILED;
+        }
         return DH_SUCCESS;
     }
     auto speaker = std::make_shared<DSpeakerDev>(devId_, shared_from_this());
     if (speaker->EnableDevice(dhId, attrs) != DH_SUCCESS) {
-        DHLOGI("Failed to enable speaker device.");
+        DHLOGI("Failed to enable speaker device first time.");
         return ERR_DH_AUDIO_FAILED;
     }
     deviceMap_[dhId] = speaker;
@@ -627,12 +632,17 @@ int32_t DAudioSourceDev::EnableDMic(const int32_t dhId, const std::string &attrs
 {
     std::lock_guard<std::mutex> devLck(ioDevMtx_);
     if (deviceMap_.find(dhId) != deviceMap_.end()) {
-        DHLOGI("The mic device is already enabled.");
+        DHLOGI("The mic device is enabled, enable it with new data this time.");
+        CHECK_NULL_RETURN(deviceMap_[dhId], ERR_DH_AUDIO_NULLPTR);
+        if (deviceMap_[dhId]->EnableDevice(dhId, attrs) != DH_SUCCESS) {
+            DHLOGI("Failed to enable mic device with new data.");
+            return ERR_DH_AUDIO_FAILED;
+        }
         return DH_SUCCESS;
     }
     auto mic = std::make_shared<DMicDev>(devId_, shared_from_this());
     if (mic->EnableDevice(dhId, attrs) != DH_SUCCESS) {
-        DHLOGI("Failed to enable mic device.");
+        DHLOGI("Failed to enable mic device first time.");
         return ERR_DH_AUDIO_FAILED;
     }
     deviceMap_[dhId] = mic;
