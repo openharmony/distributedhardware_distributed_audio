@@ -390,7 +390,7 @@ void DMicDev::EnqueueThread()
 {
     writeIndex_ = 0;
     writeNum_ = 0;
-    int64_t timeIntervalns = paramHDF_.period * AUDIO_NS_PER_SECOND / AUDIO_MS_PER_SECOND;
+    int64_t timeIntervalns = static_cast<int64_t>(paramHDF_.period * AUDIO_NS_PER_SECOND / AUDIO_MS_PER_SECOND);
     DHLOGD("Enqueue thread start, lengthPerWrite length: %{public}d, interval: %{public}d.", lengthPerTrans_,
         paramHDF_.period);
     FillJitterQueue();

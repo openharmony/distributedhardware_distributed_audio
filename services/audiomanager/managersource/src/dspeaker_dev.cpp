@@ -371,7 +371,7 @@ void DSpeakerDev::EnqueueThread()
     readIndex_ = 0;
     readNum_ = 0;
     frameIndex_ = 0;
-    int64_t timeIntervalns = paramHDF_.period * AUDIO_NS_PER_SECOND / AUDIO_MS_PER_SECOND;
+    int64_t timeIntervalns = static_cast<int64_t>(paramHDF_.period * AUDIO_NS_PER_SECOND / AUDIO_MS_PER_SECOND);
     DHLOGI("Enqueue thread start, lengthPerRead length: %{public}d, interval: %{pubic}d.", lengthPerTrans_,
         paramHDF_.period);
     while (ashmem_ != nullptr && isEnqueueRunning_.load()) {
