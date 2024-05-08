@@ -99,5 +99,19 @@ HWTEST_F(DAudioSinkProxyTest, InitSink_001, TestSize.Level1)
     ret = dAudioProxy->ReleaseSink();
     EXPECT_EQ(DH_SUCCESS, ret);
 }
+
+/**
+ * @tc.name: PauseDistributedHardware_001
+ * @tc.desc: Verify the PauseDistributedHardware function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkProxyTest, PauseDistributedHardware_001, TestSize.Level1)
+{
+    std::string networkId = "123";
+    EXPECT_EQ(DH_SUCCESS, dAudioProxy->PauseDistributedHardware(networkId));
+    EXPECT_EQ(DH_SUCCESS, dAudioProxy->ResumeDistributedHardware(networkId));
+    EXPECT_EQ(DH_SUCCESS, dAudioProxy->StopDistributedHardware(networkId));
+}
 } // namespace DistributedHardware
 } // namespace OHOS

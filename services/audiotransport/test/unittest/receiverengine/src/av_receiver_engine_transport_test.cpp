@@ -66,6 +66,8 @@ HWTEST_F(AVReceiverEngineTransportTest, InitEngine_001, TestSize.Level1)
 {
     IAVEngineProvider *providerPtr = nullptr;
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, receiverTrans_->InitEngine(providerPtr));
+    receiverTrans_->receiverAdapter_ = std::make_shared<AVTransReceiverAdapter>();
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, receiverTrans_->InitEngine(providerPtr));
     EXPECT_EQ(DH_SUCCESS, receiverTrans_->Release());
 }
 

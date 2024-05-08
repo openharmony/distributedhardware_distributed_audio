@@ -80,5 +80,18 @@ HWTEST_F(DAudioHidumperTest, GetSinkInfo_001, TestSize.Level1)
     std::string result = "123";
     EXPECT_NE(HDF_SUCCESS, hidumper_->GetSinkInfo(result));
 }
+
+/**
+ * @tc.name: StartDumpData_001
+ * @tc.desc: Verify the StartDumpData function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioHidumperTest, StartDumpData_001, TestSize.Level1)
+{
+    std::string result = "";
+    EXPECT_EQ(HDF_SUCCESS, hidumper_->StartDumpData(result));
+    EXPECT_EQ(true, hidumper_->QueryDumpDataFlag());
+}
 } // DistributedHardware
 } // OHOS

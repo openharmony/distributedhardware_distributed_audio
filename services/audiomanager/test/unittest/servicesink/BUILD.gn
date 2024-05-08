@@ -79,7 +79,49 @@ ohos_unittest("DaudioSinkServiceTest") {
   ]
 }
 
+## UnitTest daudio_sink_stub_test
+ohos_unittest("DaudioSinkStubTest") {
+  module_out_path = module_out_path
+
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "${services_path}/audiomanager/test/unittest/servicesink/src/daudio_sink_stub_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "${services_path}/audiomanager/servicesink:distributed_audio_sink",
+    "//third_party/googletest:gmock",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "access_token:libtokenid_sdk",
+    "audio_framework:audio_capturer",
+    "audio_framework:audio_client",
+    "audio_framework:audio_renderer",
+    "c_utils:utils",
+    "dsoftbus:softbus_client",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
+    "ipc:ipc_core",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+  ]
+}
+
 group("service_sink_test") {
   testonly = true
-  deps = [ ":DaudioSinkServiceTest" ]
+  deps = [
+    ":DaudioSinkServiceTest",
+    ":DaudioSinkStubTest",
+  ]
 }

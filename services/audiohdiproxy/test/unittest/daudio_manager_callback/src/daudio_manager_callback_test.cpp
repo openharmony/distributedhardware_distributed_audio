@@ -188,6 +188,24 @@ HWTEST_F(DAudioManagerCallbackTest, NotifyEvent_002, TestSize.Level1)
     event.type = AudioEventHDF::AUDIO_EVENT_CHANGE_PLAY_STATUS;
     event.content = "HDF_SUCCESS";
     EXPECT_EQ(HDF_SUCCESS, manCallback_->NotifyEvent(streamId_, event));
+    event.type = AudioEventHDF::AUDIO_EVENT_MMAP_START_SPK;
+    event.content = "HDF_SUCCESS";
+    EXPECT_EQ(HDF_SUCCESS, manCallback_->NotifyEvent(streamId_, event));
+    event.type = AudioEventHDF::AUDIO_EVENT_MMAP_STOP_SPK;
+    event.content = "HDF_SUCCESS";
+    EXPECT_EQ(HDF_SUCCESS, manCallback_->NotifyEvent(streamId_, event));
+    event.type = AudioEventHDF::AUDIO_EVENT_MMAP_START_MIC;
+    event.content = "HDF_SUCCESS";
+    EXPECT_EQ(HDF_SUCCESS, manCallback_->NotifyEvent(streamId_, event));
+    event.type = AudioEventHDF::AUDIO_EVENT_MMAP_STOP_MIC;
+    event.content = "HDF_SUCCESS";
+    EXPECT_EQ(HDF_SUCCESS, manCallback_->NotifyEvent(streamId_, event));
+    event.type = AudioEventHDF::AUDIO_EVENT_START;
+    event.content = "HDF_SUCCESS";
+    EXPECT_EQ(HDF_SUCCESS, manCallback_->NotifyEvent(streamId_, event));
+    event.type = AudioEventHDF::AUDIO_EVENT_STOP;
+    event.content = "HDF_SUCCESS";
+    EXPECT_EQ(HDF_SUCCESS, manCallback_->NotifyEvent(streamId_, event));
     event.type = -1;
     event.content = "HDF_SUCCESS";
     EXPECT_EQ(HDF_SUCCESS, manCallback_->NotifyEvent(streamId_, event));
@@ -277,6 +295,39 @@ HWTEST_F(DAudioManagerCallbackTest, ReadStreamData_002, TestSize.Level1)
     data.data.assign(audioData->Data(), audioData->Data() + audioData->Capacity());
     EXPECT_EQ(HDF_SUCCESS, manCallback_->ReadStreamData(streamId_, data));
     EXPECT_EQ(HDF_SUCCESS, manCallback_->DestroyStream(streamId_));
+}
+
+/**
+ * @tc.name: ReadMmapPosition_002
+ * @tc.desc: Verify the ReadMmapPosition function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(DAudioManagerCallbackTest, ReadMmapPosition_001, TestSize.Level1)
+{
+    int32_t streamId = 0;
+    uint64_t frames = 1;
+    OHOS::HDI::DistributedAudio::Audioext::V2_0::CurrentTime time;
+    EXPECT_EQ(HDF_SUCCESS, manCallback_->ReadMmapPosition(streamId, frames, time));
+    manCallback_->callback_ = std::make_shared<MockIDAudioHdiCallback>();
+    EXPECT_EQ(HDF_SUCCESS, manCallback_->ReadMmapPosition(streamId, frames, time));
+}
+
+/**
+ * @tc.name: RefreshAshmemInfo_002
+ * @tc.desc: Verify the RefreshAshmemInfo function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(DAudioManagerCallbackTest, RefreshAshmemInfo_001, TestSize.Level1)
+{
+    int32_t streamId = 1;
+    int fd = 1;
+    int32_t ashmemLength = 240;
+    int32_t lengthPerTrans = 960;
+    EXPECT_EQ(HDF_SUCCESS, manCallback_->RefreshAshmemInfo(streamId, fd, ashmemLength, lengthPerTrans));
+    manCallback_->callback_ = std::make_shared<MockIDAudioHdiCallback>();
+    EXPECT_EQ(HDF_SUCCESS, manCallback_->RefreshAshmemInfo(streamId, fd, ashmemLength, lengthPerTrans));
 }
 } // DistributedHardware
 } // OHOS
