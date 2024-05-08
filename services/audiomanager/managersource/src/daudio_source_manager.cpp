@@ -218,6 +218,10 @@ int32_t DAudioSourceManager::DoEnableDAudio(const std::string &args)
         sourceDev = audioDevMap_[devId].dev;
     }
     DHLOGI("Call source dev to enable daudio.");
+    if (sourceDev == nullptr) {
+        DHLOGE("Source dev is nullptr.");
+        return ERR_DH_AUDIO_FAILED;
+    }
     int32_t result = sourceDev->EnableDAudio(dhId, attrs);
     return OnEnableDAudio(devId, dhId, result);
 }
