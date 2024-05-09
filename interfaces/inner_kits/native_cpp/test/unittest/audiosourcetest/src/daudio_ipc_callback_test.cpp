@@ -147,14 +147,23 @@ HWTEST_F(DAudioIpcCallbackTest, OnNotifyUnregResult_002, TestSize.Level1)
 HWTEST_F(DAudioIpcCallbackTest, OnNotifyUnregResult_003, TestSize.Level1)
 {
     size_t  DAUDIO_MAX_DEVICE_ID_LEN = 101;
+    size_t  DAUDIO_LEGAL_DEVICE_ID_LEN = 10;
     std::string devId ;
     devId.resize(DAUDIO_MAX_DEVICE_ID_LEN);
-    const std::string dhId = "dhId";
-    const std::string reqId = "reqId";
+    std::string dhId = "dhId";
+    std::string reqId = "reqId";
     int32_t status = 0;
     const std::string data = "data";
-    int32_t ret = dAudioIpcCallback_->OnNotifyUnregResult(devId, dhId, reqId, status, data);
-    EXPECT_EQ(ERR_DH_AUDIO_SA_DEVID_ILLEGAL, ret);
+    EXPECT_EQ(ERR_DH_AUDIO_SA_DEVID_ILLEGAL,
+        dAudioIpcCallback_->OnNotifyUnregResult(devId, dhId, reqId, status, data));
+    devId.resize(DAUDIO_LEGAL_DEVICE_ID_LEN);
+    dhId.resize(DAUDIO_MAX_DEVICE_ID_LEN);
+    EXPECT_EQ(ERR_DH_AUDIO_SA_DEVID_ILLEGAL,
+        dAudioIpcCallback_->OnNotifyUnregResult(devId, dhId, reqId, status, data));
+    dhId.resize(DAUDIO_LEGAL_DEVICE_ID_LEN);
+    reqId.resize(DAUDIO_MAX_DEVICE_ID_LEN);
+    EXPECT_EQ(ERR_DH_AUDIO_SA_DEVID_ILLEGAL,
+        dAudioIpcCallback_->OnNotifyUnregResult(devId, dhId, reqId, status, data));
 }
 
 /**
@@ -245,6 +254,30 @@ HWTEST_F(DAudioIpcCallbackTest, OnHardwareStateChanged_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: OnNotifyRegResult_002
+ * @tc.desc: Verify the OnNotifyRegResult function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioIpcCallbackTest, OnHardwareStateChanged_002, TestSize.Level1)
+{
+    std::string devId = "123";
+    std::string dhId = "1";
+    size_t DAUDIO_MAX_DEVICE_ID_LEN = 101;
+    size_t DAUDIO_LEGAL_DEVICE_ID_LEN = 10;
+    int32_t status = 0;
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, dAudioIpcCallback_->OnHardwareStateChanged(devId, dhId, status));
+    dAudioIpcCallback_->triggerListener_ = nullptr;
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, dAudioIpcCallback_->OnDataSyncTrigger(devId));
+    devId.resize(DAUDIO_MAX_DEVICE_ID_LEN);
+    EXPECT_EQ(ERR_DH_AUDIO_SA_DEVID_ILLEGAL, dAudioIpcCallback_->OnHardwareStateChanged(devId, dhId, status));
+    dhId.resize(DAUDIO_MAX_DEVICE_ID_LEN);
+    EXPECT_EQ(ERR_DH_AUDIO_SA_DEVID_ILLEGAL, dAudioIpcCallback_->OnHardwareStateChanged(devId, dhId, status));
+    devId.resize(DAUDIO_LEGAL_DEVICE_ID_LEN);
+    EXPECT_EQ(ERR_DH_AUDIO_SA_DEVID_ILLEGAL, dAudioIpcCallback_->OnHardwareStateChanged(devId, dhId, status));
+}
+
+/**
  * @tc.name: OnNotifyRegResult_001
  * @tc.desc: Verify the OnNotifyRegResult function.
  * @tc.type: FUNC
@@ -258,6 +291,24 @@ HWTEST_F(DAudioIpcCallbackTest, OnDataSyncTrigger_001, TestSize.Level1)
     int32_t ret = dAudioIpcCallback_->OnDataSyncTrigger(devId);
     dAudioIpcCallback_->UnRegisterTriggerListener();
     EXPECT_EQ(DH_SUCCESS, ret);
+}
+
+/**
+ * @tc.name: OnNotifyRegResult_002
+ * @tc.desc: Verify the OnNotifyRegResult function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioIpcCallbackTest, OnDataSyncTrigger_002, TestSize.Level1)
+{
+    size_t DAUDIO_MAX_DEVICE_ID_LEN = 101;
+    size_t DAUDIO_LEGAL_DEVICE_ID_LEN = 10;
+    std::string devId ;
+    devId.resize(DAUDIO_MAX_DEVICE_ID_LEN);
+    EXPECT_EQ(ERR_DH_AUDIO_SA_DEVID_ILLEGAL, dAudioIpcCallback_->OnDataSyncTrigger(devId));
+    devId.resize(DAUDIO_LEGAL_DEVICE_ID_LEN);
+    dAudioIpcCallback_->triggerListener_ = nullptr;
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, dAudioIpcCallback_->OnDataSyncTrigger(devId));
 }
 } // namespace DistributedHardware
 } // namespace OHOS
