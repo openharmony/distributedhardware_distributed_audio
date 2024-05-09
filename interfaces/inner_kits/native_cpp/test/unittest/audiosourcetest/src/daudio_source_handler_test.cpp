@@ -113,9 +113,10 @@ HWTEST_F(DAudioSourceHandlerTest, RegisterDistributedHardware_003, TestSize.Leve
 HWTEST_F(DAudioSourceHandlerTest, RegisterDistributedHardware_004, TestSize.Level1)
 {
     size_t DAUDIO_MAX_DEVICE_ID_LEN = 101;
+    size_t DAUDIO_LEGAL_DEVICE_ID_LEN = 10;
     std::string devId;
     devId.resize(DAUDIO_MAX_DEVICE_ID_LEN);
-    const std::string dhId = "dhId";
+    std::string dhId = "dhId";
     EnableParam param;
     param.sinkVersion = "1";
     param.sinkAttrs = "attrs";
@@ -125,6 +126,12 @@ HWTEST_F(DAudioSourceHandlerTest, RegisterDistributedHardware_004, TestSize.Leve
     int32_t ret = DAudioSourceHandler::GetInstance().RegisterDistributedHardware(devId, dhId, param, callback);
     EXPECT_EQ(ERR_DH_AUDIO_SA_DEVID_ILLEGAL, ret);
     std::shared_ptr<UnregisterCallback> uncallback = std::make_shared<UnregisterCallbackTest>();
+    ret = DAudioSourceHandler::GetInstance().UnregisterDistributedHardware(devId, dhId, uncallback);
+    EXPECT_EQ(ERR_DH_AUDIO_SA_DEVID_ILLEGAL, ret);
+    devId.resize(DAUDIO_LEGAL_DEVICE_ID_LEN);
+    dhId.resize(DAUDIO_MAX_DEVICE_ID_LEN);
+    ret = DAudioSourceHandler::GetInstance().RegisterDistributedHardware(devId, dhId, param, callback);
+    EXPECT_EQ(ERR_DH_AUDIO_SA_DEVID_ILLEGAL, ret);
     ret = DAudioSourceHandler::GetInstance().UnregisterDistributedHardware(devId, dhId, uncallback);
     EXPECT_EQ(ERR_DH_AUDIO_SA_DEVID_ILLEGAL, ret);
 }
@@ -186,10 +193,15 @@ HWTEST_F(DAudioSourceHandlerTest, ConfigDistributedHardware_002, TestSize.Level1
     std::string key = "key";
     std::string value = "value";
     size_t DAUDIO_MAX_DEVICE_ID_LEN = 101;
+    size_t DAUDIO_LEGAL_DEVICE_ID_LEN = 10;
     std::string devId;
     devId.resize(DAUDIO_MAX_DEVICE_ID_LEN);
     DAudioSourceHandler::GetInstance().dAudioSourceProxy_ = new MockIDAudioSource();
     int32_t ret = DAudioSourceHandler::GetInstance().ConfigDistributedHardware(devId, dhId, key, value);
+    EXPECT_EQ(ERR_DH_AUDIO_SA_DEVID_ILLEGAL, ret);
+    devId.resize(DAUDIO_LEGAL_DEVICE_ID_LEN);
+    dhId.resize(DAUDIO_MAX_DEVICE_ID_LEN);
+    ret = DAudioSourceHandler::GetInstance().ConfigDistributedHardware(devId, dhId, key, value);
     EXPECT_EQ(ERR_DH_AUDIO_SA_DEVID_ILLEGAL, ret);
 }
 

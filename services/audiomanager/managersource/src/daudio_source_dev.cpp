@@ -119,11 +119,7 @@ int32_t DAudioSourceDev::EnableDAudio(const std::string &dhId, const std::string
     cJSON_AddStringToObject(jParam, KEY_DH_ID, dhId.c_str());
     cJSON_AddStringToObject(jParam, KEY_ATTRS, attrs.c_str());
     char *jsonString = cJSON_PrintUnformatted(jParam);
-    if (jsonString == nullptr) {
-        DHLOGE("Failed to create JSON data");
-        cJSON_Delete(jParam);
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_FREE_RETURN(jsonString, ERR_DH_AUDIO_NULLPTR, jParam);
     auto eventParam = std::make_shared<std::string>(jsonString);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_DAUDIO_ENABLE, eventParam, 0);
     if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
@@ -146,11 +142,7 @@ int32_t DAudioSourceDev::DisableDAudioInner(const std::string &dhId)
     cJSON_AddStringToObject(jParam, KEY_DEV_ID, devId_.c_str());
     cJSON_AddStringToObject(jParam, KEY_DH_ID, dhId.c_str());
     char *jsonString = cJSON_PrintUnformatted(jParam);
-    if (jsonString == nullptr) {
-        DHLOGE("Failed to create JSON data");
-        cJSON_Delete(jParam);
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_FREE_RETURN(jsonString, ERR_DH_AUDIO_NULLPTR, jParam);
     auto eventParam = std::make_shared<std::string>(jsonString);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_DAUDIO_DISABLE, eventParam, 0);
     if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
@@ -173,11 +165,7 @@ int32_t DAudioSourceDev::DisableDAudio(const std::string &dhId)
     CHECK_NULL_RETURN(jParamClose, ERR_DH_AUDIO_NULLPTR);
     cJSON_AddStringToObject(jParamClose, KEY_DH_ID, dhId.c_str());
     char *data = cJSON_PrintUnformatted(jParamClose);
-    if (data == nullptr) {
-        DHLOGE("Failed to create JSON data.");
-        cJSON_Delete(jParamClose);
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_FREE_RETURN(data, ERR_DH_AUDIO_NULLPTR, jParamClose);
     AudioEvent event(AudioEventType::EVENT_UNKNOWN, std::string(data));
     int32_t dhIdNum = ConvertString2Int(dhId);
     CHECK_AND_FREECHAR_RETURN_RET_LOG(dhIdNum == ERR_DH_AUDIO_FAILED, ERR_DH_AUDIO_NOT_SUPPORT, data,
@@ -214,11 +202,7 @@ int32_t DAudioSourceDev::RestoreThreadStatus()
     cJSON *jParam = cJSON_CreateObject();
     CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
     char *jsonString = cJSON_PrintUnformatted(jParam);
-    if (jsonString == nullptr) {
-        DHLOGE("Failed to create JSON data");
-        cJSON_Delete(jParam);
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_FREE_RETURN(jsonString, ERR_DH_AUDIO_NULLPTR, jParam);
     auto eventParam = std::make_shared<std::string>(jsonString);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_SET_THREAD_STATUS, eventParam, 0);
     if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
@@ -578,17 +562,10 @@ int32_t DAudioSourceDev::TaskEnableDAudio(const std::string &args)
         return ERR_DH_AUDIO_SA_PARAM_INVALID;
     }
     int32_t dhId = ParseDhidFromEvent(args);
-    if (dhId == ERR_DH_AUDIO_FAILED) {
-        DHLOGE("Parse dhId error.");
-        cJSON_Delete(jParam);
-        return ERR_DH_AUDIO_NOT_SUPPORT;
-    }
+    CHECK_AND_FREE_RETURN_RET_LOG(dhId == ERR_DH_AUDIO_FAILED, ERR_DH_AUDIO_NOT_SUPPORT,
+        jParam, "%{public}s", "Parse dhId error.");
     char *attrs = cJSON_PrintUnformatted(cJSON_GetObjectItem(jParam, KEY_ATTRS));
-    if (attrs == nullptr) {
-        DHLOGE("Failed to create JSON data");
-        cJSON_Delete(jParam);
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_FREE_RETURN(attrs, ERR_DH_AUDIO_NULLPTR, jParam);
     std::string attrsStr(attrs);
     int32_t result = 0;
     switch (GetDevTypeByDHId(dhId)) {

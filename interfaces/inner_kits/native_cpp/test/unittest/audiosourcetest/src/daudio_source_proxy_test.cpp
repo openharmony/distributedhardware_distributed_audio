@@ -92,6 +92,36 @@ HWTEST_F(DAudioSourceProxyTest, RegisterDistributedHardware_002, TestSize.Level1
 }
 
 /**
+ * @tc.name: RegisterDistributedHardware_003
+ * @tc.desc: Verify the RegisterDistributedHardware function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceProxyTest, RegisterDistributedHardware_003, TestSize.Level1)
+{
+    size_t DAUDIO_MAX_DEVICE_ID_LEN = 101;
+    size_t DAUDIO_LEGAL_DEVICE_ID_LEN = 10;
+    std::string devId;
+    devId.resize(DAUDIO_LEGAL_DEVICE_ID_LEN);
+    std::string dhId;
+    dhId.resize(DAUDIO_MAX_DEVICE_ID_LEN);
+    std::string reqId = "reqId";
+    EnableParam param;
+    param.sinkVersion = "1";
+    param.sinkAttrs = "attrs";
+
+    int32_t ret = dAudioProxy->RegisterDistributedHardware(devId, dhId, param, reqId);
+    EXPECT_EQ(ERR_DH_AUDIO_SA_DEVID_ILLEGAL, ret);
+    ret = dAudioProxy->UnregisterDistributedHardware(devId, dhId, reqId);
+    EXPECT_EQ(ERR_DH_AUDIO_SA_DEVID_ILLEGAL, ret);
+    dhId.resize(DAUDIO_LEGAL_DEVICE_ID_LEN);
+    reqId.resize(DAUDIO_MAX_DEVICE_ID_LEN);
+    ret = dAudioProxy->RegisterDistributedHardware(devId, dhId, param, reqId);
+    EXPECT_EQ(ERR_DH_AUDIO_SA_DEVID_ILLEGAL, ret);
+    ret = dAudioProxy->UnregisterDistributedHardware(devId, dhId, reqId);
+}
+
+/**
  * @tc.name: ConfigDistributedHardware_001
  * @tc.desc: Verify the ConfigDistributedHardware function.
  * @tc.type: FUNC
@@ -103,11 +133,9 @@ HWTEST_F(DAudioSourceProxyTest, ConfigDistributedHardware_001, TestSize.Level1)
     const std::string dhId = "dhId";
     const std::string key = "value";
     const std::string value = "value";
-    const int32_t eventType = 1;
 
     int32_t ret = dAudioProxy->ConfigDistributedHardware(devId, dhId, key, value);
     EXPECT_EQ(DH_SUCCESS, ret);
-    dAudioProxy->DAudioNotify(devId, dhId, eventType, value);
 }
 
 /**
@@ -118,14 +146,21 @@ HWTEST_F(DAudioSourceProxyTest, ConfigDistributedHardware_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceProxyTest, ConfigDistributedHardware_002, TestSize.Level1)
 {
-    size_t  DAUDIO_MAX_DEVICE_ID_LEN = 101;
+    size_t DAUDIO_MAX_DEVICE_ID_LEN = 101;
+    size_t DAUDIO_LEGAL_DEVICE_ID_LEN = 10;
+    const int32_t eventType = 1;
     std::string devId;
     devId.resize(DAUDIO_MAX_DEVICE_ID_LEN);
-    const std::string dhId = "dhId";
+    std::string dhId = "dhId";
     const std::string key = "value";
     const std::string value = "value";
-
+    dAudioProxy->DAudioNotify(devId, dhId, eventType, value);
     int32_t ret = dAudioProxy->ConfigDistributedHardware(devId, dhId, key, value);
+    EXPECT_EQ(ERR_DH_AUDIO_SA_DEVID_ILLEGAL, ret);
+    devId.resize(DAUDIO_LEGAL_DEVICE_ID_LEN);
+    dhId.resize(DAUDIO_MAX_DEVICE_ID_LEN);
+    dAudioProxy->DAudioNotify(devId, dhId, eventType, value);
+    ret = dAudioProxy->ConfigDistributedHardware(devId, dhId, key, value);
     EXPECT_EQ(ERR_DH_AUDIO_SA_DEVID_ILLEGAL, ret);
 }
 } // namespace DistributedHardware
