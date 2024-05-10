@@ -162,7 +162,7 @@ int32_t DSpeakerClient::SetUp(const AudioParam &param)
         DHLOGE("Speaker trans start failed.");
         return ret;
     }
-    auto pid = getpid();
+    auto pid = getprocpid();
     ret = AudioStandard::AudioSystemManager::GetInstance()->RegisterVolumeKeyEventCallback(pid, shared_from_this());
     if (ret != DH_SUCCESS) {
         DHLOGE("Failed to register volume key event callback.");
@@ -193,7 +193,7 @@ int32_t DSpeakerClient::Release()
         speakerTrans_ = nullptr;
     }
 
-    int32_t ret = AudioStandard::AudioSystemManager::GetInstance()->UnregisterVolumeKeyEventCallback(getpid());
+    int32_t ret = AudioStandard::AudioSystemManager::GetInstance()->UnregisterVolumeKeyEventCallback(getprocpid());
     if (ret != DH_SUCCESS) {
         DHLOGE("Failed to unregister volume key event callback, error code %{public}d.", ret);
         isSucess = false;
