@@ -37,6 +37,12 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+enum DaudioBusinessState : int32_t {
+    UNKNOWN,
+    IDLE,
+    RUNNING,
+    PAUSING
+};
 class DAudioSourceDev : public IAudioEventCallback, public std::enable_shared_from_this<DAudioSourceDev> {
 public:
     DAudioSourceDev(const std::string &devId, const std::shared_ptr<DAudioSourceMgrCallback> &callback);
@@ -76,6 +82,8 @@ private:
     int32_t TaskSpkMmapStop(const std::string &args);
     int32_t TaskMicMmapStart(const std::string &args);
     int32_t TaskMicMmapStop(const std::string &args);
+    void NotifyFwkRunning(const std::string &devId, const std::string &dhId);
+    void NotifyFwkIdle(const std::string &devId, const std::string &dhId);
 
     void OnDisableTaskResult(int32_t resultCode, const std::string &result, const std::string &funcName);
     void OnEnableTaskResult(int32_t resultCode, const std::string &result, const std::string &funcName);
