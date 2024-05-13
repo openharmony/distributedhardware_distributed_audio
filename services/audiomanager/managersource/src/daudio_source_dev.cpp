@@ -48,7 +48,6 @@ constexpr uint32_t EVENT_MMAP_MIC_START = 83;
 constexpr uint32_t EVENT_MMAP_MIC_STOP = 84;
 constexpr uint32_t EVENT_DAUDIO_ENABLE = 88;
 constexpr uint32_t EVENT_DAUDIO_DISABLE = 89;
-constexpr uint32_t EVENT_SET_THREAD_STATUS = 90;
 }
 
 DAudioSourceDev::DAudioSourceDev(const std::string &devId, const std::shared_ptr<DAudioSourceMgrCallback> &callback)
@@ -196,34 +195,14 @@ int32_t DAudioSourceDev::DisableDAudio(const std::string &dhId)
     return DH_SUCCESS;
 }
 
-int32_t DAudioSourceDev::RestoreThreadStatus()
-{
-    CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
-    cJSON *jParam = cJSON_CreateObject();
-    CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
-    char *jsonString = cJSON_PrintUnformatted(jParam);
-    CHECK_NULL_FREE_RETURN(jsonString, ERR_DH_AUDIO_NULLPTR, jParam);
-    auto eventParam = std::make_shared<std::string>(jsonString);
-    auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_SET_THREAD_STATUS, eventParam, 0);
-    if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
-        DHLOGE("Send event failed.");
-        cJSON_Delete(jParam);
-        cJSON_free(jsonString);
-        return ERR_DH_AUDIO_FAILED;
-    }
-    cJSON_Delete(jParam);
-    cJSON_free(jsonString);
-    return DH_SUCCESS;
-}
-
 bool DAudioSourceDev::GetThreadStatusFlag()
 {
     return threadStatusFlag_;
 }
 
-void DAudioSourceDev::SetThreadStatusFlag()
+void DAudioSourceDev::SetThreadStatusFlag(bool flag)
 {
-    threadStatusFlag_ = false;
+    threadStatusFlag_ = flag;
 }
 
 void DAudioSourceDev::NotifyEvent(const AudioEvent &event)
@@ -1268,7 +1247,6 @@ DAudioSourceDev::SourceEventHandler::SourceEventHandler(const std::shared_ptr<Ap
     mapEventFuncs_[EVENT_MMAP_SPK_STOP] = &DAudioSourceDev::SourceEventHandler::SpkMmapStopCallback;
     mapEventFuncs_[EVENT_MMAP_MIC_START] = &DAudioSourceDev::SourceEventHandler::MicMmapStartCallback;
     mapEventFuncs_[EVENT_MMAP_MIC_STOP] = &DAudioSourceDev::SourceEventHandler::MicMmapStopCallback;
-    mapEventFuncs_[EVENT_SET_THREAD_STATUS] = &DAudioSourceDev::SourceEventHandler::SetThreadStatusFlagTrue;
 }
 
 DAudioSourceDev::SourceEventHandler::~SourceEventHandler() {}
@@ -1530,14 +1508,6 @@ void DAudioSourceDev::SourceEventHandler::MicMmapStopCallback(const AppExecFwk::
         return;
     }
     DHLOGI("Stop mic with mmap mode successfully.");
-}
-
-void DAudioSourceDev::SourceEventHandler::SetThreadStatusFlagTrue(const AppExecFwk::InnerEvent::Pointer &event)
-{
-    (void) event;
-    auto sourceDevObj = sourceDev_.lock();
-    CHECK_NULL_VOID(sourceDevObj);
-    sourceDevObj->threadStatusFlag_ = true;
 }
 
 int32_t DAudioSourceDev::SourceEventHandler::GetEventParam(const AppExecFwk::InnerEvent::Pointer &event,

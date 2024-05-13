@@ -466,7 +466,7 @@ void DAudioSourceManager::RestoreThreadStatus()
     if (!audioDevMap_.empty()) {
         for (auto &iter : audioDevMap_) {
             CHECK_NULL_VOID(iter.second.dev);
-            iter.second.dev->RestoreThreadStatus();
+            iter.second.dev->SetThreadStatusFlag(true);
         }
     }
 }
@@ -476,13 +476,11 @@ void DAudioSourceManager::ListenAudioDev()
     auto taskFunc = [this]() {
         std::lock_guard<std::mutex> lock(devMapMtx_);
         for (auto &iter : audioDevMap_) {
-            if (iter.second.dev == nullptr) {
-                continue;
-            }
+            CHECK_NULL_VOID(iter.second.dev);
             if (iter.second.dev->GetThreadStatusFlag()) {
-                iter.second.dev->SetThreadStatusFlag();
+                iter.second.dev->SetThreadStatusFlag(false);
             } else {
-                DHLOGE("Exit the current proces");
+                DHLOGE("Exit the current process hicollie");
                 _Exit(0);
             }
         }
