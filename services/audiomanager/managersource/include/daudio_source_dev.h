@@ -47,8 +47,7 @@ public:
 
     int32_t EnableDAudio(const std::string &dhId, const std::string &attrs);
     int32_t DisableDAudio(const std::string &dhId);
-    int32_t RestoreThreadStatus();
-    void SetThreadStatusFlag();
+    void SetThreadStatusFlag(bool flag);
     bool GetThreadStatusFlag();
     void NotifyEvent(const AudioEvent &event) override;
 
@@ -163,7 +162,6 @@ private:
         void SpkMmapStopCallback(const AppExecFwk::InnerEvent::Pointer &event);
         void MicMmapStartCallback(const AppExecFwk::InnerEvent::Pointer &event);
         void MicMmapStopCallback(const AppExecFwk::InnerEvent::Pointer &event);
-        void SetThreadStatusFlagTrue(const AppExecFwk::InnerEvent::Pointer &event);
         int32_t GetEventParam(const AppExecFwk::InnerEvent::Pointer &event, std::string &eventParam);
 
     private:
