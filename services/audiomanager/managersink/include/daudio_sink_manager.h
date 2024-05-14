@@ -73,6 +73,7 @@ private:
     int32_t GetDeviceSecurityLevel(const std::string &udid);
     std::string GetUdidByNetworkId(const std::string &networkId);
     int32_t VerifySecurityLevel(const std::string &devId);
+    int32_t InitAudioDevice(std::shared_ptr<DAudioSinkDev> dev, const std::string &devId, bool isSpkOrMic);
 
 private:
     static constexpr const char* DEVCLEAR_THREAD = "sinkClearTh";

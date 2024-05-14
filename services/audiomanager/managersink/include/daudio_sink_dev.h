@@ -81,6 +81,7 @@ private:
     int32_t GetParamValue(const cJSON *j, const char* key, int32_t &value);
     int32_t GetCJsonObjectItems(const cJSON *j, AudioParam &audioParam);
     int32_t ParseDhidFromEvent(std::string args);
+    int32_t ParseResultFromEvent(std::string args);
     int32_t ConvertString2Int(std::string val);
 
 private:

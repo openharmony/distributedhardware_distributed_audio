@@ -53,8 +53,7 @@ public:
 
     int32_t EnableDAudio(const std::string &dhId, const std::string &attrs);
     int32_t DisableDAudio(const std::string &dhId);
-    int32_t RestoreThreadStatus();
-    void SetThreadStatusFlag();
+    void SetThreadStatusFlag(bool flag);
     bool GetThreadStatusFlag();
     void NotifyEvent(const AudioEvent &event) override;
 
@@ -120,6 +119,7 @@ private:
     std::shared_ptr<DAudioIoDev> FindIoDevImpl(std::string args);
     int32_t ParseDhidFromEvent(std::string args);
     int32_t ConvertString2Int(std::string val);
+    int32_t CreateMicEngine(std::shared_ptr<DAudioIoDev> mic);
 
 private:
     static constexpr uint8_t RPC_WAIT_SECONDS = 10;
@@ -171,7 +171,6 @@ private:
         void SpkMmapStopCallback(const AppExecFwk::InnerEvent::Pointer &event);
         void MicMmapStartCallback(const AppExecFwk::InnerEvent::Pointer &event);
         void MicMmapStopCallback(const AppExecFwk::InnerEvent::Pointer &event);
-        void SetThreadStatusFlagTrue(const AppExecFwk::InnerEvent::Pointer &event);
         int32_t GetEventParam(const AppExecFwk::InnerEvent::Pointer &event, std::string &eventParam);
 
     private:
