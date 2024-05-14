@@ -57,7 +57,17 @@ void DMicDev::OnEngineTransMessage(const std::shared_ptr<AVTransMessage> &messag
 void DMicDev::OnEngineTransDataAvailable(const std::shared_ptr<AudioData> &audioData)
 {
     DHLOGD("On Engine Data available");
-    OnDecodeTransDataDone(audioData);
+    if (echoCannelOn_) {
+#ifdef ECHO_CANNEL_ENABLE
+        if (echoManager_ == nullptr) {
+            DHLOGE("Echo manager is nullptr.");
+            return;
+        }
+        echoManager_->OnMicDataReceived(audioData);
+#endif
+    } else {
+        OnDecodeTransDataDone(audioData);
+    }
 }
 
 int32_t DMicDev::InitReceiverEngine(IAVEngineProvider *providerPtr)
@@ -216,6 +226,20 @@ int32_t DMicDev::SetUp()
         DHLOGE("Mic trans set up failed. ret: %{public}d.", ret);
         return ret;
     }
+    echoCannelOn_ = false;
+#ifdef ECHO_CANNEL_ENABLE
+    if (echoCannelOn_ && echoManager_ == nullptr) {
+        echoManager_ = std::make_shared<DAudioEchoCannelManager>();
+    }
+    AudioCommonParam info;
+    info.sampleRate = param_.comParam.sampleRate;
+    info.channelMask = param_.comParam.channelMask;
+    info.bitFormat = param_.comParam.bitFormat;
+    info.frameSize = param_.comParam.frameSize;
+    if (echoManager_ != nullptr) {
+        echoManager_->SetUp(info, shared_from_this());
+    }
+#endif
     return DH_SUCCESS;
 }
 
@@ -235,6 +259,14 @@ int32_t DMicDev::Start()
         DHLOGE("Wait channel open timeout(%{public}ds).", CHANNEL_WAIT_SECONDS);
         return ERR_DH_AUDIO_SA_WAIT_TIMEOUT;
     }
+#ifdef ECHO_CANNEL_ENABLE
+    CHECK_NULL_RETURN(echoManager_, DH_SUCCESS);
+    ret = echoManager_->Start();
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Echo manager start failed. ret: %d.", ret);
+        return ret;
+    }
+#endif
     isOpened_.store(true);
     return DH_SUCCESS;
 }
@@ -261,6 +293,14 @@ int32_t DMicDev::Stop()
     if (ret != DH_SUCCESS) {
         DHLOGE("Stop mic trans failed, ret: %{public}d.", ret);
     }
+#ifdef ECHO_CANNEL_ENABLE
+    CHECK_NULL_RETURN(echoManager_, DH_SUCCESS);
+    ret = echoManager_->Stop();
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Echo manager stop failed. ret: %d.", ret);
+        return ret;
+    }
+#endif
     return DH_SUCCESS;
 }
 
@@ -280,6 +320,12 @@ int32_t DMicDev::Release()
         DHLOGE("Release mic trans failed, ret: %{public}d.", ret);
         return ret;
     }
+#ifdef ECHO_CANNEL_ENABLE
+    if (echoManager_ != nullptr) {
+        echoManager_->Release();
+        echoManager_ = nullptr;
+    }
+#endif
     dumpFlag_.store(false);
     return DH_SUCCESS;
 }

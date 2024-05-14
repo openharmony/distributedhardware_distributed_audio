@@ -51,6 +51,11 @@ ohos_shared_library("distributed_audio_source") {
     "${services_path}/audiomanager/common/include",
   ]
 
+  if (distributed_audio_extension_sa) {
+    include_dirs +=
+        [ "${distributedaudio_ext_path}/services/aeceffectprocessor/include" ]
+  }
+
   sources = [
     "${audio_control_path}/controlsource/src/daudio_source_dev_ctrl_manager.cpp",
     "${audio_hdi_proxy_path}/src/daudio_hdf_operate.cpp",
@@ -69,6 +74,10 @@ ohos_shared_library("distributed_audio_source") {
     "src/daudio_source_stub.cpp",
   ]
 
+  if (distributed_audio_extension_sa) {
+    sources += [ "${services_path}/audiomanager/managersource/src/daudio_echo_cannel_manager.cpp" ]
+  }
+
   deps = [
     "${audio_transport_path}/receiverengine:distributed_audio_decode_transport",
     "${audio_transport_path}/senderengine:distributed_audio_encode_transport",
@@ -80,6 +89,7 @@ ohos_shared_library("distributed_audio_source") {
     "access_token:libaccesstoken_sdk",
     "access_token:libtokenid_sdk",
     "audio_framework:audio_capturer",
+    "audio_framework:audio_client",
     "audio_framework:audio_renderer",
     "cJSON:cjson",
     "c_utils:utils",
@@ -100,6 +110,18 @@ ohos_shared_library("distributed_audio_source") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
+
+  cflags = []
+
+  if (distributed_audio_extension_sa) {
+    external_deps += [
+      "distributed_audio_ext:daudio_aec_effect_processor",
+      "distributed_audio_ext:distributed_audio_ext_utils",
+    ]
+    cflags += [ "-DECHO_CANNEL_ENABLE" ]
+  }
+
+  cflags_cc = cflags
 
   defines = [
     "HI_LOG_ENABLE",

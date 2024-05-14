@@ -93,6 +93,7 @@ ohos_unittest("DMicDevTest") {
   deps = [
     "${audio_transport_path}/receiverengine:distributed_audio_decode_transport",
     "${services_path}/audiomanager/servicesource:distributed_audio_source",
+    "${services_path}/common:distributed_audio_utils",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
   ]
@@ -119,6 +120,7 @@ ohos_unittest("DSpeakerDevTest") {
   deps = [
     "${audio_transport_path}/senderengine:distributed_audio_encode_transport",
     "${services_path}/audiomanager/servicesource:distributed_audio_source",
+    "${services_path}/common:distributed_audio_utils",
     "//third_party/googletest:gmock",
     "//third_party/googletest:gtest_main",
   ]

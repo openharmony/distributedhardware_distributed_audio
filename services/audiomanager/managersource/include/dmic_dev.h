@@ -26,6 +26,9 @@
 #include "av_receiver_engine_transport.h"
 #include "ashmem.h"
 #include "daudio_constants.h"
+#ifdef ECHO_CANNEL_ENABLE
+#include "daudio_echo_cannel_manager.h"
+#endif
 #include "daudio_hdi_handler.h"
 #include "daudio_io_dev.h"
 #include "iaudio_data_transport.h"
@@ -106,6 +109,9 @@ private:
     std::atomic<bool> isOpened_ = false;
     std::atomic<bool> dumpFlag_ = false;
     std::shared_ptr<IAudioDataTransport> micTrans_ = nullptr;
+#ifdef ECHO_CANNEL_ENABLE
+    std::shared_ptr<DAudioEchoCannelManager> echoManager_ = nullptr;
+#endif
     std::queue<std::shared_ptr<AudioData>> dataQueue_;
     AudioStatus curStatus_ = AudioStatus::STATUS_IDLE;
     // Mic capture parameters
@@ -130,6 +136,7 @@ private:
     std::mutex writeAshmemMutex_;
     std::condition_variable dataQueueCond_;
     int32_t dhId_ = -1;
+    bool echoCannelOn_ = false;
 };
 } // DistributedHardware
 } // OHOS

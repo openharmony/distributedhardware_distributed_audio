@@ -52,7 +52,6 @@ ohos_shared_library("distributed_audio_encode_transport") {
     "${audio_processor_path}/directprocessor/src/audio_direct_processor.cpp",
     "${audio_transport_path}/senderengine/src/av_sender_engine_adapter.cpp",
     "${audio_transport_path}/senderengine/src/av_sender_engine_transport.cpp",
-    "${services_path}/common/audiodata/src/audio_data.cpp",
   ]
 
   deps = [ "${services_path}/common:distributed_audio_utils" ]
