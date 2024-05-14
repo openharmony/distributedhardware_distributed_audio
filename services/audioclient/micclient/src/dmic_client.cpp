@@ -169,7 +169,7 @@ int32_t DMicClient::SendMessage(uint32_t type, std::string content, std::string 
         type != static_cast<uint32_t>(NOTIFY_CLOSE_MIC_RESULT) &&
         type != static_cast<uint32_t>(CLOSE_MIC)) {
         DHLOGE("event type is not NOTIFY_OPEN_MIC or NOTIFY_CLOSE_MIC or"
-        "CLOSE_MIC or OPEN_CTRL. type: %{public}u", type);
+            "CLOSE_MIC or OPEN_CTRL. type: %{public}u", type);
         return ERR_DH_AUDIO_NULLPTR;
     }
     CHECK_NULL_RETURN(micTrans_, ERR_DH_AUDIO_NULLPTR);

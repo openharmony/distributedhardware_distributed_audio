@@ -223,7 +223,7 @@ int32_t DAudioSinkManager::InitAudioDevice(std::shared_ptr<DAudioSinkDev> dev, c
             DHLOGE("Verify security level failed.");
             return ERR_DH_AUDIO_FAILED;
         }
-        SetDevLevelStatus(true);
+        dev->SetDevLevelStatus(true);
         ret = dev->InitAVTransEngines(ChannelState::MIC_CONTROL_OPENED, sendProviderPtr_);
     }
     if (ret != DH_SUCCESS) {
