@@ -127,6 +127,19 @@ HWTEST_F(DAudioSinkManagerTest, CreateAudioDevice_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: InitAudioDevice_001
+ * @tc.desc: Verify the InitAudioDevice function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkDevTest, InitAudioDevice_001, TestSize.Level1)
+{
+    std::string devId = "1";
+    EXPECT_NE(DH_SUCCESS, daudioSinkManager.InitAudioDevice(devId, true));
+    EXPECT_NE(DH_SUCCESS, daudioSinkManager.InitAudioDevice(devId, false));
+}
+
+/**
  * @tc.name: LoadAVSenderEngineProvider_001
  * @tc.desc: Verify the LoadAVSenderEngineProvider function.
  * @tc.type: FUNC

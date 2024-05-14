@@ -211,6 +211,23 @@ HWTEST_F(DAudioSinkDevTest, ParseDhidFromEvent_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: ParseResultFromEvent_001
+ * @tc.desc: Verify the ParseResultFromEvent function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkDevTest, ParseResultFromEvent_001, TestSize.Level1)
+{
+    std::string args = "{\"result\":\"0\"}";
+    EXPECT_EQ(DH_SUCCESS, sinkDev_->ParseResultFromEvent(args));
+    args = "{\"result\":\"-40001\"}";
+    EXPECT_EQ(-40001, sinkDev_->ParseResultFromEvent(args));
+    std::string dhIdArgs = "{\"result\": 1 }";
+    EXPECT_NE(DH_SUCCESS, sinkDev_->ParseResultFromEvent(dhIdArgs));
+}
+
+
+/**
  * @tc.name: TaskStartRender_001
  * @tc.desc: Verify the TaskStartRender function.
  * @tc.type: FUNC

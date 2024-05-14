@@ -703,7 +703,6 @@ int32_t DAudioSourceDev::TaskOpenDSpeaker(const std::string &args)
     }
     int32_t dhId = ParseDhidFromEvent(args);
     if (dhId < 0) {
-        DHLOGE("Failed to parse dhardware id.");
         return ERR_DH_AUDIO_FAILED;
     }
     auto speaker = FindIoDevImpl(args);
@@ -715,6 +714,13 @@ int32_t DAudioSourceDev::TaskOpenDSpeaker(const std::string &args)
     int32_t ret = speaker->InitSenderEngine(DAudioSourceManager::GetInstance().getSenderProvider());
     if (ret != DH_SUCCESS) {
         DHLOGE("Speaker init sender Engine, error code %{public}d.", ret);
+        NotifyHDF(NOTIFY_OPEN_SPEAKER_RESULT, HDF_EVENT_INIT_ENGINE_FAILED, dhId);
+        return ret;
+    }
+
+    ret = WaitForRPC(NOTIFY_OPEN_CTRL_RESULT);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Speaker init sender engine, create ctrl error.");
         NotifyHDF(NOTIFY_OPEN_SPEAKER_RESULT, HDF_EVENT_INIT_ENGINE_FAILED, dhId);
         return ret;
     }
@@ -845,6 +851,30 @@ int32_t DAudioSourceDev::TaskCloseDSpeaker(const std::string &args)
     return DH_SUCCESS;
 }
 
+int32_t DAudioSourceDev::CreateMicEngine(std::shared_ptr<DMicDev> mic)
+{
+    if (mic == nullptr) {
+        DHLOGE("Mic device not init");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    int32_t ret = mic->InitReceiverEngine(DAudioSourceManager::GetInstance().getReceiverProvider());
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Init receiver engine failed.");
+        return ret;
+    }
+    ret = WaitForRPC(NOTIFY_OPEN_CTRL_RESULT);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Mic init sender engine, create ctrl error.");
+        return ret;
+    }
+    ret = mic->SetUp();
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Mic setup failed.");
+        return ret;
+    }
+    return DH_SUCCESS;
+}
+
 int32_t DAudioSourceDev::TaskOpenDMic(const std::string &args)
 {
     DHLOGI("Task open mic, args: %{public}s.", args.c_str());
@@ -859,16 +889,10 @@ int32_t DAudioSourceDev::TaskOpenDMic(const std::string &args)
         NotifyHDF(NOTIFY_OPEN_MIC_RESULT, HDF_EVENT_RESULT_FAILED, dhId);
         return ERR_DH_AUDIO_NULLPTR;
     }
-    int32_t ret = mic->InitReceiverEngine(DAudioSourceManager::GetInstance().getReceiverProvider());
+    int32_t ret = CreateMicEngine(mic);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Init receiver engine failed.");
+        DHLOGE("Create mic engine failed.");
         NotifyHDF(NOTIFY_OPEN_MIC_RESULT, HDF_EVENT_INIT_ENGINE_FAILED, dhId);
-        return ret;
-    }
-    ret = mic->SetUp();
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Mic setup failed.");
-        NotifyHDF(NOTIFY_OPEN_MIC_RESULT, HDF_EVENT_TRANS_SETUP_FAILED, dhId);
         return ret;
     }
 
@@ -1144,7 +1168,7 @@ int32_t DAudioSourceDev::NotifySinkDev(const AudioEventType type, const cJSON *P
     cJSON *jParamCopy = cJSON_Duplicate(Param, 1);
     cJSON_AddItemToObject(jParam, KEY_AUDIO_PARAM, jParamCopy);
     cJSON_AddStringToObject(jParam, KEY_RANDOM_TASK_CODE, std::to_string(randomTaskCode).c_str());
-    DHLOGD("Notify sink dev, new engine, random task code:%{public}s", std::to_string(randomTaskCode).c_str());
+    DHLOGI("Notify sink dev, new engine, random task code:%{public}s", std::to_string(randomTaskCode).c_str());
 
     std::lock_guard<std::mutex> devLck(ioDevMtx_);
     int32_t dhIdInt = ConvertString2Int(dhId);
