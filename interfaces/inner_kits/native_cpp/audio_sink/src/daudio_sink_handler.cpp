@@ -118,7 +118,7 @@ int32_t DAudioSinkHandler::UnsubscribeLocalHardware(const std::string &dhId)
 
 void DAudioSinkHandler::OnRemoteSinkSvrDied(const wptr<IRemoteObject> &remote)
 {
-    DHLOGD("The daudio service of sink device died.");
+    DHLOGI("The daudio service of sink device died.");
     sptr<IRemoteObject> remoteObject = remote.promote();
     CHECK_NULL_VOID(remoteObject);
 
@@ -131,7 +131,7 @@ void DAudioSinkHandler::OnRemoteSinkSvrDied(const wptr<IRemoteObject> &remote)
 
 void DAudioSinkHandler::FinishStartSA(const std::string &param, const sptr<IRemoteObject> &remoteObject)
 {
-    DHLOGD("Finish start SA.");
+    DHLOGI("Finish start SA.");
     std::lock_guard<std::mutex> lock(sinkProxyMutex_);
     remoteObject->AddDeathRecipient(sinkSvrRecipient_);
     dAudioSinkProxy_ = iface_cast<IDAudioSink>(remoteObject);

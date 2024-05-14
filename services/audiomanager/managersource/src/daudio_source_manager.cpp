@@ -463,6 +463,7 @@ void DAudioSourceManager::ClearAudioDev(const std::string &devId)
 
 void DAudioSourceManager::RestoreThreadStatus()
 {
+    std::lock_guard<std::mutex> lock(devMapMtx_);
     if (!audioDevMap_.empty()) {
         for (auto &iter : audioDevMap_) {
             CHECK_NULL_VOID(iter.second.dev);

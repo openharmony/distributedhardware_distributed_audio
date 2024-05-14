@@ -202,6 +202,29 @@ int32_t DAudioSinkDev::ParseDhidFromEvent(std::string args)
     return dhId;
 }
 
+int32_t DAudioSinkDev::ParseResultFromEvent(std::string args)
+{
+    DHLOGI("ParseResultFrom args : %{public}s", args.c_str());
+    cJSON *jParam = cJSON_Parse(args.c_str());
+    CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_FAILED);
+
+    if (!CJsonParamCheck(jParam, { KEY_RESULT })) {
+        DHLOGE("Not found the keys of result.");
+        cJSON_Delete(jParam);
+        return -1;
+    }
+    cJSON *retItem = cJSON_GetObjectItem(jParam, KEY_RESULT);
+    if (retItem == NULL || !cJSON_IsNumber(retItem)) {
+        DHLOGE("Not found the keys of result.");
+        cJSON_Delete(jParam);
+        return ERR_DH_AUDIO_FAILED;
+    }
+    int32_t ret = retItem->valueint;
+    cJSON_Delete(jParam);
+    DHLOGI("Parsed result is: %{public}d.", ret);
+    return ret;
+}
+
 int32_t DAudioSinkDev::TaskStartRender(const std::string &args)
 {
     int32_t dhId = ParseDhidFromEvent(args);
@@ -440,6 +463,7 @@ void DAudioSinkDev::JudgeDeviceStatus()
 
 void DAudioSinkDev::SetDevLevelStatus(bool checkStatus)
 {
+    // todo 这里改为atomic
     isDevLevelStatus_ = checkStatus;
 }
 
@@ -472,12 +496,7 @@ void DAudioSinkDev::NotifySourceDev(const AudioEventType type, const std::string
     cJSON_AddNumberToObject(jEvent, KEY_EVENT_TYPE, static_cast<int32_t>(type));
     cJSON_AddStringToObject(jEvent, KEY_RANDOM_TASK_CODE, std::to_string(randomTaskCode).c_str());
 
-    DHLOGD("Notify source dev, new engine, random task code:%{public}s", std::to_string(randomTaskCode).c_str());
-    if (type == NOTIFY_OPEN_CTRL_RESULT || type == NOTIFY_CLOSE_CTRL_RESULT) {
-        DHLOGE("In new engine mode, ctrl is not allowed.");
-        cJSON_Delete(jEvent);
-        return;
-    }
+    DHLOGI("Notify source dev, new engine, random task code:%{public}s", std::to_string(randomTaskCode).c_str());
     int32_t dhIdInt = ConvertString2Int(dhId);
     if (dhIdInt == -1) {
         DHLOGE("Parse dhId error.");
@@ -606,13 +625,7 @@ void DAudioSinkDev::SinkEventHandler::ProcessEvent(const AppExecFwk::InnerEvent:
 
 void DAudioSinkDev::SinkEventHandler::NotifyCtrlOpened(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    DHLOGI("Ctrl channel is opened.");
-    (void)event;
-}
-
-void DAudioSinkDev::SinkEventHandler::NotifyCtrlClosed(const AppExecFwk::InnerEvent::Pointer &event)
-{
-    DHLOGI("Notify ctrl closed.");
+    DHLOGI("Ctrl channel is opened. begin to init dev, then to notify source dev.");
     std::string eventParam;
     if (GetEventParam(event, eventParam) != DH_SUCCESS) {
         DHLOGE("Failed to get event parameters.");
@@ -620,15 +633,19 @@ void DAudioSinkDev::SinkEventHandler::NotifyCtrlClosed(const AppExecFwk::InnerEv
     }
     auto sinkDevObj = sinkDev_.lock();
     CHECK_NULL_VOID(sinkDevObj);
-    if (sinkDevObj->TaskCloseDSpeaker(eventParam) != DH_SUCCESS) {
-        DHLOGE("Close speaker failed.");
-        return;
-    }
-    if (sinkDevObj->TaskCloseDMic(eventParam) != DH_SUCCESS) {
-        DHLOGE("Close mic failed.");
-        return;
-    }
-    sinkDevObj->JudgeDeviceStatus();
+
+    int32_t dhId = sinkDevObj->ParseDhidFromEvent(eventParam);
+    CHECK_AND_RETURN_LOG(dhId == -1, "%{public}s", "Parse dhId error.");
+    int32_t ret = sinkDevObj->ParseResultFromEvent(eventParam);
+    sinkDevObj->NotifySourceDev(NOTIFY_OPEN_CTRL_RESULT, std::to_string(dhId), ret);
+    DHLOGI("Init sink device task end, notify source ret %{public}d.", ret);
+    CHECK_AND_RETURN_LOG(ret != DH_SUCCESS, "%{public}s", "Init sink device failed.");
+}
+
+void DAudioSinkDev::SinkEventHandler::NotifyCtrlClosed(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    DHLOGI("Notify ctrl closed.");
+    (void)event;
 }
 
 void DAudioSinkDev::SinkEventHandler::NotifyOpenSpeaker(const AppExecFwk::InnerEvent::Pointer &event)
