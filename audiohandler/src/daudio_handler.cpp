@@ -119,6 +119,9 @@ std::vector<DHItem> DAudioHandler::Query()
     auto audioDevices = audioSrv->GetDevices(AudioStandard::DeviceFlag::ALL_DEVICES_FLAG);
     for (auto dev : audioDevices) {
         auto dhId = audioSrv->GetPinValueFromType(dev->deviceType_, dev->deviceRole_);
+        if (dhId != DEFAULT_RENDER_ID || dhId != DEFAULT_CAPTURE_ID) {
+            continue;
+        }
 
         cJSON* infoJson = cJSON_CreateObject();
         if (infoJson == nullptr) {
