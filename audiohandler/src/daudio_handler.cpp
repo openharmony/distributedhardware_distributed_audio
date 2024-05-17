@@ -119,7 +119,7 @@ std::vector<DHItem> DAudioHandler::Query()
     auto audioDevices = audioSrv->GetDevices(AudioStandard::DeviceFlag::ALL_DEVICES_FLAG);
     for (auto dev : audioDevices) {
         auto dhId = audioSrv->GetPinValueFromType(dev->deviceType_, dev->deviceRole_);
-        if (dhId != DEFAULT_RENDER_ID || dhId != DEFAULT_CAPTURE_ID) {
+        if (dhId != DEFAULT_RENDER_ID && dhId != DEFAULT_CAPTURE_ID) {
             continue;
         }
 
@@ -151,9 +151,11 @@ std::vector<DHItem> DAudioHandler::Query()
             dhItemVec.push_back(dhItem);
             DHLOGD("Query result: dhId: %{public}d, attrs: %{public}s.", LOW_LATENCY_RENDER_ID, jsonInfo);
         }
+        DHLOGI("Query result: dhId: %{public}d.", dhId);
         cJSON_Delete(infoJson);
         cJSON_free(jsonInfo);
     }
+    DHLOGI("Query result: size: (%{public}zu).", dhItemVec.size());
     ablityForDumpVec_ = dhItemVec;
     return dhItemVec;
 }
