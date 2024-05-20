@@ -103,19 +103,23 @@ bool DAudioHandler::AddItemsToObject(DHItem &dhItem, cJSON* infoJson, const int3
 std::vector<DHItem> DAudioHandler::QueryMeta()
 {
     DHLOGI("Query meta distributed hardware information.");
-    return Query();
+    return RealQuery(KEY_TYPE_META);
 }
 
 std::vector<DHItem> DAudioHandler::Query()
 {
-    DHLOGI("Query distributed hardware information.");
+    DHLOGI("Query full distributed hardware information.");
+    return RealQuery(KEY_TYPE_FULL);
+}
+
+std::vector<DHItem> DAudioHandler::RealQuery(const std::string &dataType)
+{
     auto audioSrv = AudioStandard::AudioSystemManager::GetInstance();
     std::vector<DHItem> dhItemVec;
     if (audioSrv == nullptr) {
         DHLOGE("Unable to get audio system manager.");
         return dhItemVec;
     }
-
     auto audioDevices = audioSrv->GetDevices(AudioStandard::DeviceFlag::ALL_DEVICES_FLAG);
     for (auto dev : audioDevices) {
         auto dhId = audioSrv->GetPinValueFromType(dev->deviceType_, dev->deviceRole_);
@@ -133,8 +137,9 @@ std::vector<DHItem> DAudioHandler::Query()
             cJSON_Delete(infoJson);
             return dhItemVec;
         }
-        cJSON_AddNumberToObject(infoJson, "INTERRUPT_GROUP_ID", dev->interruptGroupId_);
-        cJSON_AddNumberToObject(infoJson, "VOLUME_GROUP_ID", dev->volumeGroupId_);
+        cJSON_AddNumberToObject(infoJson, INTERRUPT_GROUP_ID, dev->interruptGroupId_);
+        cJSON_AddNumberToObject(infoJson, VOLUME_GROUP_ID, dev->volumeGroupId_);
+        cJSON_AddStringToObject(infoJson, KEY_DATATYPE, dataType.c_str());
         dhItem.dhId = AddDhIdPrefix(std::to_string(dhId));
         char *jsonInfo = cJSON_Print(infoJson);
         if (jsonInfo == NULL) {

@@ -52,6 +52,7 @@ private:
     ~DAudioHandler();
     int32_t QueryAudioInfo();
     bool AddItemsToObject(DHItem &dhItem, cJSON *infoJson, const int32_t &dhId);
+    std::vector<DHItem> RealQuery(const std::string &dataType);
 private:
     AudioInfo spkInfos_;
     AudioInfo micInfos_;

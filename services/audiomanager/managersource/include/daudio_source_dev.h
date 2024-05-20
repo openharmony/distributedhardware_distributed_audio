@@ -120,6 +120,7 @@ private:
     int32_t ParseDhidFromEvent(std::string args);
     int32_t ConvertString2Int(std::string val);
     int32_t CreateMicEngine(std::shared_ptr<DAudioIoDev> mic);
+    void SetRegDataType(const std::string &capability);
 
 private:
     static constexpr uint8_t RPC_WAIT_SECONDS = 10;
@@ -143,6 +144,7 @@ private:
     std::mutex rpcWaitMutex_;
     std::condition_variable rpcWaitCond_;
     std::atomic<bool> isRpcOpen_ = false;
+    std::atomic<bool> isFull_ = false;
     int32_t rpcResult_ = ERR_DH_AUDIO_FAILED;
     uint8_t rpcNotify_ = 0;
     std::atomic<bool> threadStatusFlag_ = false;
