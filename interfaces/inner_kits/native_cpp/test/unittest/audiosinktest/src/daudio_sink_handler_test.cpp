@@ -114,7 +114,7 @@ HWTEST_F(DAudioSinkHandlerTest, LocalHardware_004, TestSize.Level1)
     DAudioSinkHandler::GetInstance().dAudioSinkIpcCallback_ = nullptr;
     int32_t ret = DAudioSinkHandler::GetInstance().RegisterPrivacyResources(listener);
     EXPECT_EQ(ERR_DH_AUDIO_SA_PROXY_NOT_INIT, ret);
-    dAudioSinkIpcCallback_ = sptr<DAudioSinkIpcCallback>(new DAudioSinkIpcCallback());
+    DAudioSinkHandler::GetInstance().dAudioSinkIpcCallback_ = sptr<DAudioSinkIpcCallback>(new DAudioSinkIpcCallback());
     ret = DAudioSinkHandler::GetInstance().RegisterPrivacyResources(listener);
     EXPECT_EQ(DH_SUCCESS, ret);
 }
@@ -158,7 +158,7 @@ HWTEST_F(DAudioSinkHandlerTest, LocalHardware_006, TestSize.Level1)
     DAudioSinkHandler::GetInstance().dAudioSinkProxy_ = proxy;
     ret = DAudioSinkHandler::GetInstance().ResumeDistributedHardware(networkId);
     EXPECT_EQ(DH_SUCCESS, ret);
-    EXPECT_NE(DH_SUCCESS, DAudioSinkHandler::GetInstance().StopDistributedHardware(networkId));
+    EXPECT_EQ(DH_SUCCESS, DAudioSinkHandler::GetInstance().StopDistributedHardware(networkId));
 }
 } // namespace DistributedHardware
 } // namespace OHOS

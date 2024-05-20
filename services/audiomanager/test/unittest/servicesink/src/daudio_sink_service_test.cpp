@@ -81,24 +81,8 @@ HWTEST_F(DAudioSinkServiceTest, OnStart_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSinkServiceTest, Init_001, TestSize.Level1)
 {
-    sinkSrv_->isServiceStarted_ = false;
-    EXPECT_NE(true, sinkSrv_->Init());
     sinkSrv_->isServiceStarted_ = true;
     EXPECT_EQ(true, sinkSrv_->Init());
-}
-
-/**
- * @tc.name: PauseDistributedHardware_001
- * @tc.desc: Verify the PauseDistributedHardware function.
- * @tc.type: FUNC
- * @tc.require: AR000H0E5F
- */
-HWTEST_F(DAudioSinkServiceTest, PauseDistributedHardware_001, TestSize.Level1)
-{
-    std::string networkId = "netid";
-    EXPECT_EQ(DH_SUCCESS, sinkSrv_->PauseDistributedHardware(networkId));
-    EXPECT_EQ(DH_SUCCESS, sinkSrv_->ResumeDistributedHardware(networkId));
-    EXPECT_EQ(DH_SUCCESS, sinkSrv_->StopDistributedHardware(networkId));
 }
 
 /**

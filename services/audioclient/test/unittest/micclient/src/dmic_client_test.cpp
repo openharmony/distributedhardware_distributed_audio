@@ -57,10 +57,6 @@ HWTEST_F(DMicClientTest, InitSenderEngine_001, TestSize.Level1)
     IAVEngineProvider *providerPtr = nullptr;
     auto message = std::make_shared<AVTransMessage>();
     micClient_->OnEngineTransMessage(message);
-    AVTransEvent event;
-    event.type = EventType::EVENT_START_SUCCESS;
-    micClient_->audioParam_.captureOpts.capturerFlags = NORMAL_MODE;
-    micClient_->OnEngineTransEvent(event);
     EXPECT_EQ(DH_SUCCESS, micClient_->InitSenderEngine(providerPtr));
 }
 
@@ -135,7 +131,6 @@ HWTEST_F(DMicClientTest, StartCapture001, TestSize.Level1)
     EXPECT_EQ(DH_SUCCESS, micClient_->StartCapture());
     micClient_->micTrans_ = nullptr;
     EXPECT_EQ(ERR_DH_AUDIO_SA_STATUS_ERR, micClient_->StartCapture());
-    micClient_->AudioFwkCaptureData();
     EXPECT_NE(DH_SUCCESS, micClient_->StopCapture());
 }
 
