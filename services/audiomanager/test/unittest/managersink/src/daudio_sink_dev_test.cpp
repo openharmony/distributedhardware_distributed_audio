@@ -218,12 +218,23 @@ HWTEST_F(DAudioSinkDevTest, ParseDhidFromEvent_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSinkDevTest, ParseResultFromEvent_001, TestSize.Level1)
 {
-    std::string args = "{\"result\":\"0\"}";
-    EXPECT_EQ(DH_SUCCESS, sinkDev_->ParseResultFromEvent(args));
-    args = "{\"result\":\"-40001\"}";
-    EXPECT_EQ(-40001, sinkDev_->ParseResultFromEvent(args));
+    std::string args = "{\"result\":\"-40001\"}";
+    EXPECT_EQ(-1, sinkDev_->ParseResultFromEvent(args));
     std::string dhIdArgs = "{\"result\": 1 }";
     EXPECT_NE(DH_SUCCESS, sinkDev_->ParseResultFromEvent(dhIdArgs));
+
+    cJSON *jobject = cJSON_CreateObject();
+    CHECK_NULL_VOID(jobject);
+    cJSON_AddNumberToObject(jobject, KEY_RESULT, 0);
+    char *jsonData = cJSON_PrintUnformatted(jobject);
+    if (jsonData == nullptr) {
+        cJSON_Delete(jobject);
+        return;
+    }
+    std::string args1(jsonData);
+    cJSON_free(jsonData);
+    cJSON_Delete(jobject);
+    EXPECT_EQ(DH_SUCCESS, sinkDev_->ParseResultFromEvent(args1));
 }
 
 

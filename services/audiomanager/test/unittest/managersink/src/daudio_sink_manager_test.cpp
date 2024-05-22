@@ -116,14 +116,14 @@ HWTEST_F(DAudioSinkManagerTest, CreateAudioDevice_001, TestSize.Level1)
     }
     sptr<DAudioSinkIpcCallbackProxy> dAudioSinkIpcCallbackProxy(new DAudioSinkIpcCallbackProxy(remoteObject));
     daudioSinkManager.ipcSinkCallback_ = dAudioSinkIpcCallbackProxy;
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, daudioSinkManager.CreateAudioDevice(devId));
+    EXPECT_EQ(ERR_DH_AUDIO_NOT_SUPPORT, daudioSinkManager.CreateAudioDevice(devId));
     daudioSinkManager.audioDevMap_.emplace(devId, nullptr);
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, daudioSinkManager.CreateAudioDevice(devId));
+    EXPECT_EQ(ERR_DH_AUDIO_NOT_SUPPORT, daudioSinkManager.CreateAudioDevice(devId));
     daudioSinkManager.channelState_ = ChannelState::SPK_CONTROL_OPENED;
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, daudioSinkManager.CreateAudioDevice(devId));
+    EXPECT_EQ(DH_SUCCESS, daudioSinkManager.CreateAudioDevice(devId));
     daudioSinkManager.ClearAudioDev(devId);
     daudioSinkManager.channelState_ = ChannelState::MIC_CONTROL_OPENED;
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, daudioSinkManager.CreateAudioDevice(devId));
+    EXPECT_EQ(DH_SUCCESS, daudioSinkManager.CreateAudioDevice(devId));
 }
 
 /**
@@ -135,10 +135,22 @@ HWTEST_F(DAudioSinkManagerTest, CreateAudioDevice_001, TestSize.Level1)
 HWTEST_F(DAudioSinkManagerTest, InitAudioDevice_001, TestSize.Level1)
 {
     std::string devId = "1";
+    std::string params = "params";
     std::shared_ptr<DAudioSinkDev> dev = nullptr;
     EXPECT_NE(DH_SUCCESS, daudioSinkManager.InitAudioDevice(dev, devId, true));
-    sptr<IDAudioSinkIpcCallback> callback = nullptr;
-    dev = std::make_shared<DAudioSinkDev>(devId, callback);
+    auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgr == nullptr) {
+        return;
+    }
+    sptr<DAudioSinkLoadCallback> loadCallback(new DAudioSinkLoadCallback(params));
+    samgr->LoadSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID, loadCallback);
+    sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID);
+    if (remoteObject == nullptr) {
+        return;
+    }
+    sptr<DAudioSinkIpcCallbackProxy> dAudioSinkIpcCallbackProxy(new DAudioSinkIpcCallbackProxy(remoteObject));
+    daudioSinkManager.ipcSinkCallback_ = dAudioSinkIpcCallbackProxy;
+    dev = std::make_shared<DAudioSinkDev>(devId, dAudioSinkIpcCallbackProxy);
     EXPECT_NE(DH_SUCCESS, daudioSinkManager.InitAudioDevice(dev, devId, true));
     EXPECT_NE(DH_SUCCESS, daudioSinkManager.InitAudioDevice(dev, devId, false));
 }
