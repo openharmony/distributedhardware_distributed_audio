@@ -1213,5 +1213,24 @@ HWTEST_F(DAudioSourceDevTest, ParseDhidFromEvent_001, TestSize.Level1)
     std::string args1 = "{\"devId\":\"10\"}";
     EXPECT_EQ(ERR_DH_AUDIO_NOT_SUPPORT, sourceDev_->DisableDAudio(args1));
 }
+
+/**
+ * @tc.name: EnableDAudio_001
+ * @tc.desc: Verify the EnableDAudio function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, EnableDAudio_001, TestSize.Level1)
+{
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->AwakeAudioDev());
+    sourceDev_->isFull_.store(true);
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->EnableDAudio(DH_ID_SPK, ATTRS));
+    sourceDev_->isFull_.store(false);
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->EnableDAudio(DH_ID_SPK, ATTRS));
+    std::string argsMeta = "{\"dataType\":\"meta\"}";
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->EnableDAudio(DH_ID_SPK, argsMeta));
+    std::string argsFull = "{\"dataType\":\"full\"}";
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->EnableDAudio(DH_ID_SPK, argsFull));
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -106,6 +106,27 @@ void DAudioSourceDev::SleepAudioDev()
     DHLOGI("Sleep audio dev over.");
 }
 
+void DAudioSourceDev::SetRegDataType(const std::string &capability)
+{
+    DHLOGI("SetRegDataType enter.");
+    cJSON *jParam = cJSON_Parse(capability.c_str());
+    CHECK_NULL_VOID(jParam);
+    if (!CJsonParamCheck(jParam, { KEY_DATATYPE })) {
+        DHLOGE("The key dataType is not found.");
+        cJSON_Delete(jParam);
+        return;
+    }
+    cJSON *dataType = cJSON_GetObjectItem(jParam, KEY_DATATYPE);
+    CHECK_NULL_AND_FREE_VOID(dataType, jParam);
+    DHLOGI("RegData type is : %{public}s.", dataType->valuestring);
+    std::string typeStr(dataType->valuestring);
+    if (typeStr == KEY_TYPE_FULL) {
+        isFull_.store(true);
+    } else {
+        isFull_.store(false);
+    }
+}
+
 int32_t DAudioSourceDev::EnableDAudio(const std::string &dhId, const std::string &attrs)
 {
     DHLOGI("Enable audio device, dhId: %{public}s.", dhId.c_str());
@@ -130,6 +151,9 @@ int32_t DAudioSourceDev::EnableDAudio(const std::string &dhId, const std::string
     DHLOGI("Enable audio task generate successfully.");
     cJSON_Delete(jParam);
     cJSON_free(jsonString);
+    if (!isFull_.load()) {
+        SetRegDataType(attrs);
+    }
     return DH_SUCCESS;
 }
 
@@ -696,6 +720,9 @@ void DAudioSourceDev::OnDisableTaskResult(int32_t resultCode, const std::string 
 void DAudioSourceDev::NotifyFwkRunning(const std::string &devId, const std::string &dhId)
 {
     DAudioSourceManager::GetInstance().OnHardwareStateChanged(devId, dhId, DaudioBusinessState::RUNNING);
+    if (!isFull_.load()) {
+        DAudioSourceManager::GetInstance().OnDataSyncTrigger(devId);
+    }
 }
 
 void DAudioSourceDev::NotifyFwkIdle(const std::string &devId, const std::string &dhId)
@@ -727,14 +754,12 @@ int32_t DAudioSourceDev::TaskOpenDSpeaker(const std::string &args)
         NotifyHDF(NOTIFY_OPEN_SPEAKER_RESULT, HDF_EVENT_INIT_ENGINE_FAILED, dhId);
         return ret;
     }
-
     ret = WaitForRPC(NOTIFY_OPEN_CTRL_RESULT);
     if (ret != DH_SUCCESS) {
         DHLOGE("Speaker init sender engine, create ctrl error.");
         NotifyHDF(NOTIFY_OPEN_SPEAKER_RESULT, HDF_EVENT_INIT_ENGINE_FAILED, dhId);
         return ret;
     }
-
     cJSON *jAudioParam = cJSON_CreateObject();
     CHECK_NULL_RETURN(jAudioParam, ERR_DH_AUDIO_NULLPTR);
     to_json(jAudioParam, speaker->GetAudioParam());

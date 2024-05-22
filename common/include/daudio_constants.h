@@ -107,6 +107,8 @@ const std::string AUDIO_EVENT_RESTART = "restart";
 const std::string AUDIO_EVENT_PAUSE = "pause";
 
 const std::string AUDIO_ENGINE_FLAG = "persist.distributedhardware.distributedaudio.engine.enable";
+const std::string KEY_TYPE_META = "meta";
+const std::string KEY_TYPE_FULL = "full";
 
 constexpr const char *KEY_TYPE = "type";
 constexpr const char *KEY_CHANGE_TYPE = "ChangeType";
@@ -144,6 +146,8 @@ constexpr const char *MAX_VOLUME_LEVEL = "MAX_VOLUME_LEVEL";
 constexpr const char *MIN_VOLUME_LEVEL = "MIN_VOLUME_LEVEL";
 constexpr const char *VOLUME_GROUP_ID = "VOLUME_GROUP_ID";
 constexpr const char *VOLUME_EVENT_TYPE = "EVENT_TYPE";
+constexpr const char *KEY_DATATYPE = "dataType";
+constexpr const char *INTERRUPT_GROUP_ID = "INTERRUPT_GROUP_ID";
 
 const std::string DUMP_FILE_PATH = "/data/data/daudio";
 const std::string AUDIO_PERMISSION_NAME = "ohos.permission.ENABLE_DISTRIBUTED_HARDWARE";
