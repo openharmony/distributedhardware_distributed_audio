@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -515,15 +515,17 @@ int32_t DAudioSinkManager::VerifySecurityLevel(const std::string &devId)
         return ERR_DH_AUDIO_FAILED;
     }
 
-    std::string sinkDevId = "";
-    ret = GetLocalDeviceNetworkId(sinkDevId);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("GetLocalDeviceNetworkId failed, ret: %{public}d", ret);
-        return ret;
-    }
-    if (isSensitive_ && !CheckDeviceSecurityLevel(devId, sinkDevId)) {
-        DHLOGE("Check device security level failed!");
-        return ERR_DH_AUDIO_FAILED;
+    if (isCheckSecLevel_) {
+        std::string sinkDevId = "";
+        ret = GetLocalDeviceNetworkId(sinkDevId);
+        if (ret != DH_SUCCESS) {
+            DHLOGE("GetLocalDeviceNetworkId failed, ret: %{public}d", ret);
+            return ret;
+        }
+        if (isSensitive_ && !CheckDeviceSecurityLevel(devId, sinkDevId)) {
+            DHLOGE("Check device security level failed!");
+            return ERR_DH_AUDIO_FAILED;
+        }
     }
     return DH_SUCCESS;
 }
