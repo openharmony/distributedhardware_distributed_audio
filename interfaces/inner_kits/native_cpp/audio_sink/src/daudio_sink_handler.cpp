@@ -36,6 +36,9 @@ IMPLEMENT_SINGLE_INSTANCE(DAudioSinkHandler);
 DAudioSinkHandler::DAudioSinkHandler()
 {
     DHLOGD("DAudio sink handler constructed.");
+    if (!sinkSvrRecipient_) {
+        sinkSvrRecipient_ = new DAudioSinkSvrRecipient();
+    }
     if (!dAudioSinkIpcCallback_) {
         dAudioSinkIpcCallback_ = new DAudioSinkIpcCallback();
     }
