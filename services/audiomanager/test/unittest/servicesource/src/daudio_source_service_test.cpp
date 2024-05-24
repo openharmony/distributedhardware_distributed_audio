@@ -91,6 +91,11 @@ HWTEST_F(DAudioSourceServiceTest, ConfigDistributedHardware_001, TestSize.Level1
     std::string value = "1";
 
     EXPECT_EQ(DH_SUCCESS, sourceSrv_->ConfigDistributedHardware(devId, dhId, key, value));
+    int32_t eventType = 1;
+    std::string content = "content";
+    sourceSrv_->DAudioNotify(devId, dhId, eventType, content);
+    std::string reqId = "reg";
+    EXPECT_NE(DH_SUCCESS, sourceSrv_->UnregisterDistributedHardware(devId, dhId, reqId));
 }
 
 /**

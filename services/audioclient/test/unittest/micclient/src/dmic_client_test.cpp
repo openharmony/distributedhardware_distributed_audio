@@ -146,6 +146,8 @@ HWTEST_F(DMicClientTest, StopCapture001, TestSize.Level1)
     EXPECT_NE(DH_SUCCESS, micClient_->StopCapture());
     micClient_->clientStatus_ = STATUS_START;
     EXPECT_NE(DH_SUCCESS, micClient_->StopCapture());
+    size_t length = 1;
+    micClient_->OnReadData(length);
     EXPECT_EQ(DH_SUCCESS, micClient_->OnDecodeTransDataDone(audioData));
 }
 

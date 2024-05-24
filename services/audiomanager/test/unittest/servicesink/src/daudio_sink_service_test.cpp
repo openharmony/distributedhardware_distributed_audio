@@ -74,6 +74,18 @@ HWTEST_F(DAudioSinkServiceTest, OnStart_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: Init_001
+ * @tc.desc: Verify the Init function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkServiceTest, Init_001, TestSize.Level1)
+{
+    sinkSrv_->isServiceStarted_ = true;
+    EXPECT_EQ(true, sinkSrv_->Init());
+}
+
+/**
  * @tc.name: InitSink_001
  * @tc.desc: Verify the InitSink function.
  * @tc.type: FUNC

@@ -247,6 +247,22 @@ HWTEST_F(DAudioSourceMgrTest, OnEnableDAudio_002, TestSize.Level1)
 }
 
 /**
+ * @tc.name: OnEnableDAudio_003
+ * @tc.desc: Verify the OnEnableDAudio function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceMgrTest, OnEnableDAudio_003, TestSize.Level1)
+{
+    EXPECT_NE(DH_SUCCESS, sourceMgr.Init(ipcCallbackProxy_));
+    sourceMgr.ipcCallback_ = ipcCallbackProxy_;
+    std::string reqId = GetRandomID();
+    sourceMgr.audioDevMap_[DEV_ID].ports[DH_ID_SPK] = reqId;
+    EXPECT_EQ(DH_SUCCESS, sourceMgr.OnEnableDAudio(DEV_ID, DH_ID_SPK, DH_SUCCESS));
+    EXPECT_EQ(DH_SUCCESS, sourceMgr.UnInit());
+}
+
+/**
  * @tc.name: OnDisableDAudio_001
  * @tc.desc: Verify the OnDisableDAudio function.
  * @tc.type: FUNC
