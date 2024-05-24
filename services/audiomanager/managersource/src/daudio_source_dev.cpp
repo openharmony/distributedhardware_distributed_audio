@@ -117,7 +117,11 @@ void DAudioSourceDev::SetRegDataType(const std::string &capability)
         return;
     }
     cJSON *dataType = cJSON_GetObjectItem(jParam, KEY_DATATYPE);
-    CHECK_NULL_AND_FREE_VOID(dataType, jParam);
+    if (dataType == nullptr || !cJSON_IsString(dataType)) {
+        DHLOGE("The key dataType is null.");
+        cJSON_Delete(jParam);
+        return;
+    }
     DHLOGI("RegData type is : %{public}s.", dataType->valuestring);
     std::string typeStr(dataType->valuestring);
     if (typeStr == KEY_TYPE_FULL) {

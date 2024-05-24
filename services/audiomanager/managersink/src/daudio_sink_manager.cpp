@@ -202,6 +202,8 @@ int32_t DAudioSinkManager::CreateAudioDevice(const std::string &devId)
     std::string eventContent = std::string(jsonData);
     cJSON_free(jsonData);
     cJSON_Delete(jParam);
+    int32_t SLEEP_TIME = 300;
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_TIME));
     NotifyEvent(devId, CTRL_OPENED, eventContent);
     return DH_SUCCESS;
 }
