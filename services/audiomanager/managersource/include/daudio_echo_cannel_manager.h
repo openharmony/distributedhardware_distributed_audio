@@ -71,7 +71,6 @@ private:
     void *aecHandler_ = nullptr;
     AecEffector *aecProcessor_ = nullptr;
     constexpr static size_t COND_WAIT_TIME_MS = 10;
-    constexpr static size_t COND_WAIT_TIME_MS = 10;
     constexpr static size_t WAIT_MIC_DATA_TIME_US = 5000;
     constexpr static size_t REF_QUEUE_MAX_SIZE = 10;
     std::queue<std::shared_ptr<AudioData>> refDataQueue_;
@@ -81,6 +80,6 @@ private:
     std::condition_variable refQueueCond_;
     std::atomic<bool> isStarted = false;
 };
-} // namespace DistributedHardware 
+} // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DAUDIO_DMIC_DEV_H
