@@ -52,8 +52,13 @@ ohos_shared_library("distributed_audio_source") {
   ]
 
   if (distributed_audio_extension_sa) {
-    include_dirs +=
-        [ "${distributedaudio_ext_path}/services/aeceffectprocessor/include" ]
+    include_dirs += [
+      "${distributedaudio_ext_path}/services/audioprocessor/aeceffectprocessor/include",
+      "${distributedaudio_ext_path}/services/audioprocessor/effectcomponent/audiopipeline/include",
+      "${distributedaudio_ext_path}/services/audioprocessor/effectcomponent/elementfactory/include",
+      "${distributedaudio_ext_path}/services/audioprocessor/effectcomponent/elements/include",
+      "${distributedaudio_ext_path}/services/audioprocessor/effectcomponent/pipelinemanager/include",
+    ]
   }
 
   sources = [
@@ -114,10 +119,6 @@ ohos_shared_library("distributed_audio_source") {
   cflags = []
 
   if (distributed_audio_extension_sa) {
-    external_deps += [
-      "distributed_audio_ext:daudio_aec_effect_processor",
-      "distributed_audio_ext:distributed_audio_ext_utils",
-    ]
     cflags += [ "-DECHO_CANNEL_ENABLE" ]
   }
 

@@ -22,16 +22,15 @@
 
 #include "audio_capturer.h"
 #include "audio_info.h"
-#include "aec_effect_processor.h"
+#include "aec_effector.h"
 #include "iaudio_datatrans_callback.h"
 
 #include "audio_data.h"
-#include "audio_data_ext.h"
 #include "audio_param.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class DAudioEchoCannelManager : public AudioStandard::AudioCaptureReadCallback,
+class DAudioEchoCannelManager : public AudioStandard::AudioCapturerReadCallback,
     public std::enable_shared_from_this<DAudioEchoCannelManager> {
 public:
     DAudioEchoCannelManager();
@@ -48,7 +47,7 @@ public:
 private:
     void OnReadData(size_t length) override;
     void AecProcessData();
-    int32_t ProcessMicData(const std::shared_ptr &pipeInData,
+    int32_t ProcessMicData(const std::shared_ptr<AudioData> &pipeInData,
         std::shared_ptr<AudioData> &micOutData);
     
     int32_t AudioCaptureSetUp();
@@ -63,14 +62,14 @@ private:
     int32_t StopAecProcessor();
     int32_t ReleaseAecProcessor();
 
-    std::unique_ptr<AudioStandard::AudioCapturer> audioCapturer = nullptr;
-    std::atomic<bool> isAecRunnig_ = false;
+    std::unique_ptr<AudioStandard::AudioCapturer> audioCapturer_ = nullptr;
+    std::atomic<bool> isAecRunning_ = false;
     std::thread aecProcessThread_;
     static constexpr const char* AECTHREADNAME = "AecProcessThread";
 
     std::shared_ptr<IAudioDataTransCallback> devCallback_;
     void *aecHandler_ = nullptr;
-    AecEffectProcessor *aecProcessor_ = nullptr;
+    AecEffector *aecProcessor_ = nullptr;
     constexpr static size_t COND_WAIT_TIME_MS = 10;
     constexpr static size_t COND_WAIT_TIME_MS = 10;
     constexpr static size_t WAIT_MIC_DATA_TIME_US = 5000;
@@ -81,5 +80,7 @@ private:
     std::mutex outQueueMtx_;
     std::condition_variable refQueueCond_;
     std::atomic<bool> isStarted = false;
-} // OHOS
+};
+} // namespace DistributedHardware 
+} // namespace OHOS
 #endif // OHOS_DAUDIO_DMIC_DEV_H
