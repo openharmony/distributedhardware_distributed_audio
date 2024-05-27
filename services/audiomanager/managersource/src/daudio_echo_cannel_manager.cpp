@@ -30,10 +30,10 @@
 using namespace OHOS::AudioStandard;
 namespace OHOS {
 namespace DistributedHardware {
-using AecEffectProcessorProvider = AecEffectProcessor *(*)();
+using AecEffectProcessorProvider = AecEffector *(*)();
 
 const std::string ECHOCANNEL_SO_NAME = "libdaudio_aec_effect_processor.z.so";
-const std::string GET_AEC_EFFECT_PROCESSOR_FUNC = "GetAecEffectProcessor";
+const std::string GET_AEC_EFFECT_PROCESSOR_FUNC = "GetAecEffector";
 const int32_t FRAME_SIZE_NORMAL = 3840;
 #ifdef __LP64__
 const std::string LIB_LOAD_PATH = "/system/lib64/";
@@ -63,13 +63,13 @@ int32_t DAudioEchoCannelManager::SetUp(const AudioCommonParam param,
         return ERR_DH_AUDIO_FAILED;
     }
     ret = InitAecProcessor();
-    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Init Aec Processor error. ret: %d.", ret);
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Init Aec Processor error. ret: %{public}d.", ret);
 
     ret = AudioCaptureSetUp();
-    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Init Get Reference error. ret: %d.", ret);
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Init Get Reference error. ret: %{public}d.", ret);
 
     ret = AudioCaptureStart();
-    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Start Get Reference error. ret: %d.", ret);
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Start Get Reference error. ret: %{public}d.", ret);
 
     return DH_SUCCESS;
 }
@@ -78,7 +78,7 @@ int32_t DAudioEchoCannelManager::Start()
 {
     DHLOGI("Start EchoCannel.");
     int32_t ret = StartAecProcessor();
-    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Start Aec Processor error. ret: %d.", ret);
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Start Aec Processor error. ret: %{public}d.", ret);
 
     isStarted.store(true);
     DHLOGI("Start EchoCannel success.");
@@ -90,9 +90,9 @@ int32_t DAudioEchoCannelManager::Stop()
     DHLOGI("Stop EchoCannel.");
     isStarted.store(false);
     int32_t ret = StopAecProcessor();
-    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Stop Aec Processor error. ret: %d.", ret);
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Stop Aec Processor error. ret: %{public}d.", ret);
     ret = AudioCaptureStop();
-    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Stop Get Reference error. ret: %d.", ret);
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Stop Get Reference error. ret: %{public}d.", ret);
     DHLOGI("Stop EchoCannel success.");
     return DH_SUCCESS;
 }
@@ -101,10 +101,10 @@ int32_t DAudioEchoCannelManager::Release()
 {
     DHLOGI("Release EchoCannel.");
     int32_t ret = AudioCaptureRelease();
-    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Release Get Reference error. ret: %d.", ret);
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Release Get Reference error. ret: %{public}d.", ret);
 
     ret = ReleaseAecProcessor();
-    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Release Aec Processor error. ret: %d.", ret);
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Release Aec Processor error. ret: %{public}d.", ret);
     UnLoadAecProcessor();
     isStarted.store(false);
     return DH_SUCCESS;
@@ -120,7 +120,7 @@ int32_t DAudioEchoCannelManager::OnMicDataReceived(const std::shared_ptr<AudioDa
         auto micOutData = std::make_shared<AudioData>(pipeInData->Size());
         int32_t ret = ProcessMicData(pipeInData, micOutData);
         if (ret != DH_SUCCESS) {
-            DHLOGE("Mic data call processor error. ret : %d.", ret);
+            DHLOGE("Mic data call processor error. ret : %{public}d.", ret);
             devCallback_->OnDecodeTransDataDone(pipeInData);
             return ERR_DH_AUDIO_FAILED;
         }
@@ -138,25 +138,27 @@ int32_t DAudioEchoCannelManager::ProcessMicData(const std::shared_ptr<AudioData>
     std::shared_ptr<AudioData> &micOutData)
 {
     DHLOGI("Process mic data.");
-    auto micInDataExt = std::make_shared<AudioDataExt>(pipeInData->Size());
-    std::shared_ptr<AudioDataExt> micOutDataExt = nullptr;
+    uint8_t *micOutDataExt = nullptr;
     CHECK_AND_RETURN_RET_LOG(pipeInData == nullptr, ERR_DH_AUDIO_NULLPTR, "pipeInData is nullptr.");
     CHECK_AND_RETURN_RET_LOG(micOutData == nullptr, ERR_DH_AUDIO_NULLPTR, "micOutData is nullptr.");
     CHECK_AND_RETURN_RET_LOG(aecProcessor_ == nullptr, ERR_DH_AUDIO_NULLPTR, "aec processor is nullptr.");
-    if (memcpy_s(micInDataExt->Data(), micInDataExt->Size(), pipeInData->Data(), pipeInData->Size()) != EOK) {
-        DHLOGE("copy mic data before aec error.");
-        return ERR_DH_AUDIO_FAILED;
-    }
-    int32_t ret = aecProcessor_->OnSendOriginData(micInDataExt, StreamType::MIC1, micOutDataExt);
+    int32_t ret = aecProcessor_->OnSendOriginData(aecProcessor_, pipeInData->Data(),
+        pipeInData->Size(), StreamType::MIC1, &micOutDataExt);
     if (ret != DH_SUCCESS || micOutDataExt == nullptr) {
-        DHLOGI("aec effect process pipeInReferenceData fail. errocode:%d", ret);
+        DHLOGI("aec effect process pipeInReferenceData fail. errocode:%{public}d", ret);
         return ERR_DH_AUDIO_FAILED;
     }
-    if (memcpy_s(micOutData->Data(), micOutData->Size(), micOutDataExt->Data(), micOutDataExt->Size()) != EOK) {
+    if (memcpy_s(micOutData->Data(), micOutData->Size(), micOutDataExt, pipeInData->Size()) != EOK) {
         DHLOGE("copy mic data after aec error.");
-        return ERR_DH_AUDIO_FAILED;
+        ret = ERR_DH_AUDIO_FAILED;
+    } else {
+        ret = DH_SUCCESS;
     }
-    return DH_SUCCESS;
+    if (micOutDataExt != nullptr) {
+        free(micOutDataExt);
+        micOutDataExt = nullptr;
+    }
+    return ret;
 }
 
 void DAudioEchoCannelManager::AecProcessData()
@@ -165,11 +167,10 @@ void DAudioEchoCannelManager::AecProcessData()
     if (pthread_setname_np(pthread_self(), AECTHREADNAME) != DH_SUCCESS) {
         DHLOGE("aec process thread setname failed.");
     }
-    DHLOGI("Begin the aec process thread. refDataQueueSize: %d.",
-        refDataQueue_.size());
+    DHLOGI("Begin the aec process thread. refDataQueueSize: %{public}zu.", refDataQueue_.size());
     while (aecProcessor_ != nullptr && isAecRunning_.load()) {
         std::shared_ptr<AudioData> refInData = nullptr;
-        std::shared_ptr<AudioDataExt> refOutDataExt = nullptr;
+        uint8_t *refOutDataExt = nullptr;
         {
             std::unique_lock<std::mutex> refLck(refQueueMtx_);
             refQueueCond_.wait_for(refLck, std::chrono::milliseconds(COND_WAIT_TIME_MS),
@@ -180,19 +181,19 @@ void DAudioEchoCannelManager::AecProcessData()
             }
             refInData = refDataQueue_.front();
             refDataQueue_.pop();
-            DHLOGI("Pop new echo ref data, ref dataqueue size: %d.", refDataQueue_.size());
-        }
-        auto refInDataExt = std::make_shared<AudioDataExt>(refInData->Size());
-        if (memcpy_s(refInDataExt->Data(), refInDataExt->Size(), refInData->Data(), refInData->Size()) != EOK) {
-            DHLOGE("copy ref data before aec error.");
-            continue;
+            DHLOGI("Pop new echo ref data, ref dataqueue size: %{public}zu.", refDataQueue_.size());
         }
 #ifdef DUMP_FILE
         SaveFile("/data/cankao.pcm", const_cast<uint8_t*>(refInData->Data()), refInData->Size());
 #endif
-        int32_t ret = aecProcessor_->OnSendOriginData(refInDataExt, StreamType::REF, refOutDataExt);
+        int32_t ret = aecProcessor_->OnSendOriginData(aecProcessor_, refInData->Data(), refInData->Size(),
+            StreamType::REF, &refOutDataExt);
         if (ret != DH_SUCCESS) {
-            DHLOGE("aec effect process pipeInReferenceData fail. errocode:%d", ret);
+            DHLOGE("aec effect process pipeInReferenceData fail. errocode:%{public}d", ret);
+        }
+        if (refOutDataExt != nullptr) {
+            free(refOutDataExt);
+            refOutDataExt = nullptr;
         }
     }
     DHLOGI("the aec process thread exit.");
@@ -211,10 +212,10 @@ void DAudioEchoCannelManager::OnReadData(size_t length)
         DHLOGE("Get buffer desc failed. On read data.");
         return;
     }
-    DHLOGD("Get echo ref data. size: %d.", bufDesc.bufLength);
+    DHLOGD("Get echo ref data. size: %{puclic}zu.", bufDesc.bufLength);
     std::shared_ptr<AudioData> audioData = std::make_shared<AudioData>(bufDesc.bufLength);
     if (audioData->Capacity() != bufDesc.bufLength) {
-        DHLOGE("Audio data length is not equal to buflength. datalength: %d, bufLength: %d",
+        DHLOGE("Audio data length is not equal to buflength. datalength: %{puclic}zu, bufLength: %{puclic}zu",
             audioData->Capacity(), bufDesc.bufLength);
     }
     if (memcpy_s(audioData->Data(), audioData->Capacity(), bufDesc.buffer, bufDesc.bufLength) != EOK) {
@@ -229,7 +230,7 @@ void DAudioEchoCannelManager::OnReadData(size_t length)
         refDataQueue_.pop();
     }
     refDataQueue_.push(audioData);
-    DHLOGI("Push new echo ref data, buf len: %d.", refDataQueue_.size());
+    DHLOGI("Push new echo ref data, buf len: %{puclic}zu.", refDataQueue_.size());
     refQueueCond_.notify_all();
 }
 
@@ -239,7 +240,7 @@ int32_t DAudioEchoCannelManager::AudioCaptureSetUp()
         DHLOGI("Audio capture has been created. no need to setup.");
         return DH_SUCCESS;
     }
-    AudioStandard::AudioCaptureOptions capturerOptions = {
+    AudioStandard::AudioCapturerOptions capturerOptions = {
         {
             AudioStandard::AudioSamplingRate::SAMPLE_RATE_48000,
             AudioStandard::AudioEncodingType::ENCODING_PCM,
@@ -256,8 +257,8 @@ int32_t DAudioEchoCannelManager::AudioCaptureSetUp()
     capturerOptions.playbackCaptureConfig.filterOptions.usages.push_back(AudioStandard::
         StreamUsage::STREAM_USAGE_UNKNOWN);
 
-    audioCapturer_ = AudioStandard::AudioCapturer::create(capturerOptions);
-    CHECK_AND_RETURN_RET_LOG(audioCapturer_ == nullptr, ERR_DH_AUDIO_FAILED, "Audio capture create failed");
+    audioCapturer_ = AudioStandard::AudioCapturer::Create(capturerOptions);
+    CHECK_AND_RETURN_RET_LOG(audioCapturer_ == nullptr, ERR_DH_AUDIO_FAILED, "Audio capture create failed.");
 
     int32_t ret = audioCapturer_->SetCaptureMode(CAPTURE_MODE_CALLBACK);
     CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Set capture mode callback fail, ret %{public}d.", ret);
@@ -283,7 +284,7 @@ int32_t DAudioEchoCannelManager::AudioCaptureStart()
 int32_t DAudioEchoCannelManager::AudioCaptureStop()
 {
     if (audioCapturer_ == nullptr) {
-        DHLOGIE("Audio capturer is nullptr stop.");
+        DHLOGE("Audio capturer is nullptr stop.");
         return ERR_DH_AUDIO_FAILED;
     }
     if (!audioCapturer_->Stop()) {
@@ -298,8 +299,8 @@ int32_t DAudioEchoCannelManager::AudioCaptureRelease()
     if (audioCapturer_ != nullptr && !audioCapturer_->Release()) {
         DHLOGE("Audio capturer release failed.");
     }
-    audioCapturer_ == nullptr;
-    DHLOGE("Audio capturer release end.");
+    audioCapturer_ = nullptr;
+    DHLOGI("Audio capturer release end.");
     return DH_SUCCESS;
 }
 
@@ -347,9 +348,9 @@ int32_t DAudioEchoCannelManager::InitAecProcessor()
         DHLOGE("Aec processor is nullptr.");
         return ERR_DH_AUDIO_NULLPTR;
     }
-    int32_t ret = aecProcessor_->Init(param);
+    int32_t ret = aecProcessor_->Init(aecProcessor_, param);
     if (ret != DH_SUCESS) {
-        DHLOGE("Aec effect processor init fail. errorcode: %d", ret);
+        DHLOGE("Aec effect processor init fail. errorcode: %{public}d", ret);
         return ERR_DH_AUDIO_FAILED;
     }
     DHLOGI("Aec effect process init success.");
@@ -362,13 +363,13 @@ int32_t DAudioEchoCannelManager::StartAecProcessor()
         DHLOGE("Aec process is nullptr.");
         return ERR_DH_AUDIO_NULLPTR;
     }
-    int32_t ret = aecProcessor_->StartUp();
+    int32_t ret = aecProcessor_->StartUp(aecProcessor_);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Aec effect process start fail. errorcode:%d", ret);
+        DHLOGE("Aec effect process start fail. errorcode:%{public}d", ret);
         return ERR_DH_AUDIO_FAILED;
     }
-    if (!isAecRunning.load()) {
-        isAecRunning.store(true);
+    if (!isAecRunning_.load()) {
+        isAecRunning_.store(true);
         aecProcessThread_ = std::thread(&DAudioEchoCannelManager::AecProcessData, this);
     }
     DHLOGI("Aec effect process start success.");
@@ -378,17 +379,17 @@ int32_t DAudioEchoCannelManager::StartAecProcessor()
 int32_t DAudioEchoCannelManager::StopAecProcessor()
 {
     if (aecProcessor_ == nullptr) {
-        DHLOGI("Aec process is nullptr.");
+        DHLOGE("Aec processor is nullptr.");
         return ERR_DH_AUDIO_NULLPTR;
     }
-    int32_t ret = aecProcessor_->ShutDown();
+    int32_t ret = aecProcessor_->ShutDown(aecProcessor_);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Aec effect process stop fail. errorcode:%d", ret);
+        DHLOGE("Aec effect process stop fail. errorcode:%{public}d", ret);
         return ERR_DH_AUDIO_FAILED;
     }
-    if (!isAecRunning.load()) {
+    if (isAecRunning_.load()) {
         DHLOGI("Stop the aec process thread.");
-        isAecRunning.store(false);
+        isAecRunning_.store(false);
         if (aecProcessThread_.joinable()) {
             aecProcessThread_.join();
         }
@@ -399,15 +400,15 @@ int32_t DAudioEchoCannelManager::StopAecProcessor()
 
 int32_t DAudioEchoCannelManager::ReleaseAecProcessor()
 {
-    if (isAecRunning.load()) {
+    if (isAecRunning_.load()) {
         DHLOGI("Stop the aec process thread.");
-        isAecRunning.store(false);
+        isAecRunning_.store(false);
         if (aecProcessThread_.joinable()) {
             aecProcessThread_.join();
         }
     }
     if (aecProcessor_ != nullptr) {
-        if (aecProcessor_->Release() != DH_SUCCESS) {
+        if (aecProcessor_->Release(aecProcessor_) != DH_SUCCESS) {
             DHLOGE("Aec effect process release fail.");
         }
         aecProcessor_ = nullptr;

@@ -136,6 +136,11 @@ typedef struct {
     int64_t tvSec;
     int64_t tvNSec;
 } CurrentTimeHDF;
+
+typedef enum {
+    REF,
+    MIC1,
+} StreamType;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DAUDIO_AUDIO_PARAM_H

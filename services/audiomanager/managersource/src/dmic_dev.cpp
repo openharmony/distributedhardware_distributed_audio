@@ -226,7 +226,7 @@ int32_t DMicDev::SetUp()
         DHLOGE("Mic trans set up failed. ret: %{public}d.", ret);
         return ret;
     }
-    echoCannelOn_ = false;
+    echoCannelOn_ = true;
 #ifdef ECHO_CANNEL_ENABLE
     if (echoCannelOn_ && echoManager_ == nullptr) {
         echoManager_ = std::make_shared<DAudioEchoCannelManager>();
@@ -263,7 +263,7 @@ int32_t DMicDev::Start()
     CHECK_NULL_RETURN(echoManager_, DH_SUCCESS);
     ret = echoManager_->Start();
     if (ret != DH_SUCCESS) {
-        DHLOGE("Echo manager start failed. ret: %d.", ret);
+        DHLOGE("Echo manager start failed. ret: %{public}d.", ret);
         return ret;
     }
 #endif
@@ -297,7 +297,7 @@ int32_t DMicDev::Stop()
     CHECK_NULL_RETURN(echoManager_, DH_SUCCESS);
     ret = echoManager_->Stop();
     if (ret != DH_SUCCESS) {
-        DHLOGE("Echo manager stop failed. ret: %d.", ret);
+        DHLOGE("Echo manager stop failed. ret: %{public}d.", ret);
         return ret;
     }
 #endif
