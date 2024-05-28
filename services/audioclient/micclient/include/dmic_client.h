@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -75,7 +75,7 @@ private:
 private:
     constexpr static uint8_t CHANNEL_WAIT_SECONDS = 5;
     static constexpr const char* CAPTURETHREAD = "captureThread";
-    const std::string MIC_CLIENT_FILENAME = DUMP_FILE_PATH + "/sink_mic_send_to_trans.pcm";
+    const std::string DUMP_DAUDIO_MIC_BEFORE_TRANS_NAME = "dump_sink_mic_before_trans.pcm";
 
     std::string devId_;
     int32_t dhId_;
@@ -92,6 +92,7 @@ private:
     int64_t lastCaptureStartTime_ = 0;
     int64_t lastTransStartTime_ = 0;
     std::atomic<bool> isPauseStatus_ = false;
+    FILE *dumpFile_ = nullptr;
 };
 } // DistributedHardware
 } // OHOS

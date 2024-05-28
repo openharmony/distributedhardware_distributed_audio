@@ -64,6 +64,8 @@ int32_t DAudioEchoCannelManager::SetUp(const AudioCommonParam param,
     }
     ret = InitAecProcessor();
     CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Init Aec Processor error. ret: %{public}d.", ret);
+    DumpFileUtil::OpenDumpFile(DUMP_SERVER_PARA, DUMP_DAUDIO_AEC_REFERENCE_FILENAME, &dumpFileRef_);
+    DumpFileUtil::OpenDumpFile(DUMP_SERVER_PARA, DUMP_DAUDIO_AEC_RECORD_FILENAME, &dumpFileRec_);
 
     ret = AudioCaptureSetUp();
     CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Init Get Reference error. ret: %{public}d.", ret);
@@ -106,6 +108,8 @@ int32_t DAudioEchoCannelManager::Release()
     ret = ReleaseAecProcessor();
     CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Release Aec Processor error. ret: %{public}d.", ret);
     UnLoadAecProcessor();
+    DumpFileUtil::CloseDumpFile(&dumpFileRef_);
+    DumpFileUtil::CloseDumpFile(&dumpFileRec_);
     isStarted.store(false);
     return DH_SUCCESS;
 }
@@ -124,9 +128,7 @@ int32_t DAudioEchoCannelManager::OnMicDataReceived(const std::shared_ptr<AudioDa
             devCallback_->OnDecodeTransDataDone(pipeInData);
             return ERR_DH_AUDIO_FAILED;
         }
-#ifdef DUMP_FILE
-        SaveFile("/data/luzhi.pcm", const_cast<uint8_t*>(pipeInData->Data()), pipeInData->Size());
-#endif
+        DumpFileUtil::WriteDumpFile(dumpFileRec_, static_cast<void *>(pipeInData->Data()), pipeInData->Size());
         devCallback_->OnDecodeTransDataDone(micOutData);
     } else {
         devCallback_->OnDecodeTransDataDone(pipeInData);
@@ -183,9 +185,7 @@ void DAudioEchoCannelManager::AecProcessData()
             refDataQueue_.pop();
             DHLOGI("Pop new echo ref data, ref dataqueue size: %{public}zu.", refDataQueue_.size());
         }
-#ifdef DUMP_FILE
-        SaveFile("/data/cankao.pcm", const_cast<uint8_t*>(refInData->Data()), refInData->Size());
-#endif
+        DumpFileUtil::WriteDumpFile(dumpFileRef_, static_cast<void *>(refInData->Data()), refInData->Size());
         int32_t ret = aecProcessor_->OnSendOriginData(aecProcessor_, refInData->Data(), refInData->Size(),
             StreamType::REF, &refOutDataExt);
         if (ret != DH_SUCCESS) {
@@ -349,7 +349,7 @@ int32_t DAudioEchoCannelManager::InitAecProcessor()
         return ERR_DH_AUDIO_NULLPTR;
     }
     int32_t ret = aecProcessor_->Init(aecProcessor_, param);
-    if (ret != DH_SUCESS) {
+    if (ret != DH_SUCCESS) {
         DHLOGE("Aec effect processor init fail. errorcode: %{public}d", ret);
         return ERR_DH_AUDIO_FAILED;
     }

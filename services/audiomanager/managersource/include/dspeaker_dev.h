@@ -84,15 +84,14 @@ private:
 
 private:
     static constexpr const char* ENQUEUE_THREAD = "spkEnqueueTh";
-    const std::string SPK_DEV_FILENAME = DUMP_FILE_PATH + "/source_spk_write_to_trans.pcm";
-    const std::string SPK_LOWLATENCY_FILENAME = DUMP_FILE_PATH + "/source_spk_read_from_ashmem.pcm";
+    const std::string SPK_DEV_FILENAME = "dump_source_spk_write_to_trans.pcm";
+    const std::string SPK_LOWLATENCY_FILENAME = "dump_source_spk_fast_read_from_ashmem.pcm";
 
     std::weak_ptr<IAudioEventCallback> audioEventCallback_;
     std::mutex channelWaitMutex_;
     std::condition_variable channelWaitCond_;
     std::atomic<bool> isTransReady_ = false;
     std::atomic<bool> isOpened_ = false;
-    std::atomic<bool> dumpFlag_ = false;
     int32_t curPort_ = 0;
     std::shared_ptr<IAudioDataTransport> speakerTrans_ = nullptr;
 
@@ -113,6 +112,8 @@ private:
     std::thread enqueueDataThread_;
     int64_t lastwriteStartTime_ = 0;
     int32_t dhId_ = -1;
+    FILE *dumpFileCommn_ = nullptr;
+    FILE *dumpFileFast_ = nullptr;
 };
 } // DistributedHardware
 } // OHOS

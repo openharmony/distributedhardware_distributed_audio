@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -161,6 +161,7 @@ int32_t DMicClient::SetUp(const AudioParam &param)
         param.comParam.sampleRate, param.comParam.bitFormat, param.comParam.channelMask, param.captureOpts.sourceType,
         param.captureOpts.capturerFlags, param.comParam.frameSize);
     audioParam_ = param;
+    DumpFileUtil::OpenDumpFile(DUMP_SERVER_PARA, DUMP_DAUDIO_MIC_BEFORE_TRANS_NAME, &dumpFile_);
     return AudioFwkClientSetUp();
 }
 
@@ -204,6 +205,7 @@ int32_t DMicClient::Release()
     if (isReleaseError) {
         return ERR_DH_AUDIO_FAILED;
     }
+    DumpFileUtil::CloseDumpFile(&dumpFile_);
     return DH_SUCCESS;
 }
 
@@ -269,11 +271,7 @@ void DMicClient::AudioFwkCaptureData()
     if (isPauseStatus_.load()) {
         memset_s(audioData->Data(), audioData->Size(), 0, audioData->Size());
     }
-#ifdef DUMP_DMICCLIENT_FILE
-    if (DaudioSinkHidumper::GetInstance().QueryDumpDataFlag()) {
-        SaveFile(MIC_CLIENT_FILENAME, const_cast<uint8_t*>(audioData->Data()), audioData->Size());
-    }
-#endif
+    DumpFileUtil::WriteDumpFile(dumpFile_, static_cast<void *>(audioData->Data()), audioData->Size());
     int64_t startTransTime = GetNowTimeUs();
     int32_t ret = micTrans_->FeedAudioData(audioData);
     if (ret != DH_SUCCESS) {

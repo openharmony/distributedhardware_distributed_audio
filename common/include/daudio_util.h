@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,6 +18,7 @@
 
 #include <chrono>
 #include <fstream>
+#include <map>
 #include <string>
 #include "cJSON.h"
 
@@ -26,6 +27,9 @@
 #define AUDIO_NS_PER_SECOND ((int64_t)1000000000)
 namespace OHOS {
 namespace DistributedHardware {
+const std::string DUMP_SERVER_PARA = "sys.daudio.dump.write.enable";
+const std::string DUMP_SERVICE_DIR = "/data/local/tmp/";
+
 int32_t GetLocalDeviceNetworkId(std::string &networkId);
 std::string GetRandomID();
 std::string GetAnonyString(const std::string &value);
@@ -57,6 +61,19 @@ std::string ReduceDhIdPrefix(const std::string &dhId);
 template <typename T>
 bool GetSysPara(const char *key, T &value);
 bool IsParamEnabled(const std::string &key, bool &isEnabled);
+
+class DumpFileUtil {
+public:
+    static void OpenDumpFile(const std::string &para, const std::string &fileName, FILE **file);
+    static void CloseDumpFile(FILE **dumpFile);
+    static void WriteDumpFile(FILE *dumpFile, void *buffer, size_t bufferSize);
+
+    static std::map<std::string, std::string> g_lastPara;
+
+private:
+    static FILE *OpenDumpFileInner(const std::string &para, const std::string &fileName);
+    static void ChangeDumpFileState(const std::string &para, FILE **dumpFile, const std::string &fileName);
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DAUDIO_UTIL_H
