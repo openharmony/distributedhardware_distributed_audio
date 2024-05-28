@@ -97,8 +97,8 @@ private:
     static constexpr size_t LOW_LATENCY_JITTER_TIME_MS = 50;
     static constexpr uint32_t MMAP_WAIT_FRAME_US = 5000;
     static constexpr const char* ENQUEUE_THREAD = "micEnqueueTh";
-    const std::string MIC_DEV_FILENAME = DUMP_FILE_PATH + "/source_mic_read_from_trans.pcm";
-    const std::string MIC_LOWLATENCY_FILENAME = DUMP_FILE_PATH + "/source_mic_write_to_ashmem.pcm";
+    const std::string DUMP_DAUDIO_MIC_READ_FROM_BUF_NAME = "dump_source_mic_read_from_trans.pcm";
+    const std::string DUMP_DAUDIO_LOWLATENCY_MIC_FROM_BUF_NAME = "dump_source_mic_write_to_ashmem.pcm";
 
     std::weak_ptr<IAudioEventCallback> audioEventCallback_;
     std::mutex dataQueueMtx_;
@@ -107,7 +107,6 @@ private:
     int32_t curPort_ = 0;
     std::atomic<bool> isTransReady_ = false;
     std::atomic<bool> isOpened_ = false;
-    std::atomic<bool> dumpFlag_ = false;
     std::shared_ptr<IAudioDataTransport> micTrans_ = nullptr;
 #ifdef ECHO_CANNEL_ENABLE
     std::shared_ptr<DAudioEchoCannelManager> echoManager_ = nullptr;
@@ -137,6 +136,8 @@ private:
     std::condition_variable dataQueueCond_;
     int32_t dhId_ = -1;
     bool echoCannelOn_ = false;
+    FILE *dumpFileCommn_ = nullptr;
+    FILE *dumpFileFast_ = nullptr;
 };
 } // DistributedHardware
 } // OHOS

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -94,7 +94,7 @@ private:
     constexpr static size_t DATA_QUEUE_SIZE = 8;
     constexpr static size_t SLEEP_TIME = 5000;
     static constexpr const char* RENDERTHREAD = "renderThread";
-    const std::string SPK_CLIENT_FILENAME = DUMP_FILE_PATH + "/sink_spk_recv_from_trans.pcm";
+    const std::string DUMP_DAUDIO_SPK_AFTER_TRANS_NAME = "dump_sink_spk_recv_from_trans.pcm";
 
     std::string devId_;
     const int32_t dhId_;
@@ -112,6 +112,7 @@ private:
     std::weak_ptr<IAudioEventCallback> eventCallback_;
     int64_t lastPlayStartTime_ = 0;
     int64_t lastReceiveStartTime_ = 0;
+    FILE *dumpFile_ = nullptr;
 };
 } // DistributedHardware
 } // OHOS

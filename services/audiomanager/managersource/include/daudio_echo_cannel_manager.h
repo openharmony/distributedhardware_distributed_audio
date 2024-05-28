@@ -27,6 +27,7 @@
 
 #include "audio_data.h"
 #include "audio_param.h"
+#include "daudio_util.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -62,6 +63,10 @@ private:
     int32_t StopAecProcessor();
     int32_t ReleaseAecProcessor();
 
+private:
+    const std::string DUMP_DAUDIO_AEC_REFERENCE_FILENAME = "dump_aec_reference_signal.pcm";
+    const std::string DUMP_DAUDIO_AEC_RECORD_FILENAME = "dump_aec_record_signal.pcm";
+
     std::unique_ptr<AudioStandard::AudioCapturer> audioCapturer_ = nullptr;
     std::atomic<bool> isAecRunning_ = false;
     std::thread aecProcessThread_;
@@ -79,6 +84,8 @@ private:
     std::mutex outQueueMtx_;
     std::condition_variable refQueueCond_;
     std::atomic<bool> isStarted = false;
+    FILE *dumpFileRef_ = nullptr;
+    FILE *dumpFileRec_ = nullptr;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

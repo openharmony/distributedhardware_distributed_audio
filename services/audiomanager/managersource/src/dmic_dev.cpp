@@ -240,6 +240,8 @@ int32_t DMicDev::SetUp()
         echoManager_->SetUp(info, shared_from_this());
     }
 #endif
+    DumpFileUtil::OpenDumpFile(DUMP_SERVER_PARA, DUMP_DAUDIO_MIC_READ_FROM_BUF_NAME, &dumpFileCommn_);
+    DumpFileUtil::OpenDumpFile(DUMP_SERVER_PARA, DUMP_DAUDIO_LOWLATENCY_MIC_FROM_BUF_NAME, &dumpFileFast_);
     return DH_SUCCESS;
 }
 
@@ -326,7 +328,8 @@ int32_t DMicDev::Release()
         echoManager_ = nullptr;
     }
 #endif
-    dumpFlag_.store(false);
+    DumpFileUtil::CloseDumpFile(&dumpFileCommn_);
+    DumpFileUtil::CloseDumpFile(&dumpFileFast_);
     return DH_SUCCESS;
 }
 
@@ -365,16 +368,8 @@ int32_t DMicDev::ReadStreamData(const int32_t streamId, std::shared_ptr<AudioDat
         data = dataQueue_.front();
         dataQueue_.pop();
     }
-#ifdef DUMP_DMICDEV_FILE
-    if (DaudioHidumper::GetInstance().QueryDumpDataFlag()) {
-        if (!dumpFlag_) {
-            AudioEvent event(NOTIFY_HDF_MIC_DUMP, "");
-            NotifyHdfAudioEvent(event, dhId_);
-            dumpFlag_.store(true);
-        }
-        SaveFile(MIC_DEV_FILENAME, const_cast<uint8_t*>(data->Data()), data->Size());
-    }
-#endif
+
+    DumpFileUtil::WriteDumpFile(dumpFileCommn_, static_cast<void *>(data->Data()), data->Size());
     int64_t endTime = GetNowTimeUs();
     if (IsOutDurationRange(startTime, endTime, lastReadStartTime_)) {
         DHLOGE("This time read data spend: %{public}" PRId64" us, The interval of read data this time and "
@@ -454,11 +449,7 @@ void DMicDev::EnqueueThread()
                 dataQueue_.pop();
             }
         }
-#ifdef DUMP_DMICDEV_FILE
-    if (DaudioHidumper::GetInstance().QueryDumpDataFlag()) {
-        SaveFile(MIC_LOWLATENCY_FILENAME, const_cast<uint8_t*>(audioData->Data()), audioData->Size());
-    }
-#endif
+        DumpFileUtil::WriteDumpFile(dumpFileFast_, static_cast<void *>(audioData->Data()), audioData->Size());
         bool writeRet = ashmem_->WriteToAshmem(audioData->Data(), audioData->Size(), writeIndex_);
         if (writeRet) {
             DHLOGD("Write to ashmem success! write index: %{public}d, writeLength: %{public}d.",

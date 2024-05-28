@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,11 +15,13 @@
 
 #include "daudio_util.h"
 
-#include <ctime>
 #include <cstddef>
+#include <ctime>
 #include <iomanip>
 #include <map>
+#include <ostream>
 #include <random>
+#include <sstream>
 #include <sstream>
 #include <sys/time.h>
 
@@ -520,17 +522,12 @@ std::string ReduceDhIdPrefix(const std::string &dhId)
 template <typename T>
 bool GetSysPara(const char *key, T &value)
 {
-    if (key == nullptr) {
-        DHLOGE("GetSysPara: key is nullptr");
-        return false;
-    }
-    char paraValue[20] = {0}; // 20 for system parameter
+    CHECK_AND_RETURN_RET_LOG(key == nullptr, false, "key is nullptr");
+    char paraValue[30] = {0}; // 30 for system parameter
     auto res = GetParameter(key, "-1", paraValue, sizeof(paraValue));
-    if (res <= 0) {
-        DHLOGD("GetSysPara fail, key:%{public}s res:%{public}d", key, res);
-        return false;
-    }
-    DHLOGI("GetSysPara: key:%{public}s value:%{public}s", key, paraValue);
+
+    CHECK_AND_RETURN_RET_LOG(res <= 0, false, "GetParameter fail, key:%{public}s res:%{public}d", key, res);
+    DHLOGI("GetSysPara key:%{public}s value:%{public}s", key, paraValue);
     std::stringstream valueStr;
     valueStr << paraValue;
     valueStr >> value;
@@ -568,6 +565,77 @@ void SaveFile(const std::string fileName, uint8_t *audioData, int32_t size)
     }
     ofs.write(reinterpret_cast<char*>(audioData), size);
     ofs.close();
+}
+
+std::map<std::string, std::string> DumpFileUtil::g_lastPara = {};
+
+FILE *DumpFileUtil::OpenDumpFileInner(const std::string &para, const std::string &fileName)
+{
+    std::string filePath = DUMP_SERVICE_DIR + fileName;
+    std::string dumpPara;
+    FILE *dumpFile = nullptr;
+    bool res = GetSysPara(para.c_str(), dumpPara);
+    if (!res || dumpPara.empty()) {
+        DHLOGI("%{public}s is not set, dump dcamera is not required", para.c_str());
+        g_lastPara[para] = dumpPara;
+        return dumpFile;
+    }
+    DHLOGI("%{public}s = %{public}s, filePath: %{public}s", para.c_str(), dumpPara.c_str(), filePath.c_str());
+    if (dumpPara == "w") {
+        dumpFile = fopen(filePath.c_str(), "wb+");
+        CHECK_AND_RETURN_RET_LOG(dumpFile == nullptr, dumpFile, "Error opening dump file!");
+    } else if (dumpPara == "a") {
+        dumpFile = fopen(filePath.c_str(), "ab+");
+        CHECK_AND_RETURN_RET_LOG(dumpFile == nullptr, dumpFile, "Error opening dump file!");
+    }
+    g_lastPara[para] = dumpPara;
+    return dumpFile;
+}
+
+void DumpFileUtil::WriteDumpFile(FILE *dumpFile, void *buffer, size_t bufferSize)
+{
+    if (dumpFile == nullptr) {
+        return;
+    }
+    CHECK_AND_RETURN_LOG(buffer == nullptr, "Invalid write param");
+    size_t writeResult = fwrite(buffer, 1, bufferSize, dumpFile);
+    CHECK_AND_RETURN_LOG(writeResult != bufferSize, "Failed to write the file.");
+}
+
+void DumpFileUtil::CloseDumpFile(FILE **dumpFile)
+{
+    if (*dumpFile) {
+        fclose(*dumpFile);
+        *dumpFile = nullptr;
+    }
+}
+
+void DumpFileUtil::ChangeDumpFileState(const std::string &para, FILE **dumpFile, const std::string &filePath)
+{
+    CHECK_AND_RETURN_LOG(*dumpFile == nullptr, "Invalid file para");
+    CHECK_AND_RETURN_LOG(g_lastPara[para] != "w" || g_lastPara[para] != "a", "Invalid input para");
+    std::string dumpPara;
+    bool res = GetSysPara(para.c_str(), dumpPara);
+    if (!res || dumpPara.empty()) {
+        DHLOGE("get %{public}s fail", para.c_str());
+    }
+    if (g_lastPara[para] == "w" && dumpPara == "w") {
+        return;
+    }
+    CloseDumpFile(dumpFile);
+    OpenDumpFile(para, filePath, dumpFile);
+}
+
+void DumpFileUtil::OpenDumpFile(const std::string &para, const std::string &fileName, FILE **file)
+{
+    if (*file != nullptr) {
+        DumpFileUtil::ChangeDumpFileState(para, file, fileName);
+        return;
+    }
+
+    if (para == DUMP_SERVER_PARA) {
+        *file = DumpFileUtil::OpenDumpFileInner(para, fileName);
+    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS

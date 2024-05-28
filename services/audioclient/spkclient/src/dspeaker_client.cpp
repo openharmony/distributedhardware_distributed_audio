@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -153,8 +153,8 @@ int32_t DSpeakerClient::SetUp(const AudioParam &param)
         DHLOGE("Set up failed, Create Audio renderer failed.");
         return ret;
     }
+    DumpFileUtil::OpenDumpFile(DUMP_SERVER_PARA, DUMP_DAUDIO_SPK_AFTER_TRANS_NAME, &dumpFile_);
     CHECK_NULL_RETURN(speakerTrans_, ERR_DH_AUDIO_NULLPTR);
-
     ret = speakerTrans_->SetUp(audioParam_, audioParam_, shared_from_this(), CAP_SPK);
     if (ret != DH_SUCCESS) {
         DHLOGE("Speaker trans setup failed.");
@@ -207,6 +207,7 @@ int32_t DSpeakerClient::Release()
         audioRenderer_ = nullptr;
     }
     clientStatus_ = AudioStatus::STATUS_IDLE;
+    DumpFileUtil::CloseDumpFile(&dumpFile_);
     return isSucess ? DH_SUCCESS : ERR_DH_AUDIO_CLIENT_RENDER_RELEASE_FAILED;
 }
 
@@ -289,11 +290,7 @@ void DSpeakerClient::PlayThreadRunning()
             uint64_t queueSize = static_cast<uint64_t>(dataQueue_.size());
             DHLOGD("Pop spk data, dataqueue size: %{public}" PRIu64, queueSize);
         }
-#ifdef DUMP_DSPEAKERCLIENT_FILE
-        if (DaudioSinkHidumper::GetInstance().QueryDumpDataFlag()) {
-            SaveFile(SPK_CLIENT_FILENAME, const_cast<uint8_t*>(audioData->Data()), audioData->Size());
-        }
-#endif
+        DumpFileUtil::WriteDumpFile(dumpFile_, static_cast<void *>(audioData->Data()), audioData->Size());
         int32_t writeOffSet = 0;
         while (writeOffSet < static_cast<int32_t>(audioData->Capacity())) {
             int32_t writeLen = audioRenderer_->Write(audioData->Data() + writeOffSet,
