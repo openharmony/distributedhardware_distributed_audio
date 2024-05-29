@@ -15,7 +15,9 @@
         "name": "distributed_audio",
         "subsystem": "distributedhardware",
         "syscap": [],
-        "features": [],
+        "features": [
+            "distributed_audio_extension_sa"
+        ],
         "adapted_system_type": [
             "standard"
         ],
