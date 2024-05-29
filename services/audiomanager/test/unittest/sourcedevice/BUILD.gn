@@ -49,6 +49,16 @@ config("module_private_config") {
     "${services_path}/common/audiodata/include",
     "${services_path}/common/audioeventcallback",
   ]
+
+  if (distributed_audio_extension_sa) {
+    include_dirs += [
+      "${distributedaudio_ext_path}/services/audioprocessor/aeceffectprocessor/include",
+      "${distributedaudio_ext_path}/services/audioprocessor/effectcomponent/audiopipeline/include",
+      "${distributedaudio_ext_path}/services/audioprocessor/effectcomponent/elementfactory/include",
+      "${distributedaudio_ext_path}/services/audioprocessor/effectcomponent/elements/include",
+      "${distributedaudio_ext_path}/services/audioprocessor/effectcomponent/pipelinemanager/include",
+    ]
+  }
 }
 
 ## UnitTest daudio_source_dev_test
@@ -80,6 +90,14 @@ ohos_unittest("DaudioSourceDevTest") {
     "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]
+
+  cflags = []
+
+  if (distributed_audio_extension_sa) {
+    cflags += [ "-DECHO_CANNEL_ENABLE" ]
+  }
+
+  cflags_cc = cflags
 }
 
 ## UnitTest daudio_source_dev_test
@@ -107,6 +125,14 @@ ohos_unittest("DMicDevTest") {
     "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]
+
+  cflags = []
+
+  if (distributed_audio_extension_sa) {
+    cflags += [ "-DECHO_CANNEL_ENABLE" ]
+  }
+
+  cflags_cc = cflags
 }
 
 ## UnitTest daudio_source_dev_test
