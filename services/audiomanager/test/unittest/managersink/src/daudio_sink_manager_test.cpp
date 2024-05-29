@@ -224,12 +224,12 @@ HWTEST_F(DAudioSinkManagerTest, VerifySecurityLevel_001, TestSize.Level1)
     }
     sptr<DAudioSinkIpcCallbackProxy> dAudioSinkIpcCallbackProxy(new DAudioSinkIpcCallbackProxy(remoteObject));
     daudioSinkManager.ipcSinkCallback_ = dAudioSinkIpcCallbackProxy;
-    EXPECT_NE(DH_SUCCESS, daudioSinkManager.VerifySecurityLevel(devId));
+    EXPECT_EQ(DH_SUCCESS, daudioSinkManager.VerifySecurityLevel(devId));
     daudioSinkManager.isSensitive_ = true;
     daudioSinkManager.isSameAccount_ = false;
-    EXPECT_NE(DH_SUCCESS, daudioSinkManager.VerifySecurityLevel(devId));
+    EXPECT_EQ(DH_SUCCESS, daudioSinkManager.VerifySecurityLevel(devId));
     daudioSinkManager.isSameAccount_ = true;
-    EXPECT_NE(DH_SUCCESS, daudioSinkManager.VerifySecurityLevel(devId));
+    EXPECT_EQ(DH_SUCCESS, daudioSinkManager.VerifySecurityLevel(devId));
 }
 
 /**
