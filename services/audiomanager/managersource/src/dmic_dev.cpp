@@ -142,6 +142,7 @@ int32_t DMicDev::CreateStream(const int32_t streamId)
     cbObj->NotifyEvent(event);
     DAudioHisysevent::GetInstance().SysEventWriteBehavior(DAUDIO_OPEN, devId_, std::to_string(dhId_),
         "daudio mic device open success.");
+    streamId_ = streamId;
     cJSON_Delete(jParam);
     cJSON_free(jsonData);
     return DH_SUCCESS;
@@ -500,9 +501,10 @@ AudioParam DMicDev::GetAudioParam() const
 
 int32_t DMicDev::NotifyHdfAudioEvent(const AudioEvent &event, const int32_t portId)
 {
-    int32_t ret = DAudioHdiHandler::GetInstance().NotifyEvent(devId_, portId, 0, event);
+    int32_t ret = DAudioHdiHandler::GetInstance().NotifyEvent(devId_, portId, streamId_, event);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Notify event: %{public}d, result: %{public}s.", event.type, event.content.c_str());
+        DHLOGE("Notify event: %{public}d, result: %{public}s, streamId: %{public}d.",
+            event.type, event.content.c_str(), streamId_);
     }
     return DH_SUCCESS;
 }

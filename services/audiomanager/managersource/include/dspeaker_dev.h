@@ -93,6 +93,7 @@ private:
     std::atomic<bool> isTransReady_ = false;
     std::atomic<bool> isOpened_ = false;
     int32_t curPort_ = 0;
+    int32_t streamId_ = 0;
     std::shared_ptr<IAudioDataTransport> speakerTrans_ = nullptr;
 
     // Speaker render parameters
