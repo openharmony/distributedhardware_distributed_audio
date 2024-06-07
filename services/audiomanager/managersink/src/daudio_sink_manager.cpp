@@ -429,7 +429,7 @@ int32_t DAudioSinkManager::StopDistributedHardware(const std::string &networkId)
 bool DAudioSinkManager::CheckDeviceSecurityLevel(const std::string &srcDeviceId, const std::string &dstDeviceId)
 {
     DHLOGI("CheckDeviceSecurityLevel srcDeviceId %{public}s, dstDeviceId %{public}s.",
-        srcDeviceId.c_str(), dstDeviceId.c_str());
+        GetAnonyString(srcDeviceId).c_str(), GetAnonyString(dstDeviceId).c_str());
     std::string srcUdid = GetUdidByNetworkId(srcDeviceId);
     if (srcUdid.empty()) {
         DHLOGE("src udid is empty");
