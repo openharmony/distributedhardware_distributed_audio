@@ -80,6 +80,7 @@ private:
     std::mutex devMapMutex_;
     std::unordered_map<std::string, std::shared_ptr<DAudioSinkDev>> audioDevMap_;
     std::mutex remoteSvrMutex_;
+    std::mutex ipcCallbackMutex_;
     std::map<std::string, sptr<IDAudioSource>> sourceServiceMap_;
     std::thread devClearThread_;
     std::string localNetworkId_;

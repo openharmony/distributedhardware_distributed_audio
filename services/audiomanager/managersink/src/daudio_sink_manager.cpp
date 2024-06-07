@@ -63,8 +63,11 @@ DAudioSinkManager::~DAudioSinkManager()
 int32_t DAudioSinkManager::Init(const sptr<IDAudioSinkIpcCallback> &sinkCallback)
 {
     DHLOGI("Init audio sink manager.");
-    initCallback_ = std::make_shared<DeviceInitCallback>();
-    ipcSinkCallback_ = sinkCallback;
+    {
+        std::lock_guard<std::mutex> lock(ipcCallbackMutex_);
+        initCallback_ = std::make_shared<DeviceInitCallback>();
+        ipcSinkCallback_ = sinkCallback;
+    }
     CHECK_AND_RETURN_RET_LOG(GetLocalDeviceNetworkId(localNetworkId_) != DH_SUCCESS,
         ERR_DH_AUDIO_FAILED, "%{public}s", "Get local network id failed.");
     CHECK_AND_RETURN_RET_LOG(LoadAVReceiverEngineProvider() != DH_SUCCESS,

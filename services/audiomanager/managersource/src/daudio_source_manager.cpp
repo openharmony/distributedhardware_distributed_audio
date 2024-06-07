@@ -79,9 +79,11 @@ int32_t DAudioSourceManager::Init(const sptr<IDAudioIpcCallback> &callback)
         DHLOGE("Get local network id failed.");
         return ERR_DH_AUDIO_FAILED;
     }
-
-    ipcCallback_ = callback;
-    daudioMgrCallback_ = std::make_shared<DAudioSourceMgrCallback>();
+    {
+        std::lock_guard<std::mutex> lock(ipcCallbackMutex_);
+        ipcCallback_ = callback;
+        daudioMgrCallback_ = std::make_shared<DAudioSourceMgrCallback>();
+    }
     int32_t ret = LoadAVSenderEngineProvider();
     if (ret != DH_SUCCESS) {
         DHLOGE("load av transport sender engine provider failed");
