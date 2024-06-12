@@ -93,7 +93,7 @@ private:
     IAVEngineProvider *rcvProviderPtr_ = nullptr;
     void *pSHandler_ = nullptr;
     void *pRHandler_ = nullptr;
-    std::atomic<bool> isHicollieRunning_ = false;
+    std::atomic<bool> isHicollieRunning_ = true;
 
     class SourceManagerHandler : public AppExecFwk::EventHandler {
     public:

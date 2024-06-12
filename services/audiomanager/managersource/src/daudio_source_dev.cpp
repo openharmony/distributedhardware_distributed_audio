@@ -48,7 +48,6 @@ constexpr uint32_t EVENT_MMAP_MIC_START = 83;
 constexpr uint32_t EVENT_MMAP_MIC_STOP = 84;
 constexpr uint32_t EVENT_DAUDIO_ENABLE = 88;
 constexpr uint32_t EVENT_DAUDIO_DISABLE = 89;
-constexpr uint32_t EVENT_SET_THREAD_STATUS = 90;
 }
 
 DAudioSourceDev::DAudioSourceDev(const std::string &devId, const std::shared_ptr<DAudioSourceMgrCallback> &callback)
@@ -196,34 +195,14 @@ int32_t DAudioSourceDev::DisableDAudio(const std::string &dhId)
     return DH_SUCCESS;
 }
 
-int32_t DAudioSourceDev::RestoreThreadStatus()
-{
-    CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
-    cJSON *jParam = cJSON_CreateObject();
-    CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
-    char *jsonString = cJSON_PrintUnformatted(jParam);
-    CHECK_NULL_FREE_RETURN(jsonString, ERR_DH_AUDIO_NULLPTR, jParam);
-    auto eventParam = std::make_shared<std::string>(jsonString);
-    auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_SET_THREAD_STATUS, eventParam, 0);
-    if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
-        DHLOGE("Send event failed.");
-        cJSON_Delete(jParam);
-        cJSON_free(jsonString);
-        return ERR_DH_AUDIO_FAILED;
-    }
-    cJSON_Delete(jParam);
-    cJSON_free(jsonString);
-    return DH_SUCCESS;
-}
-
 bool DAudioSourceDev::GetThreadStatusFlag()
 {
     return threadStatusFlag_;
 }
 
-void DAudioSourceDev::SetThreadStatusFlag()
+void DAudioSourceDev::SetThreadStatusFlag(bool flag)
 {
-    threadStatusFlag_ = false;
+    threadStatusFlag_ = flag;
 }
 
 void DAudioSourceDev::NotifyEvent(const AudioEvent &event)
@@ -724,7 +703,6 @@ int32_t DAudioSourceDev::TaskOpenDSpeaker(const std::string &args)
     }
     int32_t dhId = ParseDhidFromEvent(args);
     if (dhId < 0) {
-        DHLOGE("Failed to parse dhardware id.");
         return ERR_DH_AUDIO_FAILED;
     }
     auto speaker = FindIoDevImpl(args);
@@ -736,6 +714,13 @@ int32_t DAudioSourceDev::TaskOpenDSpeaker(const std::string &args)
     int32_t ret = speaker->InitSenderEngine(DAudioSourceManager::GetInstance().getSenderProvider());
     if (ret != DH_SUCCESS) {
         DHLOGE("Speaker init sender Engine, error code %{public}d.", ret);
+        NotifyHDF(NOTIFY_OPEN_SPEAKER_RESULT, HDF_EVENT_INIT_ENGINE_FAILED, dhId);
+        return ret;
+    }
+
+    ret = WaitForRPC(NOTIFY_OPEN_CTRL_RESULT);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Speaker init sender engine, create ctrl error.");
         NotifyHDF(NOTIFY_OPEN_SPEAKER_RESULT, HDF_EVENT_INIT_ENGINE_FAILED, dhId);
         return ret;
     }
@@ -866,6 +851,30 @@ int32_t DAudioSourceDev::TaskCloseDSpeaker(const std::string &args)
     return DH_SUCCESS;
 }
 
+int32_t DAudioSourceDev::CreateMicEngine(std::shared_ptr<DAudioIoDev> mic)
+{
+    if (mic == nullptr) {
+        DHLOGE("Mic device not init");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    int32_t ret = mic->InitReceiverEngine(DAudioSourceManager::GetInstance().getReceiverProvider());
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Init receiver engine failed.");
+        return ret;
+    }
+    ret = WaitForRPC(NOTIFY_OPEN_CTRL_RESULT);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Mic init sender engine, create ctrl error.");
+        return ret;
+    }
+    ret = mic->SetUp();
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Mic setup failed.");
+        return ret;
+    }
+    return DH_SUCCESS;
+}
+
 int32_t DAudioSourceDev::TaskOpenDMic(const std::string &args)
 {
     DHLOGI("Task open mic, args: %{public}s.", args.c_str());
@@ -880,16 +889,10 @@ int32_t DAudioSourceDev::TaskOpenDMic(const std::string &args)
         NotifyHDF(NOTIFY_OPEN_MIC_RESULT, HDF_EVENT_RESULT_FAILED, dhId);
         return ERR_DH_AUDIO_NULLPTR;
     }
-    int32_t ret = mic->InitReceiverEngine(DAudioSourceManager::GetInstance().getReceiverProvider());
+    int32_t ret = CreateMicEngine(mic);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Init receiver engine failed.");
+        DHLOGE("Create mic engine failed.");
         NotifyHDF(NOTIFY_OPEN_MIC_RESULT, HDF_EVENT_INIT_ENGINE_FAILED, dhId);
-        return ret;
-    }
-    ret = mic->SetUp();
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Mic setup failed.");
-        NotifyHDF(NOTIFY_OPEN_MIC_RESULT, HDF_EVENT_TRANS_SETUP_FAILED, dhId);
         return ret;
     }
 
@@ -1165,7 +1168,7 @@ int32_t DAudioSourceDev::NotifySinkDev(const AudioEventType type, const cJSON *P
     cJSON *jParamCopy = cJSON_Duplicate(Param, 1);
     cJSON_AddItemToObject(jParam, KEY_AUDIO_PARAM, jParamCopy);
     cJSON_AddStringToObject(jParam, KEY_RANDOM_TASK_CODE, std::to_string(randomTaskCode).c_str());
-    DHLOGD("Notify sink dev, new engine, random task code:%{public}s", std::to_string(randomTaskCode).c_str());
+    DHLOGI("Notify sink dev, new engine, random task code:%{public}s", std::to_string(randomTaskCode).c_str());
 
     std::lock_guard<std::mutex> devLck(ioDevMtx_);
     int32_t dhIdInt = ConvertString2Int(dhId);
@@ -1268,7 +1271,6 @@ DAudioSourceDev::SourceEventHandler::SourceEventHandler(const std::shared_ptr<Ap
     mapEventFuncs_[EVENT_MMAP_SPK_STOP] = &DAudioSourceDev::SourceEventHandler::SpkMmapStopCallback;
     mapEventFuncs_[EVENT_MMAP_MIC_START] = &DAudioSourceDev::SourceEventHandler::MicMmapStartCallback;
     mapEventFuncs_[EVENT_MMAP_MIC_STOP] = &DAudioSourceDev::SourceEventHandler::MicMmapStopCallback;
-    mapEventFuncs_[EVENT_SET_THREAD_STATUS] = &DAudioSourceDev::SourceEventHandler::SetThreadStatusFlagTrue;
 }
 
 DAudioSourceDev::SourceEventHandler::~SourceEventHandler() {}
@@ -1530,14 +1532,6 @@ void DAudioSourceDev::SourceEventHandler::MicMmapStopCallback(const AppExecFwk::
         return;
     }
     DHLOGI("Stop mic with mmap mode successfully.");
-}
-
-void DAudioSourceDev::SourceEventHandler::SetThreadStatusFlagTrue(const AppExecFwk::InnerEvent::Pointer &event)
-{
-    (void) event;
-    auto sourceDevObj = sourceDev_.lock();
-    CHECK_NULL_VOID(sourceDevObj);
-    sourceDevObj->threadStatusFlag_ = true;
 }
 
 int32_t DAudioSourceDev::SourceEventHandler::GetEventParam(const AppExecFwk::InnerEvent::Pointer &event,

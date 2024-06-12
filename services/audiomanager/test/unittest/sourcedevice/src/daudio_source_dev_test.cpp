@@ -1178,7 +1178,6 @@ HWTEST_F(DAudioSourceDevTest, EnableDMic_003, TestSize.Level1)
     sourceDev_->handler_->SpkMmapStopCallback(msgEvent);
     sourceDev_->handler_->MicMmapStartCallback(msgEvent);
     sourceDev_->handler_->MicMmapStopCallback(msgEvent);
-    sourceDev_->handler_->SetThreadStatusFlagTrue(msgEvent);
     sourceDev_->SleepAudioDev();
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->EnableDMic(dhId, ATTRS));
 }
