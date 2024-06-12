@@ -202,6 +202,8 @@ int32_t DAudioSinkManager::CreateAudioDevice(const std::string &devId)
     std::string eventContent = std::string(jsonData);
     cJSON_free(jsonData);
     cJSON_Delete(jParam);
+    const int32_t SLEEP_TIME = 300;
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_TIME));
     NotifyEvent(devId, CTRL_OPENED, eventContent);
     return DH_SUCCESS;
 }
@@ -223,7 +225,7 @@ int32_t DAudioSinkManager::InitAudioDevice(std::shared_ptr<DAudioSinkDev> dev, c
             DHLOGE("Verify security level failed.");
             return ERR_DH_AUDIO_FAILED;
         }
-        SetDevLevelStatus(true);
+        dev->SetDevLevelStatus(true);
         ret = dev->InitAVTransEngines(ChannelState::MIC_CONTROL_OPENED, sendProviderPtr_);
     }
     if (ret != DH_SUCCESS) {

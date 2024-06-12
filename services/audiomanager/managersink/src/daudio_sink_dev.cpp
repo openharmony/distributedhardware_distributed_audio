@@ -463,7 +463,6 @@ void DAudioSinkDev::JudgeDeviceStatus()
 
 void DAudioSinkDev::SetDevLevelStatus(bool checkStatus)
 {
-    // todo 这里改为atomic
     isDevLevelStatus_ = checkStatus;
 }
 

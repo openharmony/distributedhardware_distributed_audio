@@ -851,7 +851,7 @@ int32_t DAudioSourceDev::TaskCloseDSpeaker(const std::string &args)
     return DH_SUCCESS;
 }
 
-int32_t DAudioSourceDev::CreateMicEngine(std::shared_ptr<DMicDev> mic)
+int32_t DAudioSourceDev::CreateMicEngine(std::shared_ptr<DAudioIoDev> mic)
 {
     if (mic == nullptr) {
         DHLOGE("Mic device not init");

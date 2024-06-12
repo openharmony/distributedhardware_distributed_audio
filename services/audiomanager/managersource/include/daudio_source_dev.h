@@ -111,7 +111,7 @@ private:
     std::shared_ptr<DAudioIoDev> FindIoDevImpl(std::string args);
     int32_t ParseDhidFromEvent(std::string args);
     int32_t ConvertString2Int(std::string val);
-    int32_t CreateMicEngine(std::shared_ptr<DMicDev> mic);
+    int32_t CreateMicEngine(std::shared_ptr<DAudioIoDev> mic);
 
 private:
     static constexpr uint8_t RPC_WAIT_SECONDS = 10;

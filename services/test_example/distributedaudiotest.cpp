@@ -156,13 +156,19 @@ static int32_t GetUserInput()
     int32_t res = -1;
     size_t count = 3;
     std::cout << ">>";
-    scanf_s("%d", &res);
+    int ret = scanf_s("%d", &res);
+    if (ret == -1) {
+        std::cout << "get input error" << std::endl;
+    }
     while (std::cin.fail() && count > 0) {
         std::cin.clear();
         std::cin.ignore();
         std::cout << "invalid input, not a number! Please retry with a number." << std::endl;
         std::cout << ">>";
-        scanf_s("%d", &res);
+        ret = scanf_s("%d", &res);
+        if (ret == -1) {
+            std::cout << "get input error" << std::endl;
+        }
         count--;
     }
     return res;
