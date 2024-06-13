@@ -105,6 +105,7 @@ private:
     std::mutex channelWaitMutex_;
     std::condition_variable channelWaitCond_;
     int32_t curPort_ = 0;
+    int32_t streamId_ = 100;
     std::atomic<bool> isTransReady_ = false;
     std::atomic<bool> isOpened_ = false;
     std::shared_ptr<IAudioDataTransport> micTrans_ = nullptr;
