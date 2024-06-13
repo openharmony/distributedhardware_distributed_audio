@@ -608,7 +608,6 @@ void DAudioSourceManager::SourceManagerHandler::EnableDAudioCallback(const AppEx
         DHLOGE("Failed to get event parameters.");
         return;
     }
-    DHLOGI("Enable audio device, param:%{public}s.", eventParam.c_str());
     DAudioSourceManager::GetInstance().DoEnableDAudio(eventParam);
 }
 
