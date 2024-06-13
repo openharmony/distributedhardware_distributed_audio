@@ -378,7 +378,7 @@ int32_t DAudioSourceDev::HandleNotifyRPC(const AudioEvent &event)
         cJSON_Delete(jParam);
         return ERR_DH_AUDIO_FAILED;
     }
-    
+
     rpcResult_ = cJSON_GetObjectItem(jParam, KEY_RESULT)->valueint;
     DHLOGD("Notify RPC event: %{public}d, result: %{public}d.", event.type, rpcResult_);
     std::map<AudioEventType, uint8_t>::iterator iter = eventNotifyMap_.find(event.type);
@@ -788,7 +788,6 @@ int32_t DAudioSourceDev::TaskOpenDSpeaker(const std::string &args)
 
 int32_t DAudioSourceDev::ParseDhidFromEvent(std::string args)
 {
-    DHLOGI("ParseDhidFrom args : %{public}s", args.c_str());
     cJSON *jParam = cJSON_Parse(args.c_str());
     CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_FAILED);
     if (!CJsonParamCheck(jParam, { KEY_DH_ID })) {
