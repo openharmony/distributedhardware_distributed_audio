@@ -126,7 +126,7 @@ HWTEST_F(DMicDevTest, DestroyStream_001, TestSize.Level1)
  */
 HWTEST_F(DMicDevTest, SetParameters_001, TestSize.Level1)
 {
-    const AudioParamHDF param = {
+    AudioParamHDF param = {
         .sampleRate = SAMPLE_RATE_8000,
         .channelMask = STEREO,
         .bitFormat = SAMPLE_U8,
@@ -137,6 +137,15 @@ HWTEST_F(DMicDevTest, SetParameters_001, TestSize.Level1)
     };
     EXPECT_EQ(DH_SUCCESS, mic_->SetParameters(streamId_, param));
     mic_->GetAudioParam();
+    param.streamUsage = StreamUsage::STREAM_USAGE_VOICE_COMMUNICATION;
+    EXPECT_EQ(DH_SUCCESS, mic_->SetParameters(streamId_, param));
+
+    param.capturerFlags = MMAP_MODE;
+    EXPECT_EQ(ERR_DH_AUDIO_SA_PARAM_INVALID, mic_->SetParameters(streamId_, param));
+    param.period = 5;
+    EXPECT_EQ(DH_SUCCESS, mic_->SetParameters(streamId_, param));
+    param.period = 20;
+    EXPECT_EQ(DH_SUCCESS, mic_->SetParameters(streamId_, param));
 }
 
 /**

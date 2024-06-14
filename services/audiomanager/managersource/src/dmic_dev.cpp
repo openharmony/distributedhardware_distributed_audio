@@ -179,6 +179,10 @@ int32_t DMicDev::SetParameters(const int32_t streamId, const AudioParamHDF &para
     DHLOGD("Set mic parameters {samplerate: %{public}d, channelmask: %{public}d, format: %{public}d, "
         "period: %{public}d, framesize: %{public}d, ext{%{public}s}}.", param.sampleRate,
         param.channelMask, param.bitFormat, param.period, param.frameSize, param.ext.c_str());
+    if (param.capturerFlags == MMAP_MODE && param.period != MMAP_NORMAL_PERIOD && param.period != MMAP_VOIP_PERIOD) {
+        DHLOGE("The period is invalid : %{public}" PRIu32, param.period);
+        return ERR_DH_AUDIO_SA_PARAM_INVALID;
+    }
     curPort_ = dhId_;
     paramHDF_ = param;
 
@@ -193,6 +197,10 @@ int32_t DMicDev::SetParameters(const int32_t streamId, const AudioParamHDF &para
         param_.captureOpts.sourceType = SOURCE_TYPE_MIC;
     }
     param_.captureOpts.capturerFlags = paramHDF_.capturerFlags;
+    if (paramHDF_.capturerFlags == MMAP_MODE) {
+        lowLatencyHalfSize_ = LOW_LATENCY_JITTER_TIME_MS / paramHDF_.period;
+        lowLatencyMaxfSize_ = LOW_LATENCY_JITTER_MAX_TIME_MS / paramHDF_.period;
+    }
     return DH_SUCCESS;
 }
 
@@ -550,8 +558,8 @@ int32_t DMicDev::OnDecodeTransDataDone(const std::shared_ptr<AudioData> &audioDa
     CHECK_NULL_RETURN(audioData, ERR_DH_AUDIO_NULLPTR);
     std::lock_guard<std::mutex> lock(dataQueueMtx_);
     dataQueSize_ = curStatus_ != AudioStatus::STATUS_START ?
-        (param_.captureOpts.capturerFlags == MMAP_MODE ? LOW_LATENCY_DATA_QUEUE_HALF_SIZE : DATA_QUEUE_HALF_SIZE) :
-        (param_.captureOpts.capturerFlags == MMAP_MODE ? LOW_LATENCY_DATA_QUEUE_MAX_SIZE : DATA_QUEUE_MAX_SIZE);
+        (param_.captureOpts.capturerFlags == MMAP_MODE ? lowLatencyHalfSize_ : DATA_QUEUE_HALF_SIZE) :
+        (param_.captureOpts.capturerFlags == MMAP_MODE ? lowLatencyMaxfSize_ : DATA_QUEUE_MAX_SIZE);
     if (isExistedEmpty_.load()) {
         dataQueSize_ = param_.captureOpts.capturerFlags == MMAP_MODE ? dataQueSize_ : DATA_QUEUE_EXT_SIZE;
     }

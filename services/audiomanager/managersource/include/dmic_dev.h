@@ -92,9 +92,10 @@ private:
     static constexpr uint8_t CHANNEL_WAIT_SECONDS = 5;
     static constexpr size_t DATA_QUEUE_MAX_SIZE = 10;
     static constexpr size_t DATA_QUEUE_HALF_SIZE = DATA_QUEUE_MAX_SIZE >> 1U;
-    static constexpr size_t LOW_LATENCY_DATA_QUEUE_MAX_SIZE = 30;
-    static constexpr size_t LOW_LATENCY_DATA_QUEUE_HALF_SIZE = 10;
-    static constexpr size_t LOW_LATENCY_JITTER_TIME_MS = 50;
+    static constexpr uint32_t LOW_LATENCY_JITTER_MAX_TIME_MS = 150;
+    static constexpr uint32_t LOW_LATENCY_JITTER_TIME_MS = 50;
+    static constexpr uint8_t MMAP_NORMAL_PERIOD = 5;
+    static constexpr uint8_t MMAP_VOIP_PERIOD = 20;
     static constexpr uint32_t MMAP_WAIT_FRAME_US = 5000;
     static constexpr const char* ENQUEUE_THREAD = "micEnqueueTh";
     const std::string DUMP_DAUDIO_MIC_READ_FROM_BUF_NAME = "dump_source_mic_read_from_trans.pcm";
@@ -139,6 +140,8 @@ private:
     bool echoCannelOn_ = false;
     FILE *dumpFileCommn_ = nullptr;
     FILE *dumpFileFast_ = nullptr;
+    uint32_t lowLatencyHalfSize_ = 0;
+    uint32_t lowLatencyMaxfSize_ = 0;
 };
 } // DistributedHardware
 } // OHOS
