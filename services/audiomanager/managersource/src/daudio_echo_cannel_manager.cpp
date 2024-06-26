@@ -212,10 +212,10 @@ void DAudioEchoCannelManager::OnReadData(size_t length)
         DHLOGE("Get buffer desc failed. On read data.");
         return;
     }
-    DHLOGD("Get echo ref data. size: %{puclic}zu.", bufDesc.bufLength);
+    DHLOGD("Get echo ref data. size: %{public}zu.", bufDesc.bufLength);
     std::shared_ptr<AudioData> audioData = std::make_shared<AudioData>(bufDesc.bufLength);
     if (audioData->Capacity() != bufDesc.bufLength) {
-        DHLOGE("Audio data length is not equal to buflength. datalength: %{puclic}zu, bufLength: %{puclic}zu",
+        DHLOGE("Audio data length is not equal to buflength. datalength: %{public}zu, bufLength: %{public}zu",
             audioData->Capacity(), bufDesc.bufLength);
     }
     if (memcpy_s(audioData->Data(), audioData->Capacity(), bufDesc.buffer, bufDesc.bufLength) != EOK) {
@@ -230,7 +230,7 @@ void DAudioEchoCannelManager::OnReadData(size_t length)
         refDataQueue_.pop();
     }
     refDataQueue_.push(audioData);
-    DHLOGI("Push new echo ref data, buf len: %{puclic}zu.", refDataQueue_.size());
+    DHLOGI("Push new echo ref data, buf len: %{public}zu.", refDataQueue_.size());
     refQueueCond_.notify_all();
 }
 
