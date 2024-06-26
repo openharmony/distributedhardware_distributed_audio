@@ -225,7 +225,7 @@ int32_t DSpeakerClient::StartRender()
     }
     if (audioParam_.renderOpts.renderFlags != MMAP_MODE) {
         isRenderReady_.store(true);
-        renderDataThread_ = std::thread(&DSpeakerClient::PlayThreadRunning, this);
+        renderDataThread_ = std::thread([this]() { this->PlayThreadRunning(); });
     }
     clientStatus_ = AudioStatus::STATUS_START;
     return DH_SUCCESS;
@@ -428,7 +428,7 @@ void DSpeakerClient::OnVolumeKeyEvent(AudioStandard::VolumeEvent volumeEvent)
 
     cJSON *jParam = cJSON_CreateObject();
     CHECK_NULL_VOID(jParam);
- 
+
     cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId_).c_str());
     cJSON_AddStringToObject(jParam, KEY_CHANGE_TYPE, VOLUME_CHANAGE);
     cJSON_AddStringToObject(jParam, AUDIO_STREAM_TYPE, std::to_string(volumeEvent.volumeType).c_str());
@@ -600,7 +600,7 @@ void DSpeakerClient::ReStart()
     }
     if (audioParam_.renderOpts.renderFlags != MMAP_MODE) {
         isRenderReady_.store(true);
-        renderDataThread_ = std::thread(&DSpeakerClient::PlayThreadRunning, this);
+        renderDataThread_ = std::thread([this]() { this->PlayThreadRunning(); });
     }
     if (audioRenderer_ != nullptr) {
         audioRenderer_->Start();

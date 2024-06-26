@@ -233,6 +233,57 @@ void DAudioSourceDev::SetThreadStatusFlag(bool flag)
     threadStatusFlag_ = flag;
 }
 
+void DAudioSourceDev::NotifyEventInner(const AudioEvent &event)
+{
+    switch (event.type) {
+        case OPEN_MIC:
+            HandleOpenDMic(event);
+            break;
+        case CLOSE_MIC:
+            HandleCloseDMic(event);
+            break;
+        case MIC_OPENED:
+            HandleDMicOpened(event);
+            break;
+        case MIC_CLOSED:
+            HandleDMicClosed(event);
+            break;
+        case CTRL_CLOSED:
+            HandleCtrlTransClosed(event);
+            break;
+        case VOLUME_SET:
+        case VOLUME_MUTE_SET:
+            HandleVolumeSet(event);
+            break;
+        case VOLUME_CHANGE:
+            HandleVolumeChange(event);
+            break;
+        case AUDIO_FOCUS_CHANGE:
+            HandleFocusChange(event);
+            break;
+        case AUDIO_RENDER_STATE_CHANGE:
+            HandleRenderStateChange(event);
+            break;
+        case CHANGE_PLAY_STATUS:
+            HandlePlayStatusChange(event);
+            break;
+        case MMAP_SPK_START:
+            HandleSpkMmapStart(event);
+            break;
+        case MMAP_SPK_STOP:
+            HandleSpkMmapStop(event);
+            break;
+        case MMAP_MIC_START:
+            HandleMicMmapStart(event);
+            break;
+        case MMAP_MIC_STOP:
+            HandleMicMmapStop(event);
+            break;
+        default:
+            break;
+    }
+}
+
 void DAudioSourceDev::NotifyEvent(const AudioEvent &event)
 {
     DHLOGD("Notify event, eventType: %{public}d.", event.type);
@@ -241,8 +292,47 @@ void DAudioSourceDev::NotifyEvent(const AudioEvent &event)
         DHLOGE("Invalid eventType: %{public}d.", event.type);
         return;
     }
-    DAudioSourceDevFunc &func = iter->second;
-    (this->*func)(event);
+    switch (event.type) {
+        case OPEN_SPEAKER:
+            HandleOpenDSpeaker(event);
+            break;
+        case CLOSE_SPEAKER:
+            HandleCloseDSpeaker(event);
+            break;
+        case SPEAKER_OPENED:
+            HandleDSpeakerOpened(event);
+            break;
+        case SPEAKER_CLOSED:
+            HandleDSpeakerClosed(event);
+            break;
+        case NOTIFY_OPEN_SPEAKER_RESULT:
+        case NOTIFY_CLOSE_SPEAKER_RESULT:
+        case NOTIFY_OPEN_MIC_RESULT:
+        case NOTIFY_CLOSE_MIC_RESULT:
+        case NOTIFY_OPEN_CTRL_RESULT:
+        case NOTIFY_CLOSE_CTRL_RESULT:
+            HandleNotifyRPC(event);
+            break;
+        case OPEN_MIC:
+        case CLOSE_MIC:
+        case MIC_OPENED:
+        case MIC_CLOSED:
+        case CTRL_CLOSED:
+        case VOLUME_SET:
+        case VOLUME_MUTE_SET:
+        case VOLUME_CHANGE:
+        case AUDIO_FOCUS_CHANGE:
+        case AUDIO_RENDER_STATE_CHANGE:
+        case CHANGE_PLAY_STATUS:
+        case MMAP_SPK_START:
+        case MMAP_SPK_STOP:
+        case MMAP_MIC_START:
+        case MMAP_MIC_STOP:
+            NotifyEventInner(event);
+            break;
+        default:
+            break;
+    }
 }
 
 int32_t DAudioSourceDev::HandleOpenDSpeaker(const AudioEvent &event)
@@ -1316,6 +1406,41 @@ DAudioSourceDev::SourceEventHandler::SourceEventHandler(const std::shared_ptr<Ap
 
 DAudioSourceDev::SourceEventHandler::~SourceEventHandler() {}
 
+void DAudioSourceDev::SourceEventHandler::ProcessEventInner(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    switch (event->GetInnerEventId()) {
+        case EVENT_VOLUME_SET:
+            SetVolumeCallback(event);
+            break;
+        case EVENT_VOLUME_CHANGE:
+            ChangeVolumeCallback(event);
+            break;
+        case EVENT_AUDIO_FOCUS_CHANGE:
+            ChangeFocusCallback(event);
+            break;
+        case EVENT_AUDIO_RENDER_STATE_CHANGE:
+            ChangeRenderStateCallback(event);
+            break;
+        case EVENT_CHANGE_PLAY_STATUS:
+            PlayStatusChangeCallback(event);
+            break;
+        case EVENT_MMAP_SPK_START:
+            SpkMmapStartCallback(event);
+            break;
+        case EVENT_MMAP_SPK_STOP:
+            SpkMmapStopCallback(event);
+            break;
+        case EVENT_MMAP_MIC_START:
+            MicMmapStartCallback(event);
+            break;
+        case EVENT_MMAP_MIC_STOP:
+            MicMmapStopCallback(event);
+            break;
+        default:
+            break;
+    }
+}
+
 void DAudioSourceDev::SourceEventHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
     auto iter = mapEventFuncs_.find(event->GetInnerEventId());
@@ -1323,8 +1448,42 @@ void DAudioSourceDev::SourceEventHandler::ProcessEvent(const AppExecFwk::InnerEv
         DHLOGE("Event Id is invaild. %{public}d", event->GetInnerEventId());
         return;
     }
-    SourceEventFunc &func = iter->second;
-    (this->*func)(event);
+    switch (event->GetInnerEventId()) {
+        case EVENT_DAUDIO_ENABLE:
+            EnableDAudioCallback(event);
+            break;
+        case EVENT_DAUDIO_DISABLE:
+            DisableDAudioCallback(event);
+            break;
+        case EVENT_OPEN_SPEAKER:
+            OpenDSpeakerCallback(event);
+            break;
+        case EVENT_CLOSE_SPEAKER:
+            CloseDSpeakerCallback(event);
+            break;
+        case EVENT_OPEN_MIC:
+            OpenDMicCallback(event);
+            break;
+        case EVENT_CLOSE_MIC:
+            CloseDMicCallback(event);
+            break;
+        case EVENT_DMIC_CLOSED:
+            DMicClosedCallback(event);
+            break;
+        case EVENT_VOLUME_SET:
+        case EVENT_VOLUME_CHANGE:
+        case EVENT_AUDIO_FOCUS_CHANGE:
+        case EVENT_AUDIO_RENDER_STATE_CHANGE:
+        case EVENT_CHANGE_PLAY_STATUS:
+        case EVENT_MMAP_SPK_START:
+        case EVENT_MMAP_SPK_STOP:
+        case EVENT_MMAP_MIC_START:
+        case EVENT_MMAP_MIC_STOP:
+            ProcessEventInner(event);
+            break;
+        default:
+            break;
+    }
 }
 
 void DAudioSourceDev::SourceEventHandler::EnableDAudioCallback(const AppExecFwk::InnerEvent::Pointer &event)

@@ -354,7 +354,7 @@ int32_t DSpeakerDev::MmapStart()
 {
     CHECK_NULL_RETURN(ashmem_, ERR_DH_AUDIO_NULLPTR);
     isEnqueueRunning_.store(true);
-    enqueueDataThread_ = std::thread(&DSpeakerDev::EnqueueThread, this);
+    enqueueDataThread_ = std::thread([this]() { this->EnqueueThread(); });
     if (pthread_setname_np(enqueueDataThread_.native_handle(), ENQUEUE_THREAD) != DH_SUCCESS) {
         DHLOGE("Enqueue data thread setname failed.");
     }

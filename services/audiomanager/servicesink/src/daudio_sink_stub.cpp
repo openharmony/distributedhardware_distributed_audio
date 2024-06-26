@@ -71,8 +71,27 @@ int32_t DAudioSinkStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Mess
         DHLOGE("Invalid request code.");
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
-    DAudioSinkServiceFunc &func = iter->second;
-    return (this->*func)(data, reply, option);
+    switch (code) {
+        case static_cast<uint32_t>(IDAudioSinkInterfaceCode::INIT_SINK):
+            return InitSinkInner(data, reply, option);
+        case static_cast<uint32_t>(IDAudioSinkInterfaceCode::RELEASE_SINK):
+            return ReleaseSinkInner(data, reply, option);
+        case static_cast<uint32_t>(IDAudioSinkInterfaceCode::SUBSCRIBE_LOCAL_HARDWARE):
+            return SubscribeLocalHardwareInner(data, reply, option);
+        case static_cast<uint32_t>(IDAudioSinkInterfaceCode::UNSUBSCRIBE_LOCAL_HARDWARE):
+            return UnsubscribeLocalHardwareInner(data, reply, option);
+        case static_cast<uint32_t>(IDAudioSinkInterfaceCode::DAUDIO_NOTIFY):
+            return DAudioNotifyInner(data, reply, option);
+        case static_cast<uint32_t>(IDAudioSinkInterfaceCode::PAUSE_DISTRIBUTED_HARDWARE):
+            return PauseDistributedHardwareInner(data, reply, option);
+        case static_cast<uint32_t>(IDAudioSinkInterfaceCode::RESUME_DISTRIBUTED_HARDWARE):
+            return ResumeDistributedHardwareInner(data, reply, option);
+        case static_cast<uint32_t>(IDAudioSinkInterfaceCode::STOP_DISTRIBUTED_HARDWARE):
+            return StopDistributedHardwareInner(data, reply, option);
+        default:
+            break;
+    }
+    return ERR_DH_AUDIO_NOT_FOUND_KEY;
 }
 
 bool DAudioSinkStub::VerifyPermission()

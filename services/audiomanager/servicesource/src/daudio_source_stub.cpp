@@ -61,8 +61,23 @@ int32_t DAudioSourceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Me
         DHLOGE("Invalid request code.");
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
-    DAudioSourceServiceFunc &func = iter->second;
-    return (this->*func)(data, reply, option);
+    switch (code) {
+        case static_cast<uint32_t>(IDAudioSourceInterfaceCode::INIT_SOURCE):
+            return InitSourceInner(data, reply, option);
+        case static_cast<uint32_t>(IDAudioSourceInterfaceCode::RELEASE_SOURCE):
+            return ReleaseSourceInner(data, reply, option);
+        case static_cast<uint32_t>(IDAudioSourceInterfaceCode::REGISTER_DISTRIBUTED_HARDWARE):
+            return RegisterDistributedHardwareInner(data, reply, option);
+        case static_cast<uint32_t>(IDAudioSourceInterfaceCode::UNREGISTER_DISTRIBUTED_HARDWARE):
+            return UnregisterDistributedHardwareInner(data, reply, option);
+        case static_cast<uint32_t>(IDAudioSourceInterfaceCode::CONFIG_DISTRIBUTED_HARDWARE):
+            return ConfigDistributedHardwareInner(data, reply, option);
+        case static_cast<uint32_t>(IDAudioSourceInterfaceCode::DAUDIO_NOTIFY):
+            return DAudioNotifyInner(data, reply, option);
+        default:
+            break;
+    }
+    return ERR_DH_AUDIO_NOT_FOUND_KEY;
 }
 
 bool DAudioSourceStub::VerifyPermission()

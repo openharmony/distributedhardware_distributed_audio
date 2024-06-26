@@ -92,7 +92,7 @@ int32_t DMicClient::OnStateChange(const AudioEventType type)
             isBlocking_.store(true);
             if (audioParam_.captureOpts.capturerFlags != MMAP_MODE) {
                 isCaptureReady_.store(true);
-                captureDataThread_ = std::thread(&DMicClient::CaptureThreadRunning, this);
+                captureDataThread_ = std::thread([this]() { this->CaptureThreadRunning(); });
             }
             event.type = AudioEventType::MIC_OPENED;
             break;
@@ -307,7 +307,7 @@ void DMicClient::OnReadData(size_t length)
 {
     AudioStandard::BufferDesc bufDesc;
     CHECK_NULL_VOID(audioCapturer_);
-    
+
     if (audioCapturer_->GetBufferDesc(bufDesc) != DH_SUCCESS || bufDesc.bufLength == 0) {
         DHLOGE("Get buffer desc failed.");
         return;

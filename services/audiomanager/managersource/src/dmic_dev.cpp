@@ -429,7 +429,7 @@ int32_t DMicDev::MmapStart()
     frameIndex_ = 0;
     startTime_ = 0;
     isEnqueueRunning_.store(true);
-    enqueueDataThread_ = std::thread(&DMicDev::EnqueueThread, this);
+    enqueueDataThread_ = std::thread([this]() { this->EnqueueThread(); });
     if (pthread_setname_np(enqueueDataThread_.native_handle(), ENQUEUE_THREAD) != DH_SUCCESS) {
         DHLOGE("Enqueue data thread setname failed.");
     }

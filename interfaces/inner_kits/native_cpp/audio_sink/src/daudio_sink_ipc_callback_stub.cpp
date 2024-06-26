@@ -44,8 +44,13 @@ int32_t DAudioSinkIpcCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel 
         DHLOGE("Invalid request code.");
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
-    DAudioSinkCallbackFunc &func = iter->second;
-    return (this->*func)(data, reply, option);
+    switch (code) {
+        case NOTIFY_RESOURCEINFO:
+            return OnNotifyResourceInfoInner(data, reply, option);
+        default:
+            break;
+    }
+    return ERR_DH_AUDIO_NOT_FOUND_KEY;
 }
 
 int32_t DAudioSinkIpcCallbackStub::OnNotifyResourceInfoInner(MessageParcel &data, MessageParcel &reply,
