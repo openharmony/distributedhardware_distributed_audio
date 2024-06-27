@@ -114,9 +114,6 @@ int32_t DMicClient::OnStateChange(const AudioEventType type)
 
 int32_t DMicClient::AudioFwkClientSetUp()
 {
-    if (audioParam_.captureOpts.sourceType == SOURCE_TYPE_VOICE_COMMUNICATION) {
-        audioParam_.captureOpts.capturerFlags = NORMAL_MODE;
-    }
     AudioStandard::AudioCapturerOptions capturerOptions = {
         {
             static_cast<AudioStandard::AudioSamplingRate>(audioParam_.comParam.sampleRate),
