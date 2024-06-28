@@ -591,11 +591,7 @@ DAudioSourceManager::SourceManagerHandler::~SourceManagerHandler() {}
 
 void DAudioSourceManager::SourceManagerHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    auto iter = mapEventFuncs_.find(event->GetInnerEventId());
-    if (iter == mapEventFuncs_.end()) {
-        DHLOGE("Event Id is invalid. %{public}d.", event->GetInnerEventId());
-        return;
-    }
+    DHLOGI("Event Id=%{public}d.", event->GetInnerEventId());
     switch (event->GetInnerEventId()) {
         case EVENT_MANAGER_ENABLE_DAUDIO:
             EnableDAudioCallback(event);
@@ -604,6 +600,7 @@ void DAudioSourceManager::SourceManagerHandler::ProcessEvent(const AppExecFwk::I
             DisableDAudioCallback(event);
             break;
         default:
+            DHLOGE("Event Id is invalid. %{public}d.", event->GetInnerEventId());
             break;
     }
 }

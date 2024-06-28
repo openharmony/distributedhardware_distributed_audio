@@ -49,6 +49,7 @@ DAudioSourceStub::DAudioSourceStub() : IRemoteStub(true)
 int32_t DAudioSourceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
+    DHLOGI("On remote request, code: %{public}d.", code);
     std::u16string desc = DAudioSourceStub::GetDescriptor();
     std::u16string remoteDesc = data.ReadInterfaceToken();
     if (desc != remoteDesc) {
@@ -56,11 +57,6 @@ int32_t DAudioSourceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Me
         return ERR_DH_AUDIO_SA_INVALID_INTERFACE_TOKEN;
     }
 
-    const auto &iter = memberFuncMap_.find(code);
-    if (iter == memberFuncMap_.end()) {
-        DHLOGE("Invalid request code.");
-        return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
-    }
     switch (code) {
         case static_cast<uint32_t>(IDAudioSourceInterfaceCode::INIT_SOURCE):
             return InitSourceInner(data, reply, option);
@@ -75,7 +71,8 @@ int32_t DAudioSourceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Me
         case static_cast<uint32_t>(IDAudioSourceInterfaceCode::DAUDIO_NOTIFY):
             return DAudioNotifyInner(data, reply, option);
         default:
-            break;
+            DHLOGE("Invalid request code.");
+            return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
     return ERR_DH_AUDIO_NOT_FOUND_KEY;
 }

@@ -654,11 +654,7 @@ void DAudioSinkDev::SinkEventHandler::ProcessEventInner(const AppExecFwk::InnerE
 
 void DAudioSinkDev::SinkEventHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    auto iter = mapEventFuncs_.find(event->GetInnerEventId());
-    if (iter == mapEventFuncs_.end()) {
-        DHLOGE("Event Id is invaild. %{public}d", event->GetInnerEventId());
-        return;
-    }
+    DHLOGI("Event Id=%{public}d", event->GetInnerEventId());
     switch (event->GetInnerEventId()) {
         case CTRL_OPENED:
             NotifyCtrlOpened(event);
@@ -692,6 +688,7 @@ void DAudioSinkDev::SinkEventHandler::ProcessEvent(const AppExecFwk::InnerEvent:
             ProcessEventInner(event);
             break;
         default:
+            DHLOGE("Event Id is invaild. %{public}d", event->GetInnerEventId());
             break;
     }
 }

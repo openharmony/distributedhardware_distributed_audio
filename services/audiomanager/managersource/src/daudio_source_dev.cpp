@@ -287,11 +287,6 @@ void DAudioSourceDev::NotifyEventInner(const AudioEvent &event)
 void DAudioSourceDev::NotifyEvent(const AudioEvent &event)
 {
     DHLOGD("Notify event, eventType: %{public}d.", event.type);
-    std::map<AudioEventType, DAudioSourceDevFunc>::iterator iter = memberFuncMap_.find(event.type);
-    if (iter == memberFuncMap_.end()) {
-        DHLOGE("Invalid eventType: %{public}d.", event.type);
-        return;
-    }
     switch (event.type) {
         case OPEN_SPEAKER:
             HandleOpenDSpeaker(event);
@@ -331,6 +326,7 @@ void DAudioSourceDev::NotifyEvent(const AudioEvent &event)
             NotifyEventInner(event);
             break;
         default:
+            DHLOGE("Invalid eventType: %{public}d.", event.type);
             break;
     }
 }
@@ -1443,11 +1439,7 @@ void DAudioSourceDev::SourceEventHandler::ProcessEventInner(const AppExecFwk::In
 
 void DAudioSourceDev::SourceEventHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    auto iter = mapEventFuncs_.find(event->GetInnerEventId());
-    if (iter == mapEventFuncs_.end()) {
-        DHLOGE("Event Id is invaild. %{public}d", event->GetInnerEventId());
-        return;
-    }
+    DHLOGI("Event Id=%{public}d", event->GetInnerEventId());
     switch (event->GetInnerEventId()) {
         case EVENT_DAUDIO_ENABLE:
             EnableDAudioCallback(event);
@@ -1482,6 +1474,7 @@ void DAudioSourceDev::SourceEventHandler::ProcessEvent(const AppExecFwk::InnerEv
             ProcessEventInner(event);
             break;
         default:
+            DHLOGE("Event Id is invaild. %{public}d", event->GetInnerEventId());
             break;
     }
 }
