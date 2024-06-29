@@ -370,7 +370,7 @@ int32_t DAudioEchoCannelManager::StartAecProcessor()
     }
     if (!isAecRunning_.load()) {
         isAecRunning_.store(true);
-        aecProcessThread_ = std::thread(&DAudioEchoCannelManager::AecProcessData, this);
+        aecProcessThread_ = std::thread([this]() { this->AecProcessData(); });
     }
     DHLOGI("Aec effect process start success.");
     return DH_SUCCESS;

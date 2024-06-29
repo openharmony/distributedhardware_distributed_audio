@@ -130,6 +130,7 @@ private:
         void NotifyRenderStateChange(const AppExecFwk::InnerEvent::Pointer &event);
         void NotifyPlayStatusChange(const AppExecFwk::InnerEvent::Pointer &event);
         int32_t GetEventParam(const AppExecFwk::InnerEvent::Pointer &event, std::string &eventParam);
+        void ProcessEventInner(const AppExecFwk::InnerEvent::Pointer &event);
 
     private:
         using SinkEventFunc = void (SinkEventHandler::*)(const AppExecFwk::InnerEvent::Pointer &event);

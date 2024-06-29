@@ -121,6 +121,7 @@ private:
     int32_t ConvertString2Int(std::string val);
     int32_t CreateMicEngine(std::shared_ptr<DAudioIoDev> mic);
     void SetRegDataType(const std::string &capability);
+    void NotifyEventInner(const AudioEvent &event);
 
 private:
     static constexpr uint8_t RPC_WAIT_SECONDS = 10;
@@ -174,6 +175,7 @@ private:
         void MicMmapStartCallback(const AppExecFwk::InnerEvent::Pointer &event);
         void MicMmapStopCallback(const AppExecFwk::InnerEvent::Pointer &event);
         int32_t GetEventParam(const AppExecFwk::InnerEvent::Pointer &event, std::string &eventParam);
+        void ProcessEventInner(const AppExecFwk::InnerEvent::Pointer &event);
 
     private:
         using SourceEventFunc = void (SourceEventHandler::*)(const AppExecFwk::InnerEvent::Pointer &event);

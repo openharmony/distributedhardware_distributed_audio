@@ -39,13 +39,14 @@ int32_t DAudioSinkIpcCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel 
         return ERR_DH_AUDIO_SA_INVALID_INTERFACE_TOKEN;
     }
 
-    std::map<int32_t, DAudioSinkCallbackFunc>::iterator iter = memberFuncMap_.find(code);
-    if (iter == memberFuncMap_.end()) {
-        DHLOGE("Invalid request code.");
-        return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+    switch (code) {
+        case NOTIFY_RESOURCEINFO:
+            return OnNotifyResourceInfoInner(data, reply, option);
+        default:
+            DHLOGE("Invalid request code.");
+            return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
-    DAudioSinkCallbackFunc &func = iter->second;
-    return (this->*func)(data, reply, option);
+    return ERR_DH_AUDIO_NOT_FOUND_KEY;
 }
 
 int32_t DAudioSinkIpcCallbackStub::OnNotifyResourceInfoInner(MessageParcel &data, MessageParcel &reply,

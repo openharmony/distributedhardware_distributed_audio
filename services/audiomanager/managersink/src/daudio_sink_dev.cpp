@@ -611,15 +611,86 @@ DAudioSinkDev::SinkEventHandler::SinkEventHandler(const std::shared_ptr<AppExecF
 
 DAudioSinkDev::SinkEventHandler::~SinkEventHandler() {}
 
+void DAudioSinkDev::SinkEventHandler::ProcessEventInner(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    switch (event->GetInnerEventId()) {
+        case OPEN_MIC:
+            NotifyOpenMic(event);
+            break;
+        case CLOSE_MIC:
+            NotifyCloseMic(event);
+            break;
+        case MIC_OPENED:
+            NotifyMicOpened(event);
+            break;
+        case MIC_CLOSED:
+            NotifyMicClosed(event);
+            break;
+        case VOLUME_SET:
+            NotifySetVolume(event);
+            break;
+        case VOLUME_CHANGE:
+            NotifyVolumeChange(event);
+            break;
+        case SET_PARAM:
+            NotifySetParam(event);
+            break;
+        case VOLUME_MUTE_SET:
+            NotifySetMute(event);
+            break;
+        case AUDIO_FOCUS_CHANGE:
+            NotifyFocusChange(event);
+            break;
+        case AUDIO_RENDER_STATE_CHANGE:
+            NotifyRenderStateChange(event);
+            break;
+        case CHANGE_PLAY_STATUS:
+            NotifyPlayStatusChange(event);
+            break;
+        default:
+            break;
+    }
+}
+
 void DAudioSinkDev::SinkEventHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    auto iter = mapEventFuncs_.find(event->GetInnerEventId());
-    if (iter == mapEventFuncs_.end()) {
-        DHLOGE("Event Id is invaild. %{public}d", event->GetInnerEventId());
-        return;
+    DHLOGI("Event Id=%{public}d", event->GetInnerEventId());
+    switch (event->GetInnerEventId()) {
+        case CTRL_OPENED:
+            NotifyCtrlOpened(event);
+            break;
+        case CTRL_CLOSED:
+            NotifyCtrlClosed(event);
+            break;
+        case OPEN_SPEAKER:
+            NotifyOpenSpeaker(event);
+            break;
+        case CLOSE_SPEAKER:
+            NotifyCloseSpeaker(event);
+            break;
+        case SPEAKER_OPENED:
+            NotifySpeakerOpened(event);
+            break;
+        case SPEAKER_CLOSED:
+            NotifySpeakerClosed(event);
+            break;
+        case OPEN_MIC:
+        case CLOSE_MIC:
+        case MIC_OPENED:
+        case MIC_CLOSED:
+        case VOLUME_SET:
+        case VOLUME_CHANGE:
+        case SET_PARAM:
+        case VOLUME_MUTE_SET:
+        case AUDIO_FOCUS_CHANGE:
+        case AUDIO_RENDER_STATE_CHANGE:
+        case CHANGE_PLAY_STATUS:
+            ProcessEventInner(event);
+            break;
+        default:
+            DHLOGE("Event Id is invaild. %{public}d", event->GetInnerEventId());
+            break;
     }
-    SinkEventFunc &func = iter->second;
-    (this->*func)(event);
 }
 
 void DAudioSinkDev::SinkEventHandler::NotifyCtrlOpened(const AppExecFwk::InnerEvent::Pointer &event)

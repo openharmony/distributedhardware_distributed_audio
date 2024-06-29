@@ -96,7 +96,7 @@ int32_t DAudioSourceManager::Init(const sptr<IDAudioIpcCallback> &callback)
     }
     if (!isHicollieRunning_.load()) {
         isHicollieRunning_.store(true);
-        listenThread_ = std::thread(&DAudioSourceManager::ListenAudioDev, this);
+        listenThread_ = std::thread([this]() { this->ListenAudioDev(); });
         if (pthread_setname_np(listenThread_.native_handle(), LISTEN_THREAD) != DH_SUCCESS) {
             DHLOGE("Dev clear thread setname failed.");
         }
@@ -428,7 +428,7 @@ void DAudioSourceManager::DeleteAudioDevice(const std::string &devId, const std:
         devClearThread_.join();
     }
     DHLOGI("audioDevMap_[devId].ports is empty");
-    devClearThread_ = std::thread(&DAudioSourceManager::ClearAudioDev, this, devId);
+    devClearThread_ = std::thread([this, devId]() { this->ClearAudioDev(devId); });
     if (pthread_setname_np(devClearThread_.native_handle(), DEVCLEAR_THREAD) != DH_SUCCESS) {
         DHLOGE("Dev clear thread setname failed.");
     }
@@ -591,13 +591,18 @@ DAudioSourceManager::SourceManagerHandler::~SourceManagerHandler() {}
 
 void DAudioSourceManager::SourceManagerHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    auto iter = mapEventFuncs_.find(event->GetInnerEventId());
-    if (iter == mapEventFuncs_.end()) {
-        DHLOGE("Event Id is invalid. %{public}d.", event->GetInnerEventId());
-        return;
+    DHLOGI("Event Id=%{public}d.", event->GetInnerEventId());
+    switch (event->GetInnerEventId()) {
+        case EVENT_MANAGER_ENABLE_DAUDIO:
+            EnableDAudioCallback(event);
+            break;
+        case EVENT_MANAGER_DISABLE_DAUDIO:
+            DisableDAudioCallback(event);
+            break;
+        default:
+            DHLOGE("Event Id is invalid. %{public}d.", event->GetInnerEventId());
+            break;
     }
-    SourceManagerFunc &func = iter->second;
-    (this->*func)(event);
 }
 
 void DAudioSourceManager::SourceManagerHandler::EnableDAudioCallback(const AppExecFwk::InnerEvent::Pointer &event)
