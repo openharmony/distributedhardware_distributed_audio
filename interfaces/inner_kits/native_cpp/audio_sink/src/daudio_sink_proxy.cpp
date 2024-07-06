@@ -34,6 +34,11 @@ int32_t DAudioSinkProxy::InitSink(const std::string &params, const sptr<IDAudioS
         return ERR_DH_AUDIO_SA_WRITE_INTERFACE_TOKEN_FAILED;
     }
 
+    if (Remote() == nullptr || sinkCallback == nullptr) {
+        DHLOGE("remote service or sinkCallback is null.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+
     if (!data.WriteString(params) || !data.WriteRemoteObject(sinkCallback->AsObject())) {
         return ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED;
     }
@@ -52,6 +57,10 @@ int32_t DAudioSinkProxy::ReleaseSink()
         return ERR_DH_AUDIO_SA_WRITE_INTERFACE_TOKEN_FAILED;
     }
 
+    if (Remote() == nullptr) {
+        DHLOGE("remote service is null.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
     Remote()->SendRequest(static_cast<uint32_t>(IDAudioSinkInterfaceCode::RELEASE_SINK), data, reply, option);
     int32_t ret = reply.ReadInt32();
     return ret;
@@ -72,6 +81,10 @@ int32_t DAudioSinkProxy::SubscribeLocalHardware(const std::string &dhId, const s
         return ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED;
     }
 
+    if (Remote() == nullptr) {
+        DHLOGE("remote service is null.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
     Remote()->SendRequest(static_cast<uint32_t>(IDAudioSinkInterfaceCode::SUBSCRIBE_LOCAL_HARDWARE),
         data, reply, option);
     int32_t ret = reply.ReadInt32();
@@ -93,6 +106,10 @@ int32_t DAudioSinkProxy::UnsubscribeLocalHardware(const std::string &dhId)
         return ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED;
     }
 
+    if (Remote() == nullptr) {
+        DHLOGE("remote service is null.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
     Remote()->SendRequest(static_cast<uint32_t>(IDAudioSinkInterfaceCode::UNSUBSCRIBE_LOCAL_HARDWARE),
         data, reply, option);
     int32_t ret = reply.ReadInt32();
@@ -116,6 +133,10 @@ void DAudioSinkProxy::DAudioNotify(const std::string &devId, const std::string &
         return;
     }
 
+    if (Remote() == nullptr) {
+        DHLOGE("remote service is null.");
+        return;
+    }
     Remote()->SendRequest(static_cast<uint32_t>(IDAudioSinkInterfaceCode::DAUDIO_NOTIFY), data, reply, option);
 }
 
@@ -132,6 +153,10 @@ int32_t DAudioSinkProxy::PauseDistributedHardware(const std::string &networkId)
         return ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED;
     }
 
+    if (Remote() == nullptr) {
+        DHLOGE("remote service is null.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
     Remote()->SendRequest(static_cast<uint32_t>(IDAudioSinkInterfaceCode::PAUSE_DISTRIBUTED_HARDWARE),
         data, reply, option);
     return reply.ReadInt32();
@@ -150,6 +175,10 @@ int32_t DAudioSinkProxy::ResumeDistributedHardware(const std::string &networkId)
         return ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED;
     }
 
+    if (Remote() == nullptr) {
+        DHLOGE("remote service is null.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
     Remote()->SendRequest(static_cast<uint32_t>(IDAudioSinkInterfaceCode::RESUME_DISTRIBUTED_HARDWARE),
         data, reply, option);
     return reply.ReadInt32();
@@ -168,6 +197,10 @@ int32_t DAudioSinkProxy::StopDistributedHardware(const std::string &networkId)
         return ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED;
     }
 
+    if (Remote() == nullptr) {
+        DHLOGE("remote service is null.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
     Remote()->SendRequest(static_cast<uint32_t>(IDAudioSinkInterfaceCode::STOP_DISTRIBUTED_HARDWARE),
         data, reply, option);
     return reply.ReadInt32();

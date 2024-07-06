@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,6 +34,11 @@ int32_t DAudioSourceProxy::InitSource(const std::string &params, const sptr<IDAu
         return ERR_DH_AUDIO_SA_WRITE_INTERFACE_TOKEN_FAILED;
     }
 
+    if (Remote() == nullptr || callback == nullptr) {
+        DHLOGE("remote service or callback is null.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+
     if (!data.WriteString(params) || !data.WriteRemoteObject(callback->AsObject())) {
         return ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED;
     }
@@ -52,6 +57,10 @@ int32_t DAudioSourceProxy::ReleaseSource()
         return ERR_DH_AUDIO_SA_WRITE_INTERFACE_TOKEN_FAILED;
     }
 
+    if (Remote() == nullptr) {
+        DHLOGE("remote service is null.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
     Remote()->SendRequest(static_cast<uint32_t>(IDAudioSourceInterfaceCode::RELEASE_SOURCE), data, reply, option);
     int32_t ret = reply.ReadInt32();
     return ret;
@@ -75,6 +84,10 @@ int32_t DAudioSourceProxy::RegisterDistributedHardware(const std::string &devId,
         return ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED;
     }
 
+    if (Remote() == nullptr) {
+        DHLOGE("remote service is null.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
     Remote()->SendRequest(static_cast<uint32_t>(IDAudioSourceInterfaceCode::REGISTER_DISTRIBUTED_HARDWARE),
         data, reply, option);
     int32_t ret = reply.ReadInt32();
@@ -98,6 +111,10 @@ int32_t DAudioSourceProxy::UnregisterDistributedHardware(const std::string &devI
         return ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED;
     }
 
+    if (Remote() == nullptr) {
+        DHLOGE("remote service is null.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
     Remote()->SendRequest(static_cast<uint32_t>(IDAudioSourceInterfaceCode::UNREGISTER_DISTRIBUTED_HARDWARE),
         data, reply, option);
     int32_t ret = reply.ReadInt32();
@@ -120,6 +137,10 @@ int32_t DAudioSourceProxy::ConfigDistributedHardware(const std::string &devId, c
         return ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED;
     }
 
+    if (Remote() == nullptr) {
+        DHLOGE("remote service is null.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
     Remote()->SendRequest(static_cast<uint32_t>(IDAudioSourceInterfaceCode::CONFIG_DISTRIBUTED_HARDWARE),
         data, reply, option);
     int32_t ret = reply.ReadInt32();
@@ -143,6 +164,10 @@ void DAudioSourceProxy::DAudioNotify(const std::string &devId, const std::string
         return;
     }
 
+    if (Remote() == nullptr) {
+        DHLOGE("remote service is null.");
+        return;
+    }
     Remote()->SendRequest(static_cast<uint32_t>(IDAudioSourceInterfaceCode::DAUDIO_NOTIFY),
         data, reply, option);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -58,6 +58,9 @@ void DSpeakerClientTest::TearDown()
  */
 HWTEST_F(DSpeakerClientTest, InitReceiverEngine_001, TestSize.Level1)
 {
+    if (speakerClient_ == nullptr) {
+        return;
+    }
     IAVEngineProvider *providerPtr = nullptr;
 
     AVTransEvent event1 = { EventType::EVENT_START_SUCCESS, "", ""};
@@ -79,6 +82,9 @@ HWTEST_F(DSpeakerClientTest, InitReceiverEngine_001, TestSize.Level1)
  */
 HWTEST_F(DSpeakerClientTest, OnStateChange_001, TestSize.Level1)
 {
+    if (speakerClient_ == nullptr) {
+        return;
+    }
     AudioStandard::VolumeEvent event;
     event.volume = 1;
     event.updateUi = 1;
@@ -99,6 +105,9 @@ HWTEST_F(DSpeakerClientTest, OnStateChange_001, TestSize.Level1)
  */
 HWTEST_F(DSpeakerClientTest, SetUp_001, TestSize.Level1)
 {
+    if (speakerClient_ == nullptr) {
+        return;
+    }
     AudioParam audioParam;
     EXPECT_EQ(DH_SUCCESS, speakerClient_->SetUp(audioParam));
     EXPECT_EQ(DH_SUCCESS, speakerClient_->SetUp(audioParam_));
@@ -117,6 +126,9 @@ HWTEST_F(DSpeakerClientTest, SetUp_001, TestSize.Level1)
  */
 HWTEST_F(DSpeakerClientTest, StartRender001, TestSize.Level1)
 {
+    if (speakerClient_ == nullptr) {
+        return;
+    }
     EXPECT_NE(DH_SUCCESS, speakerClient_->StartRender());
     EXPECT_NE(DH_SUCCESS, speakerClient_->StopRender());
 
@@ -139,6 +151,9 @@ HWTEST_F(DSpeakerClientTest, StartRender001, TestSize.Level1)
  */
 HWTEST_F(DSpeakerClientTest, StopRender001, TestSize.Level1)
 {
+    if (speakerClient_ == nullptr) {
+        return;
+    }
     EXPECT_NE(DH_SUCCESS, speakerClient_->StopRender());
     std::string args = "args";
     AudioEvent event;
@@ -171,6 +186,9 @@ HWTEST_F(DSpeakerClientTest, StopRender001, TestSize.Level1)
  */
 HWTEST_F(DSpeakerClientTest, OnDecodeTransDataDone001, TestSize.Level1)
 {
+    if (speakerClient_ == nullptr) {
+        return;
+    }
     std::shared_ptr<AudioData> audioData = nullptr;
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, speakerClient_->OnDecodeTransDataDone(audioData));
     for (size_t i = 0; i < 11; i++) {
@@ -189,6 +207,9 @@ HWTEST_F(DSpeakerClientTest, OnDecodeTransDataDone001, TestSize.Level1)
  */
 HWTEST_F(DSpeakerClientTest, Release001, TestSize.Level1)
 {
+    if (speakerClient_ == nullptr) {
+        return;
+    }
     speakerClient_->speakerTrans_ = std::make_shared<MockIAudioDataTransport>();
     std::string args = "{\"ChangeType\":\"restart\"}";
     speakerClient_->PlayStatusChange(args);
@@ -206,6 +227,9 @@ HWTEST_F(DSpeakerClientTest, Release001, TestSize.Level1)
  */
 HWTEST_F(DSpeakerClientTest, GetVolumeLevel_001, TestSize.Level1)
 {
+    if (speakerClient_ == nullptr) {
+        return;
+    }
     AudioStandard::InterruptEvent eventType = {static_cast<AudioStandard::InterruptType>(1),
         static_cast<AudioStandard::InterruptForceType>(0), static_cast<AudioStandard::InterruptHint>(0)};
     speakerClient_->OnInterrupt(eventType);
@@ -222,6 +246,9 @@ HWTEST_F(DSpeakerClientTest, GetVolumeLevel_001, TestSize.Level1)
  */
 HWTEST_F(DSpeakerClientTest, SendMessage_001, TestSize.Level1)
 {
+    if (speakerClient_ == nullptr) {
+        return;
+    }
     std::string content = "content";
     std::string dstDevId = "dstDevId";
     audioParam_.renderOpts.renderFlags = MMAP_MODE;

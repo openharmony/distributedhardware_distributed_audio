@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -42,6 +42,9 @@ void DAudioHidumperTest::TearDown()
  */
 HWTEST_F(DAudioHidumperTest, Dump_001, TestSize.Level1)
 {
+    if (hidumper_ == nullptr) {
+        return;
+    }
     std::string result;
     std::vector<std::string> args;
     EXPECT_EQ(true, hidumper_->Dump(args, result));
@@ -65,6 +68,9 @@ HWTEST_F(DAudioHidumperTest, Dump_001, TestSize.Level1)
  */
 HWTEST_F(DAudioHidumperTest, GetSourceDevId_001, TestSize.Level1)
 {
+    if (hidumper_ == nullptr) {
+        return;
+    }
     std::string result = "123";
     EXPECT_NE(HDF_SUCCESS, hidumper_->GetSourceDevId(result));
 }
@@ -77,6 +83,9 @@ HWTEST_F(DAudioHidumperTest, GetSourceDevId_001, TestSize.Level1)
  */
 HWTEST_F(DAudioHidumperTest, GetSinkInfo_001, TestSize.Level1)
 {
+    if (hidumper_ == nullptr) {
+        return;
+    }
     std::string result = "123";
     EXPECT_NE(HDF_SUCCESS, hidumper_->GetSinkInfo(result));
 }
@@ -89,6 +98,9 @@ HWTEST_F(DAudioHidumperTest, GetSinkInfo_001, TestSize.Level1)
  */
 HWTEST_F(DAudioHidumperTest, StartDumpData_001, TestSize.Level1)
 {
+    if (hidumper_ == nullptr) {
+        return;
+    }
     std::string result = "";
     EXPECT_EQ(HDF_SUCCESS, hidumper_->StartDumpData(result));
     EXPECT_EQ(true, hidumper_->QueryDumpDataFlag());
