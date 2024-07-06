@@ -591,6 +591,7 @@ DAudioSourceManager::SourceManagerHandler::~SourceManagerHandler() {}
 
 void DAudioSourceManager::SourceManagerHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    CHECK_NULL_VOID(event);
     DHLOGI("Event Id=%{public}d.", event->GetInnerEventId());
     switch (event->GetInnerEventId()) {
         case EVENT_MANAGER_ENABLE_DAUDIO:

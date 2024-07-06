@@ -51,6 +51,7 @@ HWTEST_F(AVReceiverEngineTransportTest, SetUp_001, TestSize.Level1)
     AudioParam localParam;
     AudioParam remoteParam;
     std::shared_ptr<IAudioDataTransCallback> callback = nullptr;
+    ASSERT_NE(receiverTrans_, nullptr);
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, receiverTrans_->SetUp(localParam, remoteParam, callback, CAP_SPK));
     receiverTrans_->receiverAdapter_ = std::make_shared<AVTransReceiverAdapter>();
     EXPECT_EQ(DH_SUCCESS, receiverTrans_->SetUp(localParam, remoteParam, callback, CAP_SPK));
@@ -65,6 +66,7 @@ HWTEST_F(AVReceiverEngineTransportTest, SetUp_001, TestSize.Level1)
 HWTEST_F(AVReceiverEngineTransportTest, InitEngine_001, TestSize.Level1)
 {
     IAVEngineProvider *providerPtr = nullptr;
+    ASSERT_NE(receiverTrans_, nullptr);
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, receiverTrans_->InitEngine(providerPtr));
     receiverTrans_->receiverAdapter_ = std::make_shared<AVTransReceiverAdapter>();
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, receiverTrans_->InitEngine(providerPtr));
@@ -79,6 +81,7 @@ HWTEST_F(AVReceiverEngineTransportTest, InitEngine_001, TestSize.Level1)
  */
 HWTEST_F(AVReceiverEngineTransportTest, CreateCtrl_001, TestSize.Level1)
 {
+    ASSERT_NE(receiverTrans_, nullptr);
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, receiverTrans_->CreateCtrl());
     receiverTrans_->receiverAdapter_ = std::make_shared<AVTransReceiverAdapter>();
     receiverTrans_->receiverAdapter_->chnCreateSuccess_ = true;
@@ -93,6 +96,7 @@ HWTEST_F(AVReceiverEngineTransportTest, CreateCtrl_001, TestSize.Level1)
  */
 HWTEST_F(AVReceiverEngineTransportTest, Start_001, TestSize.Level1)
 {
+    ASSERT_NE(receiverTrans_, nullptr);
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, receiverTrans_->Start());
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, receiverTrans_->Stop());
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, receiverTrans_->Release());
@@ -114,6 +118,7 @@ HWTEST_F(AVReceiverEngineTransportTest, Pause_001, TestSize.Level1)
     AudioParam remoteParam;
     size_t bufLen = 4096;
     std::shared_ptr<AudioData> audioData = std::make_shared<AudioData>(bufLen);
+    ASSERT_NE(receiverTrans_, nullptr);
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, receiverTrans_->Restart(localParam, remoteParam));
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, receiverTrans_->Pause());
     EXPECT_EQ(DH_SUCCESS, receiverTrans_->FeedAudioData(audioData));
@@ -131,6 +136,7 @@ HWTEST_F(AVReceiverEngineTransportTest, Pause_002, TestSize.Level1)
     AudioParam remoteParam;
     size_t bufLen = 4096;
     std::shared_ptr<AudioData> audioData = std::make_shared<AudioData>(bufLen);
+    ASSERT_NE(receiverTrans_, nullptr);
     receiverTrans_->receiverAdapter_ = std::make_shared<AVTransReceiverAdapter>();
     receiverTrans_->receiverAdapter_->receiverEngine_ = std::make_shared<MockIAVReceiverEngine>();
     EXPECT_EQ(DH_SUCCESS, receiverTrans_->Restart(localParam, remoteParam));
@@ -149,6 +155,7 @@ HWTEST_F(AVReceiverEngineTransportTest, SendMessage_001, TestSize.Level1)
     uint32_t type = 0;
     std::string content = "content";
     std::string dstDevId = "dstDevId";
+    ASSERT_NE(receiverTrans_, nullptr);
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, receiverTrans_->SendMessage(type, content, dstDevId));
     receiverTrans_->receiverAdapter_ = std::make_shared<AVTransReceiverAdapter>();
     receiverTrans_->receiverAdapter_->receiverEngine_ = std::make_shared<MockIAVReceiverEngine>();
@@ -166,6 +173,7 @@ HWTEST_F(AVReceiverEngineTransportTest, SetParameter_001, TestSize.Level1)
     AVTransEvent event;
     std::shared_ptr<AVTransMessage> message = nullptr;
     std::shared_ptr<AVTransBuffer> buffer = nullptr;
+    ASSERT_NE(receiverTrans_, nullptr);
     receiverTrans_->OnEngineEvent(event);
     receiverTrans_->OnEngineMessage(message);
     receiverTrans_->OnEngineDataAvailable(buffer);

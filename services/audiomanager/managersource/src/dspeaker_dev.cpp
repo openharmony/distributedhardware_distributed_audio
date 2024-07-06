@@ -300,6 +300,7 @@ int32_t DSpeakerDev::WriteStreamData(const int32_t streamId, std::shared_ptr<Aud
     DHLOGD("Write stream data, streamId:%{public}d", streamId);
     int64_t startTime = GetNowTimeUs();
     CHECK_NULL_RETURN(speakerTrans_, ERR_DH_AUDIO_NULLPTR);
+    CHECK_NULL_RETURN(data, ERR_DH_AUDIO_NULLPTR);
     DumpFileUtil::WriteDumpFile(dumpFileCommn_, static_cast<void *>(data->Data()), data->Size());
     int32_t ret = speakerTrans_->FeedAudioData(data);
     if (ret != DH_SUCCESS) {

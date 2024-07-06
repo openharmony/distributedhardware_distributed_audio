@@ -377,7 +377,7 @@ int32_t DMicDev::ReadStreamData(const int32_t streamId, std::shared_ptr<AudioDat
         data = dataQueue_.front();
         dataQueue_.pop();
     }
-
+    CHECK_NULL_RETURN(data, ERR_DH_AUDIO_NULLPTR);
     DumpFileUtil::WriteDumpFile(dumpFileCommn_, static_cast<void *>(data->Data()), data->Size());
     int64_t endTime = GetNowTimeUs();
     if (IsOutDurationRange(startTime, endTime, lastReadStartTime_)) {
@@ -457,6 +457,9 @@ void DMicDev::EnqueueThread()
                 audioData = dataQueue_.front();
                 dataQueue_.pop();
             }
+        }
+        if (audioData == nullptr) {
+            continue;
         }
         DumpFileUtil::WriteDumpFile(dumpFileFast_, static_cast<void *>(audioData->Data()), audioData->Size());
         bool writeRet = ashmem_->WriteToAshmem(audioData->Data(), audioData->Size(), writeIndex_);

@@ -312,13 +312,13 @@ int32_t DAudioSinkDev::TaskCloseDMic(const std::string &args)
     ret = micClient->Release();
     CHECK_AND_LOG(ret != DH_SUCCESS, "Release mic client failed, ret: %{public}d.", ret);
     micClientMap_.erase(dhId);
-    if (isPageStatus_.load()) {
+    if (isPageStatus_.load() && ipcSinkCallback_ != nullptr) {
         bool isSensitive = false;
         bool isSameAccount = false;
         ipcSinkCallback_->OnNotifyResourceInfo(ResourceEventType::EVENT_TYPE_CLOSE_PAGE, SUBTYPE, devId_,
             isSensitive, isSameAccount);
+        isPageStatus_.store(false);
     }
-    isPageStatus_.store(false);
     DHLOGI("Close mic device task excute success.");
     return DH_SUCCESS;
 }
@@ -479,9 +479,11 @@ void DAudioSinkDev::PullUpPage()
 {
     bool isSensitive = false;
     bool isSameAccount = false;
-    ipcSinkCallback_->OnNotifyResourceInfo(ResourceEventType::EVENT_TYPE_PULL_UP_PAGE, SUBTYPE, devId_,
-        isSensitive, isSameAccount);
-    isPageStatus_.store(true);
+    if (ipcSinkCallback_ != nullptr) {
+        ipcSinkCallback_->OnNotifyResourceInfo(ResourceEventType::EVENT_TYPE_PULL_UP_PAGE, SUBTYPE, devId_,
+            isSensitive, isSameAccount);
+        isPageStatus_.store(true);
+    }
 }
 
 void DAudioSinkDev::NotifySourceDev(const AudioEventType type, const std::string dhId, const int32_t result)
@@ -613,6 +615,7 @@ DAudioSinkDev::SinkEventHandler::~SinkEventHandler() {}
 
 void DAudioSinkDev::SinkEventHandler::ProcessEventInner(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    CHECK_NULL_VOID(event);
     switch (event->GetInnerEventId()) {
         case OPEN_MIC:
             NotifyOpenMic(event);
@@ -654,6 +657,7 @@ void DAudioSinkDev::SinkEventHandler::ProcessEventInner(const AppExecFwk::InnerE
 
 void DAudioSinkDev::SinkEventHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    CHECK_NULL_VOID(event);
     DHLOGI("Event Id=%{public}d", event->GetInnerEventId());
     switch (event->GetInnerEventId()) {
         case CTRL_OPENED:

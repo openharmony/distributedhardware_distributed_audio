@@ -46,6 +46,7 @@ HWTEST_F(AudioDataTest, SetRange_001, TestSize.Level1)
 {
     size_t offset = 100;
     size_t size = 100;
+    ASSERT_NE(audioData, nullptr);
     int32_t ret = audioData->SetRange(offset, size);
     EXPECT_EQ(ERR_DH_AUDIO_BAD_VALUE, ret);
 }
@@ -60,6 +61,7 @@ HWTEST_F(AudioDataTest, SetRange_002, TestSize.Level1)
 {
     size_t offset = 5;
     size_t size = 5;
+    ASSERT_NE(audioData, nullptr);
     int32_t ret = audioData->SetRange(offset, size);
     EXPECT_EQ(DH_SUCCESS, ret);
 }
@@ -74,6 +76,7 @@ HWTEST_F(AudioDataTest, FindInt32_001, TestSize.Level1)
 {
     const std::string name = "name";
     int32_t value = 1;
+    ASSERT_NE(audioData, nullptr);
     audioData->int32Map_.insert(std::make_pair(name, value));
     EXPECT_EQ(true, audioData->FindInt32(name, value));
 }
@@ -88,6 +91,7 @@ HWTEST_F(AudioDataTest, FindInt32_002, TestSize.Level1)
 {
     const std::string name = "name";
     int32_t value = 1;
+    ASSERT_NE(audioData, nullptr);
     EXPECT_EQ(false, audioData->FindInt32(name, value));
 }
 
@@ -101,6 +105,7 @@ HWTEST_F(AudioDataTest, FindInt64_001, TestSize.Level1)
 {
     const std::string name = "name";
     int64_t value = 1;
+    ASSERT_NE(audioData, nullptr);
     audioData->SetInt64(name, value);
     EXPECT_EQ(true, audioData->FindInt64(name, value));
 }
@@ -115,6 +120,7 @@ HWTEST_F(AudioDataTest, FindInt64_002, TestSize.Level1)
 {
     const std::string name = "name";
     int64_t value = 1;
+    ASSERT_NE(audioData, nullptr);
     EXPECT_EQ(false, audioData->FindInt64(name, value));
 }
 
@@ -128,6 +134,7 @@ HWTEST_F(AudioDataTest, FindString_001, TestSize.Level1)
 {
     const std::string name = "name";
     string value = "value";
+    ASSERT_NE(audioData, nullptr);
     audioData->stringMap_.insert(std::make_pair(name, value));
     EXPECT_EQ(true, audioData->FindString(name, value));
 }
@@ -142,6 +149,7 @@ HWTEST_F(AudioDataTest, FindString_002, TestSize.Level1)
 {
     const std::string name = "name";
     string value = "value";
+    ASSERT_NE(audioData, nullptr);
     EXPECT_EQ(false, audioData->FindString(name, value));
 }
 } // namespace DistributedHardware
