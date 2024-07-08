@@ -235,7 +235,10 @@ int32_t DMicDev::SetUp()
         DHLOGE("Mic trans set up failed. ret: %{public}d.", ret);
         return ret;
     }
-    echoCannelOn_ = true;
+    echoCannelOn_ = (paramHDF_.capturerFlags == MMAP_MODE &&
+        paramHDF_.period == MMAP_NORMAL_PERIOD) ? false : true;
+    DHLOGD("Setup mode is %{public}d, period is %{public}" PRIu32", echoCannelOn_ is %{public}d.",
+        paramHDF_.capturerFlags, paramHDF_.period, echoCannelOn_);
 #ifdef ECHO_CANNEL_ENABLE
     if (echoCannelOn_ && echoManager_ == nullptr) {
         echoManager_ = std::make_shared<DAudioEchoCannelManager>();
@@ -457,14 +460,18 @@ void DMicDev::EnqueueThread()
                 audioData = dataQueue_.front();
                 dataQueue_.pop();
             }
-        }
-        DumpFileUtil::WriteDumpFile(dumpFileFast_, static_cast<void *>(audioData->Data()), audioData->Size());
-        bool writeRet = ashmem_->WriteToAshmem(audioData->Data(), audioData->Size(), writeIndex_);
-        if (writeRet) {
-            DHLOGD("Write to ashmem success! write index: %{public}d, writeLength: %{public}d.",
-                writeIndex_, lengthPerTrans_);
-        } else {
-            DHLOGE("Write data to ashmem failed.");
+            if (audioData == nullptr) {
+                DHLOGD("The audioData is nullptr.");
+                continue;
+            }
+            DumpFileUtil::WriteDumpFile(dumpFileFast_, static_cast<void *>(audioData->Data()), audioData->Size());
+            bool writeRet = ashmem_->WriteToAshmem(audioData->Data(), audioData->Size(), writeIndex_);
+            if (writeRet) {
+                DHLOGD("Write to ashmem success! write index: %{public}d, writeLength: %{public}d.",
+                    writeIndex_, lengthPerTrans_);
+            } else {
+                DHLOGE("Write data to ashmem failed.");
+            }
         }
         writeIndex_ += lengthPerTrans_;
         if (writeIndex_ >= ashmemLength_) {
