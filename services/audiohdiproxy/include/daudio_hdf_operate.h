@@ -47,7 +47,6 @@ public:
 
 private:
     int32_t WaitLoadService(const std::string& servName);
-    int32_t WaitLoadExtService(const std::string& servName);
 
 private:
     OHOS::sptr<IDeviceManager> devmgr_;

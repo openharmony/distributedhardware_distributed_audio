@@ -77,7 +77,7 @@ int32_t DaudioHdfOperate::LoadDaudioHDFImpl()
     if (ret != HDF_SUCCESS && ret != HDF_ERR_DEVICE_BUSY) {
         return ERR_DH_AUDIO_FAILED;
     }
-    if (WaitLoadExtService(AUDIOEXT_SERVICE_NAME) != DH_SUCCESS) {
+    if (WaitLoadService(AUDIOEXT_SERVICE_NAME) != DH_SUCCESS) {
         DHLOGE("Wait load provider service failed!");
         return ERR_DH_AUDIO_FAILED;
     }
@@ -91,34 +91,31 @@ int32_t DaudioHdfOperate::LoadDaudioHDFImpl()
 int32_t DaudioHdfOperate::WaitLoadService(const std::string& servName)
 {
     std::unique_lock<std::mutex> lock(hdfOperateMutex_);
-    DHLOGD("WaitLoadService start service %s, status %hu", servName.c_str(), this->audioServStatus_.load());
-    hdfOperateCon_.wait_for(lock, std::chrono::milliseconds(WAIT_TIME), [this] {
-        return (this->audioServStatus_.load() == OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START);
-    });
+    if (servName == AUDIO_SERVICE_NAME) {
+        DHLOGD("WaitLoadService start service %s, status %hu", servName.c_str(), this->audioServStatus_.load());
+        hdfOperateCon_.wait_for(lock, std::chrono::milliseconds(WAIT_TIME), [this] {
+            return (this->audioServStatus_.load() == OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START);
+        });
 
-    if (this->audioServStatus_.load() != OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START) {
-        DHLOGE("Wait load service %{public}s failed, status %{public}hu", servName.c_str(),
-            this->audioServStatus_.load());
-        return ERR_DH_AUDIO_FAILED;
+        if (this->audioServStatus_.load() != OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START) {
+            DHLOGE("Wait load service %{public}s failed, status %{public}hu", servName.c_str(),
+                this->audioServStatus_.load());
+            return ERR_DH_AUDIO_FAILED;
+        }
     }
 
-    return DH_SUCCESS;
-}
+    if (servName == AUDIOEXT_SERVICE_NAME) {
+        DHLOGD("WaitLoadService start service %s, status %hu", servName.c_str(), this->audioextServStatus_.load());
+        hdfOperateCon_.wait_for(lock, std::chrono::milliseconds(WAIT_TIME), [this] {
+            return (this->audioextServStatus_.load() == OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START);
+        });
 
-int32_t DaudioHdfOperate::WaitLoadExtService(const std::string& servName)
-{
-    std::unique_lock<std::mutex> lock(hdfOperateMutex_);
-    DHLOGD("WaitLoadService start service %s, status %hu", servName.c_str(), this->audioextServStatus_.load());
-    hdfOperateCon_.wait_for(lock, std::chrono::milliseconds(WAIT_TIME), [this] {
-        return (this->audioextServStatus_.load() == OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START);
-    });
-
-    if (this->audioextServStatus_.load() != OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START) {
-        DHLOGE("Wait load service %{public}s failed, status %{public}hu", servName.c_str(),
-            this->audioextServStatus_.load());
-        return ERR_DH_AUDIO_FAILED;
+        if (this->audioextServStatus_.load() != OHOS::HDI::ServiceManager::V1_0::SERVIE_STATUS_START) {
+            DHLOGE("Wait load service %{public}s failed, status %{public}hu", servName.c_str(),
+                this->audioextServStatus_.load());
+            return ERR_DH_AUDIO_FAILED;
+        }
     }
-
     return DH_SUCCESS;
 }
 
