@@ -106,6 +106,7 @@ ohos_shared_library("distributed_audio_source") {
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
     "hdf_core:libhdi",
+    "hdf_core:libhdf_utils",
     "hicollie:libhicollie",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
@@ -114,7 +115,6 @@ ohos_shared_library("distributed_audio_source") {
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "hdf_core:libhdf_utils",
   ]
 
   cflags = []
