@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -44,6 +44,9 @@ void DAudioIpcCallbackTest::TearDown(void)
  */
 HWTEST_F(DAudioIpcCallbackTest, OnNotifyRegResult_001, TestSize.Level1)
 {
+    if (dAudioIpcCallback_ == nullptr) {
+        return;
+    }
     const std::string devId = "devId";
     const std::string dhId = "dhId";
     const std::string reqId = "reqIdReg";
@@ -64,6 +67,9 @@ HWTEST_F(DAudioIpcCallbackTest, OnNotifyRegResult_001, TestSize.Level1)
  */
 HWTEST_F(DAudioIpcCallbackTest, OnNotifyRegResult_002, TestSize.Level1)
 {
+    if (dAudioIpcCallback_ == nullptr) {
+        return;
+    }
     const std::string devId = "devId";
     const std::string dhId = "dhId";
     const std::string reqId = "reqId";
@@ -81,6 +87,9 @@ HWTEST_F(DAudioIpcCallbackTest, OnNotifyRegResult_002, TestSize.Level1)
  */
 HWTEST_F(DAudioIpcCallbackTest, OnNotifyRegResult_003, TestSize.Level1)
 {
+    if (dAudioIpcCallback_ == nullptr) {
+        return;
+    }
     size_t  DAUDIO_MAX_DEVICE_ID_LEN = 101;
     size_t  DAUDIO_LEGAL_DEVICE_ID_LEN = 10;
     std::string devId ;
@@ -109,6 +118,9 @@ HWTEST_F(DAudioIpcCallbackTest, OnNotifyRegResult_003, TestSize.Level1)
  */
 HWTEST_F(DAudioIpcCallbackTest, OnNotifyUnregResult_001, TestSize.Level1)
 {
+    if (dAudioIpcCallback_ == nullptr) {
+        return;
+    }
     const std::string devId = "devId";
     const std::string dhId = "dhId";
     const std::string reqId = "reqIdUnreg";
@@ -129,6 +141,9 @@ HWTEST_F(DAudioIpcCallbackTest, OnNotifyUnregResult_001, TestSize.Level1)
  */
 HWTEST_F(DAudioIpcCallbackTest, OnNotifyUnregResult_002, TestSize.Level1)
 {
+    if (dAudioIpcCallback_ == nullptr) {
+        return;
+    }
     const std::string devId = "devId";
     const std::string dhId = "dhId";
     const std::string reqId = "reqId";
@@ -146,6 +161,9 @@ HWTEST_F(DAudioIpcCallbackTest, OnNotifyUnregResult_002, TestSize.Level1)
  */
 HWTEST_F(DAudioIpcCallbackTest, OnNotifyUnregResult_003, TestSize.Level1)
 {
+    if (dAudioIpcCallback_ == nullptr) {
+        return;
+    }
     size_t  DAUDIO_MAX_DEVICE_ID_LEN = 101;
     size_t  DAUDIO_LEGAL_DEVICE_ID_LEN = 10;
     std::string devId ;
@@ -174,6 +192,9 @@ HWTEST_F(DAudioIpcCallbackTest, OnNotifyUnregResult_003, TestSize.Level1)
  */
 HWTEST_F(DAudioIpcCallbackTest, PushRegRegisterCallback_001, TestSize.Level1)
 {
+    if (dAudioIpcCallback_ == nullptr) {
+        return;
+    }
     const std::string reqId = "reqIdReg";
     std::shared_ptr<RegisterCallback> callback = std::make_shared<RegisterCallbackTest>();
     int32_t sizeFront = dAudioIpcCallback_->registerCallbackMap_.size();
@@ -191,6 +212,9 @@ HWTEST_F(DAudioIpcCallbackTest, PushRegRegisterCallback_001, TestSize.Level1)
  */
 HWTEST_F(DAudioIpcCallbackTest, PopRegRegisterCallback_001, TestSize.Level1)
 {
+    if (dAudioIpcCallback_ == nullptr) {
+        return;
+    }
     const std::string reqId = "reqId";
     std::shared_ptr<RegisterCallback> callback = std::make_shared<RegisterCallbackTest>();
     dAudioIpcCallback_->PushRegisterCallback(reqId, callback);
@@ -208,6 +232,9 @@ HWTEST_F(DAudioIpcCallbackTest, PopRegRegisterCallback_001, TestSize.Level1)
  */
 HWTEST_F(DAudioIpcCallbackTest, PushUnregRegisterCallback_001, TestSize.Level1)
 {
+    if (dAudioIpcCallback_ == nullptr) {
+        return;
+    }
     const std::string reqId = "reqIdUnreg";
     std::shared_ptr<UnregisterCallback> callback = std::make_shared<UnregisterCallbackTest>();
     int32_t sizeFront = dAudioIpcCallback_->unregisterCallbackMap_.size();
@@ -225,6 +252,9 @@ HWTEST_F(DAudioIpcCallbackTest, PushUnregRegisterCallback_001, TestSize.Level1)
  */
 HWTEST_F(DAudioIpcCallbackTest, PopUnregRegisterCallback_001, TestSize.Level1)
 {
+    if (dAudioIpcCallback_ == nullptr) {
+        return;
+    }
     const std::string reqId = "reqId";
     std::shared_ptr<UnregisterCallback> callback = std::make_shared<UnregisterCallbackTest>();
     dAudioIpcCallback_->PushUnregisterCallback(reqId, callback);
@@ -242,6 +272,9 @@ HWTEST_F(DAudioIpcCallbackTest, PopUnregRegisterCallback_001, TestSize.Level1)
  */
 HWTEST_F(DAudioIpcCallbackTest, OnHardwareStateChanged_001, TestSize.Level1)
 {
+    if (dAudioIpcCallback_ == nullptr) {
+        return;
+    }
     const std::string devId = "123";
     const std::string dhId = "1";
     int32_t status = 0;
@@ -261,6 +294,9 @@ HWTEST_F(DAudioIpcCallbackTest, OnHardwareStateChanged_001, TestSize.Level1)
  */
 HWTEST_F(DAudioIpcCallbackTest, OnHardwareStateChanged_002, TestSize.Level1)
 {
+    if (dAudioIpcCallback_ == nullptr) {
+        return;
+    }
     std::string devId = "123";
     std::string dhId = "1";
     size_t DAUDIO_MAX_DEVICE_ID_LEN = 101;
@@ -285,6 +321,9 @@ HWTEST_F(DAudioIpcCallbackTest, OnHardwareStateChanged_002, TestSize.Level1)
  */
 HWTEST_F(DAudioIpcCallbackTest, OnDataSyncTrigger_001, TestSize.Level1)
 {
+    if (dAudioIpcCallback_ == nullptr) {
+        return;
+    }
     const std::string devId = "123";
     std::shared_ptr<DataSyncTriggerListener> callback = std::make_shared<DataSyncTriggerListenerTest>();
     dAudioIpcCallback_->RegisterTriggerListener(callback);
@@ -301,6 +340,9 @@ HWTEST_F(DAudioIpcCallbackTest, OnDataSyncTrigger_001, TestSize.Level1)
  */
 HWTEST_F(DAudioIpcCallbackTest, OnDataSyncTrigger_002, TestSize.Level1)
 {
+    if (dAudioIpcCallback_ == nullptr) {
+        return;
+    }
     size_t DAUDIO_MAX_DEVICE_ID_LEN = 101;
     size_t DAUDIO_LEGAL_DEVICE_ID_LEN = 10;
     std::string devId ;

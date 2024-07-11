@@ -61,11 +61,12 @@ int32_t DAudioHdiHandler::InitHdiHandler()
         DHLOGE("Load hdf driver failed, ret: %{public}d", ret);
         return ret;
     }
-    DHLOGD("Load hdf driver end.");
+    DHLOGI("Load hdf driver end.");
 
     audioSrvHdf_ = IDAudioManager::Get(HDF_AUDIO_SERVICE_NAME.c_str(), false);
     CHECK_NULL_RETURN(audioSrvHdf_, ERR_DH_AUDIO_NULLPTR);
     remote_ = OHOS::HDI::hdi_objcast<IDAudioManager>(audioSrvHdf_);
+    CHECK_NULL_RETURN(remote_, ERR_DH_AUDIO_NULLPTR);
     remote_->AddDeathRecipient(audioHdiRecipient_);
     DHLOGI("Init hdi handler success.");
     return DH_SUCCESS;
@@ -123,10 +124,12 @@ int32_t DAudioHdiHandler::RegisterAudioDevice(const std::string &devId, const in
     }
 
     auto iter = mapAudioMgrCallback_.find(searchKey);
-    int32_t res = audioSrvHdf_->RegisterAudioDevice(devId, dhId, capability, iter->second);
-    if (res != HDF_SUCCESS) {
-        DHLOGE("Call hdf proxy register failed, res: %{public}d", res);
-        return ERR_DH_AUDIO_HDI_CALL_FAILED;
+    if (iter != mapAudioMgrCallback_.end()) {
+        int32_t res = audioSrvHdf_->RegisterAudioDevice(devId, dhId, capability, iter->second);
+        if (res != HDF_SUCCESS) {
+            DHLOGE("Call hdf proxy register failed, res: %{public}d", res);
+            return ERR_DH_AUDIO_HDI_CALL_FAILED;
+        }
     }
     return DH_SUCCESS;
 }
