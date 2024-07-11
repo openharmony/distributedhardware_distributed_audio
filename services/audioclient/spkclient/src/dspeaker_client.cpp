@@ -131,7 +131,7 @@ void DSpeakerClient::OnWriteData(size_t length)
             DHLOGI("Pop spk data, dataQueue size: %{public}" PRIu64, queueSize);
         }
     }
-    if (audioData->Capacity() != bufDesc.bufLength) {
+    if ((audioData != nullptr) && (audioData->Capacity() != bufDesc.bufLength)) {
         uint64_t capacity = static_cast<uint64_t>(audioData->Capacity());
         uint64_t bufLength = static_cast<uint64_t>(bufDesc.bufLength);
         DHLOGE("Audio data length is not equal to buflength. datalength: %{public}" PRIu64
@@ -286,6 +286,9 @@ void DSpeakerClient::PlayThreadRunning()
             dataQueue_.pop();
             uint64_t queueSize = static_cast<uint64_t>(dataQueue_.size());
             DHLOGD("Pop spk data, dataqueue size: %{public}" PRIu64, queueSize);
+        }
+        if (audioData == nullptr) {
+            continue;
         }
         DumpFileUtil::WriteDumpFile(dumpFile_, static_cast<void *>(audioData->Data()), audioData->Size());
         int32_t writeOffSet = 0;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -178,7 +178,7 @@ void DAudioSourceHandler::OnRemoteSourceSvrDied(const wptr<IRemoteObject> &remot
         return;
     }
     std::lock_guard<std::mutex> lock(sourceProxyMutex_);
-    if (dAudioSourceProxy_ != nullptr) {
+    if ((dAudioSourceProxy_ != nullptr) && (dAudioSourceProxy_->AsObject() != nullptr)) {
         dAudioSourceProxy_->AsObject()->RemoveDeathRecipient(sourceSvrRecipient_);
         dAudioSourceProxy_ = nullptr;
     }
@@ -188,7 +188,9 @@ void DAudioSourceHandler::FinishStartSA(const std::string &param, const sptr<IRe
 {
     DHLOGI("Finish start SA.");
     std::lock_guard<std::mutex> lock(sourceProxyMutex_);
-    remoteObject->AddDeathRecipient(sourceSvrRecipient_);
+    if (remoteObject != nullptr) {
+        remoteObject->AddDeathRecipient(sourceSvrRecipient_);
+    }
     dAudioSourceProxy_ = iface_cast<IDAudioSource>(remoteObject);
     if ((dAudioSourceProxy_ == nullptr) || (!dAudioSourceProxy_->AsObject())) {
         DHLOGE("Failed to get daudio source proxy.");

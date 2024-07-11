@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,7 +40,9 @@ int32_t DAudioIpcCallback::OnNotifyRegResult(const std::string &devId, const std
     auto iter = registerCallbackMap_.find(reqId);
     if (iter != registerCallbackMap_.end()) {
         std::string reduceDhId = dhId;
-        iter->second->OnRegisterResult(devId, reduceDhId, status, resultData);
+        if (iter->second != nullptr) {
+            iter->second->OnRegisterResult(devId, reduceDhId, status, resultData);
+        }
         registerCallbackMap_.erase(reqId);
         return DH_SUCCESS;
     }
@@ -63,7 +65,9 @@ int32_t DAudioIpcCallback::OnNotifyUnregResult(const std::string &devId, const s
     auto iter = unregisterCallbackMap_.find(reqId);
     if (iter != unregisterCallbackMap_.end()) {
         std::string reduceDhId = dhId;
-        iter->second->OnUnregisterResult(devId, reduceDhId, status, resultData);
+        if (iter->second != nullptr) {
+            iter->second->OnUnregisterResult(devId, reduceDhId, status, resultData);
+        }
         unregisterCallbackMap_.erase(reqId);
         return DH_SUCCESS;
     }

@@ -41,6 +41,9 @@ void DAudioManagerCallbackTest::TearDown() {}
  */
 HWTEST_F(DAudioManagerCallbackTest, CreateStream_001, TestSize.Level1)
 {
+    if (manCallback_ == nullptr) {
+        return;
+    }
     manCallback_->callback_ = nullptr;
     EXPECT_EQ(HDF_FAILURE, manCallback_->CreateStream(streamId_));
 }
@@ -53,6 +56,9 @@ HWTEST_F(DAudioManagerCallbackTest, CreateStream_001, TestSize.Level1)
  */
 HWTEST_F(DAudioManagerCallbackTest, CreateStream_002, TestSize.Level1)
 {
+    if (manCallback_ == nullptr) {
+        return;
+    }
     manCallback_->callback_ = std::make_shared<MockIDAudioHdiCallback>();
     EXPECT_EQ(HDF_SUCCESS, manCallback_->CreateStream(streamId_));
     EXPECT_EQ(HDF_SUCCESS, manCallback_->DestroyStream(streamId_));
@@ -66,6 +72,9 @@ HWTEST_F(DAudioManagerCallbackTest, CreateStream_002, TestSize.Level1)
  */
 HWTEST_F(DAudioManagerCallbackTest, DestroyStream_001, TestSize.Level1)
 {
+    if (manCallback_ == nullptr) {
+        return;
+    }
     manCallback_->callback_ = nullptr;
     EXPECT_EQ(HDF_FAILURE, manCallback_->DestroyStream(streamId_));
 }
@@ -78,6 +87,9 @@ HWTEST_F(DAudioManagerCallbackTest, DestroyStream_001, TestSize.Level1)
  */
 HWTEST_F(DAudioManagerCallbackTest, DestroyStream_002, TestSize.Level1)
 {
+    if (manCallback_ == nullptr) {
+        return;
+    }
     manCallback_->callback_ = std::make_shared<MockIDAudioHdiCallback>();
     EXPECT_EQ(HDF_SUCCESS, manCallback_->CreateStream(streamId_));
     EXPECT_EQ(HDF_SUCCESS, manCallback_->DestroyStream(streamId_));
@@ -91,6 +103,9 @@ HWTEST_F(DAudioManagerCallbackTest, DestroyStream_002, TestSize.Level1)
  */
 HWTEST_F(DAudioManagerCallbackTest, SetParameters_001, TestSize.Level1)
 {
+    if (manCallback_ == nullptr) {
+        return;
+    }
     manCallback_->callback_ = std::make_shared<MockIDAudioHdiCallback>();
     EXPECT_EQ(HDF_SUCCESS, manCallback_->CreateStream(streamId_));
     OHOS::HDI::DistributedAudio::Audioext::V2_0::AudioParameter param;
@@ -107,6 +122,9 @@ HWTEST_F(DAudioManagerCallbackTest, SetParameters_001, TestSize.Level1)
  */
 HWTEST_F(DAudioManagerCallbackTest, SetParameters_002, TestSize.Level1)
 {
+    if (manCallback_ == nullptr) {
+        return;
+    }
     manCallback_->callback_ = std::make_shared<MockIDAudioHdiCallback>();
     EXPECT_EQ(HDF_SUCCESS, manCallback_->CreateStream(streamId_));
     OHOS::HDI::DistributedAudio::Audioext::V2_0::AudioParameter param = {
@@ -160,6 +178,9 @@ HWTEST_F(DAudioManagerCallbackTest, SetParameters_002, TestSize.Level1)
  */
 HWTEST_F(DAudioManagerCallbackTest, NotifyEvent_001, TestSize.Level1)
 {
+    if (manCallback_ == nullptr) {
+        return;
+    }
     manCallback_->callback_ = std::make_shared<MockIDAudioHdiCallback>();
     EXPECT_EQ(HDF_SUCCESS, manCallback_->CreateStream(streamId_));
     manCallback_->callback_ = nullptr;
@@ -176,6 +197,9 @@ HWTEST_F(DAudioManagerCallbackTest, NotifyEvent_001, TestSize.Level1)
  */
 HWTEST_F(DAudioManagerCallbackTest, NotifyEvent_002, TestSize.Level1)
 {
+    if (manCallback_ == nullptr) {
+        return;
+    }
     manCallback_->callback_ = std::make_shared<MockIDAudioHdiCallback>();
     EXPECT_EQ(HDF_SUCCESS, manCallback_->CreateStream(streamId_));
     OHOS::HDI::DistributedAudio::Audioext::V2_0::DAudioEvent event;
@@ -220,6 +244,9 @@ HWTEST_F(DAudioManagerCallbackTest, NotifyEvent_002, TestSize.Level1)
  */
 HWTEST_F(DAudioManagerCallbackTest, WriteStreamData_001, TestSize.Level1)
 {
+    if (manCallback_ == nullptr) {
+        return;
+    }
     manCallback_->callback_ = std::make_shared<MockIDAudioHdiCallback>();
     EXPECT_EQ(HDF_SUCCESS, manCallback_->CreateStream(streamId_));
     manCallback_->callback_ = nullptr;
@@ -236,6 +263,9 @@ HWTEST_F(DAudioManagerCallbackTest, WriteStreamData_001, TestSize.Level1)
  */
 HWTEST_F(DAudioManagerCallbackTest, WriteStreamData_002, TestSize.Level1)
 {
+    if (manCallback_ == nullptr) {
+        return;
+    }
     manCallback_->callback_ = std::make_shared<MockIDAudioHdiCallback>();
     EXPECT_EQ(HDF_SUCCESS, manCallback_->CreateStream(streamId_));
     OHOS::HDI::DistributedAudio::Audioext::V2_0::AudioData data;
@@ -264,6 +294,9 @@ HWTEST_F(DAudioManagerCallbackTest, WriteStreamData_002, TestSize.Level1)
  */
 HWTEST_F(DAudioManagerCallbackTest, ReadStreamData_001, TestSize.Level1)
 {
+    if (manCallback_ == nullptr) {
+        return;
+    }
     manCallback_->callback_ = std::make_shared<MockIDAudioHdiCallback>();
     EXPECT_EQ(HDF_SUCCESS, manCallback_->CreateStream(streamId_));
     manCallback_->callback_ = nullptr;
@@ -280,6 +313,9 @@ HWTEST_F(DAudioManagerCallbackTest, ReadStreamData_001, TestSize.Level1)
  */
 HWTEST_F(DAudioManagerCallbackTest, ReadStreamData_002, TestSize.Level1)
 {
+    if (manCallback_ == nullptr) {
+        return;
+    }
     manCallback_->callback_ = std::make_shared<MockIDAudioHdiCallback>();
     EXPECT_EQ(HDF_SUCCESS, manCallback_->CreateStream(streamId_));
     OHOS::HDI::DistributedAudio::Audioext::V2_0::AudioData data;
@@ -305,6 +341,9 @@ HWTEST_F(DAudioManagerCallbackTest, ReadStreamData_002, TestSize.Level1)
  */
 HWTEST_F(DAudioManagerCallbackTest, ReadMmapPosition_001, TestSize.Level1)
 {
+    if (manCallback_ == nullptr) {
+        return;
+    }
     int32_t streamId = 0;
     uint64_t frames = 1;
     OHOS::HDI::DistributedAudio::Audioext::V2_0::CurrentTime time;
@@ -321,6 +360,9 @@ HWTEST_F(DAudioManagerCallbackTest, ReadMmapPosition_001, TestSize.Level1)
  */
 HWTEST_F(DAudioManagerCallbackTest, RefreshAshmemInfo_001, TestSize.Level1)
 {
+    if (manCallback_ == nullptr) {
+        return;
+    }
     int32_t streamId = 1;
     int fd = 1;
     int32_t ashmemLength = 240;

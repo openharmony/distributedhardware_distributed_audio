@@ -270,6 +270,7 @@ void DMicClient::AudioFwkCaptureData()
     }
     DumpFileUtil::WriteDumpFile(dumpFile_, static_cast<void *>(audioData->Data()), audioData->Size());
     int64_t startTransTime = GetNowTimeUs();
+    CHECK_NULL_VOID(micTrans_);
     int32_t ret = micTrans_->FeedAudioData(audioData);
     if (ret != DH_SUCCESS) {
         DHLOGE("Failed to send data.");

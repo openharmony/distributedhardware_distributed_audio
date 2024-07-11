@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -126,7 +126,7 @@ void DAudioSinkHandler::OnRemoteSinkSvrDied(const wptr<IRemoteObject> &remote)
     CHECK_NULL_VOID(remoteObject);
 
     std::lock_guard<std::mutex> lock(sinkProxyMutex_);
-    if (dAudioSinkProxy_ != nullptr) {
+    if ((dAudioSinkProxy_ != nullptr) && (dAudioSinkProxy_->AsObject() != nullptr)) {
         dAudioSinkProxy_->AsObject()->RemoveDeathRecipient(sinkSvrRecipient_);
         dAudioSinkProxy_ = nullptr;
     }
@@ -136,7 +136,9 @@ void DAudioSinkHandler::FinishStartSA(const std::string &param, const sptr<IRemo
 {
     DHLOGI("Finish start SA.");
     std::lock_guard<std::mutex> lock(sinkProxyMutex_);
-    remoteObject->AddDeathRecipient(sinkSvrRecipient_);
+    if (remoteObject != nullptr) {
+        remoteObject->AddDeathRecipient(sinkSvrRecipient_);
+    }
     dAudioSinkProxy_ = iface_cast<IDAudioSink>(remoteObject);
     if ((dAudioSinkProxy_ == nullptr) || (!dAudioSinkProxy_->AsObject())) {
         DHLOGE("Failed to get daudio sink proxy.");

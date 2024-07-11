@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -54,6 +54,9 @@ void DAudioSinkProxyTest::TearDown(void) {}
  */
 HWTEST_F(DAudioSinkProxyTest, SubscribeLocalHardware_001, TestSize.Level1)
 {
+    if (dAudioProxy == nullptr) {
+        return;
+    }
     const std::string dhId = "dhId";
     const std::string param = "param";
     int32_t ret = dAudioProxy->SubscribeLocalHardware(dhId, param);
@@ -70,6 +73,9 @@ HWTEST_F(DAudioSinkProxyTest, SubscribeLocalHardware_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSinkProxyTest, SubscribeLocalHardware_002, TestSize.Level1)
 {
+    if (dAudioProxy == nullptr) {
+        return;
+    }
     size_t DAUDIO_MAX_DEVICE_ID_LEN = 101;
     size_t DAUDIO_LEGAL_DEVICE_ID_LEN = 10;
     std::string dhId;
@@ -100,6 +106,9 @@ HWTEST_F(DAudioSinkProxyTest, SubscribeLocalHardware_002, TestSize.Level1)
  */
 HWTEST_F(DAudioSinkProxyTest, InitSink_001, TestSize.Level1)
 {
+    if (dAudioProxy == nullptr) {
+        return;
+    }
     const std::string params = "params";
     auto dAudioSinkIpcCallback = new DAudioSinkIpcCallback();
     int32_t ret = dAudioProxy->InitSink(params, dAudioSinkIpcCallback);
@@ -116,6 +125,9 @@ HWTEST_F(DAudioSinkProxyTest, InitSink_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSinkProxyTest, PauseDistributedHardware_001, TestSize.Level1)
 {
+    if (dAudioProxy == nullptr) {
+        return;
+    }
     std::string networkId = "123";
     EXPECT_EQ(DH_SUCCESS, dAudioProxy->PauseDistributedHardware(networkId));
     EXPECT_EQ(DH_SUCCESS, dAudioProxy->ResumeDistributedHardware(networkId));

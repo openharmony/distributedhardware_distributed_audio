@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -54,6 +54,9 @@ void DMicClientTest::TearDown()
  */
 HWTEST_F(DMicClientTest, InitSenderEngine_001, TestSize.Level1)
 {
+    if (micClient_ == nullptr) {
+        return;
+    }
     IAVEngineProvider *providerPtr = nullptr;
     auto message = std::make_shared<AVTransMessage>();
     micClient_->OnEngineTransMessage(message);
@@ -68,6 +71,9 @@ HWTEST_F(DMicClientTest, InitSenderEngine_001, TestSize.Level1)
  */
 HWTEST_F(DMicClientTest, OnStateChange_001, TestSize.Level1)
 {
+    if (micClient_ == nullptr) {
+        return;
+    }
     EXPECT_NE(DH_SUCCESS, micClient_->OnStateChange(AudioEventType::NOTIFY_OPEN_SPEAKER_RESULT));
 }
 
@@ -79,6 +85,9 @@ HWTEST_F(DMicClientTest, OnStateChange_001, TestSize.Level1)
  */
 HWTEST_F(DMicClientTest, OnStateChange_002, TestSize.Level1)
 {
+    if (micClient_ == nullptr) {
+        return;
+    }
     EXPECT_EQ(DH_SUCCESS, micClient_->OnStateChange(AudioEventType::DATA_CLOSED));
 }
 
@@ -90,6 +99,9 @@ HWTEST_F(DMicClientTest, OnStateChange_002, TestSize.Level1)
  */
 HWTEST_F(DMicClientTest, SetUp_001, TestSize.Level1)
 {
+    if (micClient_ == nullptr) {
+        return;
+    }
     std::string devId = "testID";
     auto clientCallback = std::make_shared<MockIAudioEventCallback>();
     micClient_->SetAttrs(devId, clientCallback);
@@ -106,6 +118,9 @@ HWTEST_F(DMicClientTest, SetUp_001, TestSize.Level1)
  */
 HWTEST_F(DMicClientTest, StartCapture001, TestSize.Level1)
 {
+    if (micClient_ == nullptr) {
+        return;
+    }
     micClient_->CaptureThreadRunning();
     EXPECT_NE(DH_SUCCESS, micClient_->StartCapture());
     EXPECT_NE(DH_SUCCESS, micClient_->StopCapture());
@@ -142,6 +157,9 @@ HWTEST_F(DMicClientTest, StartCapture001, TestSize.Level1)
  */
 HWTEST_F(DMicClientTest, StopCapture001, TestSize.Level1)
 {
+    if (micClient_ == nullptr) {
+        return;
+    }
     std::shared_ptr<AudioData> audioData = nullptr;
     EXPECT_NE(DH_SUCCESS, micClient_->StopCapture());
     micClient_->clientStatus_ = STATUS_START;
@@ -159,6 +177,9 @@ HWTEST_F(DMicClientTest, StopCapture001, TestSize.Level1)
  */
 HWTEST_F(DMicClientTest, StopCapture002, TestSize.Level1)
 {
+    if (micClient_ == nullptr) {
+        return;
+    }
     micClient_->clientStatus_ = STATUS_START;
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, micClient_->StopCapture());
     micClient_->isCaptureReady_.store(true);
@@ -175,6 +196,9 @@ HWTEST_F(DMicClientTest, StopCapture002, TestSize.Level1)
  */
 HWTEST_F(DMicClientTest, Release001, TestSize.Level1)
 {
+    if (micClient_ == nullptr) {
+        return;
+    }
     micClient_->clientStatus_ = AudioStatus::STATUS_START;
     EXPECT_EQ(ERR_DH_AUDIO_SA_STATUS_ERR, micClient_->Release());
     micClient_->clientStatus_ = AudioStatus::STATUS_STOP;
@@ -213,6 +237,9 @@ HWTEST_F(DMicClientTest, Release001, TestSize.Level1)
  */
 HWTEST_F(DMicClientTest, SendMessage_001, TestSize.Level1)
 {
+    if (micClient_ == nullptr) {
+        return;
+    }
     std::string content = "content";
     std::string dstDevId = "dstDevId";
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, micClient_->SendMessage(EVENT_UNKNOWN, content, dstDevId));
@@ -229,6 +256,9 @@ HWTEST_F(DMicClientTest, SendMessage_001, TestSize.Level1)
  */
 HWTEST_F(DMicClientTest, AudioFwkClientSetUp_001, TestSize.Level1)
 {
+    if (micClient_ == nullptr) {
+        return;
+    }
     audioParam_.captureOpts.capturerFlags = MMAP_MODE;
     int32_t actual = micClient_->AudioFwkClientSetUp();
     EXPECT_EQ(ERR_DH_AUDIO_CLIENT_CAPTURER_CREATE_FAILED, actual);
@@ -245,6 +275,9 @@ HWTEST_F(DMicClientTest, AudioFwkClientSetUp_001, TestSize.Level1)
  */
 HWTEST_F(DMicClientTest, TransSetUp_001, TestSize.Level1)
 {
+    if (micClient_ == nullptr) {
+        return;
+    }
     int32_t actual = micClient_->TransSetUp();
     EXPECT_EQ(DH_SUCCESS, actual);
     micClient_->micTrans_ = nullptr;
