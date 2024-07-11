@@ -129,6 +129,7 @@ void DAudioSourceDev::SetRegDataType(const std::string &capability)
     } else {
         isFull_.store(false);
     }
+    cJSON_Delete(jParam);
 }
 
 int32_t DAudioSourceDev::EnableDAudio(const std::string &dhId, const std::string &attrs)
