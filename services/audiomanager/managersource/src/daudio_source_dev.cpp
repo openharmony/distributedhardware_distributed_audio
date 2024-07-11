@@ -745,12 +745,12 @@ int32_t DAudioSourceDev::TaskDisableDAudio(const std::string &args)
     if (args.length() > DAUDIO_MAX_JSON_LEN || args.empty()) {
         return ERR_DH_AUDIO_SA_PARAM_INVALID;
     }
-    cJSON *jParam = cJSON_Parse(args.c_str());
-    CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
     int32_t dhId = ParseDhidFromEvent(args);
-    CHECK_AND_FREE_RETURN_RET_LOG(dhId == ERR_DH_AUDIO_FAILED, ERR_DH_AUDIO_NULLPTR, jParam,
-        "%{public}s", "Parse dhId error.");
-    cJSON_Delete(jParam);
+    if (dhId == ERR_DH_AUDIO_FAILED) {
+        DHLOGE("Parse dhId error. hdId: %{public}d.", dhId);
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+
     DHLOGI("Parsed dhId = %{public}d", dhId);
     switch (GetDevTypeByDHId(dhId)) {
         case AUDIO_DEVICE_TYPE_SPEAKER:

@@ -16,6 +16,7 @@
 #ifndef OHOS_DAUDIO_HDF_OPERATE_H
 #define OHOS_DAUDIO_HDF_OPERATE_H
 
+#include <atomic>
 #include <condition_variable>
 #include <mutex>
 
@@ -45,13 +46,13 @@ public:
     int32_t UnLoadDaudioHDFImpl();
 
 private:
-    int32_t WaitLoadService(const uint16_t& servStatus, const std::string& servName);
+    int32_t WaitLoadService(const std::string& servName);
 
 private:
     OHOS::sptr<IDeviceManager> devmgr_;
     OHOS::sptr<IServiceManager> servMgr_;
-    uint16_t audioServStatus_ = INVALID_VALUE;
-    uint16_t audioextServStatus_ = INVALID_VALUE;
+    std::atomic<uint16_t> audioServStatus_ = INVALID_VALUE;
+    std::atomic<uint16_t> audioextServStatus_ = INVALID_VALUE;
     std::condition_variable hdfOperateCon_;
     std::mutex hdfOperateMutex_;
 };
