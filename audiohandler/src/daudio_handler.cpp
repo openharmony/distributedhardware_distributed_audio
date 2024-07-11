@@ -140,7 +140,7 @@ std::vector<DHItem> DAudioHandler::RealQuery(const std::string &dataType)
         cJSON_AddNumberToObject(infoJson, INTERRUPT_GROUP_ID, dev->interruptGroupId_);
         cJSON_AddNumberToObject(infoJson, VOLUME_GROUP_ID, dev->volumeGroupId_);
         cJSON_AddStringToObject(infoJson, KEY_DATATYPE, dataType.c_str());
-        dhItem.dhId = AddDhIdPrefix(std::to_string(dhId));
+        dhItem.dhId = std::to_string(dhId);
         char *jsonInfo = cJSON_Print(infoJson);
         if (jsonInfo == NULL) {
             DHLOGE("Failed to create JSON data.");
@@ -152,7 +152,7 @@ std::vector<DHItem> DAudioHandler::RealQuery(const std::string &dataType)
         DHLOGD("Query result: dhId: %{public}d, subtype: %{public}s, attrs: %{public}s.",
             dhId, dhItem.subtype.c_str(), jsonInfo);
         if (dhId == DEFAULT_RENDER_ID) {
-            dhItem.dhId = AddDhIdPrefix(std::to_string(LOW_LATENCY_RENDER_ID));
+            dhItem.dhId = std::to_string(LOW_LATENCY_RENDER_ID);
             dhItemVec.push_back(dhItem);
             DHLOGD("Query result: dhId: %{public}d, attrs: %{public}s.", LOW_LATENCY_RENDER_ID, jsonInfo);
         }

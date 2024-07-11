@@ -101,7 +101,7 @@ int32_t DAudioSinkHandler::SubscribeLocalHardware(const std::string &dhId, const
     if (dhId.length() > DAUDIO_MAX_DEVICE_ID_LEN) {
         return ERR_DH_AUDIO_SA_DEVID_ILLEGAL;
     }
-    std::string reduceDhId = ReduceDhIdPrefix(dhId);
+    std::string reduceDhId = dhId;
     int32_t ret = dAudioSinkProxy_->SubscribeLocalHardware(reduceDhId, param);
     return ret;
 }
@@ -114,7 +114,7 @@ int32_t DAudioSinkHandler::UnsubscribeLocalHardware(const std::string &dhId)
     if (dhId.length() > DAUDIO_MAX_DEVICE_ID_LEN) {
         return ERR_DH_AUDIO_SA_DEVID_ILLEGAL;
     }
-    std::string reduceDhId = ReduceDhIdPrefix(dhId);
+    std::string reduceDhId = dhId;
     int32_t ret = dAudioSinkProxy_->UnsubscribeLocalHardware(reduceDhId);
     return ret;
 }
