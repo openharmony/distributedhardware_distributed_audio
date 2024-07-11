@@ -867,7 +867,7 @@ int32_t DAudioSourceDev::TaskOpenDSpeaker(const std::string &args)
         DHLOGE("Task Open DSpeaker Execute failed, error code %{public}d.", ret);
         return ret;
     }
-    NotifyFwkRunning(devId_, AddDhIdPrefix(std::to_string(dhId)));
+    NotifyFwkRunning(devId_, std::to_string(dhId));
     cJSON_Delete(jAudioParam);
     return DH_SUCCESS;
 }
@@ -973,7 +973,7 @@ int32_t DAudioSourceDev::TaskCloseDSpeaker(const std::string &args)
         return ret;
     }
     NotifyHDF(NOTIFY_CLOSE_SPEAKER_RESULT, HDF_EVENT_RESULT_SUCCESS, dhId);
-    NotifyFwkIdle(devId_, AddDhIdPrefix(std::to_string(dhId)));
+    NotifyFwkIdle(devId_, std::to_string(dhId));
     return DH_SUCCESS;
 }
 
@@ -1043,7 +1043,7 @@ int32_t DAudioSourceDev::TaskOpenDMic(const std::string &args)
         return ret;
     }
     NotifyHDF(NOTIFY_OPEN_MIC_RESULT, HDF_EVENT_RESULT_SUCCESS, dhId);
-    NotifyFwkRunning(devId_, AddDhIdPrefix(std::to_string(dhId)));
+    NotifyFwkRunning(devId_, std::to_string(dhId));
     cJSON_Delete(jAudioParam);
     return DH_SUCCESS;
 }
@@ -1090,7 +1090,7 @@ int32_t DAudioSourceDev::TaskCloseDMic(const std::string &args)
         return ret;
     }
     NotifyHDF(NOTIFY_CLOSE_MIC_RESULT, HDF_EVENT_RESULT_SUCCESS, dhId);
-    NotifyFwkIdle(devId_, AddDhIdPrefix(std::to_string(dhId)));
+    NotifyFwkIdle(devId_, std::to_string(dhId));
     return DH_SUCCESS;
 }
 

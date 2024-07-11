@@ -312,22 +312,8 @@ HWTEST_F(DAudioUtilsTest, DAudioUtilTest_007, TestSize.Level1)
 }
 
 /**
- * @tc.name: DAudioLogTest_009
- * @tc.desc: Verify the AddDhIdPrefix and ReduceDhIdPrefix function.
- * @tc.type: FUNC
- * @tc.require: AR000H0E5U
- */
-HWTEST_F(DAudioUtilsTest, DAudioUtilTest_009, TestSize.Level1)
-{
-    EXPECT_EQ(AddDhIdPrefix("1394302"), "Audio_1394302");
-    EXPECT_EQ(AddDhIdPrefix("Audio_1394302"), "Audio_1394302");
-    EXPECT_EQ(ReduceDhIdPrefix("Audio_1394302"), "1394302");
-    EXPECT_EQ(ReduceDhIdPrefix("1394302"), "1394302");
-}
-
-/**
  * @tc.name: DAudioLogTest_010
- * @tc.desc: Verify the AddDhIdPrefix and ReduceDhIdPrefix function.
+ * @tc.desc: Verify the cjson function.
  * @tc.type: FUNC
  * @tc.require: AR000H0E5U
  */
@@ -351,7 +337,7 @@ HWTEST_F(DAudioUtilsTest, DAudioUtilTest_010, TestSize.Level1)
 
 /**
  * @tc.name: DAudioLogTest_011
- * @tc.desc: Verify the AddDhIdPrefix and ReduceDhIdPrefix function.
+ * @tc.desc: Verify the cjson function.
  * @tc.type: FUNC
  * @tc.require: AR000H0E5U
  */
@@ -375,7 +361,7 @@ HWTEST_F(DAudioUtilsTest, DAudioUtilTest_011, TestSize.Level1)
 
 /**
  * @tc.name: DAudioLogTest_012
- * @tc.desc: Verify the AddDhIdPrefix and ReduceDhIdPrefix function.
+ * @tc.desc: Verify the IsAudioParam function.
  * @tc.type: FUNC
  * @tc.require: AR000H0E5U
  */
@@ -396,7 +382,7 @@ HWTEST_F(DAudioUtilsTest, DAudioUtilTest_012, TestSize.Level1)
 
 /**
  * @tc.name: DAudioLogTest_013
- * @tc.desc: Verify the AddDhIdPrefix and ReduceDhIdPrefix function.
+ * @tc.desc: Verify the IsParamEnabled function.
  * @tc.type: FUNC
  * @tc.require: AR000H0E5U
  */
@@ -409,7 +395,7 @@ HWTEST_F(DAudioUtilsTest, DAudioUtilTest_013, TestSize.Level1)
 
 /**
  * @tc.name: DAudioLogTest_014
- * @tc.desc: Verify the AddDhIdPrefix and ReduceDhIdPrefix function.
+ * @tc.desc: Verify the GetSysPara function.
  * @tc.type: FUNC
  * @tc.require: AR000H0E5U
  */
@@ -424,7 +410,7 @@ HWTEST_F(DAudioUtilsTest, DAudioUtilTest_014, TestSize.Level1)
 
 /**
  * @tc.name: DAudioLogTest_015
- * @tc.desc: Verify the AddDhIdPrefix and ReduceDhIdPrefix function.
+ * @tc.desc: Verify the AbsoluteSleep function.
  * @tc.type: FUNC
  * @tc.require: AR000H0E5U
  */
