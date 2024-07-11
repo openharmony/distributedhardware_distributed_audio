@@ -288,6 +288,9 @@ static void OpenSpk(const std::string &devId)
     }
 
     g_callbackStub = new AudioParamCallbackImpl();
+    if (g_adapter == nullptr) {
+        return;
+    }
     int32_t ret = g_adapter->RegExtraParamObserver(g_callbackStub, 0);
     if (ret != DH_SUCCESS) {
         std::cout << "Register observer failed, ret: " << ret << std::endl;
@@ -442,12 +445,14 @@ static void CloseSpk()
         StopRender();
     }
 
-    int32_t ret = g_adapter->DestroyRender(g_renderId);
-    if (ret != DH_SUCCESS) {
-        std::cout << "Close speaker failed" << std::endl;
-        return;
+    if (g_adapter != nullptr) {
+        int32_t ret = g_adapter->DestroyRender(g_renderId);
+        if (ret != DH_SUCCESS) {
+            std::cout << "Close speaker failed" << std::endl;
+            return;
+        }
     }
-    if (g_micStatus == DeviceStatus::DEVICE_IDLE) {
+    if (g_micStatus == DeviceStatus::DEVICE_IDLE && g_manager != nullptr) {
         g_manager->UnloadAdapter(g_devId);
         g_adapter = nullptr;
     }
@@ -512,6 +517,9 @@ static void OpenMic(const std::string &devId)
     captureAttr.channelCount = CAPTURE_CHANNEL_MASK;
     captureAttr.sampleRate = AUDIO_SAMPLE_RATE;
     captureAttr.format = AudioFormat::AUDIO_FORMAT_TYPE_PCM_16_BIT;
+    if (g_adapter == nullptr) {
+        return;
+    }
     int32_t ret = g_adapter->CreateCapture(captureDesc, captureAttr, g_capture, g_captureId);
     if (ret != DH_SUCCESS || g_capture == nullptr) {
         std::cout << "Open MIC device failed." << std::endl;
@@ -628,12 +636,14 @@ static void CloseMic()
         StopCapture();
     }
 
-    int32_t ret = g_adapter->DestroyCapture(g_captureId);
-    if (ret != DH_SUCCESS) {
-        std::cout << "Close mic failed." << std::endl;
-        return;
+    if (g_adapter != nullptr) {
+        int32_t ret = g_adapter->DestroyCapture(g_captureId);
+        if (ret != DH_SUCCESS) {
+            std::cout << "Close mic failed." << std::endl;
+            return;
+        }
     }
-    if (g_spkStatus == DeviceStatus::DEVICE_IDLE) {
+    if (g_spkStatus == DeviceStatus::DEVICE_IDLE && g_manager != nullptr) {
         g_manager->UnloadAdapter(g_devId);
         g_adapter = nullptr;
     }
@@ -661,9 +671,11 @@ static void SetVolume()
     AudioExtParamKey key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_VOLUME;
     std::string condition = "EVENT_TYPE=1;VOLUME_GROUP_ID=1;AUDIO_VOLUME_TYPE=1;";
     std::string volStr = std::to_string(volInt);
+    if (g_adapter != nullptr) {
     int32_t ret = g_adapter->SetExtraParams(key, condition, volStr);
-    if (ret != DH_SUCCESS) {
-        std::cout << "Set volume failed" << std::endl;
+        if (ret != DH_SUCCESS) {
+            std::cout << "Set volume failed" << std::endl;
+        }
     }
 }
 
@@ -676,10 +688,12 @@ static void GetVolume()
     AudioExtParamKey key = AudioExtParamKey::AUDIO_EXT_PARAM_KEY_VOLUME;
     std::string condition = "EVENT_TYPE=1;VOLUME_GROUP_ID=1;AUDIO_VOLUME_TYPE=1;";
     std::string vol;
-    int32_t ret = g_adapter->GetExtraParams(key, condition.c_str(), vol);
-    if (ret != DH_SUCCESS) {
-        std::cout << "Get Volume failed." << std::endl;
-        return;
+    if (g_adapter != nullptr) {
+        int32_t ret = g_adapter->GetExtraParams(key, condition.c_str(), vol);
+        if (ret != DH_SUCCESS) {
+            std::cout << "Get Volume failed." << std::endl;
+            return;
+        }
     }
     std::cout << "Get volume success. volume: " << vol <<std::endl;
 }

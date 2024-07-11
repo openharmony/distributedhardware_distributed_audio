@@ -49,6 +49,7 @@ HWTEST_F(AVSenderEngineAdapterTest, Initialize_001, TestSize.Level1)
 {
     IAVEngineProvider *providerPtr = nullptr;
     std::string peerDevId = "peerDevId";
+    ASSERT_NE(senderAdapter_, nullptr);
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, senderAdapter_->Initialize(providerPtr, peerDevId));
     senderAdapter_->initialized_ = true;
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, senderAdapter_->Initialize(providerPtr, peerDevId));
@@ -63,6 +64,7 @@ HWTEST_F(AVSenderEngineAdapterTest, Initialize_001, TestSize.Level1)
 HWTEST_F(AVSenderEngineAdapterTest, Initialize_002, TestSize.Level1)
 {
     std::string peerDevId = "peerDevId";
+    ASSERT_NE(senderAdapter_, nullptr);
     senderAdapter_->senderEngine_ = std::make_shared<MockIAVSenderEngine>();
     EXPECT_EQ(DH_SUCCESS, senderAdapter_->Start());
     EXPECT_EQ(DH_SUCCESS, senderAdapter_->Stop());
@@ -77,6 +79,7 @@ HWTEST_F(AVSenderEngineAdapterTest, Initialize_002, TestSize.Level1)
  */
 HWTEST_F(AVSenderEngineAdapterTest, Release_001, TestSize.Level1)
 {
+    ASSERT_NE(senderAdapter_, nullptr);
     senderAdapter_->senderEngine_ = std::make_shared<MockIAVSenderEngineForFail>();
     EXPECT_EQ(DH_SUCCESS, senderAdapter_->Release());
 }
@@ -89,6 +92,7 @@ HWTEST_F(AVSenderEngineAdapterTest, Release_001, TestSize.Level1)
  */
 HWTEST_F(AVSenderEngineAdapterTest, Start_001, TestSize.Level1)
 {
+    ASSERT_NE(senderAdapter_, nullptr);
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, senderAdapter_->Start());
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, senderAdapter_->Stop());
 }
@@ -102,6 +106,7 @@ HWTEST_F(AVSenderEngineAdapterTest, Start_001, TestSize.Level1)
 HWTEST_F(AVSenderEngineAdapterTest, SetParameter_001, TestSize.Level1)
 {
     std::string param = "param";
+    ASSERT_NE(senderAdapter_, nullptr);
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, senderAdapter_->SetParameter(AVTransTag::AUDIO_SAMPLE_RATE, param));
 }
 
@@ -114,6 +119,7 @@ HWTEST_F(AVSenderEngineAdapterTest, SetParameter_001, TestSize.Level1)
 HWTEST_F(AVSenderEngineAdapterTest, SetParameter_002, TestSize.Level1)
 {
     std::string param = "param";
+    ASSERT_NE(senderAdapter_, nullptr);
     senderAdapter_->senderEngine_ = std::make_shared<MockIAVSenderEngine>();
     EXPECT_EQ(DH_SUCCESS, senderAdapter_->SetParameter(AVTransTag::AUDIO_SAMPLE_RATE, param));
 }
@@ -127,6 +133,7 @@ HWTEST_F(AVSenderEngineAdapterTest, SetParameter_002, TestSize.Level1)
 HWTEST_F(AVSenderEngineAdapterTest, PushData_001, TestSize.Level1)
 {
     size_t bufLen = 4096;
+    ASSERT_NE(senderAdapter_, nullptr);
     std::shared_ptr<AudioData> audioData = std::make_shared<AudioData>(bufLen);
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, senderAdapter_->PushData(audioData));
     senderAdapter_->senderEngine_ = std::make_shared<MockIAVSenderEngine>();
@@ -142,6 +149,7 @@ HWTEST_F(AVSenderEngineAdapterTest, PushData_001, TestSize.Level1)
 HWTEST_F(AVSenderEngineAdapterTest, CreateControlChannel_001, TestSize.Level1)
 {
     std::string peerDevId = "peerDevId";
+    ASSERT_NE(senderAdapter_, nullptr);
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, senderAdapter_->CreateControlChannel(peerDevId));
     senderAdapter_->chnCreateSuccess_ = true;
     EXPECT_EQ(DH_SUCCESS, senderAdapter_->CreateControlChannel(peerDevId));
@@ -156,6 +164,7 @@ HWTEST_F(AVSenderEngineAdapterTest, CreateControlChannel_001, TestSize.Level1)
 HWTEST_F(AVSenderEngineAdapterTest, CreateControlChannel_002, TestSize.Level1)
 {
     std::string peerDevId = "peerDevId";
+    ASSERT_NE(senderAdapter_, nullptr);
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, senderAdapter_->CreateControlChannel(peerDevId));
     senderAdapter_->senderEngine_ = std::make_shared<MockIAVSenderEngine>();
     EXPECT_EQ(ERR_DH_AV_TRANS_CREATE_CHANNEL_FAILED, senderAdapter_->CreateControlChannel(peerDevId));
@@ -170,6 +179,7 @@ HWTEST_F(AVSenderEngineAdapterTest, CreateControlChannel_002, TestSize.Level1)
 HWTEST_F(AVSenderEngineAdapterTest, WaitForChannelCreated_001, TestSize.Level1)
 {
     senderAdapter_->chnCreateSuccess_ = true;
+    ASSERT_NE(senderAdapter_, nullptr);
     EXPECT_EQ(DH_SUCCESS, senderAdapter_->WaitForChannelCreated());
     senderAdapter_->chnCreateSuccess_ = false;
     EXPECT_EQ(ERR_DH_AUDIO_SA_WAIT_TIMEOUT, senderAdapter_->WaitForChannelCreated());
@@ -187,6 +197,7 @@ HWTEST_F(AVSenderEngineAdapterTest, SendMessageToRemote_001, TestSize.Level1)
     std::string content = "content";
     std::string dstDevId = "dstDevId";
     auto message = std::make_shared<AVTransMessage>(type, content, dstDevId);
+    ASSERT_NE(senderAdapter_, nullptr);
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, senderAdapter_->SendMessageToRemote(message));
     senderAdapter_->senderEngine_ = std::make_shared<MockIAVSenderEngine>();
     EXPECT_EQ(DH_SUCCESS, senderAdapter_->SendMessageToRemote(message));
@@ -201,6 +212,7 @@ HWTEST_F(AVSenderEngineAdapterTest, SendMessageToRemote_001, TestSize.Level1)
 HWTEST_F(AVSenderEngineAdapterTest, RegisterAdapterCallback_001, TestSize.Level1)
 {
     std::shared_ptr<AVSenderAdapterCallback> callback = nullptr;
+    ASSERT_NE(senderAdapter_, nullptr);
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, senderAdapter_->RegisterAdapterCallback(callback));
     callback = std::make_shared<MockAVSenderAdapterCallback>();
     EXPECT_EQ(DH_SUCCESS, senderAdapter_->RegisterAdapterCallback(callback));
@@ -215,6 +227,7 @@ HWTEST_F(AVSenderEngineAdapterTest, RegisterAdapterCallback_001, TestSize.Level1
 HWTEST_F(AVSenderEngineAdapterTest, OnSenderEvent_001, TestSize.Level1)
 {
     AVTransEvent event;
+    ASSERT_NE(senderAdapter_, nullptr);
     EXPECT_EQ(DH_SUCCESS, senderAdapter_->OnSenderEvent(event));
     std::shared_ptr<AVTransMessage> message = nullptr;
     EXPECT_EQ(DH_SUCCESS, senderAdapter_->OnMessageReceived(message));
@@ -233,6 +246,7 @@ HWTEST_F(AVSenderEngineAdapterTest, OnSenderEvent_002, TestSize.Level1)
 {
     AVTransEvent event;
     event.type = EventType::EVENT_ADD_STREAM;
+    ASSERT_NE(senderAdapter_, nullptr);
     EXPECT_EQ(DH_SUCCESS, senderAdapter_->OnSenderEvent(event));
     senderAdapter_->adapterCallback_ = std::make_shared<MockAVSenderAdapterCallback>();
     event.type = EventType::EVENT_START_SUCCESS;

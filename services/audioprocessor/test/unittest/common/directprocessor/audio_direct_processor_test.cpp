@@ -59,6 +59,7 @@ HWTEST_F(AudioDirectProcessorTest, ConfigureAudioProcessor_001, TestSize.Level1)
 {
     AudioCommonParam param;
     std::shared_ptr<IAudioProcessorCallback> procCallback = nullptr;
+    ASSERT_NE(processor_, nullptr);
     EXPECT_NE(DH_SUCCESS, processor_->ConfigureAudioProcessor(param, param, procCallback));
 }
 
@@ -70,6 +71,7 @@ HWTEST_F(AudioDirectProcessorTest, ConfigureAudioProcessor_001, TestSize.Level1)
  */
 HWTEST_F(AudioDirectProcessorTest, StartAudioProcessor_001, TestSize.Level1)
 {
+    ASSERT_NE(processor_, nullptr);
     EXPECT_EQ(DH_SUCCESS, processor_->StartAudioProcessor());
     EXPECT_EQ(DH_SUCCESS, processor_->StopAudioProcessor());
 }
@@ -82,6 +84,7 @@ HWTEST_F(AudioDirectProcessorTest, StartAudioProcessor_001, TestSize.Level1)
  */
 HWTEST_F(AudioDirectProcessorTest, FeedAudioProcessor_001, TestSize.Level1)
 {
+    ASSERT_NE(processor_, nullptr);
     std::shared_ptr<AudioData> inputData = nullptr;
     EXPECT_EQ(ERR_DH_AUDIO_BAD_VALUE, processor_->FeedAudioProcessor(inputData));
     inputData = std::make_shared<AudioData>(4096);

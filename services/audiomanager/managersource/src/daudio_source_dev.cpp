@@ -904,6 +904,7 @@ int32_t DAudioSourceDev::ConvertString2Int(std::string val)
 
 int32_t DAudioSourceDev::OpenDSpeakerInner(std::shared_ptr<DAudioIoDev> &speaker, const int32_t dhId)
 {
+    CHECK_NULL_RETURN(speaker, ERR_DH_AUDIO_NULLPTR);
     int32_t ret = speaker->SetUp();
     if (ret != DH_SUCCESS) {
         DHLOGE("Speaker setup failed, error code %{public}d.", ret);
@@ -1316,6 +1317,7 @@ int32_t DAudioSourceDev::NotifySinkDev(const AudioEventType type, const cJSON *P
         cJSON_Delete(jParam);
         return ERR_DH_AUDIO_NULLPTR;
     }
+    CHECK_NULL_RETURN(ioDev, ERR_DH_AUDIO_NULLPTR);
     ioDev->SendMessage(static_cast<uint32_t>(type), std::string(content), devId_);
     if (type == CLOSE_SPEAKER || type == CLOSE_MIC) {
         // Close spk || Close mic  do not need to wait RPC
@@ -1337,6 +1339,7 @@ int32_t DAudioSourceDev::NotifyHDF(const AudioEventType type, const std::string 
         return ERR_DH_AUDIO_NULLPTR;
     }
     auto ioDev = deviceMap_[dhId];
+    CHECK_NULL_RETURN(ioDev, ERR_DH_AUDIO_NULLPTR);
     AudioEvent event(type, result);
     switch (type) {
         case NOTIFY_OPEN_SPEAKER_RESULT:
@@ -1404,6 +1407,7 @@ DAudioSourceDev::SourceEventHandler::~SourceEventHandler() {}
 
 void DAudioSourceDev::SourceEventHandler::ProcessEventInner(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    CHECK_NULL_VOID(event);
     switch (event->GetInnerEventId()) {
         case EVENT_VOLUME_SET:
             SetVolumeCallback(event);
@@ -1439,6 +1443,7 @@ void DAudioSourceDev::SourceEventHandler::ProcessEventInner(const AppExecFwk::In
 
 void DAudioSourceDev::SourceEventHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    CHECK_NULL_VOID(event);
     DHLOGI("Event Id=%{public}d", event->GetInnerEventId());
     switch (event->GetInnerEventId()) {
         case EVENT_DAUDIO_ENABLE:
