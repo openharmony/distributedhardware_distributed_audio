@@ -36,11 +36,11 @@ DAudioSourceHandler::DAudioSourceHandler()
 {
     DHLOGD("Audio source handler constructed.");
     if (!sourceSvrRecipient_) {
-        sourceSvrRecipient_ = new DAudioSourceSvrRecipient();
+        sourceSvrRecipient_ = sptr<DAudioSourceSvrRecipient>(new DAudioSourceSvrRecipient());
     }
 
     if (!dAudioIpcCallback_) {
-        dAudioIpcCallback_ = new DAudioIpcCallback();
+        dAudioIpcCallback_ = sptr<DAudioIpcCallback>(new DAudioIpcCallback());
     }
 }
 
@@ -55,7 +55,8 @@ int32_t DAudioSourceHandler::InitSource(const std::string &params)
     if (dAudioSourceProxy_ == nullptr) {
         sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
         CHECK_NULL_RETURN(samgr, ERR_DH_AUDIO_NULLPTR);
-        sptr<DAudioSourceLoadCallback> loadCallback = new DAudioSourceLoadCallback(params);
+        sptr<DAudioSourceLoadCallback> loadCallback = sptr<DAudioSourceLoadCallback>(
+            new DAudioSourceLoadCallback(params));
         int32_t ret = samgr->LoadSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SOURCE_SA_ID, loadCallback);
         if (ret != ERR_OK) {
             DHLOGE("Failed to Load systemAbility, ret code: %{public}d", ret);
