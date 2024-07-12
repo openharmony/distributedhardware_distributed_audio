@@ -62,7 +62,7 @@ void DAudioSinkDev::SleepAudioDev()
 
 int32_t DAudioSinkDev::InitAVTransEngines(const ChannelState channelState, IAVEngineProvider *providerPtr)
 {
-    DHLOGI("Init InitAVTransEngines");
+    DHLOGI("Init InitAVTransEngines.");
     CHECK_NULL_RETURN(providerPtr, ERR_DH_AUDIO_FAILED);
 
     if (channelState == ChannelState::UNKNOWN) {
