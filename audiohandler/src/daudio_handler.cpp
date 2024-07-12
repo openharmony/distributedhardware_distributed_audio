@@ -156,7 +156,6 @@ std::vector<DHItem> DAudioHandler::RealQuery(const std::string &dataType)
             dhItemVec.push_back(dhItem);
             DHLOGD("Query result: dhId: %{public}d, attrs: %{public}s.", LOW_LATENCY_RENDER_ID, jsonInfo);
         }
-        DHLOGI("Query result: dhId: %{public}d.", dhId);
         cJSON_Delete(infoJson);
         cJSON_free(jsonInfo);
     }

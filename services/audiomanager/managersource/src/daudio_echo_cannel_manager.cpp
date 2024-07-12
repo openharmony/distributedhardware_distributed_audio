@@ -324,7 +324,7 @@ int32_t DAudioEchoCannelManager::LoadAecProcessor()
         return ERR_DH_AUDIO_NULLPTR;
     }
     aecProcessor_ = getAecEffectProcessorFunc();
-    DHLOGI("LoadAecEffectProcessor exit.");
+    DHLOGI("LoadAecEffectProcessor exit");
     return DH_SUCCESS;
 }
 
