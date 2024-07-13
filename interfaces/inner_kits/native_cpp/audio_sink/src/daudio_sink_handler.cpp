@@ -37,10 +37,10 @@ DAudioSinkHandler::DAudioSinkHandler()
 {
     DHLOGD("DAudio sink handler constructed.");
     if (!sinkSvrRecipient_) {
-        sinkSvrRecipient_ = new DAudioSinkSvrRecipient();
+        sinkSvrRecipient_ = sptr<DAudioSinkSvrRecipient>(new DAudioSinkSvrRecipient());
     }
     if (!dAudioSinkIpcCallback_) {
-        dAudioSinkIpcCallback_ = new DAudioSinkIpcCallback();
+        dAudioSinkIpcCallback_ = sptr<DAudioSinkIpcCallback>(new DAudioSinkIpcCallback());
     }
 }
 
