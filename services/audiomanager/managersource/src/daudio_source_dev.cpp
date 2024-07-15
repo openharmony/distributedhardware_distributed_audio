@@ -1318,7 +1318,11 @@ int32_t DAudioSourceDev::NotifySinkDev(const AudioEventType type, const cJSON *P
         cJSON_Delete(jParam);
         return ERR_DH_AUDIO_NULLPTR;
     }
-    CHECK_NULL_RETURN(ioDev, ERR_DH_AUDIO_NULLPTR);
+    if (ioDev == nullptr) {
+        cJSON_Delete(jParam);
+        cJSON_free(content);
+        return ERR_DH_AUDIO_NULLPTR;
+    }
     ioDev->SendMessage(static_cast<uint32_t>(type), std::string(content), devId_);
     if (type == CLOSE_SPEAKER || type == CLOSE_MIC) {
         // Close spk || Close mic  do not need to wait RPC
