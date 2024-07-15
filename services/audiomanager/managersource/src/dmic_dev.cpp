@@ -235,10 +235,7 @@ int32_t DMicDev::SetUp()
         DHLOGE("Mic trans set up failed. ret: %{public}d.", ret);
         return ret;
     }
-    echoCannelOn_ = (paramHDF_.capturerFlags == MMAP_MODE &&
-        paramHDF_.period == MMAP_NORMAL_PERIOD) ? false : true;
-    DHLOGD("Setup mode is %{public}d, period is %{public}" PRIu32", echoCannelOn_ is %{public}d.",
-        paramHDF_.capturerFlags, paramHDF_.period, echoCannelOn_);
+    echoCannelOn_ = false;
 #ifdef ECHO_CANNEL_ENABLE
     if (echoCannelOn_ && echoManager_ == nullptr) {
         echoManager_ = std::make_shared<DAudioEchoCannelManager>();
