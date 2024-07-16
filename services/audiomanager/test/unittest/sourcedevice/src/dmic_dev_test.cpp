@@ -197,6 +197,7 @@ HWTEST_F(DMicDevTest, Start_001, TestSize.Level1)
     EXPECT_FALSE(mic_->IsOpened());
 
     mic_->micTrans_ = std::make_shared<MockIAudioDataTransport>();
+    EXPECT_EQ(DH_SUCCESS, mic_->SetUp());
     mic_->isTransReady_.store(true);
     EXPECT_EQ(DH_SUCCESS, mic_->Start());
     EXPECT_TRUE(mic_->IsOpened());
