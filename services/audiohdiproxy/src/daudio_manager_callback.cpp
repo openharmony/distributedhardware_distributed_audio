@@ -178,6 +178,10 @@ int32_t DAudioManagerCallback::WriteStreamData(int32_t streamId,
     }
 
     std::shared_ptr<AudioData> audioData = std::make_shared<AudioData>(data.param.frameSize);
+    if (audioData->Capacity() < data.data.size()) {
+        DHLOGE("audio data capacity is smaller than data size");
+        return HDF_FAILURE;
+    }
     int32_t ret = memcpy_s(audioData->Data(), audioData->Capacity(), data.data.data(), data.data.size());
     if (ret != EOK) {
         DHLOGE("Copy audio data failed, error code %{public}d.", ret);

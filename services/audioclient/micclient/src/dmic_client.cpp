@@ -319,6 +319,10 @@ void DMicClient::OnReadData(size_t length)
         DHLOGE("Audio data length is not equal to buflength. datalength: %{public}" PRIu64
             ", bufLength: %{public}" PRIu64, capacity, bufLength);
     }
+    if (audioData->Capacity() < bufDesc.bufLength) {
+        DHLOGE("audio data size smaller than bufDesc.");
+        return;
+    }
     if (memcpy_s(audioData->Data(), audioData->Capacity(), bufDesc.buffer, bufDesc.bufLength) != EOK) {
         DHLOGE("Copy audio data failed.");
     }

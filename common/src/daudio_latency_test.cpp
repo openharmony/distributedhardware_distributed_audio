@@ -24,7 +24,7 @@
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DAudioLatencyTest"
-
+#define MAXSIZE 8192
 namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(DAudioLatencyTest);
@@ -69,6 +69,10 @@ int32_t DAudioLatencyTest::AddRecordTime(const int64_t recordBeepTime)
 
 bool DAudioLatencyTest::IsFrameHigh(const int16_t *audioData, const int32_t size, int32_t threshhold)
 {
+    if (size > MAXSIZE) {
+        DHLOGI("size=%{public}d is over range", size);
+        return false;
+    }
     int32_t max = 0;
     for (int32_t i = 0; i < size; i++) {
         int16_t f = abs(audioData[i]);

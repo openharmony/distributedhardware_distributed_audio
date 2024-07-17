@@ -41,7 +41,7 @@ void SinkProxyInitSinkFuzzTest(const uint8_t* data, size_t size)
         return;
     }
     std::shared_ptr<DAudioSinkProxy> dAudioProxy = std::make_shared<DAudioSinkProxy>(remoteObject);
-    sptr<DAudioSinkIpcCallback> dAudioSinkIpcCallback = new DAudioSinkIpcCallback();
+    sptr<DAudioSinkIpcCallback> dAudioSinkIpcCallback(new DAudioSinkIpcCallback());
     dAudioProxy->InitSink(params, dAudioSinkIpcCallback);
 }
 }

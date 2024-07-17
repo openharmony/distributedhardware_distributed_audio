@@ -164,6 +164,7 @@ HWTEST_F(DAudioUtilsTest, DAudioUtilTest_002, TestSize.Level1)
     cJSON_AddStringToObject(jsonObj, "one", "one");
     cJSON_AddNumberToObject(jsonObj, "two", 2);
     CJsonParamCheck(jsonObj, keys);
+    cJSON_Delete(jsonObj);
 
     int64_t tvSec;
     int64_t tvNSec;
