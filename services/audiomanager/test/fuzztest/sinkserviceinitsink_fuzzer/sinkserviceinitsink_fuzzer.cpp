@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,7 +36,7 @@ void SinkServiceInitSinkFuzzTest(const uint8_t* data, size_t size)
     bool runOnCreate = *(reinterpret_cast<const bool*>(data));
     
     auto dAudioSinkService = std::make_shared<DAudioSinkService>(saId, runOnCreate);
-    sptr<DAudioSinkIpcCallback> dAudioSinkIpcCallback = new DAudioSinkIpcCallback();
+    sptr<DAudioSinkIpcCallback> dAudioSinkIpcCallback(new DAudioSinkIpcCallback());
 
     dAudioSinkService->InitSink(params, dAudioSinkIpcCallback);
 }

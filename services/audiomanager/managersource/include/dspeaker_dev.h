@@ -86,6 +86,7 @@ private:
     static constexpr const char* ENQUEUE_THREAD = "spkEnqueueTh";
     const std::string SPK_DEV_FILENAME = "dump_source_spk_write_to_trans.pcm";
     const std::string SPK_LOWLATENCY_FILENAME = "dump_source_spk_fast_read_from_ashmem.pcm";
+    const int32_t ASHMEM_MAX_LEN = 2 * 4096;
 
     std::weak_ptr<IAudioEventCallback> audioEventCallback_;
     std::mutex channelWaitMutex_;

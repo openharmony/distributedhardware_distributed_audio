@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,9 +30,9 @@ void DAudioSourceMgrTest::TearDownTestCase(void) {}
 
 void DAudioSourceMgrTest::SetUp(void)
 {
-    dAudioIpcCallback_ = new DAudioIpcCallback();
+    dAudioIpcCallback_ = sptr<DAudioIpcCallback>(new DAudioIpcCallback());
     remoteObject_ = dAudioIpcCallback_;
-    ipcCallbackProxy_ = (new DAudioIpcCallbackProxy(remoteObject_));
+    ipcCallbackProxy_ = sptr<DAudioIpcCallbackProxy>(new DAudioIpcCallbackProxy(remoteObject_));
     auto runner = AppExecFwk::EventRunner::Create(true);
     if (runner == nullptr) {
         return;

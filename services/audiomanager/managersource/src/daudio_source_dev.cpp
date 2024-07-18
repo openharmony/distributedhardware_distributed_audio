@@ -196,8 +196,12 @@ int32_t DAudioSourceDev::DisableDAudio(const std::string &dhId)
     CHECK_NULL_FREE_RETURN(data, ERR_DH_AUDIO_NULLPTR, jParamClose);
     AudioEvent event(AudioEventType::EVENT_UNKNOWN, std::string(data));
     int32_t dhIdNum = ConvertString2Int(dhId);
-    CHECK_AND_FREECHAR_RETURN_RET_LOG(dhIdNum == ERR_DH_AUDIO_FAILED, ERR_DH_AUDIO_NOT_SUPPORT, data,
-        "%{public}s", "Parse dhId error.");
+    if (dhIdNum == ERR_DH_AUDIO_FAILED) {
+        DHLOGE("Parse dhId error.");
+        cJSON_Delete(jParamClose);
+        cJSON_free(data);
+        return ERR_DH_AUDIO_NOT_SUPPORT;
+    }
     switch (GetDevTypeByDHId(dhIdNum)) {
         case AUDIO_DEVICE_TYPE_SPEAKER:
             event.type = CLOSE_SPEAKER;

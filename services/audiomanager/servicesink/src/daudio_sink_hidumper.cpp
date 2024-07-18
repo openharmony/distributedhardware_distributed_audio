@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -55,6 +55,10 @@ bool DaudioSinkHidumper::Dump(const std::vector<std::string> &args, std::string 
 {
     result.clear();
     int32_t argsSize = static_cast<int32_t>(args.size());
+    if (argsSize > DUMP_MAX_SIZE) {
+        DHLOGE("Dump input is invalid");
+        return false;
+    }
     DHLOGI("Distributed audio hidumper dump args.size():%{public}d", argsSize);
     for (int32_t i = 0; i < argsSize; i++) {
         DHLOGI("Distributed audio hidumper dump args[%{public}d]: %{public}s.", i, args.at(i).c_str());
