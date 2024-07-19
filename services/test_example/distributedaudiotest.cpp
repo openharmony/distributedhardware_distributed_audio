@@ -287,7 +287,7 @@ static void OpenSpk(const std::string &devId)
         return;
     }
 
-    g_callbackStub = new AudioParamCallbackImpl();
+    g_callbackStub = OHOS::sptr<IAudioCallback>(new AudioParamCallbackImpl());
     if (g_adapter == nullptr) {
         return;
     }

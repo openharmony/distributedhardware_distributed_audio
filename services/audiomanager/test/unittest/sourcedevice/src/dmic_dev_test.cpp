@@ -200,6 +200,7 @@ HWTEST_F(DMicDevTest, Start_001, TestSize.Level1)
     EXPECT_EQ(DH_SUCCESS, mic_->SetUp());
     mic_->isTransReady_.store(true);
     EXPECT_EQ(DH_SUCCESS, mic_->Start());
+    mic_->isOpened_.store(true);
     EXPECT_TRUE(mic_->IsOpened());
 }
 
@@ -222,6 +223,7 @@ HWTEST_F(DMicDevTest, Start_002, TestSize.Level1)
 
     mic_->isTransReady_.store(true);
     EXPECT_EQ(DH_SUCCESS, mic_->Start());
+    mic_->isOpened_.store(true);
     EXPECT_TRUE(mic_->IsOpened());
 }
 

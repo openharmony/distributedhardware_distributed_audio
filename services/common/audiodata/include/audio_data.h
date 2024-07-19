@@ -40,6 +40,7 @@ public:
     bool FindString(const string &name, string &value);
 
 private:
+    const uint32_t CAPACITY_MAX_SIZE = 2 * 4096;
     size_t capacity_ = 0;
     size_t rangeOffset_ = 0;
     size_t rangeLength_ = 0;

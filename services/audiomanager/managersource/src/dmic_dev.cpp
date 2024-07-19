@@ -408,15 +408,17 @@ int32_t DMicDev::RefreshAshmemInfo(const int32_t streamId,
         if (ashmem_ != nullptr) {
             return DH_SUCCESS;
         }
-        ashmem_ = new Ashmem(fd, ashmemLength);
-        ashmemLength_ = ashmemLength;
-        lengthPerTrans_ = lengthPerTrans;
-        DHLOGD("Create ashmem success. fd:%{public}d, ashmem length: %{public}d, lengthPreTrans: %{public}d",
-            fd, ashmemLength_, lengthPerTrans_);
-        bool mapRet = ashmem_->MapReadAndWriteAshmem();
-        if (!mapRet) {
-            DHLOGE("Mmap ashmem failed.");
-            return ERR_DH_AUDIO_NULLPTR;
+        if (ashmemLength < ASHMEM_MAX_LEN) {
+            ashmem_ = sptr<Ashmem>(new Ashmem(fd, ashmemLength));
+            ashmemLength_ = ashmemLength;
+            lengthPerTrans_ = lengthPerTrans;
+            DHLOGD("Create ashmem success. fd:%{public}d, ashmem length: %{public}d, lengthPreTrans: %{public}d",
+                fd, ashmemLength_, lengthPerTrans_);
+            bool mapRet = ashmem_->MapReadAndWriteAshmem();
+            if (!mapRet) {
+                DHLOGE("Mmap ashmem failed.");
+                return ERR_DH_AUDIO_NULLPTR;
+            }
         }
     }
     return DH_SUCCESS;

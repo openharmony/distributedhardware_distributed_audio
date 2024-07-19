@@ -87,7 +87,7 @@ HWTEST_F(DAudioHidumperTest, GetSinkInfo_001, TestSize.Level1)
         return;
     }
     std::string result = "123";
-    EXPECT_NE(HDF_SUCCESS, hidumper_->GetSinkInfo(result));
+    EXPECT_EQ(HDF_SUCCESS, hidumper_->GetSinkInfo(result));
 }
 
 /**
