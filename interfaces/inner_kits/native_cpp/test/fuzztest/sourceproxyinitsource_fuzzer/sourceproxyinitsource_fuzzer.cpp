@@ -42,8 +42,8 @@ void SourceProxyInitSourceFuzzTest(const uint8_t* data, size_t size)
         return;
     }
     std::shared_ptr<DAudioSourceProxy> dAudioProxy = std::make_shared<DAudioSourceProxy>(remoteObject);
-    sptr<IDAudioIpcCallback> callback = new DAudioIpcCallback();
-    
+    sptr<IDAudioIpcCallback> callback(new DAudioIpcCallback());
+
     dAudioProxy->InitSource(params, callback);
 }
 }
