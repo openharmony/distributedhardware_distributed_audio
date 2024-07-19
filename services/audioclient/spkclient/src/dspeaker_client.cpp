@@ -137,10 +137,6 @@ void DSpeakerClient::OnWriteData(size_t length)
         DHLOGE("Audio data length is not equal to buflength. datalength: %{public}" PRIu64
             ", bufLength: %{public}" PRIu64, capacity, bufLength);
     }
-    if (bufDesc.bufLength < audioData->Capacity()) {
-        DHLOGE("bufDesc data size smaller than audio capacity.");
-        return;
-    }
     if (memcpy_s(bufDesc.buffer, bufDesc.bufLength, audioData->Data(), audioData->Capacity()) != EOK) {
         DHLOGE("Copy audio data failed.");
     }
