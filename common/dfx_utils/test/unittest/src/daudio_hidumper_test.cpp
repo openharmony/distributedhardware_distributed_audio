@@ -15,6 +15,7 @@
 
 #include "daudio_hidumper_test.h"
 #include "daudio_hitrace.h"
+#include "daudio_errorcode.h"
 
 using namespace testing::ext;
 
@@ -87,7 +88,7 @@ HWTEST_F(DAudioHidumperTest, GetSinkInfo_001, TestSize.Level1)
         return;
     }
     std::string result = "123";
-    EXPECT_EQ(HDF_SUCCESS, hidumper_->GetSinkInfo(result));
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, hidumper_->GetSinkInfo(result));
 }
 
 /**
