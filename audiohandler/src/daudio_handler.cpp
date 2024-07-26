@@ -159,7 +159,7 @@ std::vector<DHItem> DAudioHandler::RealQuery(const std::string &dataType)
         cJSON_Delete(infoJson);
         cJSON_free(jsonInfo);
     }
-    DHLOGI("Query result: size: (%{public}zu).", dhItemVec.size());
+    DHLOGD("Query result: size: (%{public}zu).", dhItemVec.size());
     ablityForDumpVec_ = dhItemVec;
     return dhItemVec;
 }

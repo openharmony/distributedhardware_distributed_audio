@@ -28,7 +28,7 @@ namespace DistributedHardware {
 int32_t AudioDirectProcessor::ConfigureAudioProcessor(const AudioCommonParam &localDevParam,
     const AudioCommonParam &remoteDevParam, const std::shared_ptr<IAudioProcessorCallback> &procCallback)
 {
-    DHLOGI("Configure direct audio processor.");
+    DHLOGD("Configure direct audio processor.");
     CHECK_NULL_RETURN(procCallback, ERR_DH_AUDIO_BAD_VALUE);
     procCallback_ = procCallback;
     return DH_SUCCESS;
@@ -36,19 +36,19 @@ int32_t AudioDirectProcessor::ConfigureAudioProcessor(const AudioCommonParam &lo
 
 int32_t AudioDirectProcessor::ReleaseAudioProcessor()
 {
-    DHLOGI("Release direct audio processor.");
+    DHLOGD("Release direct audio processor.");
     return DH_SUCCESS;
 }
 
 int32_t AudioDirectProcessor::StartAudioProcessor()
 {
-    DHLOGI("Start direct audio processor.");
+    DHLOGD("Start direct audio processor.");
     return DH_SUCCESS;
 }
 
 int32_t AudioDirectProcessor::StopAudioProcessor()
 {
-    DHLOGI("Stop direct audio processor.");
+    DHLOGD("Stop direct audio processor.");
     return DH_SUCCESS;
 }
 

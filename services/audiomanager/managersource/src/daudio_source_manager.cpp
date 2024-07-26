@@ -105,7 +105,7 @@ int32_t DAudioSourceManager::Init(const sptr<IDAudioIpcCallback> &callback)
     auto runner = AppExecFwk::EventRunner::Create(true);
     CHECK_NULL_RETURN(runner, ERR_DH_AUDIO_NULLPTR);
     handler_ = std::make_shared<DAudioSourceManager::SourceManagerHandler>(runner);
-    DHLOGI("Init DAudioManager successfuly.");
+    DHLOGD("Init DAudioManager successfuly.");
     return DH_SUCCESS;
 }
 
@@ -146,7 +146,7 @@ int32_t DAudioSourceManager::UnInit()
         DHLOGD("manager handler is running, wait for idle.");
         usleep(WAIT_HANDLER_IDLE_TIME_US);
     }
-    DHLOGI("Uninit audio source manager exit.");
+    DHLOGD("Uninit audio source manager exit.");
     return DH_SUCCESS;
 }
 
@@ -190,7 +190,7 @@ int32_t DAudioSourceManager::EnableDAudio(const std::string &devId, const std::s
     }
     cJSON_Delete(jParam);
     cJSON_free(jsonString);
-    DHLOGI("Enable audio task generate successfully.");
+    DHLOGD("Enable audio task generate successfully.");
     return DH_SUCCESS;
 }
 
@@ -219,7 +219,7 @@ int32_t DAudioSourceManager::DoEnableDAudio(const std::string &args)
         audioDevMap_[devId].ports[dhId] = reqId;
         sourceDev = audioDevMap_[devId].dev;
     }
-    DHLOGI("Call source dev to enable daudio.");
+    DHLOGD("Call source dev to enable daudio.");
     if (sourceDev == nullptr) {
         DHLOGE("Source dev is nullptr.");
         return ERR_DH_AUDIO_FAILED;
@@ -254,7 +254,7 @@ int32_t DAudioSourceManager::DisableDAudio(const std::string &devId, const std::
     }
     cJSON_Delete(jParam);
     cJSON_free(jsonString);
-    DHLOGI("Disable audio task generate successfully.");
+    DHLOGD("Disable audio task generate successfully.");
     return DH_SUCCESS;
 }
 
@@ -281,7 +281,7 @@ int32_t DAudioSourceManager::DoDisableDAudio(const std::string &args)
         audioDevMap_[devId].ports[dhId] = reqId;
         sourceDev = audioDevMap_[devId].dev;
     }
-    DHLOGI("Call source dev to disable daudio.");
+    DHLOGD("Call source dev to disable daudio.");
     int32_t result = sourceDev->DisableDAudio(dhId);
     return OnDisableDAudio(devId, dhId, result);
 }
@@ -415,7 +415,7 @@ int32_t DAudioSourceManager::CreateAudioDevice(const std::string &devId)
 
 void DAudioSourceManager::DeleteAudioDevice(const std::string &devId, const std::string &dhId)
 {
-    DHLOGI("Delete audio device, devId = %{public}s, dhId = %{public}s.", GetAnonyString(devId).c_str(), dhId.c_str());
+    DHLOGD("Delete audio device, devId = %{public}s, dhId = %{public}s.", GetAnonyString(devId).c_str(), dhId.c_str());
     {
         std::lock_guard<std::mutex> lock(devMapMtx_);
         audioDevMap_[devId].ports.erase(dhId);
@@ -427,7 +427,7 @@ void DAudioSourceManager::DeleteAudioDevice(const std::string &devId, const std:
     if (devClearThread_.joinable()) {
         devClearThread_.join();
     }
-    DHLOGI("audioDevMap_[devId].ports is empty");
+    DHLOGD("audioDevMap_[devId].ports is empty");
     devClearThread_ = std::thread([this, devId]() { this->ClearAudioDev(devId); });
     if (pthread_setname_np(devClearThread_.native_handle(), DEVCLEAR_THREAD) != DH_SUCCESS) {
         DHLOGE("Dev clear thread setname failed.");
@@ -520,7 +520,7 @@ int32_t DAudioSourceManager::LoadAVSenderEngineProvider()
         return ERR_DH_AUDIO_NULLPTR;
     }
     sendProviderPtr_ = getEngineFactoryFunc(OWNER_NAME_D_SPEAKER);
-    DHLOGI("LoadAVSenderEngineProvider exit");
+    DHLOGD("LoadAVSenderEngineProvider exit");
     return DH_SUCCESS;
 }
 
@@ -555,7 +555,7 @@ int32_t DAudioSourceManager::LoadAVReceiverEngineProvider()
         return ERR_DH_AUDIO_NULLPTR;
     }
     rcvProviderPtr_ = getEngineFactoryFunc(OWNER_NAME_D_MIC);
-    DHLOGI("LoadAVReceiverEngineProvider success");
+    DHLOGD("LoadAVReceiverEngineProvider success");
     return DH_SUCCESS;
 }
 
@@ -625,7 +625,7 @@ void DAudioSourceManager::SourceManagerHandler::DisableDAudioCallback(const AppE
         DHLOGE("Failed to get event parameters.");
         return;
     }
-    DHLOGI("Disable audio device, param:%{public}s.", eventParam.c_str());
+    DHLOGD("Disable audio device, param:%{public}s.", eventParam.c_str());
     DAudioSourceManager::GetInstance().DoDisableDAudio(eventParam);
 }
 
