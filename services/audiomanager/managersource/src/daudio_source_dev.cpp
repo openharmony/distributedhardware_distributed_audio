@@ -432,7 +432,7 @@ int32_t DAudioSourceDev::HandleCloseDMic(const AudioEvent &event)
 int32_t DAudioSourceDev::HandleDMicOpened(const AudioEvent &event)
 {
     (void)event;
-    DHLOGI("Mic device opened.");
+    DHLOGD("Mic device opened.");
     return DH_SUCCESS;
 }
 
@@ -452,7 +452,7 @@ int32_t DAudioSourceDev::HandleDMicClosed(const AudioEvent &event)
 
 int32_t DAudioSourceDev::HandleCtrlTransClosed(const AudioEvent &event)
 {
-    DHLOGI("Control trans closed.");
+    DHLOGD("Control trans closed.");
     return DH_SUCCESS;
 }
 
@@ -894,7 +894,7 @@ int32_t DAudioSourceDev::ParseDhidFromEvent(std::string args)
     }
     int32_t dhId = ConvertString2Int(std::string(dhIdItem->valuestring));
     cJSON_Delete(jParam);
-    DHLOGI("Parsed dhId is: %{public}d.", dhId);
+    DHLOGD("Parsed dhId is: %{public}d.", dhId);
     return dhId;
 }
 
@@ -1658,7 +1658,7 @@ void DAudioSourceDev::SourceEventHandler::ChangeRenderStateCallback(const AppExe
         DHLOGE("Failed to process render state change event.");
         return;
     }
-    DHLOGI("Processing render state change event successfully.");
+    DHLOGD("Processing render state change event successfully.");
 }
 
 void DAudioSourceDev::SourceEventHandler::PlayStatusChangeCallback(const AppExecFwk::InnerEvent::Pointer &event)
@@ -1674,7 +1674,7 @@ void DAudioSourceDev::SourceEventHandler::PlayStatusChangeCallback(const AppExec
         DHLOGE("Failed to process playing status change event.");
         return;
     }
-    DHLOGI("Processing playing status change event successfully.");
+    DHLOGD("Processing playing status change event successfully.");
 }
 
 void DAudioSourceDev::SourceEventHandler::SpkMmapStartCallback(const AppExecFwk::InnerEvent::Pointer &event)
@@ -1690,7 +1690,7 @@ void DAudioSourceDev::SourceEventHandler::SpkMmapStartCallback(const AppExecFwk:
         DHLOGE("Failed to start speaker with mmap mode.");
         return;
     }
-    DHLOGI("Start speaker with mmap mode successfully.");
+    DHLOGD("Start speaker with mmap mode successfully.");
 }
 
 void DAudioSourceDev::SourceEventHandler::SpkMmapStopCallback(const AppExecFwk::InnerEvent::Pointer &event)
@@ -1706,7 +1706,7 @@ void DAudioSourceDev::SourceEventHandler::SpkMmapStopCallback(const AppExecFwk::
         DHLOGE("Failed to stop speaker with mmap mode.");
         return;
     }
-    DHLOGI("Stop speaker with mmap mode successfully.");
+    DHLOGD("Stop speaker with mmap mode successfully.");
 }
 
 void DAudioSourceDev::SourceEventHandler::MicMmapStartCallback(const AppExecFwk::InnerEvent::Pointer &event)
@@ -1722,7 +1722,7 @@ void DAudioSourceDev::SourceEventHandler::MicMmapStartCallback(const AppExecFwk:
         DHLOGE("Failed to start mic with mmap mode.");
         return;
     }
-    DHLOGI("Start mic with mmap mode successfully.");
+    DHLOGD("Start mic with mmap mode successfully.");
 }
 
 void DAudioSourceDev::SourceEventHandler::MicMmapStopCallback(const AppExecFwk::InnerEvent::Pointer &event)
@@ -1738,7 +1738,7 @@ void DAudioSourceDev::SourceEventHandler::MicMmapStopCallback(const AppExecFwk::
         DHLOGE("Failed to stop mic with mmap mode.");
         return;
     }
-    DHLOGI("Stop mic with mmap mode successfully.");
+    DHLOGD("Stop mic with mmap mode successfully.");
 }
 
 int32_t DAudioSourceDev::SourceEventHandler::GetEventParam(const AppExecFwk::InnerEvent::Pointer &event,

@@ -135,7 +135,7 @@ int32_t DaudioHdfOperate::UnLoadDaudioHDFImpl()
     }
     audioServStatus_.store(INVALID_VALUE);
     audioextServStatus_.store(INVALID_VALUE);
-    DHLOGI("UnLoad daudio hdf impl end!");
+    DHLOGD("UnLoad daudio hdf impl end!");
     return DH_SUCCESS;
 }
 } // namespace DistributedHardware

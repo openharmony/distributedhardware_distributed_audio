@@ -193,7 +193,7 @@ std::string GetAnonyString(const std::string &value)
 
 int32_t GetDevTypeByDHId(int32_t dhId)
 {
-    DHLOGI("Get dev type by dhId: %{public}d.", dhId);
+    DHLOGD("Get dev type by dhId: %{public}d.", dhId);
     if (static_cast<uint32_t>(dhId) & 0x8000000) {
         return AUDIO_DEVICE_TYPE_MIC;
     } else if (static_cast<uint32_t>(dhId) & 0x7ffffff) {

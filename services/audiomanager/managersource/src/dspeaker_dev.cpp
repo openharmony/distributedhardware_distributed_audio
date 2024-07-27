@@ -265,7 +265,7 @@ int32_t DSpeakerDev::Pause()
         DHLOGE("Pause speaker trans failed, ret: %{public}d.", ret);
         return ret;
     }
-    DHLOGI("Pause success.");
+    DHLOGD("Pause success.");
     return DH_SUCCESS;
 }
 
@@ -278,7 +278,7 @@ int32_t DSpeakerDev::Restart()
         DHLOGE("Restart speaker trans failed, ret: %{public}d.", ret);
         return ret;
     }
-    DHLOGI("Restart success.");
+    DHLOGD("Restart success.");
     return DH_SUCCESS;
 }
 
@@ -291,7 +291,7 @@ int32_t DSpeakerDev::ReadStreamData(const int32_t streamId, std::shared_ptr<Audi
 {
     (void)streamId;
     (void)data;
-    DHLOGI("Dspeaker dev not support read stream data.");
+    DHLOGD("Dspeaker dev not support read stream data.");
     return DH_SUCCESS;
 }
 
@@ -376,7 +376,7 @@ void DSpeakerDev::EnqueueThread()
         int64_t timeOffset = UpdateTimeOffset(frameIndex_, timeIntervalns, startTime_);
         DHLOGD("Read frameIndex: %{public}" PRId64", timeOffset: %{public}" PRId64, frameIndex_, timeOffset);
         auto readData = ashmem_->ReadFromAshmem(lengthPerTrans_, readIndex_);
-        DHLOGI("Read from ashmem success! read index: %{public}d, readLength: %{public}d.",
+        DHLOGD("Read from ashmem success! read index: %{public}d, readLength: %{public}d.",
             readIndex_, lengthPerTrans_);
         std::shared_ptr<AudioData> audioData = std::make_shared<AudioData>(lengthPerTrans_);
         if (readData != nullptr) {
@@ -419,7 +419,7 @@ AudioParam DSpeakerDev::GetAudioParam() const
 
 int32_t DSpeakerDev::SendMessage(uint32_t type, std::string content, std::string dstDevId)
 {
-    DHLOGI("Send message to remote.");
+    DHLOGD("Send message to remote.");
     if (type != static_cast<uint32_t>(OPEN_SPEAKER) && type != static_cast<uint32_t>(CLOSE_SPEAKER) &&
         type != static_cast<uint32_t>(CHANGE_PLAY_STATUS) && type != static_cast<uint32_t>(VOLUME_SET) &&
         type != static_cast<uint32_t>(VOLUME_MUTE_SET)) {

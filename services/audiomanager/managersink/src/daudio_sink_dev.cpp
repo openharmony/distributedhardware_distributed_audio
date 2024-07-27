@@ -204,7 +204,7 @@ int32_t DAudioSinkDev::ParseDhidFromEvent(std::string args)
 
 int32_t DAudioSinkDev::ParseResultFromEvent(std::string args)
 {
-    DHLOGI("ParseResultFrom args : %{public}s", args.c_str());
+    DHLOGD("ParseResultFrom args : %{public}s", args.c_str());
     cJSON *jParam = cJSON_Parse(args.c_str());
     CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_FAILED);
 
@@ -452,7 +452,7 @@ int32_t DAudioSinkDev::SendAudioEventToRemote(const AudioEvent &event)
 
 void DAudioSinkDev::JudgeDeviceStatus()
 {
-    DHLOGI("Checking device's status.");
+    DHLOGD("Checking device's status.");
     if (isSpkInUse_.load() || isMicInUse_.load()) {
         DHLOGI("Device contain periperials in using, speaker status: %{public}d, mic status: %{public}d.",
             isSpkInUse_.load(), isMicInUse_.load());
@@ -658,7 +658,7 @@ void DAudioSinkDev::SinkEventHandler::ProcessEventInner(const AppExecFwk::InnerE
 void DAudioSinkDev::SinkEventHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
     CHECK_NULL_VOID(event);
-    DHLOGI("Event Id=%{public}d", event->GetInnerEventId());
+    DHLOGD("Event Id=%{public}d", event->GetInnerEventId());
     switch (event->GetInnerEventId()) {
         case CTRL_OPENED:
             NotifyCtrlOpened(event);

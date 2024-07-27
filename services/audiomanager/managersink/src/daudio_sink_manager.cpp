@@ -172,7 +172,7 @@ int32_t DAudioSinkManager::CreateAudioDevice(const std::string &devId)
     {
         std::lock_guard<std::mutex> lock(devMapMutex_);
         if (audioDevMap_.find(devId) != audioDevMap_.end()) {
-            DHLOGI("Audio sink dev in map. devId: %{public}s.", GetAnonyString(devId).c_str());
+            DHLOGD("Audio sink dev in map. devId: %{public}s.", GetAnonyString(devId).c_str());
             dev = audioDevMap_[devId];
         } else {
             dev = std::make_shared<DAudioSinkDev>(devId, ipcSinkCallback_);
@@ -281,7 +281,7 @@ void DAudioSinkManager::NotifyEvent(const std::string &devId, const int32_t even
 {
     AudioEvent audioEvent(eventType, eventContent);
     std::lock_guard<std::mutex> lock(devMapMutex_);
-    DHLOGI("Notify event, devId: %{public}s.", GetAnonyString(devId).c_str());
+    DHLOGD("Notify event, devId: %{public}s.", GetAnonyString(devId).c_str());
     CHECK_AND_RETURN_LOG(audioDevMap_.find(devId) == audioDevMap_.end(),
         "%{public}s", "Notify event error, dev not exist.");
     CHECK_NULL_VOID(audioDevMap_[devId]);
@@ -434,7 +434,7 @@ int32_t DAudioSinkManager::StopDistributedHardware(const std::string &networkId)
 
 bool DAudioSinkManager::CheckDeviceSecurityLevel(const std::string &srcDeviceId, const std::string &dstDeviceId)
 {
-    DHLOGI("CheckDeviceSecurityLevel srcDeviceId %{public}s, dstDeviceId %{public}s.",
+    DHLOGD("CheckDeviceSecurityLevel srcDeviceId %{public}s, dstDeviceId %{public}s.",
         GetAnonyString(srcDeviceId).c_str(), GetAnonyString(dstDeviceId).c_str());
     std::string srcUdid = GetUdidByNetworkId(srcDeviceId);
     if (srcUdid.empty()) {
@@ -446,12 +446,12 @@ bool DAudioSinkManager::CheckDeviceSecurityLevel(const std::string &srcDeviceId,
         DHLOGE("dst udid is empty");
         return false;
     }
-    DHLOGI("CheckDeviceSecurityLevel srcUdid %{public}s, dstUdid %{public}s.",
+    DHLOGD("CheckDeviceSecurityLevel srcUdid %{public}s, dstUdid %{public}s.",
         GetAnonyString(srcUdid).c_str(), GetAnonyString(dstUdid).c_str());
     int32_t srcDeviceSecurityLevel = GetDeviceSecurityLevel(srcUdid);
     int32_t dstDeviceSecurityLevel = GetDeviceSecurityLevel(dstUdid);
-    DHLOGI("SrcDeviceSecurityLevel, level is %{public}d", srcDeviceSecurityLevel);
-    DHLOGI("dstDeviceSecurityLevel, level is %{public}d", dstDeviceSecurityLevel);
+    DHLOGD("SrcDeviceSecurityLevel, level is %{public}d", srcDeviceSecurityLevel);
+    DHLOGD("dstDeviceSecurityLevel, level is %{public}d", dstDeviceSecurityLevel);
     if (srcDeviceSecurityLevel == DEFAULT_DEVICE_SECURITY_LEVEL ||
         srcDeviceSecurityLevel < dstDeviceSecurityLevel) {
         DHLOGE("The device security of source device is lower.");
@@ -518,7 +518,7 @@ int32_t DAudioSinkManager::VerifySecurityLevel(const std::string &devId)
         DHLOGE("Query resource failed, ret: %{public}d", ret);
         return ret;
     }
-    DHLOGI("VerifySecurityLevel isSensitive: %{public}d, isSameAccount: %{public}d", isSensitive_, isSameAccount_);
+    DHLOGD("VerifySecurityLevel isSensitive: %{public}d, isSameAccount: %{public}d", isSensitive_, isSameAccount_);
     if (isSensitive_ && !isSameAccount_) {
         DHLOGE("Privacy resource must be logged in with same account.");
         return ERR_DH_AUDIO_FAILED;

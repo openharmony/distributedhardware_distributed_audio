@@ -150,12 +150,12 @@ int32_t AVTransReceiverAdapter::OnReceiverEvent(const AVTransEvent &event)
         case EventType::EVENT_ENGINE_ERROR:
         case EventType::EVENT_REMOTE_ERROR:
             if (adapterCallback_ != nullptr) {
-                DHLOGI("On receive event.");
+                DHLOGD("On receive event.");
                 adapterCallback_->OnEngineEvent(event);
             }
             break;
         default:
-            DHLOGI("Invaild event type.");
+            DHLOGE("Invaild event type.");
             break;
     }
     return DH_SUCCESS;

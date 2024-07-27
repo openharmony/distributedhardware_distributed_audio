@@ -123,12 +123,12 @@ void DSpeakerClient::OnWriteData(size_t length)
         std::unique_lock<std::mutex> spkLck(dataQueueMtx_);
         if (dataQueue_.empty()) {
             audioData = std::make_shared<AudioData>(bufDesc.bufLength);
-            DHLOGI("Pop spk data, dataQueue is empty. write empty data.");
+            DHLOGD("Pop spk data, dataQueue is empty. write empty data.");
         } else {
             audioData = dataQueue_.front();
             dataQueue_.pop();
             uint64_t queueSize = static_cast<uint64_t>(dataQueue_.size());
-            DHLOGI("Pop spk data, dataQueue size: %{public}" PRIu64, queueSize);
+            DHLOGD("Pop spk data, dataQueue size: %{public}" PRIu64, queueSize);
         }
     }
     if ((audioData != nullptr) && (audioData->Capacity() != bufDesc.bufLength)) {
@@ -352,7 +352,7 @@ int32_t DSpeakerClient::OnDecodeTransDataDone(const std::shared_ptr<AudioData> &
     dataQueue_.push(audioData);
     dataQueueCond_.notify_all();
     uint64_t queueSize = static_cast<uint64_t>(dataQueue_.size());
-    DHLOGI("Push new spk data, buf len: %{public}" PRIu64, queueSize);
+    DHLOGD("Push new spk data, buf len: %{public}" PRIu64, queueSize);
     int64_t endTime = GetNowTimeUs();
     if (IsOutDurationRange(startTime, endTime, lastReceiveStartTime_)) {
         DHLOGE("This time receivce data spend: %{public}" PRId64" us, Receivce data this time and "
@@ -610,7 +610,7 @@ void DSpeakerClient::ReStart()
 
 int32_t DSpeakerClient::SendMessage(uint32_t type, std::string content, std::string dstDevId)
 {
-    DHLOGI("Send message to remote.");
+    DHLOGD("Send message to remote.");
     if (type != static_cast<uint32_t>(NOTIFY_OPEN_SPEAKER_RESULT) &&
         type != static_cast<uint32_t>(NOTIFY_OPEN_CTRL_RESULT) &&
         type != static_cast<uint32_t>(NOTIFY_CLOSE_SPEAKER_RESULT) &&

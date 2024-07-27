@@ -68,7 +68,7 @@ int32_t DAudioHdiHandler::InitHdiHandler()
     remote_ = OHOS::HDI::hdi_objcast<IDAudioManager>(audioSrvHdf_);
     CHECK_NULL_RETURN(remote_, ERR_DH_AUDIO_NULLPTR);
     remote_->AddDeathRecipient(audioHdiRecipient_);
-    DHLOGI("Init hdi handler success.");
+    DHLOGD("Init hdi handler success.");
     return DH_SUCCESS;
 }
 
@@ -84,7 +84,7 @@ int32_t DAudioHdiHandler::UninitHdiHandler()
         DHLOGE("Unload hdf driver failed, ret: %{public}d", ret);
         return ret;
     }
-    DHLOGI("Uninit hdi handler success.");
+    DHLOGD("Uninit hdi handler success.");
     return DH_SUCCESS;
 }
 

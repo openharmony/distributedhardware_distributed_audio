@@ -86,7 +86,7 @@ int32_t AVTransSenderAdapter::CreateControlChannel(const std::string &peerDevId)
     int32_t ret = senderEngine_->CreateControlChannel(dstDevIds,
         ChannelAttribute{TransStrategy::LOW_LATANCY_STRATEGY});
     if (ret != DH_SUCCESS) {
-        DHLOGI("Create control channel failed, ret: %{public}d", ret);
+        DHLOGE("Create control channel failed, ret: %{public}d", ret);
         return ERR_DH_AV_TRANS_CREATE_CHANNEL_FAILED;
     }
     ret = WaitForChannelCreated();
@@ -168,7 +168,7 @@ int32_t AVTransSenderAdapter::OnSenderEvent(const AVTransEvent &event)
             }
             break;
         default:
-            DHLOGI("Invaild event type.");
+            DHLOGE("Invaild event type.");
             break;
     }
     return DH_SUCCESS;
