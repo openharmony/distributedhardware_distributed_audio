@@ -48,6 +48,7 @@ public:
 private:
     void OnReadData(size_t length) override;
     void AecProcessData();
+    void CircuitStart();
     int32_t ProcessMicData(const std::shared_ptr<AudioData> &pipeInData,
         std::shared_ptr<AudioData> &micOutData);
     
@@ -66,18 +67,22 @@ private:
 private:
     const std::string DUMP_DAUDIO_AEC_REFERENCE_FILENAME = "dump_aec_reference_signal.pcm";
     const std::string DUMP_DAUDIO_AEC_RECORD_FILENAME = "dump_aec_record_signal.pcm";
+    const std::string DUMP_DAUDIO_AEC_CIRCUIT_FILENAME = "dump_aec_circuit.pcm";
+    const std::string DUMP_DAUDIO_AEC_AFTER_PROCESS_FILENAME = "dump_aec_after_process.pcm";
 
     std::unique_ptr<AudioStandard::AudioCapturer> audioCapturer_ = nullptr;
     std::atomic<bool> isAecRunning_ = false;
     std::thread aecProcessThread_;
     static constexpr const char* AECTHREADNAME = "AecProcessThread";
+    std::atomic<bool> isCircuitStartRunning_ = false;
+    std::thread circuitStartThread_;
 
     std::shared_ptr<IAudioDataTransCallback> devCallback_;
     void *aecHandler_ = nullptr;
     AecEffector *aecProcessor_ = nullptr;
     constexpr static size_t COND_WAIT_TIME_MS = 10;
     constexpr static size_t WAIT_MIC_DATA_TIME_US = 5000;
-    constexpr static size_t REF_QUEUE_MAX_SIZE = 10;
+    constexpr static size_t REF_QUEUE_MAX_SIZE = 4;
     std::queue<std::shared_ptr<AudioData>> refDataQueue_;
     std::queue<std::shared_ptr<AudioData>> outDataQueue_;
     std::mutex refQueueMtx_;
@@ -86,6 +91,8 @@ private:
     std::atomic<bool> isStarted = false;
     FILE *dumpFileRef_ = nullptr;
     FILE *dumpFileRec_ = nullptr;
+    FILE *dumpFileAft_ = nullptr;
+    FILE *dumpFileCir_ = nullptr;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
