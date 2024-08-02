@@ -48,7 +48,7 @@ void DAudioSinkService::OnStart()
         DHLOGE("Init service failed.");
         return;
     }
-    DHLOGI("Start distributed audio service success.");
+    DHLOGD("Start distributed audio service success.");
 }
 
 void DAudioSinkService::OnStop()
@@ -68,7 +68,7 @@ bool DAudioSinkService::Init()
         }
         isServiceStarted_ = true;
     }
-    DHLOGI("Init distributed audio service success.");
+    DHLOGD("Init distributed audio service success.");
     return true;
 }
 
@@ -82,7 +82,7 @@ int32_t DAudioSinkService::ReleaseSink()
 {
     DHLOGI("Release sink service.");
     DAudioSinkManager::GetInstance().UnInit();
-    DHLOGI("Audio sink service process exit.");
+    DHLOGD("Audio sink service process exit.");
     auto systemAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     CHECK_NULL_RETURN(systemAbilityMgr, ERR_DH_AUDIO_NULLPTR);
     int32_t ret = systemAbilityMgr->UnloadSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID);
@@ -90,19 +90,19 @@ int32_t DAudioSinkService::ReleaseSink()
         DHLOGE("Sink systemabilitymgr unloadsystemability failed, ret: %{public}d", ret);
         return ERR_DH_AUDIO_SA_LOAD_FAILED;
     }
-    DHLOGI("Sink systemabilitymgr unloadsystemability successfully!");
+    DHLOGD("Sink systemabilitymgr unloadsystemability successfully!");
     return DH_SUCCESS;
 }
 
 int32_t DAudioSinkService::SubscribeLocalHardware(const std::string &dhId, const std::string &param)
 {
-    DHLOGI("Subscribe local hardware.");
+    DHLOGD("Subscribe local hardware.");
     return DH_SUCCESS;
 }
 
 int32_t DAudioSinkService::UnsubscribeLocalHardware(const std::string &dhId)
 {
-    DHLOGI("Unsubscribe local hardware.");
+    DHLOGD("Unsubscribe local hardware.");
     return DH_SUCCESS;
 }
 

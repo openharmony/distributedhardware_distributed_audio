@@ -164,7 +164,7 @@ int32_t DMicClient::SetUp(const AudioParam &param)
 
 int32_t DMicClient::SendMessage(uint32_t type, std::string content, std::string dstDevId)
 {
-    DHLOGI("Send message to remote.");
+    DHLOGD("Send message to remote.");
     if (type != static_cast<uint32_t>(NOTIFY_OPEN_MIC_RESULT) &&
         type != static_cast<uint32_t>(NOTIFY_OPEN_CTRL_RESULT) &&
         type != static_cast<uint32_t>(NOTIFY_CLOSE_MIC_RESULT) &&

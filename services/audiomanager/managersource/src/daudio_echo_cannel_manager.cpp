@@ -153,7 +153,7 @@ int32_t DAudioEchoCannelManager::OnMicDataReceived(const std::shared_ptr<AudioDa
 int32_t DAudioEchoCannelManager::ProcessMicData(const std::shared_ptr<AudioData> &pipeInData,
     std::shared_ptr<AudioData> &micOutData)
 {
-    DHLOGI("Process mic data.");
+    DHLOGD("Process mic data.");
     uint8_t *micOutDataExt = nullptr;
     CHECK_AND_RETURN_RET_LOG(pipeInData == nullptr, ERR_DH_AUDIO_NULLPTR, "pipeInData is nullptr.");
     CHECK_AND_RETURN_RET_LOG(micOutData == nullptr, ERR_DH_AUDIO_NULLPTR, "micOutData is nullptr.");
@@ -197,7 +197,7 @@ void DAudioEchoCannelManager::AecProcessData()
             }
             refInData = refDataQueue_.front();
             refDataQueue_.pop();
-            DHLOGI("Pop new echo ref data, ref dataqueue size: %{public}zu.", refDataQueue_.size());
+            DHLOGD("Pop new echo ref data, ref dataqueue size: %{public}zu.", refDataQueue_.size());
         }
         DumpFileUtil::WriteDumpFile(dumpFileRef_, static_cast<void *>(refInData->Data()), refInData->Size());
         int32_t ret = aecProcessor_->OnSendOriginData(aecProcessor_, refInData->Data(), refInData->Size(),
