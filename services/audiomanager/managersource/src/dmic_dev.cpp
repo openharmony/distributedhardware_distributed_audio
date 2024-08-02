@@ -212,6 +212,13 @@ int32_t DMicDev::NotifyEvent(const int32_t streamId, const AudioEvent &event)
     switch (event.type) {
         case AudioEventType::AUDIO_START:
             curStatus_ = AudioStatus::STATUS_START;
+            while (isTransReady_.load()) {
+                std::lock_guard<std::mutex> lock(dataQueueMtx_);
+                if (dataQueue_.size() >= NOTIFY_WAIT_FRAMES) {
+                    break;
+                }
+                usleep(NOTIFY_WAIT_TIME_US);
+            }
             isExistedEmpty_.store(false);
             break;
         case AudioEventType::AUDIO_STOP:
@@ -235,7 +242,7 @@ int32_t DMicDev::SetUp()
         DHLOGE("Mic trans set up failed. ret: %{public}d.", ret);
         return ret;
     }
-    echoCannelOn_ = false;
+    echoCannelOn_ = true;
 #ifdef ECHO_CANNEL_ENABLE
     if (echoCannelOn_ && echoManager_ == nullptr) {
         echoManager_ = std::make_shared<DAudioEchoCannelManager>();
@@ -270,14 +277,6 @@ int32_t DMicDev::Start()
         DHLOGE("Wait channel open timeout(%{public}ds).", CHANNEL_WAIT_SECONDS);
         return ERR_DH_AUDIO_SA_WAIT_TIMEOUT;
     }
-#ifdef ECHO_CANNEL_ENABLE
-    CHECK_NULL_RETURN(echoManager_, DH_SUCCESS);
-    ret = echoManager_->Start();
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Echo manager start failed. ret: %{public}d.", ret);
-        return ret;
-    }
-#endif
     isOpened_.store(true);
     return DH_SUCCESS;
 }
