@@ -129,6 +129,7 @@ void AVTransReceiverTransport::OnEngineDataAvailable(const std::shared_ptr<AVTra
     DHLOGD("On data availabled.");
     CHECK_NULL_VOID(buffer);
     auto bufferData = buffer->GetBufferData(0);
+    CHECK_NULL_VOID(bufferData);
     std::shared_ptr<AudioData> audioData = std::make_shared<AudioData>(bufferData->GetSize());
     int32_t ret = memcpy_s(audioData->Data(), audioData->Capacity(), bufferData->GetAddress(), bufferData->GetSize());
     if (ret != EOK) {
