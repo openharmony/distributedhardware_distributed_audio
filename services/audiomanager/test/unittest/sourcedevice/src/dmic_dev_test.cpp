@@ -64,7 +64,6 @@ HWTEST_F(DMicDevTest, InitReceiverEngine_001, TestSize.Level1)
     mic_->OnEngineTransEvent(event);
 
     mic_->echoCannelOn_ = true;
-    mic_->echoManager_ = nullptr;
     mic_->OnEngineTransDataAvailable(audioData);
 }
 
