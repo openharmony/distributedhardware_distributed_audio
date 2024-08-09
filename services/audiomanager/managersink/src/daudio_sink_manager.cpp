@@ -42,11 +42,6 @@ const std::string SENDER_SO_NAME = "libdistributed_av_sender.z.so";
 const std::string GET_SENDER_PROVIDER_FUNC = "GetAVSenderEngineProvider";
 const std::string RECEIVER_SO_NAME = "libdistributed_av_receiver.z.so";
 const std::string GET_RECEIVER_PROVIDER_FUNC = "GetAVReceiverEngineProvider";
-#ifdef __LP64__
-const std::string LIB_LOAD_PATH = "/system/lib64/";
-#else
-const std::string LIB_LOAD_PATH = "/system/lib/";
-#endif
 DAudioSinkManager::DAudioSinkManager()
 {
     DHLOGD("Distributed audio sink manager constructed.");
@@ -304,13 +299,11 @@ void DAudioSinkManager::ClearAudioDev(const std::string &devId)
 int32_t DAudioSinkManager::LoadAVReceiverEngineProvider()
 {
     DHLOGI("LoadAVReceiverEngineProvider enter");
-    char path[PATH_MAX + 1] = {0x00};
-    if ((LIB_LOAD_PATH.length() + RECEIVER_SO_NAME.length()) > PATH_MAX ||
-        realpath((LIB_LOAD_PATH + RECEIVER_SO_NAME).c_str(), path) == nullptr) {
+    if (RECEIVER_SO_NAME.length() > PATH_MAX) {
         DHLOGE("File open failed");
         return ERR_DH_AUDIO_NULLPTR;
     }
-    pRHandler_ = dlopen(path, RTLD_LAZY | RTLD_NODELETE);
+    pRHandler_ = dlopen(RECEIVER_SO_NAME.c_str(), RTLD_LAZY | RTLD_NODELETE);
     CHECK_NULL_RETURN(pRHandler_, ERR_DH_AUDIO_NULLPTR);
 
     AVTransProviderClass getEngineFactoryFunc = (AVTransProviderClass)dlsym(pRHandler_,
@@ -339,13 +332,11 @@ int32_t DAudioSinkManager::UnloadAVReceiverEngineProvider()
 int32_t DAudioSinkManager::LoadAVSenderEngineProvider()
 {
     DHLOGI("LoadAVSenderEngineProvider enter");
-    char path[PATH_MAX + 1] = {0x00};
-    if ((LIB_LOAD_PATH.length() + SENDER_SO_NAME.length()) > PATH_MAX ||
-        realpath((LIB_LOAD_PATH + SENDER_SO_NAME).c_str(), path) == nullptr) {
+    if (SENDER_SO_NAME.length() > PATH_MAX) {
         DHLOGE("File open failed");
         return ERR_DH_AUDIO_NULLPTR;
     }
-    pSHandler_ = dlopen(path, RTLD_LAZY | RTLD_NODELETE);
+    pSHandler_ = dlopen(SENDER_SO_NAME.c_str(), RTLD_LAZY | RTLD_NODELETE);
     CHECK_NULL_RETURN(pSHandler_, ERR_DH_AUDIO_NULLPTR);
 
     AVTransProviderClass getEngineFactoryFunc = (AVTransProviderClass)dlsym(pSHandler_,

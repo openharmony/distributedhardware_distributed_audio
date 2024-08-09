@@ -35,11 +35,6 @@ using AecEffectProcessorProvider = AecEffector *(*)();
 const std::string ECHOCANNEL_SO_NAME = "libdaudio_aec_effect_processor.z.so";
 const std::string GET_AEC_EFFECT_PROCESSOR_FUNC = "GetAecEffector";
 const int32_t FRAME_SIZE_NORMAL = 3840;
-#ifdef __LP64__
-const std::string LIB_LOAD_PATH = "/system/lib64/";
-#else
-const std::string LIB_LOAD_PATH = "/system/lib/";
-#endif
 
 DAudioEchoCannelManager::DAudioEchoCannelManager()
 {
@@ -328,13 +323,11 @@ int32_t DAudioEchoCannelManager::AudioCaptureRelease()
 int32_t DAudioEchoCannelManager::LoadAecProcessor()
 {
     DHLOGI("LoadAecEffectProcessor enter");
-    char path[PATH_MAX + 1] = {0x00};
-    if ((LIB_LOAD_PATH.length() + ECHOCANNEL_SO_NAME.length()) > PATH_MAX ||
-        realpath((LIB_LOAD_PATH+ ECHOCANNEL_SO_NAME).c_str(), path) == nullptr) {
+    if (ECHOCANNEL_SO_NAME.length() > PATH_MAX) {
         DHLOGE("File open failed");
         return ERR_DH_AUDIO_NULLPTR;
     }
-    aecHandler_ = dlopen(path, RTLD_LAZY | RTLD_NODELETE);
+    aecHandler_ = dlopen(ECHOCANNEL_SO_NAME.c_str(), RTLD_LAZY | RTLD_NODELETE);
     CHECK_AND_RETURN_RET_LOG(aecHandler_ == nullptr, ERR_DH_AUDIO_NULLPTR, "dlOpen error.");
     AecEffectProcessorProvider getAecEffectProcessorFunc = (AecEffectProcessorProvider)dlsym(aecHandler_,
         GET_AEC_EFFECT_PROCESSOR_FUNC.c_str());
