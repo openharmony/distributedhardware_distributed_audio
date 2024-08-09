@@ -126,14 +126,7 @@ ohos_unittest("DMicDevTest") {
     "samgr:samgr_proxy",
   ]
 
-  cflags = [
-    "-g",
-    "-O0",
-    "-Wno-unused-variable",
-    "-fno-omit-frame-pointer",
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
+  cflags = []
 
   if (distributed_audio_extension_sa) {
     cflags += [ "-DECHO_CANNEL_ENABLE" ]

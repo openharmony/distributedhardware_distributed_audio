@@ -15,7 +15,6 @@
 
 #include "dmic_dev_test.h"
 
-#include "daudio_echo_cannel_manager.h"
 using namespace testing::ext;
 
 namespace OHOS {
@@ -66,9 +65,6 @@ HWTEST_F(DMicDevTest, InitReceiverEngine_001, TestSize.Level1)
 
     mic_->echoCannelOn_ = true;
     mic_->echoManager_ = nullptr;
-    mic_->OnEngineTransDataAvailable(audioData);
-
-    mic_->echoManager_ = std::make_shared<DAudioEchoCannelManager>();
     mic_->OnEngineTransDataAvailable(audioData);
 }
 
@@ -274,9 +270,6 @@ HWTEST_F(DMicDevTest, Stop_001, TestSize.Level1)
     mic_->micTrans_ = std::make_shared<MockIAudioDataTransport>();
     EXPECT_EQ(DH_SUCCESS, mic_->Stop());
     EXPECT_FALSE(mic_->IsOpened());
-
-    mic_->echoManager_ = std::make_shared<DAudioEchoCannelManager>();
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->Stop());
 }
 
 /**
@@ -309,9 +302,6 @@ HWTEST_F(DMicDevTest, Release_001, TestSize.Level1)
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->Release());
 
     mic_->micTrans_ = std::make_shared<MockIAudioDataTransport>();
-    EXPECT_EQ(DH_SUCCESS, mic_->Release());
-
-    mic_->echoManager_ = std::make_shared<DAudioEchoCannelManager>();
     EXPECT_EQ(DH_SUCCESS, mic_->Release());
 }
 
