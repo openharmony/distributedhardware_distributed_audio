@@ -15,6 +15,7 @@
 
 #include "dmic_dev_test.h"
 
+#include "daudio_echo_cannel_manager.h"
 using namespace testing::ext;
 
 namespace OHOS {
