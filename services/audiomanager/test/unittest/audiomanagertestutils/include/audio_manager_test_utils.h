@@ -89,6 +89,63 @@ public:
         return 0;
     }
 };
+
+class MockIAudioDataTransportInner : public IAudioDataTransport {
+public:
+    MockIAudioDataTransportInner() = default;
+    ~MockIAudioDataTransportInner() = default;
+
+    int32_t SetUp(const AudioParam &localParam, const AudioParam &remoteParam,
+        const std::shared_ptr<IAudioDataTransCallback> &callback, const PortCapType capType) override
+    {
+        return ERR_DH_AUDIO_FAILED;
+    }
+
+    int32_t Start() override
+    {
+        return ERR_DH_AUDIO_FAILED;
+    }
+
+    int32_t Stop() override
+    {
+        return ERR_DH_AUDIO_FAILED;
+    }
+
+    int32_t Release() override
+    {
+        return ERR_DH_AUDIO_FAILED;
+    }
+
+    int32_t Pause() override
+    {
+        return ERR_DH_AUDIO_FAILED;
+    }
+
+    int32_t Restart(const AudioParam &localParam, const AudioParam &remoteParam) override
+    {
+        return ERR_DH_AUDIO_FAILED;
+    }
+
+    int32_t FeedAudioData(std::shared_ptr<AudioData> &audioData) override
+    {
+        return ERR_DH_AUDIO_FAILED;
+    }
+
+    int32_t InitEngine(IAVEngineProvider *providerPtr) override
+    {
+        return ERR_DH_AUDIO_FAILED;
+    }
+
+    int32_t SendMessage(uint32_t type, std::string content, std::string dstDevId) override
+    {
+        return ERR_DH_AUDIO_FAILED;
+    }
+
+    int32_t CreateCtrl() override
+    {
+        return ERR_DH_AUDIO_FAILED;
+    }
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_AUDIO_MANAGER_TEST_UTILS

@@ -58,7 +58,17 @@ HWTEST_F(DMicDevTest, InitReceiverEngine_001, TestSize.Level1)
     mic_->OnEngineTransDataAvailable(audioData);
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->InitReceiverEngine(providerPtr));
     mic_->micTrans_ = std::make_shared<MockIAudioDataTransport>();
-    EXPECT_EQ(DH_SUCCESS, mic_->InitReceiverEngine(providerPtr));
+    EXPECT_EQ(DH_SUCCESS, mic_->InitReceiverEngine(providerPtr));.
+
+    AVTransEvent event = { EventType::EVENT_STOP_SUCCESS, "", "" };
+    mic_->OnEngineTransEvent(event);
+
+    mic_->echoCannelOn_ = true;
+    mic_->echoManager_ = nullptr;
+    mic_->OnEngineTransDataAvailable(audioData);
+
+    mic_->echoManager_ = std::make_shared<DAudioEchoCannelManager>();
+    mic_->OnEngineTransDataAvailable(audioData);
 }
 
 /**
@@ -162,6 +172,22 @@ HWTEST_F(DMicDevTest, NotifyEvent_001, TestSize.Level1)
     event.type = EVENT_UNKNOWN;
     EXPECT_EQ(DH_SUCCESS, mic_->NotifyEvent(streamId_, event));
 
+    mic_->isTransReady_ = false;
+    event.type = AUDIO_START;
+    EXPECT_EQ(DH_SUCCESS, mic_->NotifyEvent(streamId_, event));
+
+    event.type = AUDIO_STOP;
+    EXPECT_EQ(DH_SUCCESS, mic_->NotifyEvent(streamId_, event));
+
+    mic_->isTransReady_ = true;
+    for (int32_t i = 0; i < NOTIFY_WAIT_FRAMES; i++) {
+        size_t size = 4096;
+        auto audioData = std::make_shared<AudioData>(size);
+        mic_->dataQueue_.push(audioData);
+    }
+    event.type = AUDIO_START;
+    EXPECT_EQ(DH_SUCCESS, mic_->NotifyEvent(streamId_, event));
+
     eventCb_ = nullptr;
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->NotifyEvent(streamId_, event));
 }
@@ -179,6 +205,9 @@ HWTEST_F(DMicDevTest, SetUp_001, TestSize.Level1)
 
     mic_->micTrans_ = std::make_shared<MockIAudioDataTransport>();
     EXPECT_EQ(DH_SUCCESS, mic_->SetUp());
+
+    mic_->micTrans_ = std::make_shared<MockIAudioDataTransportInner>();
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, mic_->SetUp());
 }
 
 /**
@@ -244,6 +273,9 @@ HWTEST_F(DMicDevTest, Stop_001, TestSize.Level1)
     mic_->micTrans_ = std::make_shared<MockIAudioDataTransport>();
     EXPECT_EQ(DH_SUCCESS, mic_->Stop());
     EXPECT_FALSE(mic_->IsOpened());
+
+    mic_->echoManager_ =  = std::make_shared<DAudioEchoCannelManager>();
+    EXPECT_EQ(DH_SUCCESS, mic_->Stop());
 }
 
 /**
@@ -277,6 +309,12 @@ HWTEST_F(DMicDevTest, Release_001, TestSize.Level1)
 
     mic_->micTrans_ = std::make_shared<MockIAudioDataTransport>();
     EXPECT_EQ(DH_SUCCESS, mic_->Release());
+
+    int32_t fd = 1;
+    int32_t ashmemLength = 960;
+    mic_->ashmem_ = sptr<Ashmem>(new Ashmem(fd, ashmemLength));
+    mic_->echoManager_ = std::make_shared<DAudioEchoCannelManager>();
+    EXPECT_EQ(DH_SUCCESS, mic_->Release());
 }
 
 
@@ -305,6 +343,15 @@ HWTEST_F(DMicDevTest, ReadStreamData_001, TestSize.Level1)
     mic_->FillJitterQueue();
 
     std::shared_ptr<AudioData> readData1 = nullptr;
+    EXPECT_EQ(DH_SUCCESS, mic_->ReadStreamData(streamId_, readData1));
+
+    mic_->curStatus_ = AudioStatus::STATUS_STOP;
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, mic_->ReadStreamData(streamId_, readData1));
+
+    mic_->insertFrameCnt_ = 1;
+    EXPECT_EQ(DH_SUCCESS, mic_->ReadStreamData(streamId_, readData1));
+
+    mic_->insertFrameCnt_ = 11;
     EXPECT_EQ(DH_SUCCESS, mic_->ReadStreamData(streamId_, readData1));
 }
 
@@ -378,6 +425,28 @@ HWTEST_F(DMicDevTest, SendMessage_001, TestSize.Level1)
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->SendMessage(OPEN_MIC, content, dstDevId));
     mic_->micTrans_ = std::make_shared<MockIAudioDataTransport>();
     EXPECT_EQ(DH_SUCCESS, mic_->SendMessage(OPEN_MIC, content, dstDevId));
+}
+
+/**
+ * @tc.name: RefreshAshmemInfo_001
+ * @tc.desc: Verify RefreshAshmemInfo function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, RefreshAshmemInfo_001, TestSize.Level1)
+{
+    int32_t fd = 1;
+    int32_t ashmemLength = 4096;
+    int32_t lengthPerTrans = 960;
+    mic_->param_.captureOpts.capturerFlags = NORMAL_MODE;
+    EXPECT_EQ(DH_SUCCESS, mic_->RefreshAshmemInfo(streamId_, fd, ashmemLength, lengthPerTrans));
+
+    mic_->ashmem_ = sptr<Ashmem>(new Ashmem(fd, ashmemLength));
+    mic_->param_.captureOpts.capturerFlags = MMAP_MODE;
+    EXPECT_EQ(DH_SUCCESS, mic_->RefreshAshmemInfo(streamId_, fd, ashmemLength, lengthPerTrans));
+
+    mic_->ashmem_ = nullptr;
+    EXPECT_EQ(DH_SUCCESS, mic_->RefreshAshmemInfo(streamId_, fd, ashmemLength, lengthPerTrans));
 }
 } // namespace DistributedHardware
 } // namespace OHOS
