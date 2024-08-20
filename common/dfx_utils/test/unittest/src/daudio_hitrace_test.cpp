@@ -52,6 +52,7 @@ HWTEST_F(DAudioHitraceTest, End_001, TestSize.Level1)
     hitrace_->End();
     hitrace_->isFinished_ = true;
     hitrace_->End();
+    EXPECT_EQ(true, hitrace_->isFinished_);
 }
 } // DistributedHardware
 } // OHOS
