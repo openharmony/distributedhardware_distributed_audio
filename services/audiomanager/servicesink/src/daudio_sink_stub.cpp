@@ -128,6 +128,10 @@ int32_t DAudioSinkStub::ReleaseSinkInner(MessageParcel &data, MessageParcel &rep
 
 int32_t DAudioSinkStub::SubscribeLocalHardwareInner(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (!VerifyPermission()) {
+        DHLOGE("Permission verification fail.");
+        return ERR_DH_AUDIO_SA_PERMISSION_FAIED;
+    }
     std::string dhId = data.ReadString();
     std::string param = data.ReadString();
     int32_t ret = SubscribeLocalHardware(dhId, param);
@@ -137,6 +141,10 @@ int32_t DAudioSinkStub::SubscribeLocalHardwareInner(MessageParcel &data, Message
 
 int32_t DAudioSinkStub::UnsubscribeLocalHardwareInner(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (!VerifyPermission()) {
+        DHLOGE("Permission verification fail.");
+        return ERR_DH_AUDIO_SA_PERMISSION_FAIED;
+    }
     std::string dhId = data.ReadString();
     int32_t ret = UnsubscribeLocalHardware(dhId);
     reply.WriteInt32(ret);
@@ -156,9 +164,9 @@ int32_t DAudioSinkStub::DAudioNotifyInner(MessageParcel &data, MessageParcel &re
 
 int32_t DAudioSinkStub::PauseDistributedHardwareInner(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    if (!HasAccessDHPermission()) {
-        DHLOGE("The caller has no ACCESS_DISTRIBUTED_HARDWARE permission.");
-        return ERR_DH_AUDIO_ACCESS_PERMISSION_CHECK_FAIL;
+    if (!VerifyPermission()) {
+        DHLOGE("Permission verification fail.");
+        return ERR_DH_AUDIO_SA_PERMISSION_FAIED;
     }
     std::string networkId = data.ReadString();
     int32_t ret = PauseDistributedHardware(networkId);
@@ -168,9 +176,9 @@ int32_t DAudioSinkStub::PauseDistributedHardwareInner(MessageParcel &data, Messa
 
 int32_t DAudioSinkStub::ResumeDistributedHardwareInner(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    if (!HasAccessDHPermission()) {
-        DHLOGE("The caller has no ACCESS_DISTRIBUTED_HARDWARE permission.");
-        return ERR_DH_AUDIO_ACCESS_PERMISSION_CHECK_FAIL;
+    if (!VerifyPermission()) {
+        DHLOGE("Permission verification fail.");
+        return ERR_DH_AUDIO_SA_PERMISSION_FAIED;
     }
     std::string networkId = data.ReadString();
     int32_t ret = ResumeDistributedHardware(networkId);
@@ -180,22 +188,14 @@ int32_t DAudioSinkStub::ResumeDistributedHardwareInner(MessageParcel &data, Mess
 
 int32_t DAudioSinkStub::StopDistributedHardwareInner(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    if (!HasAccessDHPermission()) {
-        DHLOGE("The caller has no ACCESS_DISTRIBUTED_HARDWARE permission.");
-        return ERR_DH_AUDIO_ACCESS_PERMISSION_CHECK_FAIL;
+    if (!VerifyPermission()) {
+        DHLOGE("Permission verification fail.");
+        return ERR_DH_AUDIO_SA_PERMISSION_FAIED;
     }
     std::string networkId = data.ReadString();
     int32_t ret = StopDistributedHardware(networkId);
     reply.WriteInt32(ret);
     return DH_SUCCESS;
-}
-
-bool DAudioSinkStub::HasAccessDHPermission()
-{
-    Security::AccessToken::AccessTokenID callerToken = IPCSkeleton::GetCallingTokenID();
-    const std::string permissionName = "ohos.permission.ACCESS_DISTRIBUTED_HARDWARE";
-    int32_t result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
-    return (result == Security::AccessToken::PERMISSION_GRANTED);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

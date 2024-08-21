@@ -40,7 +40,6 @@ private:
     int32_t PauseDistributedHardwareInner(MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int32_t ResumeDistributedHardwareInner(MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int32_t StopDistributedHardwareInner(MessageParcel &data, MessageParcel &reply, MessageOption &option);
-    bool HasAccessDHPermission();
 
     using DAudioSinkServiceFunc = int32_t (DAudioSinkStub::*)(MessageParcel &data, MessageParcel &reply,
         MessageOption &option);

@@ -153,6 +153,10 @@ int32_t DAudioSourceStub::UnregisterDistributedHardwareInner(MessageParcel &data
 int32_t DAudioSourceStub::ConfigDistributedHardwareInner(MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
+    if (!VerifyPermission()) {
+        DHLOGE("Permission verification fail.");
+        return ERR_DH_AUDIO_SA_PERMISSION_FAIED;
+    }
     std::string networkId = data.ReadString();
     std::string dhId = data.ReadString();
     std::string key = data.ReadString();
