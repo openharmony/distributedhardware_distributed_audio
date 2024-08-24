@@ -31,17 +31,6 @@ ohos_fuzztest("SourceServiceInitSourceFuzzTest") {
   sources = [ "sourceserviceinitsource_fuzzer.cpp" ]
 
   include_dirs = [
-    "${fwk_utils_path}/include/log",
-    "${fwk_utils_path}/include",
-    "${fwk_common_path}/log/include",
-    "${fwk_common_path}/utils/include",
-    "${driver_audio_path}/include",
-    "${mediastandardfwk_path}/audiocapturer/include",
-    "${mediastandardfwk_path}/audiomanager/include",
-    "${mediastandardfwk_path}/audiocommon/include",
-  ]
-
-  include_dirs += [
     "include",
     "${common_path}/include",
     "${common_path}/dfx_utils/include",
@@ -63,9 +52,12 @@ ohos_fuzztest("SourceServiceInitSourceFuzzTest") {
   ]
 
   external_deps = [
+    "audio_framework:audio_capturer",
+    "audio_framework:audio_client",
     "audio_framework:audio_renderer",
     "cJSON:cjson",
     "c_utils:utils",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "drivers_interface_distributed_audio:libdaudio_proxy_1.0",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",

@@ -20,15 +20,6 @@ config("module_private_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "${fwk_common_path}/utils/include",
-    "${mediastandard_path}/interfaces/inner_api/native",
-    "${mediastandard_path}/services/utils/include",
-    "${mediastandardfwk_path}/audiocapturer/include",
-    "${mediastandardfwk_path}/audiocommon/include",
-    "${mediastandardfwk_path}/audiomanager/include",
-  ]
-
-  include_dirs += [
     "include",
     "${common_path}/include",
     "${distributedaudio_path}/audiohandler/include",
@@ -44,15 +35,15 @@ ohos_unittest("AudioHandlerTest") {
 
   configs = [ ":module_private_config" ]
 
-  deps = [
-    "${distributedaudio_path}/audiohandler:distributed_audio_handler",
-    "//third_party/googletest:gtest_main",
-  ]
+  deps = [ "${distributedaudio_path}/audiohandler:distributed_audio_handler" ]
 
   external_deps = [
+    "audio_framework:audio_capturer",
+    "audio_framework:audio_client",
     "audio_framework:audio_renderer",
     "cJSON:cjson",
     "c_utils:utils",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "hilog:libhilog",
   ]
 }
