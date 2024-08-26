@@ -20,11 +20,6 @@ config("module_private_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "${mediastandard_path}/interfaces/innerkits/native/media/include",
-    "${mediastandardfwk_path}/audiocommon/include",
-  ]
-
-  include_dirs += [
     "include",
     "${common_path}/include",
     "${common_path}/dfx_utils/include",
@@ -50,14 +45,16 @@ ohos_unittest("AVTransSenderAdapterTest") {
   deps = [
     "${audio_transport_path}/senderengine:distributed_audio_encode_transport",
     "${services_path}/common:distributed_audio_utils",
-    "//third_party/googletest:gmock",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
+    "audio_framework:audio_capturer",
+    "audio_framework:audio_client",
+    "audio_framework:audio_renderer",
     "cJSON:cjson",
     "distributed_hardware_fwk:distributed_av_sender",
     "dsoftbus:softbus_client",
+    "googletest:gmock",
   ]
 }
 

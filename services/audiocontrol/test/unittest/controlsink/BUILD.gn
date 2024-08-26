@@ -19,9 +19,7 @@ module_out_path = "distributed_audio/services/audiocontrol/control_sink_test"
 config("module_private_config") {
   visibility = [ ":*" ]
 
-  include_dirs = [ "${fwk_common_path}/utils/include" ]
-
-  include_dirs += [
+  include_dirs = [
     "include",
     "${common_path}/include",
     "${services_path}/common/audiodata/include",
@@ -43,13 +41,13 @@ ohos_unittest("ControlSinkTest") {
 
   configs = [ ":module_private_config" ]
 
-  deps = [
-    "${services_path}/audiomanager/servicesink:distributed_audio_sink",
-    "//third_party/googletest:gmock",
-    "//third_party/googletest:gtest_main",
-  ]
+  deps = [ "${services_path}/audiomanager/servicesink:distributed_audio_sink" ]
 
-  external_deps = [ "c_utils:utils" ]
+  external_deps = [
+    "c_utils:utils",
+    "distributed_hardware_fwk:distributedhardwareutils",
+    "googletest:gmock",
+  ]
 }
 
 group("control_sink_test") {

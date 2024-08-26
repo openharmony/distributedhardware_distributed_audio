@@ -31,13 +31,6 @@ ohos_fuzztest("SinkServiceReleaseSinkFuzzTest") {
   sources = [ "sinkservicereleasesink_fuzzer.cpp" ]
 
   include_dirs = [
-    "${fwk_utils_path}/include/log",
-    "${fwk_utils_path}/include",
-    "${fwk_common_path}/log/include",
-    "${fwk_common_path}/utils/include",
-  ]
-
-  include_dirs += [
     "include",
     "${common_path}/include",
     "${innerkits_path}/native_cpp/audio_sink/include",
@@ -54,6 +47,7 @@ ohos_fuzztest("SinkServiceReleaseSinkFuzzTest") {
 
   external_deps = [
     "c_utils:utils",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]

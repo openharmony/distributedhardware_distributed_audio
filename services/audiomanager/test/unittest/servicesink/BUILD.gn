@@ -22,15 +22,6 @@ config("module_private_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "${audio_framework_path}/audiopolicy/include",
-    "${fwk_common_path}/utils/include",
-    "${mediastandardfwk_path}/audiocapturer/include",
-    "${mediastandardfwk_path}/audiocommon/include",
-    "${mediastandardfwk_path}/audiorenderer/include",
-    "${mediastandardfwk_path}/audiomanager/include",
-  ]
-
-  include_dirs += [
     "${audio_client_path}/micclient/include",
     "${audio_client_path}/spkclient/include",
     "${audio_control_path}/controlsink/include",
@@ -59,18 +50,16 @@ ohos_unittest("DaudioSinkServiceTest") {
 
   configs = [ ":module_private_config" ]
 
-  deps = [
-    "${services_path}/audiomanager/servicesink:distributed_audio_sink",
-    "//third_party/googletest:gmock",
-    "//third_party/googletest:gtest_main",
-  ]
+  deps = [ "${services_path}/audiomanager/servicesink:distributed_audio_sink" ]
 
   external_deps = [
     "audio_framework:audio_capturer",
     "audio_framework:audio_client",
     "audio_framework:audio_renderer",
     "c_utils:utils",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "dsoftbus:softbus_client",
+    "googletest:gmock",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "ipc:ipc_core",
@@ -96,11 +85,7 @@ ohos_unittest("DaudioSinkStubTest") {
 
   configs = [ ":module_private_config" ]
 
-  deps = [
-    "${services_path}/audiomanager/servicesink:distributed_audio_sink",
-    "//third_party/googletest:gmock",
-    "//third_party/googletest:gtest_main",
-  ]
+  deps = [ "${services_path}/audiomanager/servicesink:distributed_audio_sink" ]
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
@@ -109,7 +94,9 @@ ohos_unittest("DaudioSinkStubTest") {
     "audio_framework:audio_client",
     "audio_framework:audio_renderer",
     "c_utils:utils",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "dsoftbus:softbus_client",
+    "googletest:gmock",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "ipc:ipc_core",

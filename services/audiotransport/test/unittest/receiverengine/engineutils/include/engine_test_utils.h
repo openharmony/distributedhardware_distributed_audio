@@ -105,7 +105,7 @@ public:
         return 0;
     }
 
-    int32_t RegisterReceiverCallback(const std::shared_ptr<IAVReceiverEngineCallback> &callback)
+    int32_t RegisterReceiverCallback(const std::shared_ptr<IAVReceiverEngineCallback> &callback) override
     {
         (void) callback;
         return 0;
@@ -177,7 +177,7 @@ public:
         return 0;
     }
 
-    int32_t RegisterSenderCallback(const std::shared_ptr<IAVSenderEngineCallback> &callback)
+    int32_t RegisterSenderCallback(const std::shared_ptr<IAVSenderEngineCallback> &callback) override
     {
         (void) callback;
         return 0;
@@ -249,7 +249,7 @@ public:
         return 1;
     }
 
-    int32_t RegisterSenderCallback(const std::shared_ptr<IAVSenderEngineCallback> &callback)
+    int32_t RegisterSenderCallback(const std::shared_ptr<IAVSenderEngineCallback> &callback) override
     {
         (void) callback;
         return 0;

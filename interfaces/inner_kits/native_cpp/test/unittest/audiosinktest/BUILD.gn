@@ -20,11 +20,6 @@ config("module_private_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "${fwk_common_path}/utils/include",
-    "${fwk_utils_path}/include",
-  ]
-
-  include_dirs += [
     "./include",
     "${common_path}/include",
     "${interfaces_path}/inner_kits/native_cpp/audio_sink/include",
@@ -43,14 +38,12 @@ ohos_unittest("AudioSinkTest") {
 
   configs = [ ":module_private_config" ]
 
-  deps = [
-    "${distributedaudio_path}/interfaces/inner_kits/native_cpp/audio_sink:distributed_audio_sink_sdk",
-    "//third_party/googletest:gmock",
-    "//third_party/googletest:gtest_main",
-  ]
+  deps = [ "${distributedaudio_path}/interfaces/inner_kits/native_cpp/audio_sink:distributed_audio_sink_sdk" ]
 
   external_deps = [
     "c_utils:utils",
+    "distributed_hardware_fwk:distributedhardwareutils",
+    "googletest:gmock",
     "hilog:libhilog",
     "ipc:ipc_core",
     "samgr:samgr_proxy",

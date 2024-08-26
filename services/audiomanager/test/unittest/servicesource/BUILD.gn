@@ -22,16 +22,6 @@ config("module_private_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "${audio_framework_path}/audiopolicy/include",
-    "${driver_audio_path}/include",
-    "${fwk_common_path}/utils/include",
-    "${mediastandardfwk_path}/audiocapturer/include",
-    "${mediastandardfwk_path}/audiocommon/include",
-    "${mediastandardfwk_path}/audiorenderer/include",
-    "${mediastandardfwk_path}/audiomanager/include",
-  ]
-
-  include_dirs += [
     "${audio_control_path}/controlsource/include",
     "${audio_hdi_proxy_path}/include",
     "${audio_processor_path}/interface",
@@ -41,7 +31,6 @@ config("module_private_config") {
     "${common_path}/include",
     "${common_path}/dfx_utils/include",
     "${distributedaudio_path}/audiohandler/include",
-    "${hdf_service_path}/hdi_service/common/include",
     "${innerkits_path}/native_cpp/audio_sink/include",
     "${innerkits_path}/native_cpp/audio_source/include",
     "${interfaces_path}/inner_kits/native_cpp/audio_sink/include",
@@ -67,11 +56,8 @@ ohos_unittest("DaudioSourceServiceTest") {
 
   configs = [ ":module_private_config" ]
 
-  deps = [
-    "${services_path}/audiomanager/servicesource:distributed_audio_source",
-    "//third_party/googletest:gmock",
-    "//third_party/googletest:gtest_main",
-  ]
+  deps =
+      [ "${services_path}/audiomanager/servicesource:distributed_audio_source" ]
 
   external_deps = [
     "audio_framework:audio_capturer",
@@ -79,8 +65,10 @@ ohos_unittest("DaudioSourceServiceTest") {
     "audio_framework:audio_renderer",
     "cJSON:cjson",
     "c_utils:utils",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "drivers_interface_distributed_audio:libdaudio_proxy_1.0",
     "dsoftbus:softbus_client",
+    "googletest:gmock",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "ipc:ipc_core",
@@ -106,11 +94,8 @@ ohos_unittest("DaudioSourceStubTest") {
 
   configs = [ ":module_private_config" ]
 
-  deps = [
-    "${services_path}/audiomanager/servicesource:distributed_audio_source",
-    "//third_party/googletest:gmock",
-    "//third_party/googletest:gtest_main",
-  ]
+  deps =
+      [ "${services_path}/audiomanager/servicesource:distributed_audio_source" ]
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
@@ -120,8 +105,10 @@ ohos_unittest("DaudioSourceStubTest") {
     "audio_framework:audio_renderer",
     "cJSON:cjson",
     "c_utils:utils",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "drivers_interface_distributed_audio:libdaudio_proxy_1.0",
     "dsoftbus:softbus_client",
+    "googletest:gmock",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "ipc:ipc_core",
