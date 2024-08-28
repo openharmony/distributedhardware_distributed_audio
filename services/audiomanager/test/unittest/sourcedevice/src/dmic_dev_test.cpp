@@ -20,6 +20,7 @@ using namespace testing::ext;
 namespace OHOS {
 namespace DistributedHardware {
 constexpr int32_t DH_ID = 1;
+constexpr size_t NOTIFY_WAIT_FRAMES = 5;
 constexpr int32_t DH_ID_MIC = 134217728;
 const std::string DEV_ID = "Test_Dev_Id";
 const std::string CAP = "Test_Capability";
@@ -176,7 +177,7 @@ HWTEST_F(DMicDevTest, NotifyEvent_001, TestSize.Level1)
     EXPECT_EQ(DH_SUCCESS, mic_->NotifyEvent(streamId_, event));
 
     mic_->isTransReady_ = true;
-    for (int32_t i = 0; i < DMicDev::NOTIFY_WAIT_FRAMES; i++) {
+    for (int32_t i = 0; i < NOTIFY_WAIT_FRAMES; i++) {
         size_t size = 4096;
         auto audioData = std::make_shared<AudioData>(size);
         mic_->dataQueue_.push(audioData);
