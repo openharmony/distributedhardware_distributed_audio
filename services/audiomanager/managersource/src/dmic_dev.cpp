@@ -212,13 +212,6 @@ int32_t DMicDev::NotifyEvent(const int32_t streamId, const AudioEvent &event)
     switch (event.type) {
         case AudioEventType::AUDIO_START:
             curStatus_ = AudioStatus::STATUS_START;
-            while (isTransReady_.load()) {
-                std::lock_guard<std::mutex> lock(dataQueueMtx_);
-                if (dataQueue_.size() >= NOTIFY_WAIT_FRAMES) {
-                    break;
-                }
-                usleep(NOTIFY_WAIT_TIME_US);
-            }
             isExistedEmpty_.store(false);
             break;
         case AudioEventType::AUDIO_STOP:

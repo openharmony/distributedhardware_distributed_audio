@@ -101,8 +101,6 @@ private:
     const std::string DUMP_DAUDIO_MIC_READ_FROM_BUF_NAME = "dump_source_mic_read_from_trans.pcm";
     const std::string DUMP_DAUDIO_LOWLATENCY_MIC_FROM_BUF_NAME = "dump_source_mic_write_to_ashmem.pcm";
     const int32_t ASHMEM_MAX_LEN = 2 * 4096;
-    static constexpr size_t NOTIFY_WAIT_FRAMES = 5;
-    static constexpr uint32_t NOTIFY_WAIT_TIME_US = 20000;
 
     std::weak_ptr<IAudioEventCallback> audioEventCallback_;
     std::mutex dataQueueMtx_;
