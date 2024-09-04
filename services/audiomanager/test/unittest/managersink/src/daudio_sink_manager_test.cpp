@@ -105,15 +105,11 @@ HWTEST_F(DAudioSinkManagerTest, CreateAudioDevice_001, TestSize.Level1)
     std::string devId = "devId";
     std::string params = "params";
     auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (samgr == nullptr) {
-        return;
-    }
+    ASSERT_TRUE(samgr != nullptr);
     sptr<DAudioSinkLoadCallback> loadCallback(new DAudioSinkLoadCallback(params));
     samgr->LoadSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID, loadCallback);
     sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID);
-    if (remoteObject == nullptr) {
-        return;
-    }
+    ASSERT_TRUE(remoteObject != nullptr);
     sptr<DAudioSinkIpcCallbackProxy> dAudioSinkIpcCallbackProxy(new DAudioSinkIpcCallbackProxy(remoteObject));
     daudioSinkManager.ipcSinkCallback_ = dAudioSinkIpcCallbackProxy;
     EXPECT_EQ(ERR_DH_AUDIO_NOT_SUPPORT, daudioSinkManager.CreateAudioDevice(devId));
@@ -139,15 +135,11 @@ HWTEST_F(DAudioSinkManagerTest, InitAudioDevice_001, TestSize.Level1)
     std::shared_ptr<DAudioSinkDev> dev = nullptr;
     EXPECT_NE(DH_SUCCESS, daudioSinkManager.InitAudioDevice(dev, devId, true));
     auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (samgr == nullptr) {
-        return;
-    }
+    ASSERT_TRUE(samgr != nullptr);
     sptr<DAudioSinkLoadCallback> loadCallback(new DAudioSinkLoadCallback(params));
     samgr->LoadSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID, loadCallback);
     sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID);
-    if (remoteObject == nullptr) {
-        return;
-    }
+    ASSERT_TRUE(remoteObject != nullptr);
     sptr<DAudioSinkIpcCallbackProxy> dAudioSinkIpcCallbackProxy(new DAudioSinkIpcCallbackProxy(remoteObject));
     daudioSinkManager.ipcSinkCallback_ = dAudioSinkIpcCallbackProxy;
     dev = std::make_shared<DAudioSinkDev>(devId, dAudioSinkIpcCallbackProxy);
@@ -181,15 +173,11 @@ HWTEST_F(DAudioSinkManagerTest, PauseDistributedHardware_001, TestSize.Level1)
     std::string devId = "devId";
     std::string params = "params";
     auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (samgr == nullptr) {
-        return;
-    }
+    ASSERT_TRUE(samgr != nullptr);
     sptr<DAudioSinkLoadCallback> loadCallback(new DAudioSinkLoadCallback(params));
     samgr->LoadSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID, loadCallback);
     sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID);
-    if (remoteObject == nullptr) {
-        return;
-    }
+    ASSERT_TRUE(remoteObject != nullptr);
     sptr<DAudioSinkIpcCallbackProxy> dAudioSinkIpcCallbackProxy(new DAudioSinkIpcCallbackProxy(remoteObject));
     auto dev = std::make_shared<DAudioSinkDev>(networkId, dAudioSinkIpcCallbackProxy);
     EXPECT_EQ(DH_SUCCESS, daudioSinkManager.PauseDistributedHardware(networkId));
@@ -213,15 +201,11 @@ HWTEST_F(DAudioSinkManagerTest, VerifySecurityLevel_001, TestSize.Level1)
     std::string networkId = "networkId";
     std::string params = "params";
     auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (samgr == nullptr) {
-        return;
-    }
+    ASSERT_TRUE(samgr != nullptr);
     sptr<DAudioSinkLoadCallback> loadCallback(new DAudioSinkLoadCallback(params));
     samgr->LoadSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID, loadCallback);
     sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID);
-    if (remoteObject == nullptr) {
-        return;
-    }
+    ASSERT_TRUE(remoteObject != nullptr);
     sptr<DAudioSinkIpcCallbackProxy> dAudioSinkIpcCallbackProxy(new DAudioSinkIpcCallbackProxy(remoteObject));
     daudioSinkManager.ipcSinkCallback_ = dAudioSinkIpcCallbackProxy;
     EXPECT_EQ(DH_SUCCESS, daudioSinkManager.VerifySecurityLevel(devId));

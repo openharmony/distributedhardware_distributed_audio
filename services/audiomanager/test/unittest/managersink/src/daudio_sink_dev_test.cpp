@@ -158,10 +158,7 @@ HWTEST_F(DAudioSinkDevTest, TaskOpenDSpeaker_003, TestSize.Level1)
     cJSON_AddNumberToObject(jobject, KEY_STREAM_USAGE, 0);
     cJSON_AddNumberToObject(jobject, KEY_SOURCE_TYPE, 0);
     char *jsonData = cJSON_PrintUnformatted(jobject);
-    if (jsonData == nullptr) {
-        cJSON_Delete(jobject);
-        return;
-    }
+    CHECK_NULL_AND_FREE_VOID(jsonData, jobject);
     std::string args(jsonData);
     cJSON_free(jsonData);
     cJSON_Delete(jobject);
@@ -236,10 +233,7 @@ HWTEST_F(DAudioSinkDevTest, ParseResultFromEvent_001, TestSize.Level1)
     CHECK_NULL_VOID(jobject);
     cJSON_AddNumberToObject(jobject, KEY_RESULT, 0);
     char *jsonData = cJSON_PrintUnformatted(jobject);
-    if (jsonData == nullptr) {
-        cJSON_Delete(jobject);
-        return;
-    }
+    CHECK_NULL_AND_FREE_VOID(jsonData, jobject);
     std::string args1(jsonData);
     cJSON_free(jsonData);
     cJSON_Delete(jobject);
@@ -302,10 +296,7 @@ HWTEST_F(DAudioSinkDevTest, TaskOpenDMic_002, TestSize.Level1)
     cJSON_AddNumberToObject(jobject, KEY_STREAM_USAGE, 0);
     cJSON_AddNumberToObject(jobject, KEY_SOURCE_TYPE, 0);
     char *jsonData = cJSON_PrintUnformatted(jobject);
-    if (jsonData == nullptr) {
-        cJSON_Delete(jobject);
-        return;
-    }
+    CHECK_NULL_AND_FREE_VOID(jsonData, jobject);
     std::string args(jsonData);
     cJSON_free(jsonData);
     cJSON_Delete(jobject);

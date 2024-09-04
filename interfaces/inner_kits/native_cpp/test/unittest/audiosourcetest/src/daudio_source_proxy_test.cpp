@@ -53,9 +53,7 @@ void DAudioSourceProxyTest::TearDown(void) {}
  */
 HWTEST_F(DAudioSourceProxyTest, RegisterDistributedHardware_001, TestSize.Level1)
 {
-    if (dAudioProxy == nullptr) {
-        return;
-    }
+    ASSERT_TRUE(dAudioProxy != nullptr);
     const std::string devId = "devId";
     const std::string dhId = "dhId";
     const std::string reqId = "reqId";
@@ -79,9 +77,7 @@ HWTEST_F(DAudioSourceProxyTest, RegisterDistributedHardware_001, TestSize.Level1
  */
 HWTEST_F(DAudioSourceProxyTest, RegisterDistributedHardware_002, TestSize.Level1)
 {
-    if (dAudioProxy == nullptr) {
-        return;
-    }
+    ASSERT_TRUE(dAudioProxy != nullptr);
     size_t  DAUDIO_MAX_DEVICE_ID_LEN = 101;
     std::string devId;
     devId.resize(DAUDIO_MAX_DEVICE_ID_LEN);
@@ -105,9 +101,7 @@ HWTEST_F(DAudioSourceProxyTest, RegisterDistributedHardware_002, TestSize.Level1
  */
 HWTEST_F(DAudioSourceProxyTest, RegisterDistributedHardware_003, TestSize.Level1)
 {
-    if (dAudioProxy == nullptr) {
-        return;
-    }
+    ASSERT_TRUE(dAudioProxy != nullptr);
     size_t DAUDIO_MAX_DEVICE_ID_LEN = 101;
     size_t DAUDIO_LEGAL_DEVICE_ID_LEN = 10;
     std::string devId;
@@ -138,9 +132,7 @@ HWTEST_F(DAudioSourceProxyTest, RegisterDistributedHardware_003, TestSize.Level1
  */
 HWTEST_F(DAudioSourceProxyTest, ConfigDistributedHardware_001, TestSize.Level1)
 {
-    if (dAudioProxy == nullptr) {
-        return;
-    }
+    ASSERT_TRUE(dAudioProxy != nullptr);
     const std::string devId = "devId";
     const std::string dhId = "dhId";
     const std::string key = "value";
@@ -158,9 +150,7 @@ HWTEST_F(DAudioSourceProxyTest, ConfigDistributedHardware_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceProxyTest, ConfigDistributedHardware_002, TestSize.Level1)
 {
-    if (dAudioProxy == nullptr) {
-        return;
-    }
+    ASSERT_TRUE(dAudioProxy != nullptr);
     size_t DAUDIO_MAX_DEVICE_ID_LEN = 101;
     size_t DAUDIO_LEGAL_DEVICE_ID_LEN = 10;
     const int32_t eventType = 1;

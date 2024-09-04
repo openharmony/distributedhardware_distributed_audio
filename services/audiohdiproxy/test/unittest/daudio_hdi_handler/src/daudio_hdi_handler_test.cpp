@@ -41,9 +41,7 @@ void DAudioHdiHandlerTest::TearDown()
  */
 HWTEST_F(DAudioHdiHandlerTest, InitHdiHandler_001, TestSize.Level1)
 {
-    if (hdiHandler_ == nullptr) {
-        return;
-    }
+    ASSERT_TRUE(hdiHandler_ != nullptr);
     EXPECT_EQ(HDF_SUCCESS, hdiHandler_->InitHdiHandler());
     EXPECT_EQ(HDF_SUCCESS, hdiHandler_->InitHdiHandler()); // test repeated initialization
 }
@@ -56,9 +54,7 @@ HWTEST_F(DAudioHdiHandlerTest, InitHdiHandler_001, TestSize.Level1)
  */
 HWTEST_F(DAudioHdiHandlerTest, RegisterAudioDevice_001, TestSize.Level1)
 {
-    if (hdiHandler_ == nullptr) {
-        return;
-    }
+    ASSERT_TRUE(hdiHandler_ != nullptr);
     EXPECT_EQ(HDF_SUCCESS, hdiHandler_->InitHdiHandler());
     hdiHandler_->audioSrvHdf_ = nullptr;
     std::shared_ptr<IDAudioHdiCallback> callbackObjParam = std::make_shared<MockIDAudioHdiCallback>();
@@ -80,9 +76,7 @@ HWTEST_F(DAudioHdiHandlerTest, RegisterAudioDevice_001, TestSize.Level1)
  */
 HWTEST_F(DAudioHdiHandlerTest, RegisterAudioDevice_002, TestSize.Level1)
 {
-    if (hdiHandler_ == nullptr) {
-        return;
-    }
+    ASSERT_TRUE(hdiHandler_ != nullptr);
     EXPECT_EQ(HDF_SUCCESS, hdiHandler_->InitHdiHandler());
     std::shared_ptr<IDAudioHdiCallback> callbackObjParam = std::make_shared<MockIDAudioHdiCallback>();
     EXPECT_EQ(ERR_DH_AUDIO_HDI_CALL_FAILED,
@@ -98,9 +92,7 @@ HWTEST_F(DAudioHdiHandlerTest, RegisterAudioDevice_002, TestSize.Level1)
  */
 HWTEST_F(DAudioHdiHandlerTest, NotifyEvent_001, TestSize.Level1)
 {
-    if (hdiHandler_ == nullptr) {
-        return;
-    }
+    ASSERT_TRUE(hdiHandler_ != nullptr);
     EXPECT_EQ(HDF_SUCCESS, hdiHandler_->InitHdiHandler());
     hdiHandler_->audioSrvHdf_ = nullptr;
     AudioEvent audioEvent;
@@ -115,9 +107,7 @@ HWTEST_F(DAudioHdiHandlerTest, NotifyEvent_001, TestSize.Level1)
  */
 HWTEST_F(DAudioHdiHandlerTest, NotifyEvent_002, TestSize.Level1)
 {
-    if (hdiHandler_ == nullptr) {
-        return;
-    }
+    ASSERT_TRUE(hdiHandler_ != nullptr);
     EXPECT_EQ(HDF_SUCCESS, hdiHandler_->InitHdiHandler());
     hdiHandler_->audioSrvHdf_ = new MockIDAudioManager();
     AudioEvent audioEvent1(AudioEventType::NOTIFY_OPEN_SPEAKER_RESULT, "");
@@ -150,9 +140,7 @@ HWTEST_F(DAudioHdiHandlerTest, NotifyEvent_002, TestSize.Level1)
  */
 HWTEST_F(DAudioHdiHandlerTest, UnRegisterAudioDevice_001, TestSize.Level1)
 {
-    if (hdiHandler_ == nullptr) {
-        return;
-    }
+    ASSERT_TRUE(hdiHandler_ != nullptr);
     hdiHandler_->audioSrvHdf_ = nullptr;
     EXPECT_NE(HDF_SUCCESS, hdiHandler_->UnRegisterAudioDevice(devId_, dhId_));
 }
@@ -165,9 +153,7 @@ HWTEST_F(DAudioHdiHandlerTest, UnRegisterAudioDevice_001, TestSize.Level1)
  */
 HWTEST_F(DAudioHdiHandlerTest, UnInitHdiHandler_001, TestSize.Level1)
 {
-    if (hdiHandler_ == nullptr) {
-        return;
-    }
+    ASSERT_TRUE(hdiHandler_ != nullptr);
     hdiHandler_->audioSrvHdf_ = nullptr;
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, hdiHandler_->UninitHdiHandler());
 }
