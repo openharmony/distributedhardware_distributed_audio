@@ -43,9 +43,7 @@ void DAudioHidumperTest::TearDown()
  */
 HWTEST_F(DAudioHidumperTest, Dump_001, TestSize.Level1)
 {
-    if (hidumper_ == nullptr) {
-        return;
-    }
+    ASSERT_TRUE(hidumper_ != nullptr);
     std::string result;
     std::vector<std::string> args;
     EXPECT_EQ(true, hidumper_->Dump(args, result));
@@ -69,9 +67,7 @@ HWTEST_F(DAudioHidumperTest, Dump_001, TestSize.Level1)
  */
 HWTEST_F(DAudioHidumperTest, GetSourceDevId_001, TestSize.Level1)
 {
-    if (hidumper_ == nullptr) {
-        return;
-    }
+    ASSERT_TRUE(hidumper_ != nullptr);
     std::string result = "123";
     EXPECT_NE(HDF_SUCCESS, hidumper_->GetSourceDevId(result));
 }
@@ -84,9 +80,7 @@ HWTEST_F(DAudioHidumperTest, GetSourceDevId_001, TestSize.Level1)
  */
 HWTEST_F(DAudioHidumperTest, GetSinkInfo_001, TestSize.Level1)
 {
-    if (hidumper_ == nullptr) {
-        return;
-    }
+    ASSERT_TRUE(hidumper_ != nullptr);
     std::string result = "123";
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, hidumper_->GetSinkInfo(result));
 }
@@ -99,9 +93,7 @@ HWTEST_F(DAudioHidumperTest, GetSinkInfo_001, TestSize.Level1)
  */
 HWTEST_F(DAudioHidumperTest, StartDumpData_001, TestSize.Level1)
 {
-    if (hidumper_ == nullptr) {
-        return;
-    }
+    ASSERT_TRUE(hidumper_ != nullptr);
     std::string result = "";
     EXPECT_EQ(HDF_SUCCESS, hidumper_->StartDumpData(result));
     EXPECT_EQ(true, hidumper_->QueryDumpDataFlag());

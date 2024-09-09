@@ -42,9 +42,7 @@ void DAudioHitraceTest::TearDown()
  */
 HWTEST_F(DAudioHitraceTest, End_001, TestSize.Level1)
 {
-    if (hitrace_ == nullptr) {
-        return;
-    }
+    ASSERT_TRUE(hitrace_ != nullptr);
     std::string result = "123";
     hitrace_->isFinished_ = false;
     hitrace_->End();

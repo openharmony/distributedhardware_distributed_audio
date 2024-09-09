@@ -90,18 +90,14 @@ HWTEST_F(DAudioSinkHandlerTest, LocalHardware_003, TestSize.Level1)
     wptr<IRemoteObject> remote = nullptr;
     DAudioSinkHandler::GetInstance().OnRemoteSinkSvrDied(remote);
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (samgr == nullptr) {
-        return;
-    }
+    ASSERT_TRUE(samgr != nullptr);
     sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID);
     sptr<IDAudioSink> proxy(new DAudioSinkProxy(remoteObject));
     wptr<IRemoteObject> remoteobject (remoteObject);
     DAudioSinkHandler::GetInstance().OnRemoteSinkSvrDied(remoteobject);
     DAudioSinkHandler::GetInstance().sinkSvrRecipient_ = sptr<DAudioSinkHandler::DAudioSinkSvrRecipient>(
         new DAudioSinkHandler::DAudioSinkSvrRecipient());
-    if (DAudioSinkHandler::GetInstance().sinkSvrRecipient_ == nullptr) {
-        return;
-    }
+    ASSERT_TRUE(DAudioSinkHandler::GetInstance().sinkSvrRecipient_ != nullptr);
     DAudioSinkHandler::GetInstance().sinkSvrRecipient_->OnRemoteDied(remoteobject);
     DAudioSinkHandler::GetInstance().sinkSvrRecipient_ = nullptr;
     DAudioSinkHandler::GetInstance().dAudioSinkProxy_ = proxy;
@@ -138,9 +134,7 @@ HWTEST_F(DAudioSinkHandlerTest, LocalHardware_005, TestSize.Level1)
     int32_t ret = DAudioSinkHandler::GetInstance().PauseDistributedHardware(networkId);
     EXPECT_EQ(ERR_DH_AUDIO_SA_PROXY_NOT_INIT, ret);
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (samgr == nullptr) {
-        return;
-    }
+    ASSERT_TRUE(samgr != nullptr);
     sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID);
     sptr<IDAudioSink> proxy(new DAudioSinkProxy(remoteObject));
     DAudioSinkHandler::GetInstance().dAudioSinkProxy_ = proxy;
@@ -162,9 +156,7 @@ HWTEST_F(DAudioSinkHandlerTest, LocalHardware_006, TestSize.Level1)
     EXPECT_EQ(ERR_DH_AUDIO_SA_PROXY_NOT_INIT, ret);
     EXPECT_EQ(ERR_DH_AUDIO_SA_PROXY_NOT_INIT, DAudioSinkHandler::GetInstance().StopDistributedHardware(networkId));
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (samgr == nullptr) {
-        return;
-    }
+    ASSERT_TRUE(samgr != nullptr);
     sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID);
     sptr<IDAudioSink> proxy(new DAudioSinkProxy(remoteObject));
     DAudioSinkHandler::GetInstance().dAudioSinkProxy_ = proxy;
