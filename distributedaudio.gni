@@ -44,3 +44,12 @@ innerkits_path = "${distributedaudio_path}/interfaces/inner_kits"
 distributedaudio_fuzz_path = "distributed_audio/distributed_audio"
 
 build_flags = [ "-Werror" ]
+
+declare_args() {
+  device_security_level_control = true
+
+  if (defined(global_parts_info) &&
+      !defined(global_parts_info.security_device_security_level)) {
+    device_security_level_control = false
+  }
+}

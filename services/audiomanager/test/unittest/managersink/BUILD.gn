@@ -74,7 +74,6 @@ ohos_unittest("DaudioSinkDevTest") {
     "audio_framework:audio_renderer",
     "c_utils:utils",
     "device_manager:devicemanagersdk",
-    "device_security_level:dslm_sdk",
     "distributed_hardware_fwk:distributed_av_receiver",
     "distributed_hardware_fwk:distributed_av_sender",
     "hdf_core:libhdf_ipc_adapter",
@@ -85,6 +84,11 @@ ohos_unittest("DaudioSinkDevTest") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
+
+  if (device_security_level_control){
+    external_deps += [ "device_security_level:dslm_sdk" ]
+    defines = [ "DEVICE_SECURITY_LEVEL_ENABLE" ]
+  }
 }
 
 ## UnitTest daudio_sink_manager_test
@@ -108,7 +112,6 @@ ohos_unittest("DAudioSinkManagerTest") {
     "audio_framework:audio_renderer",
     "c_utils:utils",
     "device_manager:devicemanagersdk",
-    "device_security_level:dslm_sdk",
     "distributed_hardware_fwk:distributed_av_receiver",
     "distributed_hardware_fwk:distributed_av_sender",
     "hdf_core:libhdf_ipc_adapter",
@@ -119,6 +122,11 @@ ohos_unittest("DAudioSinkManagerTest") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
+
+  if (device_security_level_control){
+    external_deps += [ "device_security_level:dslm_sdk" ]
+    defines = [ "DEVICE_SECURITY_LEVEL_ENABLE" ]
+  }
 }
 
 group("manager_sink_test") {

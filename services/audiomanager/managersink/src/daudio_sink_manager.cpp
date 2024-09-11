@@ -415,6 +415,7 @@ bool DAudioSinkManager::CheckDeviceSecurityLevel(const std::string &srcDeviceId,
 
 int32_t DAudioSinkManager::GetDeviceSecurityLevel(const std::string &udid)
 {
+    #ifdef DEVICE_SECURITY_LEVEL_ENABLE
     DeviceIdentify devIdentify;
     devIdentify.length = DEVICE_ID_MAX_LEN;
     int32_t ret = memcpy_s(devIdentify.identity, DEVICE_ID_MAX_LEN, udid.c_str(), DEVICE_ID_MAX_LEN);
@@ -430,7 +431,9 @@ int32_t DAudioSinkManager::GetDeviceSecurityLevel(const std::string &udid)
         info = nullptr;
         return DEFAULT_DEVICE_SECURITY_LEVEL;
     }
+    #endif
     int32_t level = 0;
+    #ifdef DEVICE_SECURITY_LEVEL_ENABLE
     ret = GetDeviceSecurityLevelValue(info, &level);
     DHLOGE("Get device security level, level is %d", level);
     FreeDeviceSecurityInfo(info);
@@ -439,6 +442,7 @@ int32_t DAudioSinkManager::GetDeviceSecurityLevel(const std::string &udid)
         DHLOGE("Get device security level failed %d", ret);
         return DEFAULT_DEVICE_SECURITY_LEVEL;
     }
+    #endif
     return level;
 }
 
