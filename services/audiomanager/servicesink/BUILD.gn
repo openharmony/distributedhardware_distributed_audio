@@ -79,7 +79,6 @@ ohos_shared_library("distributed_audio_sink") {
     "cJSON:cjson",
     "c_utils:utils",
     "device_manager:devicemanagersdk",
-    "device_security_level:dslm_sdk",
     "distributed_hardware_fwk:distributed_av_receiver",
     "distributed_hardware_fwk:distributed_av_sender",
     "distributed_hardware_fwk:distributedhardwareutils",
@@ -100,6 +99,11 @@ ohos_shared_library("distributed_audio_sink") {
     "HI_LOG_ENABLE",
     "LOG_DOMAIN=0xD004130",
   ]
+
+  if (device_security_level_control) {
+    external_deps += [ "device_security_level:dslm_sdk" ]
+    defines += [ "DEVICE_SECURITY_LEVEL_ENABLE" ]
+  }
 
   subsystem_name = "distributedhardware"
 
