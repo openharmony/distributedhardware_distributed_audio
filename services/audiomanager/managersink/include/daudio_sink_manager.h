@@ -22,8 +22,10 @@
 #include "single_instance.h"
 #include "device_manager.h"
 #include "device_manager_callback.h"
+#ifdef DEVICE_SECURITY_LEVEL_ENABLE
 #include "device_security_defines.h"
 #include "device_security_info.h"
+#endif
 
 #include "daudio_sink_dev.h"
 #include "idaudio_source.h"
