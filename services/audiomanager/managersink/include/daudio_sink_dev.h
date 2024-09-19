@@ -80,6 +80,7 @@ private:
     void PullUpPage();
 
     int32_t ParseDhidFromEvent(std::string args);
+    int32_t ParseResultFromEvent(std::string args);
     int32_t ConvertString2Int(std::string val);
 
 private:

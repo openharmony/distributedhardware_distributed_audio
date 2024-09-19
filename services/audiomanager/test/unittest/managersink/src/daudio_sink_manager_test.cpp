@@ -87,14 +87,23 @@ HWTEST_F(DAudioSinkManagerTest, DAudioNotify_001, TestSize.Level1)
 HWTEST_F(DAudioSinkManagerTest, CreateAudioDevice_001, TestSize.Level1)
 {
     std::string devId = "devId";
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, daudioSinkManager.CreateAudioDevice(devId));
+    std::string params = "params";
+    auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    ASSERT_TRUE(samgr != nullptr);
+    sptr<DAudioSinkLoadCallback> loadCallback(new DAudioSinkLoadCallback(params));
+    samgr->LoadSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID, loadCallback);
+    sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID);
+    ASSERT_TRUE(remoteObject != nullptr);
+    sptr<DAudioSinkIpcCallbackProxy> dAudioSinkIpcCallbackProxy(new DAudioSinkIpcCallbackProxy(remoteObject));
+    daudioSinkManager.ipcSinkCallback_ = dAudioSinkIpcCallbackProxy;
+    EXPECT_EQ(ERR_DH_AUDIO_NOT_SUPPORT, daudioSinkManager.CreateAudioDevice(devId));
     daudioSinkManager.audioDevMap_.emplace(devId, nullptr);
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, daudioSinkManager.CreateAudioDevice(devId));
+    EXPECT_EQ(ERR_DH_AUDIO_NOT_SUPPORT, daudioSinkManager.CreateAudioDevice(devId));
     daudioSinkManager.channelState_ = ChannelState::SPK_CONTROL_OPENED;
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, daudioSinkManager.CreateAudioDevice(devId));
+    EXPECT_EQ(DH_SUCCESS, daudioSinkManager.CreateAudioDevice(devId));
     daudioSinkManager.ClearAudioDev(devId);
     daudioSinkManager.channelState_ = ChannelState::MIC_CONTROL_OPENED;
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, daudioSinkManager.CreateAudioDevice(devId));
+    EXPECT_EQ(DH_SUCCESS, daudioSinkManager.CreateAudioDevice(devId));
 }
 
 /**

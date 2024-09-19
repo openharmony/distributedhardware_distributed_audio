@@ -15,6 +15,8 @@
 
 #include "daudio_sink_manager.h"
 
+#include "cJSON.h"
+
 #include <dlfcn.h>
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
@@ -174,30 +176,70 @@ int32_t DAudioSinkManager::CreateAudioDevice(const std::string &devId)
             dev = audioDevMap_[devId];
         } else {
             dev = std::make_shared<DAudioSinkDev>(devId, ipcSinkCallback_);
-            if (dev->AwakeAudioDev() != DH_SUCCESS) {
-                DHLOGE("Awake audio dev failed.");
-                return ERR_DH_AUDIO_FAILED;
-            }
             audioDevMap_.emplace(devId, dev);
         }
     }
 
-    int32_t ret = ERR_DH_AUDIO_FAILED;
-    if (channelState_ == ChannelState::SPK_CONTROL_OPENED) {
-        ret = dev->InitAVTransEngines(ChannelState::SPK_CONTROL_OPENED, rcvProviderPtr_);
-    }
+    int32_t dhId;
+    bool isSpkOrMic = false;
     if (channelState_ == ChannelState::MIC_CONTROL_OPENED) {
-        ret = dev->InitAVTransEngines(ChannelState::MIC_CONTROL_OPENED, sendProviderPtr_);
-        if (!ret) {
-            ret = VerifySecurityLevel(devId);
+        dhId = PIN_IN_MIC;
+        isSpkOrMic = false;
+    } else if (channelState_ == ChannelState::SPK_CONTROL_OPENED) {
+        dhId = PIN_OUT_SPEAKER;
+        isSpkOrMic = true;
+    } else {
+        DHLOGE("Channel state error.");
+        return ERR_DH_AUDIO_NOT_SUPPORT;
+    }
+    int32_t ret = InitAudioDevice(dev, devId, isSpkOrMic);
+    cJSON *jParam = cJSON_CreateObject();
+    CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
+    cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId).c_str());
+    cJSON_AddStringToObject(jParam, KEY_RESULT, std::to_string(ret).c_str());
+    char *jsonData = cJSON_PrintUnformatted(jParam);
+    if (jsonData == nullptr) {
+        DHLOGE("Failed to create JSON data.");
+        cJSON_Delete(jParam);
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    std::string eventContent = std::string(jsonData);
+    cJSON_free(jsonData);
+    cJSON_Delete(jParam);
+    NotifyEvent(devId, CTRL_OPENED, eventContent);
+    return DH_SUCCESS;
+}
+
+int32_t DAudioSinkManager::InitAudioDevice(std::shared_ptr<DAudioSinkDev> dev, const std::string &devId,
+    bool isSpkOrMic)
+{
+    DHLOGI("Init audio device.");
+    if (dev == nullptr) {
+        DHLOGE("dev is nullptr.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    int32_t ret;
+    if (isSpkOrMic) {
+        ret = dev->InitAVTransEngines(ChannelState::SPK_CONTROL_OPENED, rcvProviderPtr_);
+    } else {
+        ret = VerifySecurityLevel(devId);
+        if (ret != DH_SUCCESS) {
+            DHLOGE("Verify security level failed.");
+            return ERR_DH_AUDIO_FAILED;
         }
+        ret = dev->InitAVTransEngines(ChannelState::MIC_CONTROL_OPENED, sendProviderPtr_);
     }
     if (ret != DH_SUCCESS) {
-        DHLOGE("Init av transport sender engine failed.");
+        DHLOGE("Init av transport engine failed.");
         dev->JudgeDeviceStatus();
         return ERR_DH_AUDIO_FAILED;
     }
-    return DH_SUCCESS;
+    ret = dev->AwakeAudioDev();
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Awake audio dev failed.");
+        return ERR_DH_AUDIO_FAILED;
+    }
+    return ret;
 }
 
 int32_t DAudioSinkManager::DAudioNotify(const std::string &devId, const std::string &dhId, const int32_t eventType,

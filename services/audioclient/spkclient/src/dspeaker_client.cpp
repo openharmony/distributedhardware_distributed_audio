@@ -609,6 +609,7 @@ int32_t DSpeakerClient::SendMessage(uint32_t type, std::string content, std::str
 {
     DHLOGI("Send message to remote.");
     if (type != static_cast<uint32_t>(NOTIFY_OPEN_SPEAKER_RESULT) &&
+        type != static_cast<uint32_t>(NOTIFY_OPEN_CTRL_RESULT) &&
         type != static_cast<uint32_t>(NOTIFY_CLOSE_SPEAKER_RESULT) &&
         type != static_cast<uint32_t>(VOLUME_CHANGE) &&
         type != static_cast<uint32_t>(AUDIO_FOCUS_CHANGE) &&
