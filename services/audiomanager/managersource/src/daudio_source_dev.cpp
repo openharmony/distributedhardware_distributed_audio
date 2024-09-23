@@ -904,7 +904,7 @@ int32_t DAudioSourceDev::ConvertString2Int(std::string val)
         DHLOGE("String is not number. str:%{public}s.", val.c_str());
         return ERR_DH_AUDIO_FAILED;
     }
-    return std::stoi(val);
+    return std::atoi(val.c_str());
 }
 
 int32_t DAudioSourceDev::OpenDSpeakerInner(std::shared_ptr<DAudioIoDev> &speaker, const int32_t dhId)

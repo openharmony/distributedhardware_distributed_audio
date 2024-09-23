@@ -263,7 +263,7 @@ int32_t GetAudioParamInt(const std::string &params, const std::string &key, int3
         DHLOGE("String is not number. str:%{public}s.", val.c_str());
         return ERR_DH_AUDIO_NOT_SUPPORT;
     }
-    value = std::stoi(val);
+    value = std::atoi(val.c_str());
     return DH_SUCCESS;
 }
 
