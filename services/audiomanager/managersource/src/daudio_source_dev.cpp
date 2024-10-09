@@ -1194,17 +1194,18 @@ int32_t DAudioSourceDev::TaskPlayStatusChange(const std::string &args)
     if (changeType == AUDIO_EVENT_RESTART) {
         if (speaker->Restart() != DH_SUCCESS) {
             DHLOGE("Speaker restart failed.");
+            return ERR_DH_AUDIO_FAILED;
         }
-        return ERR_DH_AUDIO_FAILED;
     } else if (changeType == AUDIO_EVENT_PAUSE) {
         if (speaker->Pause() != DH_SUCCESS) {
             DHLOGE("Speaker Pause failed.");
+            return ERR_DH_AUDIO_FAILED;
         }
-        return ERR_DH_AUDIO_FAILED;
     } else {
         DHLOGE("Play status error.");
         return ERR_DH_AUDIO_FAILED;
     }
+    return DH_SUCCESS;
 }
 
 int32_t DAudioSourceDev::SendAudioEventToRemote(const AudioEvent &event)
