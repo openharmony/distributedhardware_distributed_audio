@@ -22,12 +22,6 @@ config("module_private_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "${mediastandardfwk_path}/audiocommon/include",
-    "${mediastandardfwk_path}/audiomanager/include",
-    "${mediastandardfwk_path}/audiorenderer/include",
-  ]
-
-  include_dirs += [
     "${audio_client_path}/interface",
     "${audio_client_path}/spkclient/include",
     "${audio_client_path}/test/unittest/spkclient/include",
@@ -37,7 +31,6 @@ config("module_private_config") {
     "${audio_transport_path}/receiverengine/include",
     "${audio_transport_path}/senderengine/include",
     "${common_path}/include",
-    "${fwk_common_path}/utils/include",
     "${services_path}/common/audioeventcallback",
     "${services_path}/common/audiodata/include",
     "${services_path}/common/audioparam",
@@ -57,15 +50,17 @@ ohos_unittest("SpeakerClientTest") {
   deps = [
     "${services_path}/audiomanager/servicesink:distributed_audio_sink",
     "${services_path}/common:distributed_audio_utils",
-    "//third_party/googletest:gmock",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
+    "audio_framework:audio_capturer",
     "audio_framework:audio_client",
+    "audio_framework:audio_renderer",
     "cJSON:cjson",
     "distributed_hardware_fwk:distributed_av_receiver",
     "distributed_hardware_fwk:distributed_av_sender",
+    "distributed_hardware_fwk:distributedhardwareutils",
+    "googletest:gmock",
   ]
 }
 

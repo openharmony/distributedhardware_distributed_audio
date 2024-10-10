@@ -21,9 +21,7 @@ module_out_path = "distributed_audio/services/audioclient/mic_client_test"
 config("module_private_config") {
   visibility = [ ":*" ]
 
-  include_dirs = [ "${mediastandardfwk_path}/audiocommon/include" ]
-
-  include_dirs += [
+  include_dirs = [
     "${audio_client_path}/interface",
     "${audio_client_path}/micclient/include",
     "${audio_client_path}/test/unittest/micclient/include",
@@ -33,7 +31,6 @@ config("module_private_config") {
     "${audio_transport_path}/receiverengine/include",
     "${audio_transport_path}/senderengine/include",
     "${common_path}/include",
-    "${fwk_common_path}/utils/include",
     "${services_path}/common/audioeventcallback",
     "${services_path}/common/audiodata/include",
     "${services_path}/common/audioparam",
@@ -50,17 +47,17 @@ ohos_unittest("MicClientTest") {
 
   configs = [ ":module_private_config" ]
 
-  deps = [
-    "${services_path}/audiomanager/servicesink:distributed_audio_sink",
-    "//third_party/googletest:gmock",
-    "//third_party/googletest:gtest_main",
-  ]
+  deps = [ "${services_path}/audiomanager/servicesink:distributed_audio_sink" ]
 
   external_deps = [
     "audio_framework:audio_capturer",
+    "audio_framework:audio_client",
+    "audio_framework:audio_renderer",
     "cJSON:cjson",
     "distributed_hardware_fwk:distributed_av_receiver",
     "distributed_hardware_fwk:distributed_av_sender",
+    "distributed_hardware_fwk:distributedhardwareutils",
+    "googletest:gmock",
   ]
 }
 

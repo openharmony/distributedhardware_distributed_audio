@@ -20,14 +20,6 @@ config("module_private_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "${driver_audio_path}/include",
-    "${fwk_common_path}/utils/include",
-    "${mediastandardfwk_path}/audiocapturer/include",
-    "${mediastandardfwk_path}/audiocommon/include",
-    "${mediastandardfwk_path}/audiomanager/include",
-  ]
-
-  include_dirs += [
     "include",
     "${audio_control_path}/controlsource/include",
     "${audio_hdi_proxy_path}/include",
@@ -38,7 +30,6 @@ config("module_private_config") {
     "${common_path}/include",
     "${common_path}/dfx_utils/include",
     "${distributedaudio_path}/audiohandler/include",
-    "${hdf_service_path}/hdi_service/common/include",
     "${innerkits_path}/native_cpp/audio_source/include",
     "${innerkits_path}/native_cpp/audio_sink/include",
     "${interfaces_path}/inner_kits/native_cpp/audio_sink/include",
@@ -74,18 +65,21 @@ ohos_unittest("DaudioSourceDevTest") {
     "${audio_transport_path}/senderengine:distributed_audio_encode_transport",
     "${services_path}/audiomanager/servicesource:distributed_audio_source",
     "${services_path}/common:distributed_audio_utils",
-    "//third_party/googletest:gmock",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
+    "audio_framework:audio_capturer",
+    "audio_framework:audio_client",
+    "audio_framework:audio_renderer",
     "cJSON:cjson",
     "c_utils:utils",
     "distributed_hardware_fwk:distributed_av_receiver",
     "distributed_hardware_fwk:distributed_av_sender",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "drivers_interface_distributed_audio:libdaudioext_proxy_2.0",
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
+    "googletest:gmock",
     "hilog:libhilog",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
@@ -112,15 +106,17 @@ ohos_unittest("DMicDevTest") {
     "${audio_transport_path}/receiverengine:distributed_audio_decode_transport",
     "${services_path}/audiomanager/servicesource:distributed_audio_source",
     "${services_path}/common:distributed_audio_utils",
-    "//third_party/googletest:gmock",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
+    "audio_framework:audio_capturer",
+    "audio_framework:audio_client",
+    "audio_framework:audio_renderer",
     "cJSON:cjson",
     "distributed_hardware_fwk:distributed_av_receiver",
     "distributed_hardware_fwk:distributed_av_sender",
     "drivers_interface_distributed_audio:libdaudioext_proxy_2.0",
+    "googletest:gmock",
     "hilog:libhilog",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
@@ -147,16 +143,18 @@ ohos_unittest("DSpeakerDevTest") {
     "${audio_transport_path}/senderengine:distributed_audio_encode_transport",
     "${services_path}/audiomanager/servicesource:distributed_audio_source",
     "${services_path}/common:distributed_audio_utils",
-    "//third_party/googletest:gmock",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
+    "audio_framework:audio_capturer",
+    "audio_framework:audio_client",
+    "audio_framework:audio_renderer",
     "cJSON:cjson",
     "c_utils:utils",
     "distributed_hardware_fwk:distributed_av_receiver",
     "distributed_hardware_fwk:distributed_av_sender",
     "drivers_interface_distributed_audio:libdaudioext_proxy_2.0",
+    "googletest:gmock",
     "hilog:libhilog",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
@@ -187,11 +185,12 @@ ohos_unittest("DAudioEchoCannelManagerTest") {
     "${audio_transport_path}/senderengine:distributed_audio_encode_transport",
     "${services_path}/audiomanager/servicesource:distributed_audio_source",
     "${services_path}/common:distributed_audio_utils",
-    "//third_party/googletest:gmock",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
+    "audio_framework:audio_capturer",
+    "audio_framework:audio_client",
+    "audio_framework:audio_renderer",
     "cJSON:cjson",
     "c_utils:utils",
     "distributed_hardware_fwk:distributed_av_receiver",
@@ -199,6 +198,7 @@ ohos_unittest("DAudioEchoCannelManagerTest") {
     "drivers_interface_distributed_audio:libdaudioext_proxy_2.0",
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
+    "googletest:gmock",
     "hilog:libhilog",
     "ipc:ipc_core",
     "samgr:samgr_proxy",

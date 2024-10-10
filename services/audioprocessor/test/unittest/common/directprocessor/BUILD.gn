@@ -23,12 +23,6 @@ config("module_private_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "${mediastandard_path}/interfaces/innerkits/native/media/include",
-    "${mediastandardfwk_path}/audiocommon/include",
-    "${fwk_common_path}/utils/include",
-  ]
-
-  include_dirs += [
     "${common_path}/include",
     "${services_path}/common/audioparam",
     "${services_path}/common/audiodata/include",
@@ -47,11 +41,14 @@ ohos_unittest("DirectProcessorTest") {
   deps = [
     "${audio_transport_path}/receiverengine:distributed_audio_decode_transport",
     "${services_path}/common:distributed_audio_utils",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
+    "audio_framework:audio_capturer",
+    "audio_framework:audio_client",
+    "audio_framework:audio_renderer",
     "c_utils:utils",
+    "distributed_hardware_fwk:distributedhardwareutils",
     "player_framework:media_client",
   ]
 
