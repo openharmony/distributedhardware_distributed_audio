@@ -98,11 +98,11 @@ HWTEST_F(DAudioSinkStubTest, PauseDistributedHardwareInner_001, TestSize.Level1)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    EXPECT_EQ(ERR_DH_AUDIO_ACCESS_PERMISSION_CHECK_FAIL,
+    EXPECT_EQ(ERR_DH_AUDIO_SA_PERMISSION_FAIED,
         sinkStub_->PauseDistributedHardwareInner(data, reply, option));
-    EXPECT_EQ(ERR_DH_AUDIO_ACCESS_PERMISSION_CHECK_FAIL,
+    EXPECT_EQ(ERR_DH_AUDIO_SA_PERMISSION_FAIED,
         sinkStub_->ResumeDistributedHardwareInner(data, reply, option));
-    EXPECT_EQ(ERR_DH_AUDIO_ACCESS_PERMISSION_CHECK_FAIL,
+    EXPECT_EQ(ERR_DH_AUDIO_SA_PERMISSION_FAIED,
         sinkStub_->StopDistributedHardwareInner(data, reply, option));
 }
 
@@ -117,8 +117,8 @@ HWTEST_F(DAudioSinkStubTest, SubscribeLocalHardwareInner_001, TestSize.Level1)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    EXPECT_EQ(DH_SUCCESS, sinkStub_->SubscribeLocalHardwareInner(data, reply, option));
-    EXPECT_EQ(DH_SUCCESS, sinkStub_->UnsubscribeLocalHardwareInner(data, reply, option));
+    EXPECT_EQ(ERR_DH_AUDIO_SA_PERMISSION_FAIED, sinkStub_->SubscribeLocalHardwareInner(data, reply, option));
+    EXPECT_EQ(ERR_DH_AUDIO_SA_PERMISSION_FAIED, sinkStub_->UnsubscribeLocalHardwareInner(data, reply, option));
     EXPECT_EQ(DH_SUCCESS, sinkStub_->DAudioNotifyInner(data, reply, option));
 }
 } // DistributedHardware
