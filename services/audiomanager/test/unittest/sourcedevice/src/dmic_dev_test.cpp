@@ -20,6 +20,7 @@ using namespace testing::ext;
 namespace OHOS {
 namespace DistributedHardware {
 constexpr int32_t DH_ID = 1;
+constexpr size_t NOTIFY_WAIT_FRAMES = 5;
 constexpr int32_t DH_ID_MIC = 134217728;
 const std::string DEV_ID = "Test_Dev_Id";
 const std::string CAP = "Test_Capability";
@@ -59,6 +60,12 @@ HWTEST_F(DMicDevTest, InitReceiverEngine_001, TestSize.Level1)
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->InitReceiverEngine(providerPtr));
     mic_->micTrans_ = std::make_shared<MockIAudioDataTransport>();
     EXPECT_EQ(DH_SUCCESS, mic_->InitReceiverEngine(providerPtr));
+
+    event = { EventType::EVENT_STOP_SUCCESS, "", "" };
+    mic_->OnEngineTransEvent(event);
+
+    mic_->echoCannelOn_ = true;
+    mic_->OnEngineTransDataAvailable(audioData);
 }
 
 /**
@@ -162,6 +169,22 @@ HWTEST_F(DMicDevTest, NotifyEvent_001, TestSize.Level1)
     event.type = EVENT_UNKNOWN;
     EXPECT_EQ(DH_SUCCESS, mic_->NotifyEvent(streamId_, event));
 
+    mic_->isTransReady_ = false;
+    event.type = AUDIO_START;
+    EXPECT_EQ(DH_SUCCESS, mic_->NotifyEvent(streamId_, event));
+
+    event.type = AUDIO_STOP;
+    EXPECT_EQ(DH_SUCCESS, mic_->NotifyEvent(streamId_, event));
+
+    mic_->isTransReady_ = true;
+    for (int32_t i = 0; i < NOTIFY_WAIT_FRAMES; i++) {
+        size_t size = 4096;
+        auto audioData = std::make_shared<AudioData>(size);
+        mic_->dataQueue_.push(audioData);
+    }
+    event.type = AUDIO_START;
+    EXPECT_EQ(DH_SUCCESS, mic_->NotifyEvent(streamId_, event));
+
     eventCb_ = nullptr;
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->NotifyEvent(streamId_, event));
 }
@@ -179,6 +202,9 @@ HWTEST_F(DMicDevTest, SetUp_001, TestSize.Level1)
 
     mic_->micTrans_ = std::make_shared<MockIAudioDataTransport>();
     EXPECT_EQ(DH_SUCCESS, mic_->SetUp());
+
+    mic_->micTrans_ = std::make_shared<MockIAudioDataTransportInner>();
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, mic_->SetUp());
 }
 
 /**
@@ -305,6 +331,16 @@ HWTEST_F(DMicDevTest, ReadStreamData_001, TestSize.Level1)
     mic_->FillJitterQueue();
 
     std::shared_ptr<AudioData> readData1 = nullptr;
+    EXPECT_EQ(DH_SUCCESS, mic_->ReadStreamData(streamId_, readData1));
+
+    mic_->curStatus_ = AudioStatus::STATUS_STOP;
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, mic_->ReadStreamData(streamId_, readData1));
+
+    mic_->curStatus_ = AudioStatus::STATUS_START;
+    mic_->insertFrameCnt_ = 1;
+    EXPECT_EQ(DH_SUCCESS, mic_->ReadStreamData(streamId_, readData1));
+
+    mic_->insertFrameCnt_ = 11;
     EXPECT_EQ(DH_SUCCESS, mic_->ReadStreamData(streamId_, readData1));
 }
 
