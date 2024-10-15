@@ -472,7 +472,7 @@ int32_t DAudioSinkDev::ConvertString2Int(std::string val)
         DHLOGE("String is not number. str:%{public}s.", val.c_str());
         return -1;
     }
-    return std::stoi(val);
+    return std::atoi(val.c_str());
 }
 
 void DAudioSinkDev::PullUpPage()
