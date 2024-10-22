@@ -129,6 +129,12 @@ int32_t DAudioSourceManager::UnInit()
         listenThread_.join();
     }
 
+    if (handler_ != nullptr) {
+        while (!handler_->IsIdle()) {
+            DHLOGD("manager handler is running, wait for idle.");
+            usleep(WAIT_HANDLER_IDLE_TIME_US);
+        }
+    }
     ipcCallback_ = nullptr;
     daudioMgrCallback_ = nullptr;
     if (DAudioHdiHandler::GetInstance().UninitHdiHandler() != DH_SUCCESS) {
@@ -136,11 +142,6 @@ int32_t DAudioSourceManager::UnInit()
         return ERR_DH_AUDIO_FAILED;
     }
 
-    CHECK_NULL_RETURN(handler_, DH_SUCCESS);
-    while (!handler_->IsIdle()) {
-        DHLOGD("manager handler is running, wait for idle.");
-        usleep(WAIT_HANDLER_IDLE_TIME_US);
-    }
     DHLOGD("Uninit audio source manager exit.");
     return DH_SUCCESS;
 }
