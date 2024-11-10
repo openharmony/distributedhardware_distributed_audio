@@ -187,7 +187,7 @@ void DAudioEchoCannelManager::AecProcessData()
             refQueueCond_.wait_for(refLck, std::chrono::milliseconds(COND_WAIT_TIME_MS),
                 [this]() { return !refDataQueue_.empty(); });
             if (refDataQueue_.empty()) {
-                DHLOGE("refDataQueue is Empty.");
+                DHLOGD("refDataQueue is Empty.");
                 continue;
             }
             refInData = refDataQueue_.front();
@@ -242,7 +242,7 @@ void DAudioEchoCannelManager::OnReadData(size_t length)
         refDataQueue_.pop();
     }
     refDataQueue_.push(audioData);
-    DHLOGI("Push new echo ref data, buf len: %{public}zu.", refDataQueue_.size());
+    DHLOGD("Push new echo ref data, buf len: %{public}zu.", refDataQueue_.size());
     refQueueCond_.notify_all();
 }
 
