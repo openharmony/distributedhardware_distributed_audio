@@ -28,7 +28,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-const uint32_t RANGE = 8;
 void SinkStubOnRemoteRequestFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size < (sizeof(int32_t)))) {
@@ -68,7 +67,7 @@ void SinkStubOnRemoteRequestFuzzTest(const uint8_t* data, size_t size)
         &DAudioSinkStub::ResumeDistributedHardwareInner;
     dAudioSinkService->memberFuncMap_[static_cast<uint32_t>(IDAudioSinkInterfaceCode::STOP_DISTRIBUTED_HARDWARE)] =
         &DAudioSinkStub::StopDistributedHardwareInner;
-    const uint32_t code = rd() % RANGE;
+    const uint32_t code = *(reinterpret_cast<const uint32_t*>(data));
     dAudioSinkService->OnRemoteRequest(code, pdata, reply, option);
 }
 }
