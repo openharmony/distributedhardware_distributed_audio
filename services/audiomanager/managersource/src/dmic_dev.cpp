@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -81,11 +81,6 @@ int32_t DMicDev::InitReceiverEngine(IAVEngineProvider *providerPtr)
         DHLOGE("Mic dev initialize av receiver adapter failed.");
         return ret;
     }
-    ret = micTrans_->CreateCtrl();
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Create ctrl channel failed. micdev");
-        return ret;
-    }
     return DH_SUCCESS;
 }
 
@@ -93,6 +88,39 @@ int32_t DMicDev::InitSenderEngine(IAVEngineProvider *providerPtr)
 {
     DHLOGI("InitReceiverEngine enter.");
     return DH_SUCCESS;
+}
+
+int32_t DMicDev::InitCtrlTrans()
+{
+    DHLOGI("InitCtrlTrans enter");
+    if (micCtrlTrans_ == nullptr) {
+        micCtrlTrans_ = std::make_shared<DaudioSourceCtrlTrans>(devId_,
+            SESSIONNAME_MIC_SOURCE, SESSIONNAME_MIC_SINK, shared_from_this());
+    }
+    int32_t ret = micCtrlTrans_->SetUp(shared_from_this());
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Mic ctrl SetUp failed.");
+    ret = micCtrlTrans_->Start();
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Mic ctrl Start failed.");
+    return ret;
+}
+
+void DMicDev::OnCtrlTransEvent(const AVTransEvent &event)
+{
+    if (event.type == EventType::EVENT_START_SUCCESS) {
+        OnStateChange(DATA_OPENED);
+    } else if ((event.type == EventType::EVENT_STOP_SUCCESS) ||
+        (event.type == EventType::EVENT_CHANNEL_CLOSED) ||
+        (event.type == EventType::EVENT_START_FAIL)) {
+        OnStateChange(DATA_CLOSED);
+    }
+}
+
+void DMicDev::OnCtrlTransMessage(const std::shared_ptr<AVTransMessage> &message)
+{
+    CHECK_NULL_VOID(message);
+    DHLOGI("On Engine message, type : %{public}s.", GetEventNameByType(message->type_).c_str());
+    DAudioSourceManager::GetInstance().HandleDAudioNotify(message->dstDevId_, message->dstDevId_,
+        message->type_, message->content_);
 }
 
 int32_t DMicDev::EnableDevice(const int32_t dhId, const std::string &capability)
@@ -315,6 +343,10 @@ int32_t DMicDev::Release()
         ashmem_->CloseAshmem();
         ashmem_ = nullptr;
         DHLOGI("UnInit ashmem success.");
+    }
+    if (micCtrlTrans_ != nullptr) {
+        int32_t res = micCtrlTrans_->Release();
+        CHECK_AND_RETURN_RET_LOG(res != DH_SUCCESS, res, "Mic ctrl Release failed.");
     }
     CHECK_NULL_RETURN(micTrans_, DH_SUCCESS);
 
@@ -546,8 +578,8 @@ int32_t DMicDev::SendMessage(uint32_t type, std::string content, std::string dst
         DHLOGE("Send message to remote. not OPEN_MIC or CLOSE_MIC. type: %{public}u", type);
         return ERR_DH_AUDIO_NULLPTR;
     }
-    CHECK_NULL_RETURN(micTrans_, ERR_DH_AUDIO_NULLPTR);
-    micTrans_->SendMessage(type, content, dstDevId);
+    CHECK_NULL_RETURN(micCtrlTrans_, ERR_DH_AUDIO_NULLPTR);
+    micCtrlTrans_->SendAudioEvent(type, content, dstDevId);
     return DH_SUCCESS;
 }
 

@@ -119,6 +119,7 @@ private:
     std::shared_ptr<DAudioIoDev> FindIoDevImpl(std::string args);
     int32_t ParseDhidFromEvent(std::string args);
     int32_t ConvertString2Int(std::string val);
+    int32_t CreateSpkEngine(std::shared_ptr<DAudioIoDev> speaker);
     int32_t CreateMicEngine(std::shared_ptr<DAudioIoDev> mic);
     void SetRegDataType(const std::string &capability);
     void NotifyEventInner(const AudioEvent &event);

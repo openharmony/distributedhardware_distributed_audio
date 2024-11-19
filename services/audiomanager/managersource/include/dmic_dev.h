@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,6 +31,7 @@
 #endif
 #include "daudio_hdi_handler.h"
 #include "daudio_io_dev.h"
+#include "daudio_source_ctrl_trans.h"
 #include "iaudio_data_transport.h"
 #include "iaudio_datatrans_callback.h"
 #include "iaudio_event_callback.h"
@@ -40,6 +41,7 @@ namespace OHOS {
 namespace DistributedHardware {
 class DMicDev : public DAudioIoDev,
     public IAudioDataTransCallback,
+    public IAudioCtrlTransCallback,
     public AVReceiverTransportCallback,
     public std::enable_shared_from_this<DMicDev> {
 public:
@@ -51,8 +53,12 @@ public:
     void OnEngineTransMessage(const std::shared_ptr<AVTransMessage> &message) override;
     void OnEngineTransDataAvailable(const std::shared_ptr<AudioData> &audioData) override;
 
+    void OnCtrlTransEvent(const AVTransEvent &event) override;
+    void OnCtrlTransMessage(const std::shared_ptr<AVTransMessage> &message) override;
+
     int32_t InitReceiverEngine(IAVEngineProvider *providerPtr) override;
     int32_t InitSenderEngine(IAVEngineProvider *providerPtr) override;
+    int32_t InitCtrlTrans() override;
 
     int32_t EnableDevice(const int32_t dhId, const std::string &capability) override;
     int32_t DisableDevice(const int32_t dhId) override;
@@ -111,6 +117,7 @@ private:
     std::atomic<bool> isTransReady_ = false;
     std::atomic<bool> isOpened_ = false;
     std::shared_ptr<IAudioDataTransport> micTrans_ = nullptr;
+    std::shared_ptr<IAudioCtrlTransport> micCtrlTrans_ = nullptr;
 #ifdef ECHO_CANNEL_ENABLE
     std::shared_ptr<DAudioEchoCannelManager> echoManager_ = nullptr;
 #endif

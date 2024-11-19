@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -70,6 +70,37 @@ int32_t DSpeakerClient::InitReceiverEngine(IAVEngineProvider *providerPtr)
         return ERR_DH_AUDIO_NULLPTR;
     }
     return DH_SUCCESS;
+}
+
+int32_t DSpeakerClient::InitCtrlTrans()
+{
+    DHLOGI("InitCtrlTrans enter");
+    if (speakerCtrlTrans_ == nullptr) {
+        speakerCtrlTrans_ = std::make_shared<DaudioSinkCtrlTrans>(devId_,
+            SESSIONNAME_SPK_SINK, SESSIONNAME_SPK_SOURCE, shared_from_this());
+    }
+    int32_t ret = speakerCtrlTrans_->SetUp(shared_from_this());
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Speaker ctrl SetUp failed.");
+    return DH_SUCCESS;
+}
+
+void DSpeakerClient::OnCtrlTransEvent(const AVTransEvent &event)
+{
+    if (event.type == EventType::EVENT_START_SUCCESS) {
+        OnStateChange(DATA_OPENED);
+    } else if ((event.type == EventType::EVENT_STOP_SUCCESS) ||
+        (event.type == EventType::EVENT_CHANNEL_CLOSED) ||
+        (event.type == EventType::EVENT_START_FAIL)) {
+        OnStateChange(DATA_CLOSED);
+    }
+}
+
+void DSpeakerClient::OnCtrlTransMessage(const std::shared_ptr<AVTransMessage> &message)
+{
+    CHECK_NULL_VOID(message);
+    DHLOGI("On Engine message, type : %{public}s.", GetEventNameByType(message->type_).c_str());
+    DAudioSinkManager::GetInstance().HandleDAudioNotify(message->dstDevId_, message->dstDevId_,
+        static_cast<int32_t>(message->type_), message->content_);
 }
 
 int32_t DSpeakerClient::CreateAudioRenderer(const AudioParam &param)
@@ -191,6 +222,13 @@ int32_t DSpeakerClient::Release()
             isSucess = false;
         }
         speakerTrans_ = nullptr;
+    }
+    if (speakerCtrlTrans_ != nullptr) {
+        if (speakerCtrlTrans_->Release() != DH_SUCCESS) {
+            DHLOGE("Speaker trans release failed.");
+            isSucess = false;
+        }
+        speakerCtrlTrans_ = nullptr;
     }
 
     int32_t ret = AudioStandard::AudioSystemManager::GetInstance()->UnregisterVolumeKeyEventCallback(getprocpid());
@@ -620,8 +658,8 @@ int32_t DSpeakerClient::SendMessage(uint32_t type, std::string content, std::str
         DHLOGE("event type is not NOTIFY_OPEN_SPK or NOTIFY_CLOSE_SPK or OPEN_CTRL. type:%{public}u", type);
         return ERR_DH_AUDIO_NULLPTR;
     }
-    CHECK_NULL_RETURN(speakerTrans_, ERR_DH_AUDIO_NULLPTR);
-    speakerTrans_->SendMessage(type, content, dstDevId);
+    CHECK_NULL_RETURN(speakerCtrlTrans_, ERR_DH_AUDIO_NULLPTR);
+    speakerCtrlTrans_->SendAudioEvent(type, content, dstDevId);
     return DH_SUCCESS;
 }
 

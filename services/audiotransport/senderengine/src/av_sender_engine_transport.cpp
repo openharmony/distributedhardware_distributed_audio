@@ -112,15 +112,17 @@ int32_t AVTransSenderTransport::SendMessage(uint32_t type, std::string content, 
 
 void AVTransSenderTransport::OnEngineEvent(const AVTransEvent &event)
 {
-    CHECK_NULL_VOID(transCallback_);
-    transCallback_->OnEngineTransEvent(event);
+    auto sourceDevObj = transCallback_.lock();
+    CHECK_NULL_VOID(sourceDevObj);
+    sourceDevObj->OnEngineTransEvent(event);
 }
 
 void AVTransSenderTransport::OnEngineMessage(const std::shared_ptr<AVTransMessage> &message)
 {
     CHECK_NULL_VOID(message);
-    CHECK_NULL_VOID(transCallback_);
-    transCallback_->OnEngineTransMessage(message);
+    auto sourceDevObj = transCallback_.lock();
+    CHECK_NULL_VOID(sourceDevObj);
+    sourceDevObj->OnEngineTransMessage(message);
 }
 
 int32_t AVTransSenderTransport::SetParameter(const AudioParam &audioParam)

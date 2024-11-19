@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,6 +36,7 @@
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
 #include "daudio_log.h"
+#include "daudio_sink_ctrl_trans.h"
 #include "iaudio_data_transport.h"
 #include "iaudio_datatrans_callback.h"
 #include "iaudio_event_callback.h"
@@ -46,6 +47,7 @@ namespace DistributedHardware {
 class DMicClient : public IAudioDataTransCallback,
     public AudioStandard::AudioCapturerReadCallback,
     public IMicClient, public AVSenderTransportCallback,
+    public IAudioCtrlTransCallback,
     public std::enable_shared_from_this<DMicClient> {
 public:
     DMicClient(const std::string &devId, const int32_t dhId, const std::shared_ptr<IAudioEventCallback> &callback)
@@ -55,7 +57,10 @@ public:
     int32_t OnDecodeTransDataDone(const std::shared_ptr<AudioData> &audioData) override;
     void OnEngineTransEvent(const AVTransEvent &event) override;
     void OnEngineTransMessage(const std::shared_ptr<AVTransMessage> &message) override;
+    void OnCtrlTransEvent(const AVTransEvent &event) override;
+    void OnCtrlTransMessage(const std::shared_ptr<AVTransMessage> &message) override;
     int32_t InitSenderEngine(IAVEngineProvider *providerPtr) override;
+    int32_t InitCtrlTrans() override;
     int32_t SetUp(const AudioParam &param) override;
     int32_t Release() override;
     int32_t StartCapture() override;
@@ -89,6 +94,7 @@ private:
     std::weak_ptr<IAudioEventCallback> eventCallback_;
     std::unique_ptr<AudioStandard::AudioCapturer> audioCapturer_ = nullptr;
     std::shared_ptr<IAudioDataTransport> micTrans_ = nullptr;
+    std::shared_ptr<IAudioCtrlTransport> micCtrlTrans_ = nullptr;
     int64_t lastCaptureStartTime_ = 0;
     int64_t lastTransStartTime_ = 0;
     std::atomic<bool> isPauseStatus_ = false;

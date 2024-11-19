@@ -149,6 +149,7 @@ int32_t AVTransSenderAdapter::WaitForChannelCreated()
 int32_t AVTransSenderAdapter::OnSenderEvent(const AVTransEvent &event)
 {
     DHLOGI("On sender event, type: %{public}d", event.type);
+    std::shared_ptr<AVSenderAdapterCallback> transportObj = nullptr;
     switch (event.type) {
         case EventType::EVENT_CHANNEL_OPEN_FAIL:
         case EventType::EVENT_CHANNEL_OPENED: {
@@ -162,9 +163,10 @@ int32_t AVTransSenderAdapter::OnSenderEvent(const AVTransEvent &event)
         case EventType::EVENT_STOP_SUCCESS:
         case EventType::EVENT_ENGINE_ERROR:
         case EventType::EVENT_REMOTE_ERROR:
-            if (adapterCallback_ != nullptr) {
+            transportObj = adapterCallback_.lock();
+            if (transportObj != nullptr) {
                 DHLOGI("Send event.");
-                adapterCallback_->OnEngineEvent(event);
+                transportObj->OnEngineEvent(event);
             }
             break;
         default:
@@ -176,8 +178,9 @@ int32_t AVTransSenderAdapter::OnSenderEvent(const AVTransEvent &event)
 
 int32_t AVTransSenderAdapter::OnMessageReceived(const std::shared_ptr<AVTransMessage> &message)
 {
-    if (adapterCallback_ != nullptr) {
-        adapterCallback_->OnEngineMessage(message);
+    auto transportObj = adapterCallback_.lock();
+    if (transportObj != nullptr) {
+        transportObj->OnEngineMessage(message);
     }
     return DH_SUCCESS;
 }
