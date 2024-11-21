@@ -26,6 +26,12 @@ void SinkHandlerRegisterPrivacyResourcesFuzzTest(const uint8_t* data, size_t siz
         return;
     }
     std::shared_ptr<PrivacyResourcesListener> listener = std::make_shared<MockComponentResourceInfo>();
+    auto type = *(reinterpret_cast<const ResourceEventType *>(data));
+    std::string subType(reinterpret_cast<const char*>(data), size);
+    std::string networkId(reinterpret_cast<const char*>(data), size);
+    bool isSensitive = true;
+    bool isSameAccout = true;
+    listener->OnPrivaceResourceMessage(type, subType, networkId, isSensitive, isSameAccout);
     DAudioSinkHandler::GetInstance().RegisterPrivacyResources(listener);
 }
 }
