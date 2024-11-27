@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+# Copyright (c) 2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -11,45 +11,41 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos.gni")
-import("//build/ohos_var.gni")
 import("//build/test.gni")
 import("../../../../../distributedaudio.gni")
 
-module_out_path = "distributed_audio/services/audioclient/spk_client_test"
+module_out_path = "distributed_audio/services/audiotransport/ctrl_trans_test"
 
 config("module_private_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "${audio_client_path}/interface",
-    "${audio_client_path}/spkclient/include",
-    "${audio_client_path}/test/unittest/spkclient/include",
-    "${audio_client_path}/test/unittest/audioclienttestutils/include",
-    "${audio_processor_path}/interface",
-    "${audio_transport_path}/interface",
-    "${audio_transport_path}/audioctrltransport/include",
-    "${audio_transport_path}/receiverengine/include",
-    "${audio_transport_path}/senderengine/include",
+    "include",
     "${common_path}/include",
-    "${services_path}/common/audioeventcallback",
+    "${common_path}/dfx_utils/include",
+    "${audio_transport_path}/audioctrltransport/include",
+    "${audio_transport_path}/test/unittest/audioctrltransport/include",
     "${services_path}/common/audiodata/include",
     "${services_path}/common/audioparam",
   ]
 }
 
-## UnitTest dspeaker_client_test
-ohos_unittest("SpeakerClientTest") {
+## UnitTest ctrl_trans_test
+ohos_unittest("CtrlTransTest") {
   module_out_path = module_out_path
 
   sources = [
-    "${audio_client_path}/test/unittest/spkclient/src/dspeaker_client_test.cpp",
+    "src/daudio_ctrl_channel_listener_test.cpp",
+    "src/daudio_sink_ctrl_trans_test.cpp",
+    "src/daudio_source_ctrl_trans_test.cpp",
   ]
 
   configs = [ ":module_private_config" ]
 
   deps = [
+    "${audio_transport_path}/senderengine:distributed_audio_encode_transport",
     "${services_path}/audiomanager/servicesink:distributed_audio_sink",
+    "${services_path}/audiomanager/servicesource:distributed_audio_source",
     "${services_path}/common:distributed_audio_utils",
   ]
 
@@ -58,14 +54,13 @@ ohos_unittest("SpeakerClientTest") {
     "audio_framework:audio_client",
     "audio_framework:audio_renderer",
     "cJSON:cjson",
-    "distributed_hardware_fwk:distributed_av_receiver",
     "distributed_hardware_fwk:distributed_av_sender",
-    "distributed_hardware_fwk:distributedhardwareutils",
+    "dsoftbus:softbus_client",
     "googletest:gmock",
   ]
 }
 
-group("spk_client_test") {
+group("ctrl_channel_trans_test") {
   testonly = true
-  deps = [ ":SpeakerClientTest" ]
+  deps = [ ":CtrlTransTest" ]
 }

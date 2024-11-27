@@ -330,7 +330,7 @@ HWTEST_F(DSpeakerDevTest, Release_001, TestSize.Level1)
     spk_->speakerTrans_ = std::make_shared<MockIAudioDataTransport>();
     EXPECT_EQ(DH_SUCCESS, spk_->Release());
 
-    int32_t fd = 1;
+    int32_t fd = 10;
     int32_t ashmemLength = 10;
     int32_t streamId = 1;
     int32_t lengthPerTrans = 10;
@@ -452,6 +452,7 @@ HWTEST_F(DSpeakerDevTest, SendMessage_001, TestSize.Level1)
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, spk_->SendMessage(MIC_OPENED, content, dstDevId));
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, spk_->SendMessage(OPEN_SPEAKER, content, dstDevId));
     spk_->speakerTrans_ = std::make_shared<MockIAudioDataTransport>();
+    spk_->InitCtrlTrans();
     EXPECT_EQ(DH_SUCCESS, spk_->SendMessage(OPEN_SPEAKER, content, dstDevId));
 }
 } // namespace DistributedHardware

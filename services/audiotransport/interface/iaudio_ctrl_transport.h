@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,30 +13,27 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_IMIC_CLIENT_H
-#define OHOS_IMIC_CLIENT_H
+#ifndef IAUDIO_CTRL_TRANSPORT_H
+#define IAUDIO_CTRL_TRANSPORT_H
 
-#include <memory>
-
+#include "audio_data.h"
 #include "audio_param.h"
-#include "i_av_engine_provider.h"
+#include "av_trans_message.h"
+#include "softbus_channel_adapter.h"
+#include "iaudio_ctrltrans_callback.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class IMicClient {
+class IAudioCtrlTransport {
 public:
-    IMicClient() = default;
-    virtual ~IMicClient() = default;
-
-    virtual int32_t SetUp(const AudioParam &param) = 0;
+    IAudioCtrlTransport() = default;
+    virtual ~IAudioCtrlTransport() = default;
+    virtual int32_t SetUp(const std::shared_ptr<IAudioCtrlTransCallback> &callback) = 0;
+    virtual int32_t Start() = 0;
+    virtual int32_t Stop() = 0;
     virtual int32_t Release() = 0;
-    virtual int32_t StartCapture() = 0;
-    virtual int32_t StopCapture() = 0;
-    virtual void SetAttrs(const std::string &devId, const std::shared_ptr<IAudioEventCallback> &callback) = 0;
-    virtual int32_t InitSenderEngine(IAVEngineProvider *providerPtr) = 0;
-    virtual int32_t InitCtrlTrans() = 0;
-    virtual int32_t SendMessage(uint32_t type, std::string content, std::string dstDevId) = 0;
+    virtual int32_t SendAudioEvent(uint32_t type, const std::string &content, const std::string &dstDevId) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_IMIC_CLIENT_H
+#endif // IAUDIO_CTRL_TRANSPORT_H

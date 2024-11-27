@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -75,6 +75,7 @@ int32_t DAudioSinkDev::InitAVTransEngines(const ChannelState channelState, IAVEn
         micClientMap_[DEFAULT_CAPTURE_ID] = std::make_shared<DMicClient>(devId_, DEFAULT_CAPTURE_ID,
             shared_from_this());
         micClientMap_[DEFAULT_CAPTURE_ID]->InitSenderEngine(providerPtr);
+        micClientMap_[DEFAULT_CAPTURE_ID]->InitCtrlTrans();
     }
 
     if (channelState == ChannelState::SPK_CONTROL_OPENED) {
@@ -82,9 +83,11 @@ int32_t DAudioSinkDev::InitAVTransEngines(const ChannelState channelState, IAVEn
         spkClientMap_[DEFAULT_RENDER_ID] =
             std::make_shared<DSpeakerClient>(devId_, DEFAULT_RENDER_ID, shared_from_this());
         spkClientMap_[DEFAULT_RENDER_ID]->InitReceiverEngine(providerPtr);
+        spkClientMap_[DEFAULT_RENDER_ID]->InitCtrlTrans();
         spkClientMap_[LOW_LATENCY_RENDER_ID] =
             std::make_shared<DSpeakerClient>(devId_, LOW_LATENCY_RENDER_ID, shared_from_this());
         spkClientMap_[LOW_LATENCY_RENDER_ID]->InitReceiverEngine(providerPtr);
+        spkClientMap_[LOW_LATENCY_RENDER_ID]->InitCtrlTrans();
     }
     return DH_SUCCESS;
 }

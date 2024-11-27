@@ -87,6 +87,10 @@ int32_t DAudioSinkManager::Init(const sptr<IDAudioSinkIpcCallback> &sinkCallback
     CHECK_AND_RETURN_RET_LOG(sendProviderPtr_->RegisterProviderCallback(providerListener_) != DH_SUCCESS,
         ERR_DH_AUDIO_FAILED, "%{public}s", "Register av sender engine callback failed.");
     DHLOGI("Load av sender engine success.");
+    ctrlListenerCallback_ = std::make_shared<CtrlChannelListener>();
+    ctrlListener_ = std::make_shared<DaudioCtrlChannelListener>(ctrlListenerCallback_);
+    CHECK_AND_RETURN_RET_LOG(ctrlListener_->Init() != DH_SUCCESS, ERR_DH_AUDIO_FAILED, "ctrlListener init failed");
+    DHLOGI("Load ctrl trans success.");
     return DH_SUCCESS;
 }
 
@@ -95,6 +99,11 @@ int32_t DAudioSinkManager::UnInit()
     DHLOGI("UnInit audio sink manager.");
     UnloadAVSenderEngineProvider();
     UnloadAVReceiverEngineProvider();
+    if (ctrlListener_ != nullptr) {
+        ctrlListener_->UnInit();
+        ctrlListener_ = nullptr;
+        ctrlListenerCallback_ = nullptr;
+    }
     {
         std::lock_guard<std::mutex> remoteSvrLock(remoteSvrMutex_);
         sourceServiceMap_.clear();
@@ -388,6 +397,24 @@ int32_t EngineProviderListener::OnProviderEvent(const AVTransEvent &event)
         DHLOGE("Invaild event type.");
     }
     return DH_SUCCESS;
+}
+
+void CtrlChannelListener::OnCtrlChannelEvent(const AVTransEvent &event)
+{
+    DHLOGI("OnCtrlChannelEvent :%{public}d, eventContent: %{public}s.", event.type, event.content.c_str());
+    if (event.type == EventType::EVENT_CHANNEL_OPENED) {
+        DHLOGI("Received control channel opened event, create audio device for peerDevId=%{public}s, "
+            "content=%{public}s.", GetAnonyString(event.peerDevId).c_str(), event.content.c_str());
+        DAudioSinkManager::GetInstance().SetChannelState(event.content);
+        DAudioSinkManager::GetInstance().CreateAudioDevice(event.peerDevId);
+    } else if (event.type == EventType::EVENT_CHANNEL_CLOSED) {
+        DHLOGI("Received control channel closed event, clear audio device for peerDevId=%{public}s",
+            GetAnonyString(event.peerDevId).c_str());
+        std::string eventStr = event.content;
+        DAudioSinkManager::GetInstance().NotifyEvent(event.peerDevId, DISABLE_DEVICE, eventStr);
+    } else {
+        DHLOGE("Invaild event type.");
+    }
 }
 
 int32_t DAudioSinkManager::PauseDistributedHardware(const std::string &networkId)

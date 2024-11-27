@@ -413,6 +413,7 @@ HWTEST_F(DMicDevTest, SendMessage_001, TestSize.Level1)
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->SendMessage(MIC_OPENED, content, dstDevId));
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->SendMessage(OPEN_MIC, content, dstDevId));
     mic_->micTrans_ = std::make_shared<MockIAudioDataTransport>();
+    mic_->InitCtrlTrans();
     EXPECT_EQ(DH_SUCCESS, mic_->SendMessage(OPEN_MIC, content, dstDevId));
 }
 } // namespace DistributedHardware

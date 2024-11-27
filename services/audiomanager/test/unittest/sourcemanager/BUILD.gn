@@ -24,6 +24,7 @@ config("module_private_config") {
     "${audio_control_path}/controlsource/include",
     "${audio_hdi_proxy_path}/include",
     "${audio_processor_path}/interface",
+    "${audio_transport_path}/audioctrltransport/include",
     "${audio_transport_path}/audioctrltransport/interface",
     "${audio_transport_path}/audiotransportstatus/include",
     "${audio_transport_path}/audiotransportstatus/interface",

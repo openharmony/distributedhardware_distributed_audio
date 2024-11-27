@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,6 +37,7 @@ public:
     virtual void PlayStatusChange(const std::string &args) = 0;
     virtual void SetAttrs(const std::string &devId, const std::shared_ptr<IAudioEventCallback> &callback) = 0;
     virtual int32_t InitReceiverEngine(IAVEngineProvider *providerPtr) = 0;
+    virtual int32_t InitCtrlTrans() = 0;
     virtual int32_t SendMessage(uint32_t type, std::string content, std::string dstDevId) = 0;
 };
 } // namespace DistributedHardware

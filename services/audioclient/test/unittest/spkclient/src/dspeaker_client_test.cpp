@@ -63,10 +63,19 @@ HWTEST_F(DSpeakerClientTest, InitReceiverEngine_001, TestSize.Level1)
 
     AVTransEvent event1 = { EventType::EVENT_START_SUCCESS, "", ""};
     speakerClient_->OnEngineTransEvent(event1);
+    speakerClient_->OnCtrlTransEvent(event1);
     AVTransEvent event2 = { EventType::EVENT_STOP_SUCCESS, "", ""};
     speakerClient_->OnEngineTransEvent(event2);
+    speakerClient_->OnCtrlTransEvent(event2);
+    AVTransEvent event3 = { EventType::EVENT_CHANNEL_CLOSED, "", ""};
+    speakerClient_->OnEngineTransEvent(event3);
+    speakerClient_->OnCtrlTransEvent(event3);
+    AVTransEvent event4 = { EventType::EVENT_START_FAIL, "", ""};
+    speakerClient_->OnEngineTransEvent(event4);
+    speakerClient_->OnCtrlTransEvent(event4);
     auto message = std::make_shared<AVTransMessage>();
     speakerClient_->OnEngineTransMessage(message);
+    speakerClient_->OnCtrlTransMessage(message);
     auto data = std::make_shared<AudioData>(4096);
     speakerClient_->OnEngineTransDataAvailable(data);
     EXPECT_EQ(DH_SUCCESS, speakerClient_->InitReceiverEngine(providerPtr));
@@ -236,9 +245,10 @@ HWTEST_F(DSpeakerClientTest, SendMessage_001, TestSize.Level1)
     audioParam_.renderOpts.renderFlags = MMAP_MODE;
     speakerClient_->speakerTrans_ = std::make_shared<MockIAudioDataTransport>();
     speakerClient_->Pause();
+    speakerClient_->InitCtrlTrans();
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, speakerClient_->SendMessage(EVENT_UNKNOWN, content, dstDevId));
     EXPECT_EQ(DH_SUCCESS, speakerClient_->SendMessage(NOTIFY_OPEN_SPEAKER_RESULT, content, dstDevId));
-    speakerClient_->speakerTrans_ = nullptr;
+    speakerClient_->speakerCtrlTrans_ = nullptr;
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, speakerClient_->SendMessage(NOTIFY_OPEN_SPEAKER_RESULT, content, dstDevId));
 }
 } // DistributedHardware
