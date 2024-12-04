@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -136,6 +136,7 @@ int32_t AVTransReceiverAdapter::WaitForChannelCreated()
 int32_t AVTransReceiverAdapter::OnReceiverEvent(const AVTransEvent &event)
 {
     DHLOGI("On receive event, type: %{public}d", event.type);
+    std::shared_ptr<AVReceiverAdapterCallback> transportObj = nullptr;
     switch (event.type) {
         case EventType::EVENT_CHANNEL_OPEN_FAIL:
         case EventType::EVENT_CHANNEL_OPENED: {
@@ -149,9 +150,10 @@ int32_t AVTransReceiverAdapter::OnReceiverEvent(const AVTransEvent &event)
         case EventType::EVENT_STOP_SUCCESS:
         case EventType::EVENT_ENGINE_ERROR:
         case EventType::EVENT_REMOTE_ERROR:
-            if (adapterCallback_ != nullptr) {
+            transportObj = adapterCallback_.lock();
+            if (transportObj != nullptr) {
                 DHLOGD("On receive event.");
-                adapterCallback_->OnEngineEvent(event);
+                transportObj->OnEngineEvent(event);
             }
             break;
         default:
@@ -163,16 +165,18 @@ int32_t AVTransReceiverAdapter::OnReceiverEvent(const AVTransEvent &event)
 
 int32_t AVTransReceiverAdapter::OnMessageReceived(const std::shared_ptr<AVTransMessage> &message)
 {
-    if (adapterCallback_ != nullptr) {
-        adapterCallback_->OnEngineMessage(message);
+    auto transportObj = adapterCallback_.lock();
+    if (transportObj != nullptr) {
+        transportObj->OnEngineMessage(message);
     }
     return DH_SUCCESS;
 }
 
 int32_t AVTransReceiverAdapter::OnDataAvailable(const std::shared_ptr<AVTransBuffer> &buffer)
 {
-    if (adapterCallback_ != nullptr) {
-        adapterCallback_->OnEngineDataAvailable(buffer);
+    auto transportObj = adapterCallback_.lock();
+    if (transportObj != nullptr) {
+        transportObj->OnEngineDataAvailable(buffer);
     }
     return DH_SUCCESS;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,6 +39,7 @@ public:
     ~DAudioIoDev() override = default;
     virtual int32_t InitReceiverEngine(IAVEngineProvider *providerPtr) = 0;
     virtual int32_t InitSenderEngine(IAVEngineProvider *providerPtr) = 0;
+    virtual int32_t InitCtrlTrans() = 0;
 
     virtual int32_t EnableDevice(const int32_t dhId, const std::string &capability) = 0;
     virtual int32_t DisableDevice(const int32_t dhId) = 0;

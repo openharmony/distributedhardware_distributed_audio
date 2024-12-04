@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -61,7 +61,7 @@ private:
     std::atomic<bool> initialized_ = false;
     std::mutex chnCreatedMtx_;
     std::shared_ptr<IAVReceiverEngine> receiverEngine_;
-    std::shared_ptr<AVReceiverAdapterCallback> adapterCallback_;
+    std::weak_ptr<AVReceiverAdapterCallback> adapterCallback_;
     std::atomic<bool> chnCreateSuccess_ = false;
     std::condition_variable chnCreatedCondVar_;
 };

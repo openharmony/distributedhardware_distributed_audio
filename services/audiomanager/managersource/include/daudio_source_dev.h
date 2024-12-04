@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -119,6 +119,7 @@ private:
     std::shared_ptr<DAudioIoDev> FindIoDevImpl(std::string args);
     int32_t ParseDhidFromEvent(std::string args);
     int32_t ConvertString2Int(std::string val);
+    int32_t CreateSpkEngine(std::shared_ptr<DAudioIoDev> speaker);
     int32_t CreateMicEngine(std::shared_ptr<DAudioIoDev> mic);
     void SetRegDataType(const std::string &capability);
     void NotifyEventInner(const AudioEvent &event);
