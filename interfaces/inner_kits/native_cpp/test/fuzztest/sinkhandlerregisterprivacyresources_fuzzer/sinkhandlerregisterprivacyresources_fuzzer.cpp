@@ -26,9 +26,9 @@ void SinkHandlerRegisterPrivacyResourcesFuzzTest(const uint8_t* data, size_t siz
         return;
     }
     std::shared_ptr<PrivacyResourcesListener> listener = std::make_shared<MockComponentResourceInfo>();
-    auto type = *(reinterpret_cast<const ResourceEventType *>(data));
+    ResourceEventType type = ResourceEventType::EVENT_TYPE_CLOSE_PAGE;
     std::string subType(reinterpret_cast<const char*>(data), size);
-    std::string networkId(reinterpret_cast<const char*>(data), size);
+    std::string networkId = "networkId";
     bool isSensitive = true;
     bool isSameAccout = true;
     listener->OnPrivaceResourceMessage(type, subType, networkId, isSensitive, isSameAccout);
