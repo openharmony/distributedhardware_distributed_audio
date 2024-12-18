@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "daudio_sink_service.h"
 #include "if_system_ability_manager.h"
@@ -30,12 +31,13 @@ void SinkServiceDAudioNotifyFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
-    std::string dhId(reinterpret_cast<const char*>(data), size);
-    int32_t saId = *(reinterpret_cast<const int32_t*>(data));
-    bool runOnCreate = *(reinterpret_cast<const bool*>(data));
-    int32_t eventType = *(reinterpret_cast<const int32_t*>(data));
-    std::string eventContent(reinterpret_cast<const char*>(data), size);
-    std::string devId(reinterpret_cast<const char*>(data), size);
+    FuzzedDataProvider fdp(data, size);
+    std::string dhId = fdp.ConsumeRandomLengthString();
+    int32_t saId = fdp.ConsumeIntegral<int32_t>();
+    bool runOnCreate = fdp.ConsumeBool();
+    int32_t eventType = fdp.ConsumeIntegral<int32_t>();
+    std::string eventContent = fdp.ConsumeRandomLengthString();
+    std::string devId = fdp.ConsumeRandomLengthString();
 
     auto dAudioSinkService = std::make_shared<DAudioSinkService>(saId, runOnCreate);
 

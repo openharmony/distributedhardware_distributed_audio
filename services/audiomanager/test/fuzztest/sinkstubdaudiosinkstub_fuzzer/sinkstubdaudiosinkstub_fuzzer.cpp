@@ -18,6 +18,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <random>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "daudio_sink_stub.h"
 #include "daudio_sink_service.h"
@@ -33,8 +34,9 @@ void SinkStubDaudioSinkStubFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < (sizeof(int32_t)))) {
         return;
     }
-    int32_t saId = *(reinterpret_cast<const int32_t*>(data));
-    bool runOnCreate = *(reinterpret_cast<const bool*>(data));
+    FuzzedDataProvider fdp(data, size);
+    int32_t saId = fdp.ConsumeIntegral<int32_t>();
+    bool runOnCreate = fdp.ConsumeBool();
     auto dAudioSinkService = std::make_shared<DAudioSinkService>(saId, runOnCreate);
     std::random_device rd;
     MessageParcel pdata;
@@ -43,8 +45,8 @@ void SinkStubDaudioSinkStubFuzzTest(const uint8_t* data, size_t size)
     std::string devId = "1";
     std::string dhId = "2";
     std::string reqId = "3";
-    int32_t status = *(reinterpret_cast<const int32_t*>(data));
-    std::string resultData(reinterpret_cast<const char*>(data), size);
+    int32_t status = fdp.ConsumeIntegral<int32_t>();
+    std::string resultData = fdp.ConsumeRandomLengthString();
     pdata.WriteString(devId);
     pdata.WriteString(dhId);
     pdata.WriteString(reqId);
@@ -66,7 +68,7 @@ void SinkStubDaudioSinkStubFuzzTest(const uint8_t* data, size_t size)
         &DAudioSinkStub::ResumeDistributedHardwareInner;
     dAudioSinkService->memberFuncMap_[static_cast<uint32_t>(IDAudioSinkInterfaceCode::STOP_DISTRIBUTED_HARDWARE)] =
         &DAudioSinkStub::StopDistributedHardwareInner;
-    const uint32_t code = *(reinterpret_cast<const uint32_t*>(data));
+    const uint32_t code = fdp.ConsumeIntegral<const uint32_t>();
     dAudioSinkService->OnRemoteRequest(code, pdata, reply, option);
 }
 
@@ -75,8 +77,9 @@ void SinkStubSubscribeLocalHardwareInnerFuzzTest(const uint8_t* data, size_t siz
     if ((data == nullptr) || (size < (sizeof(int32_t)))) {
         return;
     }
-    int32_t saId = *(reinterpret_cast<const int32_t*>(data));
-    bool runOnCreate = *(reinterpret_cast<const bool*>(data));
+    FuzzedDataProvider fdp(data, size);
+    int32_t saId = fdp.ConsumeIntegral<int32_t>();
+    bool runOnCreate = fdp.ConsumeBool();
     auto dAudioSinkService = std::make_shared<DAudioSinkService>(saId, runOnCreate);
     std::random_device rd;
     MessageParcel pdata;
@@ -85,8 +88,8 @@ void SinkStubSubscribeLocalHardwareInnerFuzzTest(const uint8_t* data, size_t siz
     std::string devId = "1";
     std::string dhId = "2";
     std::string reqId = "3";
-    int32_t status = *(reinterpret_cast<const int32_t*>(data));
-    std::string resultData(reinterpret_cast<const char*>(data), size);
+    int32_t status = fdp.ConsumeIntegral<int32_t>();
+    std::string resultData = fdp.ConsumeRandomLengthString();
     pdata.WriteString(devId);
     pdata.WriteString(dhId);
     pdata.WriteString(reqId);
@@ -100,8 +103,9 @@ void SinkStubUnsubscribeLocalHardwareInnerFuzzTest(const uint8_t* data, size_t s
     if ((data == nullptr) || (size < (sizeof(int32_t)))) {
         return;
     }
-    int32_t saId = *(reinterpret_cast<const int32_t*>(data));
-    bool runOnCreate = *(reinterpret_cast<const bool*>(data));
+    FuzzedDataProvider fdp(data, size);
+    int32_t saId = fdp.ConsumeIntegral<int32_t>();
+    bool runOnCreate = fdp.ConsumeBool();
     auto dAudioSinkService = std::make_shared<DAudioSinkService>(saId, runOnCreate);
     std::random_device rd;
     MessageParcel pdata;
@@ -110,8 +114,8 @@ void SinkStubUnsubscribeLocalHardwareInnerFuzzTest(const uint8_t* data, size_t s
     std::string devId = "1";
     std::string dhId = "2";
     std::string reqId = "3";
-    int32_t status = *(reinterpret_cast<const int32_t*>(data));
-    std::string resultData(reinterpret_cast<const char*>(data), size);
+    int32_t status = fdp.ConsumeIntegral<int32_t>();
+    std::string resultData = fdp.ConsumeRandomLengthString();
     pdata.WriteString(devId);
     pdata.WriteString(dhId);
     pdata.WriteString(reqId);
@@ -125,8 +129,9 @@ void SinkStubDAudioNotifyInnerFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < (sizeof(int32_t)))) {
         return;
     }
-    int32_t saId = *(reinterpret_cast<const int32_t*>(data));
-    bool runOnCreate = *(reinterpret_cast<const bool*>(data));
+    FuzzedDataProvider fdp(data, size);
+    int32_t saId = fdp.ConsumeIntegral<int32_t>();
+    bool runOnCreate = fdp.ConsumeBool();
     auto dAudioSinkService = std::make_shared<DAudioSinkService>(saId, runOnCreate);
     std::random_device rd;
     MessageParcel pdata;
@@ -135,8 +140,8 @@ void SinkStubDAudioNotifyInnerFuzzTest(const uint8_t* data, size_t size)
     std::string devId = "1";
     std::string dhId = "2";
     std::string reqId = "3";
-    int32_t status = *(reinterpret_cast<const int32_t*>(data));
-    std::string resultData(reinterpret_cast<const char*>(data), size);
+    int32_t status = fdp.ConsumeIntegral<int32_t>();
+    std::string resultData = fdp.ConsumeRandomLengthString();
     pdata.WriteString(devId);
     pdata.WriteString(dhId);
     pdata.WriteString(reqId);
@@ -150,8 +155,9 @@ void SinkStubPauseDistributedHardwareInnerFuzzTest(const uint8_t* data, size_t s
     if ((data == nullptr) || (size < (sizeof(int32_t)))) {
         return;
     }
-    int32_t saId = *(reinterpret_cast<const int32_t*>(data));
-    bool runOnCreate = *(reinterpret_cast<const bool*>(data));
+    FuzzedDataProvider fdp(data, size);
+    int32_t saId = fdp.ConsumeIntegral<int32_t>();
+    bool runOnCreate = fdp.ConsumeBool();
     auto dAudioSinkService = std::make_shared<DAudioSinkService>(saId, runOnCreate);
     std::random_device rd;
     MessageParcel pdata;
@@ -160,8 +166,8 @@ void SinkStubPauseDistributedHardwareInnerFuzzTest(const uint8_t* data, size_t s
     std::string devId = "1";
     std::string dhId = "2";
     std::string reqId = "3";
-    int32_t status = *(reinterpret_cast<const int32_t*>(data));
-    std::string resultData(reinterpret_cast<const char*>(data), size);
+    int32_t status = fdp.ConsumeIntegral<int32_t>();
+    std::string resultData = fdp.ConsumeRandomLengthString();
     pdata.WriteString(devId);
     pdata.WriteString(dhId);
     pdata.WriteString(reqId);
@@ -175,8 +181,9 @@ void SinkStubResumeDistributedHardwareInnerFuzzTest(const uint8_t* data, size_t 
     if ((data == nullptr) || (size < (sizeof(int32_t)))) {
         return;
     }
-    int32_t saId = *(reinterpret_cast<const int32_t*>(data));
-    bool runOnCreate = *(reinterpret_cast<const bool*>(data));
+    FuzzedDataProvider fdp(data, size);
+    int32_t saId = fdp.ConsumeIntegral<int32_t>();
+    bool runOnCreate = fdp.ConsumeBool();
     auto dAudioSinkService = std::make_shared<DAudioSinkService>(saId, runOnCreate);
     std::random_device rd;
     MessageParcel pdata;
@@ -185,8 +192,8 @@ void SinkStubResumeDistributedHardwareInnerFuzzTest(const uint8_t* data, size_t 
     std::string devId = "1";
     std::string dhId = "2";
     std::string reqId = "3";
-    int32_t status = *(reinterpret_cast<const int32_t*>(data));
-    std::string resultData(reinterpret_cast<const char*>(data), size);
+    int32_t status = fdp.ConsumeIntegral<int32_t>();
+    std::string resultData = fdp.ConsumeRandomLengthString();
     pdata.WriteString(devId);
     pdata.WriteString(dhId);
     pdata.WriteString(reqId);
@@ -200,8 +207,9 @@ void SinkStubStopDistributedHardwareInnerFuzzTest(const uint8_t* data, size_t si
     if ((data == nullptr) || (size < (sizeof(int32_t)))) {
         return;
     }
-    int32_t saId = *(reinterpret_cast<const int32_t*>(data));
-    bool runOnCreate = *(reinterpret_cast<const bool*>(data));
+    FuzzedDataProvider fdp(data, size);
+    int32_t saId = fdp.ConsumeIntegral<int32_t>();
+    bool runOnCreate = fdp.ConsumeBool();
     auto dAudioSinkService = std::make_shared<DAudioSinkService>(saId, runOnCreate);
     std::random_device rd;
     MessageParcel pdata;
@@ -210,8 +218,8 @@ void SinkStubStopDistributedHardwareInnerFuzzTest(const uint8_t* data, size_t si
     std::string devId = "1";
     std::string dhId = "2";
     std::string reqId = "3";
-    int32_t status = *(reinterpret_cast<const int32_t*>(data));
-    std::string resultData(reinterpret_cast<const char*>(data), size);
+    int32_t status = fdp.ConsumeIntegral<int32_t>();
+    std::string resultData = fdp.ConsumeRandomLengthString();
     pdata.WriteString(devId);
     pdata.WriteString(dhId);
     pdata.WriteString(reqId);
