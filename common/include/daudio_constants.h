@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -151,6 +151,10 @@ constexpr const char *INTERRUPT_GROUP_ID = "INTERRUPT_GROUP_ID";
 
 const std::string DUMP_FILE_PATH = "/data/data/daudio";
 const std::string AUDIO_PERMISSION_NAME = "ohos.permission.ENABLE_DISTRIBUTED_HARDWARE";
+const std::string SESSIONNAME_SPK_SINK = "ohos.dhardware.daudio.dspeaker_receiver.avtrans.control";
+const std::string SESSIONNAME_SPK_SOURCE = "ohos.dhardware.daudio.dspeaker_sender.avtrans.control";
+const std::string SESSIONNAME_MIC_SOURCE = "ohos.dhardware.daudio.dmic_receiver.avtrans.control";
+const std::string SESSIONNAME_MIC_SINK = "ohos.dhardware.daudio.dmic_sender.avtrans.control";
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DAUDIO_CONSTANTS_H

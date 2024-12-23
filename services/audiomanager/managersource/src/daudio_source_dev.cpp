@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -825,6 +825,27 @@ void DAudioSourceDev::NotifyFwkIdle(const std::string &devId, const std::string 
     DAudioSourceManager::GetInstance().OnHardwareStateChanged(devId, dhId, DaudioBusinessState::IDLE);
 }
 
+int32_t DAudioSourceDev::CreateSpkEngine(std::shared_ptr<DAudioIoDev> speaker)
+{
+    CHECK_NULL_RETURN(speaker, ERR_DH_AUDIO_NULLPTR);
+    int32_t ret = speaker->InitSenderEngine(DAudioSourceManager::GetInstance().getSenderProvider());
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Speaker init sender Engine, error code %{public}d.", ret);
+        return ret;
+    }
+    ret = speaker->InitCtrlTrans();
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Speaker InitCtrlTrans, error code %{public}d.", ret);
+        return ret;
+    }
+    ret = WaitForRPC(NOTIFY_OPEN_CTRL_RESULT);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("Speaker init sender engine, create ctrl error.");
+        return ret;
+    }
+    return DH_SUCCESS;
+}
+
 int32_t DAudioSourceDev::TaskOpenDSpeaker(const std::string &args)
 {
     DAudioHitrace trace("DAudioSourceDev::TaskOpenDSpeaker");
@@ -843,15 +864,9 @@ int32_t DAudioSourceDev::TaskOpenDSpeaker(const std::string &args)
         NotifyHDF(NOTIFY_OPEN_SPEAKER_RESULT, HDF_EVENT_RESULT_FAILED, dhId);
         return ERR_DH_AUDIO_NULLPTR;
     }
-    int32_t ret = speaker->InitSenderEngine(DAudioSourceManager::GetInstance().getSenderProvider());
+    int32_t ret = CreateSpkEngine(speaker);
     if (ret != DH_SUCCESS) {
-        DHLOGE("Speaker init sender Engine, error code %{public}d.", ret);
-        NotifyHDF(NOTIFY_OPEN_SPEAKER_RESULT, HDF_EVENT_INIT_ENGINE_FAILED, dhId);
-        return ret;
-    }
-    ret = WaitForRPC(NOTIFY_OPEN_CTRL_RESULT);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Speaker init sender engine, create ctrl error.");
+        DHLOGE("Create speaker engine failed.");
         NotifyHDF(NOTIFY_OPEN_SPEAKER_RESULT, HDF_EVENT_INIT_ENGINE_FAILED, dhId);
         return ret;
     }
@@ -992,6 +1007,11 @@ int32_t DAudioSourceDev::CreateMicEngine(std::shared_ptr<DAudioIoDev> mic)
     int32_t ret = mic->InitReceiverEngine(DAudioSourceManager::GetInstance().getReceiverProvider());
     if (ret != DH_SUCCESS) {
         DHLOGE("Init receiver engine failed.");
+        return ret;
+    }
+    ret = mic->InitCtrlTrans();
+    if (ret != DH_SUCCESS) {
+        DHLOGE("mic InitCtrlTrans, error code %{public}d.", ret);
         return ret;
     }
     ret = WaitForRPC(NOTIFY_OPEN_CTRL_RESULT);

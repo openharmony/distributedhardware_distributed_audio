@@ -69,7 +69,7 @@ private:
 
 private:
     std::shared_ptr<AVTransSenderAdapter> senderAdapter_;
-    std::shared_ptr<AVSenderTransportCallback> transCallback_;
+    std::weak_ptr<AVSenderTransportCallback> transCallback_;
     std::string devId_;
 };
 } // namespace DistributedHardware

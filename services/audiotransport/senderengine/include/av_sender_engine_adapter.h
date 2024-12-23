@@ -68,7 +68,7 @@ private:
     std::condition_variable chnCreatedCondVar_;
     std::atomic<bool> chnCreateSuccess_ = false;
     std::shared_ptr<IAVSenderEngine> senderEngine_;
-    std::shared_ptr<AVSenderAdapterCallback> adapterCallback_;
+    std::weak_ptr<AVSenderAdapterCallback> adapterCallback_;
 };
 } // DistributedHardware
 } // OHOS

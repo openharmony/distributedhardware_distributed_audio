@@ -113,15 +113,17 @@ int32_t AVTransReceiverTransport::SendMessage(uint32_t type, std::string content
 
 void AVTransReceiverTransport::OnEngineEvent(const AVTransEvent &event)
 {
-    CHECK_NULL_VOID(transCallback_);
-    transCallback_->OnEngineTransEvent(event);
+    auto sourceDevObj = transCallback_.lock();
+    CHECK_NULL_VOID(sourceDevObj);
+    sourceDevObj->OnEngineTransEvent(event);
 }
 
 void AVTransReceiverTransport::OnEngineMessage(const std::shared_ptr<AVTransMessage> &message)
 {
     CHECK_NULL_VOID(message);
-    CHECK_NULL_VOID(transCallback_);
-    transCallback_->OnEngineTransMessage(message);
+    auto sourceDevObj = transCallback_.lock();
+    CHECK_NULL_VOID(sourceDevObj);
+    sourceDevObj->OnEngineTransMessage(message);
 }
 
 void AVTransReceiverTransport::OnEngineDataAvailable(const std::shared_ptr<AVTransBuffer> &buffer)
@@ -136,8 +138,9 @@ void AVTransReceiverTransport::OnEngineDataAvailable(const std::shared_ptr<AVTra
         DHLOGE("Copy audio data failed, error code %{public}d.", ret);
         return;
     }
-    CHECK_NULL_VOID(transCallback_);
-    transCallback_->OnEngineTransDataAvailable(audioData);
+    auto sourceDevObj = transCallback_.lock();
+    CHECK_NULL_VOID(sourceDevObj);
+    sourceDevObj->OnEngineTransDataAvailable(audioData);
 }
 
 int32_t AVTransReceiverTransport::SetParameter(const AudioParam &audioParam)

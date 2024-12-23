@@ -61,7 +61,7 @@ private:
     std::atomic<bool> initialized_ = false;
     std::mutex chnCreatedMtx_;
     std::shared_ptr<IAVReceiverEngine> receiverEngine_;
-    std::shared_ptr<AVReceiverAdapterCallback> adapterCallback_;
+    std::weak_ptr<AVReceiverAdapterCallback> adapterCallback_;
     std::atomic<bool> chnCreateSuccess_ = false;
     std::condition_variable chnCreatedCondVar_;
 };

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -818,6 +818,7 @@ HWTEST_F(DAudioSourceDevTest, TaskSetVolume_001, TestSize.Level1)
     auto speaker = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
     sourceDev_->deviceMap_[dhId] = speaker;
     speaker->speakerTrans_ = std::make_shared<AVTransSenderTransport>(DEV_ID, speaker);
+    speaker->InitCtrlTrans();
     std::string param = "dhId=3;" + std::string(jsonString);
     EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskSetVolume(param));
     cJSON_Delete(jParam);

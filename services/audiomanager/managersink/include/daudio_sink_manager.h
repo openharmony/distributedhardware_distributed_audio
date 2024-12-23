@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,6 +27,7 @@
 #include "device_security_info.h"
 #endif
 
+#include "daudio_ctrl_channel_listener.h"
 #include "daudio_sink_dev.h"
 #include "idaudio_source.h"
 #include "idaudio_sink_ipc_callback.h"
@@ -40,6 +41,14 @@ public:
     ~EngineProviderListener() override {};
 
     int32_t OnProviderEvent(const AVTransEvent &event) override;
+};
+
+class CtrlChannelListener : public CtrlChannelListenerCallback {
+public:
+    CtrlChannelListener() {};
+    ~CtrlChannelListener() override {};
+
+    void OnCtrlChannelEvent(const AVTransEvent &event) override;
 };
 
 class DeviceInitCallback : public DmInitCallback {
@@ -89,6 +98,8 @@ private:
     ChannelState channelState_ = ChannelState::UNKNOWN;
 
     std::shared_ptr<EngineProviderListener> providerListener_;
+    std::shared_ptr<CtrlChannelListener> ctrlListenerCallback_ = nullptr;
+    std::shared_ptr<DaudioCtrlChannelListener> ctrlListener_ = nullptr;
     IAVEngineProvider *sendProviderPtr_ = nullptr;
     IAVEngineProvider *rcvProviderPtr_ = nullptr;
     void *pSHandler_ = nullptr;

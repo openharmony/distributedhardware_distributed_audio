@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -68,6 +68,37 @@ int32_t DMicClient::InitSenderEngine(IAVEngineProvider *providerPtr)
         return ERR_DH_AUDIO_NULLPTR;
     }
     return DH_SUCCESS;
+}
+
+int32_t DMicClient::InitCtrlTrans()
+{
+    DHLOGI("InitCtrlTrans enter");
+    if (micCtrlTrans_ == nullptr) {
+        micCtrlTrans_ = std::make_shared<DaudioSinkCtrlTrans>(devId_,
+            SESSIONNAME_MIC_SINK, SESSIONNAME_MIC_SOURCE, shared_from_this());
+    }
+    int32_t ret = micCtrlTrans_->SetUp(shared_from_this());
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Mic ctrl SetUp failed.");
+    return DH_SUCCESS;
+}
+
+void DMicClient::OnCtrlTransEvent(const AVTransEvent &event)
+{
+    if (event.type == EventType::EVENT_START_SUCCESS) {
+        OnStateChange(DATA_OPENED);
+    } else if ((event.type == EventType::EVENT_STOP_SUCCESS) ||
+        (event.type == EventType::EVENT_CHANNEL_CLOSED) ||
+        (event.type == EventType::EVENT_START_FAIL)) {
+        OnStateChange(DATA_CLOSED);
+    }
+}
+
+void DMicClient::OnCtrlTransMessage(const std::shared_ptr<AVTransMessage> &message)
+{
+    CHECK_NULL_VOID(message);
+    DHLOGI("On Engine message, type : %{public}s.", GetEventNameByType(message->type_).c_str());
+    DAudioSinkManager::GetInstance().HandleDAudioNotify(message->dstDevId_, message->dstDevId_,
+        static_cast<int32_t>(message->type_), message->content_);
 }
 
 int32_t DMicClient::OnStateChange(const AudioEventType type)
@@ -173,8 +204,8 @@ int32_t DMicClient::SendMessage(uint32_t type, std::string content, std::string 
             "CLOSE_MIC or OPEN_CTRL. type: %{public}u", type);
         return ERR_DH_AUDIO_NULLPTR;
     }
-    CHECK_NULL_RETURN(micTrans_, ERR_DH_AUDIO_NULLPTR);
-    micTrans_->SendMessage(type, content, dstDevId);
+    CHECK_NULL_RETURN(micCtrlTrans_, ERR_DH_AUDIO_NULLPTR);
+    micCtrlTrans_->SendAudioEvent(type, content, dstDevId);
     return DH_SUCCESS;
 }
 
@@ -198,6 +229,13 @@ int32_t DMicClient::Release()
         isReleaseError = true;
     }
     micTrans_ = nullptr;
+    if (micCtrlTrans_ != nullptr) {
+        if (micCtrlTrans_->Release() != DH_SUCCESS) {
+            DHLOGE("Mic trans release failed.");
+            isReleaseError = true;
+        }
+        micCtrlTrans_ = nullptr;
+    }
     clientStatus_ = AudioStatus::STATUS_IDLE;
     if (isReleaseError) {
         return ERR_DH_AUDIO_FAILED;

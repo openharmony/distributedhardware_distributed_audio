@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,6 +39,7 @@
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
 #include "daudio_log.h"
+#include "daudio_sink_ctrl_trans.h"
 #include "iaudio_data_transport.h"
 #include "iaudio_datatrans_callback.h"
 #include "iaudio_event_callback.h"
@@ -48,6 +49,7 @@ namespace OHOS {
 namespace DistributedHardware {
 class DSpeakerClient : public IAudioDataTransCallback,
     public ISpkClient, public AVReceiverTransportCallback,
+    public IAudioCtrlTransCallback,
     public AudioStandard::VolumeKeyEventCallback,
     public AudioStandard::AudioRendererCallback,
     public AudioStandard::AudioRendererWriteCallback,
@@ -64,6 +66,7 @@ public:
     void OnVolumeKeyEvent(AudioStandard::VolumeEvent volumeEvent) override;
     void OnInterrupt(const AudioStandard::InterruptEvent &interruptEvent) override;
     int32_t InitReceiverEngine(IAVEngineProvider *providerPtr) override;
+    int32_t InitCtrlTrans() override;
     int32_t SetUp(const AudioParam &param) override;
     int32_t Release() override;
     int32_t StartRender() override;
@@ -77,6 +80,9 @@ public:
     void OnEngineTransEvent(const AVTransEvent &event) override;
     void OnEngineTransMessage(const std::shared_ptr<AVTransMessage> &message) override;
     void OnEngineTransDataAvailable(const std::shared_ptr<AudioData> &audioData) override;
+
+    void OnCtrlTransEvent(const AVTransEvent &event) override;
+    void OnCtrlTransMessage(const std::shared_ptr<AVTransMessage> &message) override;
 
     void OnWriteData(size_t length) override;
 private:
@@ -109,6 +115,7 @@ private:
 
     std::unique_ptr<AudioStandard::AudioRenderer> audioRenderer_ = nullptr;
     std::shared_ptr<IAudioDataTransport> speakerTrans_ = nullptr;
+    std::shared_ptr<IAudioCtrlTransport> speakerCtrlTrans_ = nullptr;
     std::weak_ptr<IAudioEventCallback> eventCallback_;
     int64_t lastPlayStartTime_ = 0;
     int64_t lastReceiveStartTime_ = 0;

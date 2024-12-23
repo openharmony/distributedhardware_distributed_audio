@@ -13,30 +13,22 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_IMIC_CLIENT_H
-#define OHOS_IMIC_CLIENT_H
+#ifndef IAUDIO_CTRLTRANS_CALLBACK_H
+#define IAUDIO_CTRLTRANS_CALLBACK_H
 
-#include <memory>
-
+#include "audio_data.h"
+#include "audio_event.h"
 #include "audio_param.h"
-#include "i_av_engine_provider.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class IMicClient {
+class IAudioCtrlTransCallback {
 public:
-    IMicClient() = default;
-    virtual ~IMicClient() = default;
-
-    virtual int32_t SetUp(const AudioParam &param) = 0;
-    virtual int32_t Release() = 0;
-    virtual int32_t StartCapture() = 0;
-    virtual int32_t StopCapture() = 0;
-    virtual void SetAttrs(const std::string &devId, const std::shared_ptr<IAudioEventCallback> &callback) = 0;
-    virtual int32_t InitSenderEngine(IAVEngineProvider *providerPtr) = 0;
-    virtual int32_t InitCtrlTrans() = 0;
-    virtual int32_t SendMessage(uint32_t type, std::string content, std::string dstDevId) = 0;
+    IAudioCtrlTransCallback() = default;
+    virtual ~IAudioCtrlTransCallback() = default;
+    virtual void OnCtrlTransEvent(const AVTransEvent &event) = 0;
+    virtual void OnCtrlTransMessage(const std::shared_ptr<AVTransMessage> &message) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_IMIC_CLIENT_H
+#endif // IAUDIO_CTRLTRANS_CALLBACK_H

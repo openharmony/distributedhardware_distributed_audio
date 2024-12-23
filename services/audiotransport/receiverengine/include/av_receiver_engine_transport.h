@@ -70,7 +70,7 @@ private:
 
 private:
     std::shared_ptr<AVTransReceiverAdapter> receiverAdapter_;
-    std::shared_ptr<AVReceiverTransportCallback> transCallback_;
+    std::weak_ptr<AVReceiverTransportCallback> transCallback_;
     std::string devId_;
 };
 } // namespace DistributedHardware
