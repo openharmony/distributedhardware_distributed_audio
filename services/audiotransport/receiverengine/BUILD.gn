@@ -54,6 +54,12 @@ ohos_shared_library("distributed_audio_decode_transport") {
     "${audio_transport_path}/receiverengine/src/av_receiver_engine_transport.cpp",
   ]
 
+  ldflags = [
+    "-fpie",
+    "-Wl,-z,relro",
+    "-Wl,-z,now",
+  ]
+
   deps = [ "${services_path}/common:distributed_audio_utils" ]
 
   external_deps = [

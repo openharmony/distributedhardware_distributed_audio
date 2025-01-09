@@ -127,6 +127,12 @@ ohos_shared_library("distributed_audio_source") {
 
   cflags_cc = cflags
 
+  ldflags = [
+    "-fpie",
+    "-Wl,-z,relro",
+    "-Wl,-z,now",
+  ]
+
   defines = [
     "HI_LOG_ENABLE",
     "LOG_DOMAIN=0xD004130",
