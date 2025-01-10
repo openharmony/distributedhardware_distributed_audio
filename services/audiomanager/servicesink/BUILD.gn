@@ -66,6 +66,12 @@ ohos_shared_library("distributed_audio_sink") {
     "src/daudio_sink_stub.cpp",
   ]
 
+  ldflags = [
+    "-fpie",
+    "-Wl,-z,relro",
+    "-Wl,-z,now",
+  ]
+
   deps = [
     "${audio_transport_path}/receiverengine:distributed_audio_decode_transport",
     "${audio_transport_path}/senderengine:distributed_audio_encode_transport",

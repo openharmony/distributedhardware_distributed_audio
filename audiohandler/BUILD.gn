@@ -52,6 +52,12 @@ ohos_shared_library("distributed_audio_handler") {
   cflags = [ "-Wno-shadow" ]
   cflags_cc = cflags
 
+  ldflags = [
+    "-fpie",
+    "-Wl,-z,relro",
+    "-Wl,-z,now",
+  ]
+
   subsystem_name = "distributedhardware"
 
   part_name = "distributed_audio"

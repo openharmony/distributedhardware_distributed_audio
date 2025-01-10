@@ -55,6 +55,12 @@ ohos_shared_library("distributed_audio_utils") {
     "audiodata/src/audio_data.cpp",
   ]
 
+  ldflags = [
+    "-fpie",
+    "-Wl,-z,relro",
+    "-Wl,-z,now",
+  ]
+
   external_deps = [
     "cJSON:cjson",
     "c_utils:utils",

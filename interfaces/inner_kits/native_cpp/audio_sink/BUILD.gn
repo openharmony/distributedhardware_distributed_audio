@@ -41,6 +41,12 @@ ohos_shared_library("distributed_audio_sink_sdk") {
     "src/daudio_sink_proxy.cpp",
   ]
 
+  ldflags = [
+    "-fpie",
+    "-Wl,-z,relro",
+    "-Wl,-z,now",
+  ]
+
   deps = [ "${services_path}/common:distributed_audio_utils" ]
 
   external_deps = [
