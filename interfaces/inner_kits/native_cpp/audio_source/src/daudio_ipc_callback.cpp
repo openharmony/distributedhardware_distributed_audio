@@ -25,6 +25,10 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+namespace {
+constexpr uint32_t DUAIO_IPC_CALLBACK_MAX_ALLOW_SIZE = 64;
+}
+
 int32_t DAudioIpcCallback::OnNotifyRegResult(const std::string &devId, const std::string &dhId,
     const std::string &reqId, int32_t status, const std::string &resultData)
 {
@@ -113,6 +117,10 @@ void DAudioIpcCallback::PushRegisterCallback(const std::string &reqId,
 {
     DHLOGD("Push register callback, reqId: %{public}s", reqId.c_str());
     std::lock_guard<std::mutex> registerLck(registerMapMtx_);
+    if (registerCallbackMap_.size() >= DUAIO_IPC_CALLBACK_MAX_ALLOW_SIZE) {
+        DHLOGE("Callback map is full, not allow to insert anymore.");
+        return;
+    }
     registerCallbackMap_.emplace(reqId, callback);
 }
 

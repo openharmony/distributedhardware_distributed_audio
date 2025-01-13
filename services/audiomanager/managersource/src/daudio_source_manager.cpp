@@ -35,6 +35,7 @@ constexpr uint32_t MAX_DEVICE_ID_LENGTH = 200;
 constexpr uint32_t MAX_DISTRIBUTED_HARDWARE_ID_LENGTH = 100;
 constexpr uint32_t EVENT_MANAGER_ENABLE_DAUDIO = 11;
 constexpr uint32_t EVENT_MANAGER_DISABLE_DAUDIO = 12;
+constexpr uint32_t DAUDIO_SINK_SERVICE_MAX_SIZE = 64;
 }
 IMPLEMENT_SINGLE_INSTANCE(DAudioSourceManager);
 using AVTransProviderClass = IAVEngineProvider *(*)(const std::string &);
@@ -340,6 +341,10 @@ int32_t DAudioSourceManager::DAudioNotify(const std::string &devId, const std::s
     CHECK_NULL_RETURN(remoteSvrProxy, ERR_DH_AUDIO_NULLPTR);
     {
         std::lock_guard<std::mutex> lck(remoteSvrMutex_);
+        if (sinkServiceMap_.size() >= DAUDIO_SINK_SERVICE_MAX_SIZE) {
+            DHLOGE("Sink service map is full, not allow to insert anymore.");
+            return ERR_DH_AUDIO_FAILED;
+        }
         sinkServiceMap_[devId] = remoteSvrProxy;
         remoteSvrProxy->DAudioNotify(localDevId_, dhId, eventType, eventContent);
     }

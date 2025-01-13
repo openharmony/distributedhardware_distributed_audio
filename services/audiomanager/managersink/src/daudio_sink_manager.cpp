@@ -29,11 +29,15 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-static const std::string PARAM_CLOSE_SPEAKER = "{\"audioParam\":null,\"dhId\":\"" +
+namespace {
+const std::string PARAM_CLOSE_SPEAKER = "{\"audioParam\":null,\"dhId\":\"" +
     std::to_string(PIN_OUT_SPEAKER) + "\",\"eventType\":12}";
-static const std::string PARAM_CLOSE_MIC = "{\"audioParam\":null,\"dhId\":\"" +
+const std::string PARAM_CLOSE_MIC = "{\"audioParam\":null,\"dhId\":\"" +
     std::to_string(PIN_IN_MIC) + "\",\"eventType\":22}";
 const int DEFAULT_DEVICE_SECURITY_LEVEL = -1;
+constexpr uint32_t DAUDIO_SOURCE_SERVICE_MAX_SIZE = 64;
+}
+
 
 IMPLEMENT_SINGLE_INSTANCE(DAudioSinkManager);
 using AVTransProviderClass = IAVEngineProvider *(*)(const std::string &);
@@ -76,7 +80,7 @@ int32_t DAudioSinkManager::Init(const sptr<IDAudioSinkIpcCallback> &sinkCallback
     DHLOGI("Load av receiver engine success.");
 
     if (LoadAVSenderEngineProvider() != DH_SUCCESS) {
-        DHLOGI("Load av sender engine provider failed.");
+        DHLOGE("Load av sender engine provider failed.");
         return ERR_DH_AUDIO_FAILED;
     }
     CHECK_NULL_RETURN(sendProviderPtr_, ERR_DH_AUDIO_FAILED);
@@ -275,6 +279,10 @@ int32_t DAudioSinkManager::DAudioNotify(const std::string &devId, const std::str
     CHECK_NULL_RETURN(remoteSvrProxy, ERR_DH_AUDIO_NULLPTR);
     {
         std::lock_guard<std::mutex> lck(remoteSvrMutex_);
+        if (sourceServiceMap_.size() >= DAUDIO_SOURCE_SERVICE_MAX_SIZE) {
+            DHLOGE("Source service map is full, not allow to insert anymore.");
+            return ERR_DH_AUDIO_FAILED;
+        }
         sourceServiceMap_[devId] = remoteSvrProxy;
         remoteSvrProxy->DAudioNotify(localNetworkId_, dhId, eventType, eventContent);
     }
