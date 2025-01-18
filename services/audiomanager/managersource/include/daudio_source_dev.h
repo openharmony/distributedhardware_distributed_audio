@@ -108,6 +108,11 @@ private:
     int32_t HandleSpkMmapStop(const AudioEvent &event);
     int32_t HandleMicMmapStart(const AudioEvent &event);
     int32_t HandleMicMmapStop(const AudioEvent &event);
+#ifdef AUDIO_SUPPORT_SHARED_BUFFER
+    void HandleAudioStatus(const AudioEvent &event);
+    int32_t HandleAudioStart(const AudioEvent &event);
+    int32_t HandleAudioStop(const AudioEvent &event);
+#endif
 
     int32_t NotifySinkDev(const AudioEventType type, const cJSON *Param, const std::string dhId);
     int32_t NotifyHDF(const AudioEventType type, const std::string result, const int32_t dhId);
