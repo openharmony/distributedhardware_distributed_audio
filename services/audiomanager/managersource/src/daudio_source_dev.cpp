@@ -291,7 +291,6 @@ void DAudioSourceDev::NotifyEventInner(const AudioEvent &event)
 
 void DAudioSourceDev::NotifyEvent(const AudioEvent &event)
 {
-    DHLOGD("Notify event, eventType: %{public}d.", event.type);
     switch (event.type) {
         case OPEN_SPEAKER:
             HandleOpenDSpeaker(event);
@@ -313,6 +312,12 @@ void DAudioSourceDev::NotifyEvent(const AudioEvent &event)
         case NOTIFY_CLOSE_CTRL_RESULT:
             HandleNotifyRPC(event);
             break;
+#ifdef AUDIO_SUPPORT_SHARED_BUFFER
+        case AUDIO_START:
+        case AUDIO_STOP:
+            HandleAudioStatus(event);
+            break;
+#endif
         case OPEN_MIC:
         case CLOSE_MIC:
         case MIC_OPENED:
@@ -335,6 +340,68 @@ void DAudioSourceDev::NotifyEvent(const AudioEvent &event)
             break;
     }
 }
+
+#ifdef AUDIO_SUPPORT_SHARED_BUFFER
+void DAudioSourceDev::HandleAudioStatus(const AudioEvent &event)
+{
+    switch (event.type) {
+        case AUDIO_START:
+            HandleAudioStart(event);
+            break;
+        case AUDIO_STOP:
+            HandleAudioStop(event);
+            break;
+        default:
+            break;
+    }
+}
+
+int32_t DAudioSourceDev::HandleAudioStart(const AudioEvent &event)
+{
+    DHLOGI("Audio start, content: %{public}s.", event.content.c_str());
+    int32_t dhId = ParseDhidFromEvent(event.content);
+    if (dhId < 0) {
+        DHLOGE("Failed to parse dhardware id.");
+        return ERR_DH_AUDIO_SA_PARAM_INVALID;
+    }
+    if (dhId == PIN_IN_MIC) {
+        DHLOGI("MIC start");
+        return DH_SUCCESS;
+    }
+    CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
+    auto eventParam = std::make_shared<AudioEvent>(event);
+    auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_MMAP_SPK_START, eventParam, 0);
+    if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
+        DHLOGE("Send event failed.");
+        return ERR_DH_AUDIO_FAILED;
+    }
+    DHLOGD("Mmap Start event is sent successfully.");
+    return DH_SUCCESS;
+}
+
+int32_t DAudioSourceDev::HandleAudioStop(const AudioEvent &event)
+{
+    DHLOGI("Audio mmap stop, content: %{public}s.", event.content.c_str());
+    int32_t dhId = ParseDhidFromEvent(event.content);
+    if (dhId < 0) {
+        DHLOGE("Failed to parse dhardware id.");
+        return ERR_DH_AUDIO_SA_PARAM_INVALID;
+    }
+    if (dhId == PIN_IN_MIC) {
+        DHLOGI("MIC stop");
+        return DH_SUCCESS;
+    }
+    CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
+    auto eventParam = std::make_shared<AudioEvent>(event);
+    auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_MMAP_SPK_STOP, eventParam, 0);
+    if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
+        DHLOGE("Send event failed.");
+        return ERR_DH_AUDIO_FAILED;
+    }
+    DHLOGD("Speaker Mmap Stop event is sent successfully.");
+    return DH_SUCCESS;
+}
+#endif
 
 int32_t DAudioSourceDev::HandleOpenDSpeaker(const AudioEvent &event)
 {

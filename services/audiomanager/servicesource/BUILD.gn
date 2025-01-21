@@ -124,6 +124,9 @@ ohos_shared_library("distributed_audio_source") {
   if (distributed_audio_extension_sa) {
     cflags += [ "-DECHO_CANNEL_ENABLE" ]
   }
+  if (distributed_audio_shared_buffer) {
+    cflags += [ "-DAUDIO_SUPPORT_SHARED_BUFFER" ]
+  }
 
   cflags_cc = cflags
 
