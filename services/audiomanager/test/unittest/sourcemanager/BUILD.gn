@@ -75,6 +75,7 @@ ohos_unittest("DaudioSourceMgrTest") {
     "eventhandler:libeventhandler",
     "googletest:gmock",
     "hdf_core:libhdi",
+    "hilog:libhilog",
     "ipc:ipc_core",
     "ipc:ipc_single",
     "safwk:system_ability_fwk",

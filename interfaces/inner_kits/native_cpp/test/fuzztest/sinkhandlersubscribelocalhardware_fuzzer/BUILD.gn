@@ -43,6 +43,7 @@ ohos_fuzztest("SinkHandlerSubscribeLocalHardwareFuzzTest") {
     "c_utils:utils",
     "distributed_hardware_fwk:distributedhardwareutils",
     "ipc:ipc_core",
+    "samgr:samgr_proxy",
   ]
 
   defines = [

@@ -47,12 +47,12 @@ const std::map<std::string, HidumpFlag> ARGS_MAP = {
 
 DaudioHidumper::DaudioHidumper()
 {
-    DHLOGI("Distributed audio hidumper constructed.");
+    DHLOGI("construct.");
 }
 
 DaudioHidumper::~DaudioHidumper()
 {
-    DHLOGI("Distributed audio hidumper deconstructed.");
+    DHLOGI("deconstruct.");
 }
 
 bool DaudioHidumper::Dump(const std::vector<std::string> &args, std::string &result)
