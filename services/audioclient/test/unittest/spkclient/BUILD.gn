@@ -63,6 +63,7 @@ ohos_unittest("SpeakerClientTest") {
     "distributed_hardware_fwk:distributedhardwareutils",
     "dsoftbus:softbus_client",
     "googletest:gmock",
+    "hilog:libhilog",
   ]
 }
 

@@ -51,6 +51,7 @@ ohos_fuzztest("SinkIpcCallbackOnNotifyResourceInfoInnerFuzzTest") {
     "c_utils:utils",
     "distributed_hardware_fwk:distributedhardwareutils",
     "ipc:ipc_core",
+    "samgr:samgr_proxy",
   ]
 }
 

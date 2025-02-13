@@ -48,6 +48,7 @@ ohos_fuzztest("SinkServiceResumeDistributedHardwareFuzzTest") {
     "c_utils:utils",
     "distributed_hardware_fwk:distributedhardwareutils",
     "ipc:ipc_core",
+    "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
 }

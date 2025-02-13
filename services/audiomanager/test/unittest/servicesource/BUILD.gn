@@ -109,6 +109,7 @@ ohos_unittest("DaudioSourceStubTest") {
     "drivers_interface_distributed_audio:libdaudio_proxy_1.0",
     "dsoftbus:softbus_client",
     "googletest:gmock",
+    "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "ipc:ipc_core",
