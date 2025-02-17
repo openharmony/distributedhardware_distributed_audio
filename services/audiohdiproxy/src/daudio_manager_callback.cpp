@@ -36,7 +36,8 @@ int32_t DAudioManagerCallback::CreateStream(int32_t streamId /* for multistream 
 {
     DHLOGI("Open device.");
     CHECK_NULL_RETURN(callback_, HDF_FAILURE);
-    if (callback_->CreateStream(streamId) != DH_SUCCESS) {
+    int32_t ret = callback_->CreateStream(streamId);
+    if (ret != DH_SUCCESS) {
         DHLOGE("Call hdi callback failed.");
         return HDF_FAILURE;
     }

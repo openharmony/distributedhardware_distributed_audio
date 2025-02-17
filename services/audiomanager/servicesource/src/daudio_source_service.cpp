@@ -26,6 +26,7 @@
 #include "daudio_errorcode.h"
 #include "daudio_hisysevent.h"
 #include "daudio_log.h"
+#include "daudio_radar.h"
 #include "daudio_source_manager.h"
 #include "daudio_util.h"
 
@@ -70,6 +71,7 @@ int32_t DAudioSourceService::InitSource(const std::string &params, const sptr<ID
     DHLOGI("Init source service.");
     (void)params;
     int32_t ret = DAudioSourceManager::GetInstance().Init(callback);
+    DaudioRadar::GetInstance().ReportDaudioInitProgress("Init", AudioInit::SOURCE_AUDIO_INIT, ret);
     if (ret != DH_SUCCESS) {
         DHLOGE("Distributed audio source manager init failed.");
         return ret;
@@ -109,6 +111,8 @@ int32_t DAudioSourceService::UnregisterDistributedHardware(const std::string &de
 {
     DHLOGI("Unregister distributed audio device, devId: %{public}s, dhId: %{public}s.", GetAnonyString(devId).c_str(),
         dhId.c_str());
+    DaudioRadar::GetInstance().ReportDaudioUnInit("UnregisterDistributedHardware", AudioUnInit::UNREGISTER,
+        BizState::BIZ_STATE_START, DH_SUCCESS);
     return DAudioSourceManager::GetInstance().DisableDAudio(devId, dhId, reqId);
 }
 

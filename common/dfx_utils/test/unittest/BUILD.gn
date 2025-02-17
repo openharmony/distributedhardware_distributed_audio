@@ -61,6 +61,7 @@ ohos_unittest("DAudioDfxTest") {
   sources = [
     "${common_path}/dfx_utils/test/unittest/src/daudio_hidumper_test.cpp",
     "${common_path}/dfx_utils/test/unittest/src/daudio_hitrace_test.cpp",
+    "${common_path}/dfx_utils/test/unittest/src/daudio_radar_test.cpp",
   ]
   configs = [ ":module_private_config" ]
 
@@ -79,6 +80,7 @@ ohos_unittest("DAudioDfxTest") {
     "drivers_interface_distributed_audio:libdaudio_proxy_1.0",
     "dsoftbus:softbus_client",
     "googletest:gmock",
+    "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "ipc:ipc_core",
