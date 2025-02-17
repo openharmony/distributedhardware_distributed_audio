@@ -66,6 +66,7 @@ std::map<std::string, JsonTypeCheckFunc> typeCheckMap = {
     std::map<std::string, JsonTypeCheckFunc>::value_type(KEY_CONTENT_TYPE, &DistributedHardware::IsInt32),
     std::map<std::string, JsonTypeCheckFunc>::value_type(KEY_STREAM_USAGE, &DistributedHardware::IsInt32),
     std::map<std::string, JsonTypeCheckFunc>::value_type(KEY_DATATYPE, &DistributedHardware::IsString),
+    std::map<std::string, JsonTypeCheckFunc>::value_type(KEY_CODEC_TYPE, &DistributedHardware::IsInt32),
 };
 
 std::map<int32_t, std::string> eventNameMap = {

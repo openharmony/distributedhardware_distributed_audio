@@ -148,7 +148,7 @@ int32_t AVTransReceiverTransport::SetParameter(const AudioParam &audioParam)
     DHLOGI("SetParameter.");
     CHECK_NULL_RETURN(receiverAdapter_, ERR_DH_AUDIO_NULLPTR);
     receiverAdapter_->SetParameter(AVTransTag::AUDIO_SAMPLE_RATE, std::to_string(audioParam.comParam.sampleRate));
-    receiverAdapter_->SetParameter(AVTransTag::AUDIO_SAMPLE_FORMAT, std::to_string(AudioSampleFormat::SAMPLE_F32LE));
+    receiverAdapter_->SetParameter(AVTransTag::AUDIO_SAMPLE_FORMAT, std::to_string(AudioSampleFormat::SAMPLE_S16LE));
     receiverAdapter_->SetParameter(AVTransTag::AUDIO_CHANNEL_MASK, std::to_string(audioParam.comParam.channelMask));
     receiverAdapter_->SetParameter(AVTransTag::AUDIO_CHANNEL_LAYOUT, std::to_string(audioParam.comParam.channelMask));
     receiverAdapter_->SetParameter(AVTransTag::AUDIO_BIT_RATE, std::to_string(AUDIO_SET_HISTREAMER_BIT_RATE));

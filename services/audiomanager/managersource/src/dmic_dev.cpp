@@ -56,6 +56,46 @@ void DMicDev::OnEngineTransMessage(const std::shared_ptr<AVTransMessage> &messag
 
 void DMicDev::OnEngineTransDataAvailable(const std::shared_ptr<AudioData> &audioData)
 {
+    std::lock_guard<std::mutex> lock(ringbufferMutex_);
+    CHECK_NULL_VOID(ringBuffer_);
+    if (ringBuffer_->RingBufferInsert(audioData->Data(), static_cast<int32_t>(audioData->Capacity())) != DH_SUCCESS) {
+        DHLOGE("Insert ringbuffer failed.");
+        return;
+    }
+    DHLOGD("ringbuffer insert one");
+}
+
+void DMicDev::ReadFromRingbuffer()
+{
+    std::shared_ptr<AudioData> sendData = std::make_shared<AudioData>(frameSize_);
+    bool canRead = false;
+    while (isRingbufferOn_.load()) {
+        CHECK_NULL_VOID(ringBuffer_);
+        canRead = false;
+        {
+            std::lock_guard<std::mutex> lock(ringbufferMutex_);
+            if (ringBuffer_->CanBufferReadLen(frameSize_)) {
+                canRead = true;
+            }
+        }
+        if (!canRead) {
+            DHLOGD("Can not read from ringbuffer.");
+            std::this_thread::sleep_for(std::chrono::milliseconds(RINGBUFFER_WAIT_SECONDS));
+            continue;
+        }
+        {
+            std::lock_guard<std::mutex> lock(ringbufferMutex_);
+            if (ringBuffer_->RingBufferGetData(sendData->Data(), sendData->Capacity()) != DH_SUCCESS) {
+                DHLOGE("Read ringbuffer failed.");
+                continue;
+            }
+        }
+        SendToProcess(sendData);
+    }
+}
+
+void DMicDev::SendToProcess(const std::shared_ptr<AudioData> &audioData)
+{
     DHLOGD("On Engine Data available");
     if (echoCannelOn_) {
 #ifdef ECHO_CANNEL_ENABLE
@@ -134,6 +174,13 @@ int32_t DMicDev::EnableDevice(const int32_t dhId, const std::string &capability)
         return ret;
     }
     dhId_ = dhId;
+    auto pos = capability.find(SUB_PROTOCOLVER);
+    if (pos != std::string::npos) {
+        DHLOGD("ProtocolVer : 2.0");
+    } else {
+        isNeedCodec_.store(false);
+        DHLOGD("ProtocolVer : 1.0");
+    }
     return DH_SUCCESS;
 }
 
@@ -218,6 +265,10 @@ int32_t DMicDev::SetParameters(const int32_t streamId, const AudioParamHDF &para
     param_.comParam.channelMask = paramHDF_.channelMask;
     param_.comParam.bitFormat = paramHDF_.bitFormat;
     param_.comParam.codecType = AudioCodecType::AUDIO_CODEC_AAC;
+    if (isNeedCodec_.load()) {
+        param_.comParam.codecType = AudioCodecType::AUDIO_CODEC_AAC_EN;
+    }
+    DHLOGD("isNeedCodec_ : %{public}d.", isNeedCodec_.load());
     param_.comParam.frameSize = paramHDF_.frameSize;
     if (paramHDF_.streamUsage == StreamUsage::STREAM_USAGE_VOICE_COMMUNICATION) {
         param_.captureOpts.sourceType = SOURCE_TYPE_VOICE_COMMUNICATION;
@@ -263,6 +314,15 @@ int32_t DMicDev::SetUp()
         DHLOGE("Mic trans set up failed. ret: %{public}d.", ret);
         return ret;
     }
+    frameSize_ = static_cast<int32_t>(param_.comParam.frameSize);
+    {
+        std::lock_guard<std::mutex> lock(ringbufferMutex_);
+        ringBuffer_ = std::make_unique<DaudioRingBuffer>();
+        ringBuffer_->RingBufferInit(frameData_);
+        CHECK_NULL_RETURN(frameData_, ERR_DH_AUDIO_NULLPTR);
+    }
+    isRingbufferOn_.store(true);
+    ringbufferThread_ = std::thread([this]() { this->ReadFromRingbuffer(); });
     echoCannelOn_ = true;
 #ifdef ECHO_CANNEL_ENABLE
     if (echoCannelOn_ && echoManager_ == nullptr) {
@@ -355,6 +415,18 @@ int32_t DMicDev::Release()
         DHLOGE("Release mic trans failed, ret: %{public}d.", ret);
         return ret;
     }
+    isRingbufferOn_.store(false);
+    if (ringbufferThread_.joinable()) {
+        ringbufferThread_.join();
+    }
+    {
+        std::lock_guard<std::mutex> lock(ringbufferMutex_);
+        ringBuffer_ = nullptr;
+        if (frameData_ != nullptr) {
+            delete[] frameData_;
+            frameData_ = nullptr;
+        }
+    }
 #ifdef ECHO_CANNEL_ENABLE
     if (echoManager_ != nullptr) {
         echoManager_->Release();
@@ -387,17 +459,11 @@ int32_t DMicDev::ReadStreamData(const int32_t streamId, std::shared_ptr<AudioDat
     }
     std::lock_guard<std::mutex> lock(dataQueueMtx_);
     uint32_t queSize = dataQueue_.size();
-    if (insertFrameCnt_ >= queSize || queSize == 0) {
-        ++insertFrameCnt_;
+    if (queSize == 0) {
         isExistedEmpty_.store(true);
-        DHLOGD("Data queue is empty, count :%{public}u.", insertFrameCnt_);
+        DHLOGD("Data queue is empty");
         data = std::make_shared<AudioData>(param_.comParam.frameSize);
     } else {
-        while (insertFrameCnt_ > 0) {
-            DHLOGD("Data discard, count: %{public}u", insertFrameCnt_);
-            dataQueue_.pop();
-            --insertFrameCnt_;
-        }
         data = dataQueue_.front();
         dataQueue_.pop();
     }

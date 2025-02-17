@@ -32,6 +32,7 @@
 #include "daudio_hdi_handler.h"
 #include "daudio_io_dev.h"
 #include "daudio_source_ctrl_trans.h"
+#include "daudio_ringbuffer.h"
 #include "iaudio_data_transport.h"
 #include "iaudio_datatrans_callback.h"
 #include "iaudio_event_callback.h"
@@ -93,9 +94,12 @@ public:
 private:
     void EnqueueThread();
     void FillJitterQueue();
+    void ReadFromRingbuffer();
+    void SendToProcess(const std::shared_ptr<AudioData> &audioData);
 
 private:
     static constexpr uint8_t CHANNEL_WAIT_SECONDS = 5;
+    static constexpr uint8_t RINGBUFFER_WAIT_SECONDS = 5;
     static constexpr size_t DATA_QUEUE_MAX_SIZE = 10;
     static constexpr size_t DATA_QUEUE_HALF_SIZE = DATA_QUEUE_MAX_SIZE >> 1U;
     static constexpr uint32_t LOW_LATENCY_JITTER_MAX_TIME_MS = 150;
@@ -127,8 +131,8 @@ private:
     AudioParamHDF paramHDF_;
     AudioParam param_;
 
-    uint32_t insertFrameCnt_ = 0;
     std::atomic<bool> isExistedEmpty_ = false;
+    std::atomic<bool> isNeedCodec_ = true;
     size_t dataQueSize_ = 0;
     sptr<Ashmem> ashmem_ = nullptr;
     std::atomic<bool> isEnqueueRunning_ = false;
@@ -150,6 +154,12 @@ private:
     FILE *dumpFileFast_ = nullptr;
     uint32_t lowLatencyHalfSize_ = 0;
     uint32_t lowLatencyMaxfSize_ = 0;
+    std::unique_ptr<DaudioRingBuffer> ringBuffer_ = nullptr;
+    uint8_t *frameData_ = nullptr;
+    int32_t frameSize_ = 0;
+    std::thread ringbufferThread_;
+    std::atomic<bool> isRingbufferOn_ = false;
+    std::mutex ringbufferMutex_;
 };
 } // DistributedHardware
 } // OHOS

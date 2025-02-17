@@ -113,7 +113,7 @@ constexpr int32_t RENDER_CHANNEL_MASK = 2;
 constexpr int32_t CAPTURE_INTER_LEAVED = 1;
 constexpr int32_t CAPTURE_STREAM_ID = 2;
 constexpr int32_t CAPTURE_CHANNEL_MASK = 2;
-constexpr int64_t AUDIO_FRAME_TIME_INTERFAL_DEFAULT = 21333;
+constexpr int64_t AUDIO_FRAME_TIME_INTERFAL_DEFAULT = 20000;
 
 static OHOS::sptr<IAudioManager> g_manager = nullptr;
 static OHOS::sptr<IAudioAdapter> g_adapter = nullptr;

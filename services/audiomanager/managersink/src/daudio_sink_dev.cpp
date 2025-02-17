@@ -566,6 +566,12 @@ int32_t DAudioSinkDev::GetCJsonObjectItems(const cJSON *j, AudioParam &audioPara
     CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "%{public}s", "Get param value error.");
     ret = GetParamValue(j, KEY_CAPTURE_FLAGS, reinterpret_cast<int32_t&>(audioParam.captureOpts.capturerFlags));
     CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "%{public}s", "Get param value error.");
+
+    if (CJsonParamCheck(j, { KEY_CODEC_TYPE })) {
+        ret = GetParamValue(j, KEY_CODEC_TYPE, reinterpret_cast<int32_t&>(audioParam.comParam.codecType));
+        CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "%{public}s", "Get param value error.");
+    }
+    DHLOGD("codecType: %{public}d", static_cast<int32_t>(audioParam.comParam.codecType));
     return ret;
 }
 

@@ -1114,7 +1114,6 @@ int32_t DAudioSourceDev::TaskOpenDMic(const std::string &args)
         NotifyHDF(NOTIFY_OPEN_MIC_RESULT, HDF_EVENT_INIT_ENGINE_FAILED, dhId);
         return ret;
     }
-
     cJSON *jAudioParam = cJSON_CreateObject();
     CHECK_NULL_RETURN(jAudioParam, ERR_DH_AUDIO_NULLPTR);
     to_json(jAudioParam, mic->GetAudioParam());
@@ -1471,6 +1470,7 @@ void DAudioSourceDev::to_json(cJSON *j, const AudioParam &param)
     cJSON_AddNumberToObject(j, KEY_FORMAT, param.comParam.bitFormat);
     cJSON_AddNumberToObject(j, KEY_CHANNELS, param.comParam.channelMask);
     cJSON_AddNumberToObject(j, KEY_FRAMESIZE, param.comParam.frameSize);
+    cJSON_AddNumberToObject(j, KEY_CODEC_TYPE, param.comParam.codecType);
     cJSON_AddNumberToObject(j, KEY_CONTENT_TYPE, param.renderOpts.contentType);
     cJSON_AddNumberToObject(j, KEY_STREAM_USAGE, param.renderOpts.streamUsage);
     cJSON_AddNumberToObject(j, KEY_RENDER_FLAGS, param.renderOpts.renderFlags);
