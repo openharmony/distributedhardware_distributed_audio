@@ -53,50 +53,47 @@ bool DAudioHandler::AddItemsToObject(DHItem &dhItem, cJSON* infoJson, const int3
     DHLOGD("Get dhId and then add other items into cjson object");
     int32_t deviceType = GetDevTypeByDHId(dhId);
     if (deviceType == AUDIO_DEVICE_TYPE_MIC) {
-        dhItem.subtype = "mic";
-        cJSON *sampleArray = cJSON_CreateArray();
-        CHECK_NULL_RETURN(sampleArray, false);
-        cJSON_AddItemToObject(infoJson, "SampleRates", sampleArray);
-        for (const auto &value : micInfos_.sampleRates) {
-            cJSON_AddItemToArray(sampleArray, cJSON_CreateNumber(static_cast<uint32_t>(value)));
-        }
-
-        cJSON *channelArray = cJSON_CreateArray();
-        CHECK_NULL_RETURN(channelArray, false);
-        cJSON_AddItemToObject(infoJson, "ChannelMasks", channelArray);
-        for (const auto &value : micInfos_.channels) {
-            cJSON_AddItemToArray(channelArray, cJSON_CreateNumber(static_cast<uint32_t>(value)));
-        }
-
-        cJSON *formatsArray = cJSON_CreateArray();
-        CHECK_NULL_RETURN(formatsArray, false);
-        cJSON_AddItemToObject(infoJson, "Formats", formatsArray);
-        for (const auto &value : micInfos_.formats) {
-            cJSON_AddItemToArray(formatsArray, cJSON_CreateNumber(static_cast<uint32_t>(value)));
-        }
+        return AddParamsToJson(dhItem, infoJson, MIC, micInfos_);
     } else if (deviceType == AUDIO_DEVICE_TYPE_SPEAKER) {
-        dhItem.subtype = "speaker";
-        cJSON *sampleArray = cJSON_CreateArray();
-        CHECK_NULL_RETURN(sampleArray, false);
-        cJSON_AddItemToObject(infoJson, "SampleRates", sampleArray);
-        for (const auto &value : spkInfos_.sampleRates) {
-            cJSON_AddItemToArray(sampleArray, cJSON_CreateNumber(static_cast<uint32_t>(value)));
-        }
-
-        cJSON *channelArray = cJSON_CreateArray();
-        CHECK_NULL_RETURN(channelArray, false);
-        cJSON_AddItemToObject(infoJson, "ChannelMasks", channelArray);
-        for (const auto &value : spkInfos_.channels) {
-            cJSON_AddItemToArray(channelArray, cJSON_CreateNumber(static_cast<uint32_t>(value)));
-        }
-
-        cJSON *formatsArray = cJSON_CreateArray();
-        CHECK_NULL_RETURN(formatsArray, false);
-        cJSON_AddItemToObject(infoJson, "Formats", formatsArray);
-        for (const auto &value : spkInfos_.formats) {
-            cJSON_AddItemToArray(formatsArray, cJSON_CreateNumber(static_cast<uint32_t>(value)));
-        }
+        return AddParamsToJson(dhItem, infoJson, SPEAKER, spkInfos_);
     }
+    return true;
+}
+
+bool DAudioHandler::AddParamsToJson(DHItem &dhItem, cJSON* infoJson, const std::string &subtype, const AudioInfo &infos)
+{
+    dhItem.subtype = subtype;
+    cJSON *sampleArray = cJSON_CreateArray();
+    CHECK_NULL_RETURN(sampleArray, false);
+    cJSON_AddItemToObject(infoJson, SAMPLERATES, sampleArray);
+    for (const auto &value : infos.sampleRates) {
+        cJSON_AddItemToArray(sampleArray, cJSON_CreateNumber(static_cast<uint32_t>(value)));
+    }
+    cJSON *channelArray = cJSON_CreateArray();
+    CHECK_NULL_RETURN(channelArray, false);
+    cJSON_AddItemToObject(infoJson, CHANNELMASKS, channelArray);
+    for (const auto &value : infos.channels) {
+        cJSON_AddItemToArray(channelArray, cJSON_CreateNumber(static_cast<uint32_t>(value)));
+    }
+    cJSON *formatsArray = cJSON_CreateArray();
+    CHECK_NULL_RETURN(formatsArray, false);
+    cJSON_AddItemToObject(infoJson, FORMATS, formatsArray);
+    for (const auto &value : infos.formats) {
+        cJSON_AddItemToArray(formatsArray, cJSON_CreateNumber(static_cast<uint32_t>(value)));
+    }
+    cJSON *usageArray = cJSON_CreateArray();
+    CHECK_NULL_RETURN(usageArray, false);
+    cJSON_AddItemToObject(infoJson, SUPPORTEDSTREAM, usageArray);
+    for (const auto &value : supportedStream_) {
+        cJSON_AddItemToArray(usageArray, cJSON_CreateString(value.c_str()));
+    }
+    cJSON *codecArray = cJSON_CreateArray();
+    CHECK_NULL_RETURN(codecArray, false);
+    cJSON_AddItemToObject(infoJson, CODEC, codecArray);
+    for (const auto &value : codec_) {
+        cJSON_AddItemToArray(codecArray, cJSON_CreateString(value.c_str()));
+    }
+    cJSON_AddStringToObject(infoJson, PROTOCOLVER, VERSION_TWO);
     return true;
 }
 
@@ -184,6 +181,9 @@ int32_t DAudioHandler::QueryAudioInfo()
     spkInfos_.sampleRates = OHOS::AudioStandard::AudioRenderer::GetSupportedSamplingRates();
     spkInfos_.formats = OHOS::AudioStandard::AudioRenderer::GetSupportedFormats();
     spkInfos_.channels = OHOS::AudioStandard::AudioRenderer::GetSupportedChannels();
+    supportedStream_.push_back(MUSIC);
+    codec_.push_back(AAC);
+    codec_.push_back(PCM);
     return DH_SUCCESS;
 }
 

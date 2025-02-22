@@ -110,6 +110,7 @@ private:
 
     sptr<Ashmem> ashmem_ = nullptr;
     std::atomic<bool> isEnqueueRunning_ = false;
+    std::atomic<bool> isNeedCodec_ = true;
     int32_t ashmemLength_ = -1;
     int32_t lengthPerTrans_ = -1;
     int32_t readIndex_ = -1;

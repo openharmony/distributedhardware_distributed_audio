@@ -57,7 +57,8 @@ typedef enum {
 
 typedef enum {
     AUDIO_CODEC_AAC = 0,
-    AUDIO_CODEC_FLAC = 1
+    AUDIO_CODEC_FLAC = 1,
+    AUDIO_CODEC_AAC_EN = 2
 } AudioCodecType;
 
 typedef enum {

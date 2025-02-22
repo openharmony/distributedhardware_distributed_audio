@@ -294,7 +294,7 @@ void DMicClient::AudioFwkCaptureData()
         }
         int64_t endTime = GetNowTimeUs();
         if (IsOutDurationRange(startTime, endTime, lastCaptureStartTime_)) {
-            DHLOGE("This time capture spend: %{public}" PRId64" us, The interval of capture this time and "
+            DHLOGD("This time capture spend: %{public}" PRId64" us, The interval of capture this time and "
                 "the last time: %{public}" PRId64" us", endTime - startTime, startTime - lastCaptureStartTime_);
         }
         lastCaptureStartTime_ = startTime;
@@ -315,7 +315,7 @@ void DMicClient::AudioFwkCaptureData()
     }
     int64_t endTransTime = GetNowTimeUs();
     if (IsOutDurationRange(startTransTime, endTransTime, lastTransStartTime_)) {
-        DHLOGE("This time send data spend: %{public}" PRId64" us, The interval of send data this time and "
+        DHLOGD("This time send data spend: %{public}" PRId64" us, The interval of send data this time and "
             "the last time: %{public}" PRId64" us",
             endTransTime - startTransTime, startTransTime - lastTransStartTime_);
     }

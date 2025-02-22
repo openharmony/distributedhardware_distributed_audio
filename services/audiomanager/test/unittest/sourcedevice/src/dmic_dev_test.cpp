@@ -337,10 +337,8 @@ HWTEST_F(DMicDevTest, ReadStreamData_001, TestSize.Level1)
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, mic_->ReadStreamData(streamId_, readData1));
 
     mic_->curStatus_ = AudioStatus::STATUS_START;
-    mic_->insertFrameCnt_ = 1;
     EXPECT_EQ(DH_SUCCESS, mic_->ReadStreamData(streamId_, readData1));
 
-    mic_->insertFrameCnt_ = 11;
     EXPECT_EQ(DH_SUCCESS, mic_->ReadStreamData(streamId_, readData1));
 }
 

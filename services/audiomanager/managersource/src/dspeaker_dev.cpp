@@ -47,6 +47,13 @@ int32_t DSpeakerDev::EnableDevice(const int32_t dhId, const std::string &capabil
         return ret;
     }
     dhId_ = dhId;
+    auto pos = capability.find(SUB_PROTOCOLVER);
+    if (pos != std::string::npos) {
+        DHLOGD("ProtocolVer : 2.0");
+    } else {
+        isNeedCodec_.store(false);
+        DHLOGD("ProtocolVer : 1.0");
+    }
     return DH_SUCCESS;
 }
 
@@ -204,6 +211,10 @@ int32_t DSpeakerDev::SetParameters(const int32_t streamId, const AudioParamHDF &
     param_.renderOpts.contentType = CONTENT_TYPE_MUSIC;
     param_.renderOpts.renderFlags = paramHDF_.renderFlags;
     param_.renderOpts.streamUsage = paramHDF_.streamUsage;
+    if (isNeedCodec_.load()) {
+        param_.comParam.codecType = AudioCodecType::AUDIO_CODEC_AAC_EN;
+    }
+    DHLOGD("isNeedCodec_: %{public}d", isNeedCodec_.load());
     return DH_SUCCESS;
 }
 

@@ -52,10 +52,13 @@ private:
     ~DAudioHandler();
     int32_t QueryAudioInfo();
     bool AddItemsToObject(DHItem &dhItem, cJSON *infoJson, const int32_t &dhId);
+    bool AddParamsToJson(DHItem &dhItem, cJSON* infoJson, const std::string &subtype, const AudioInfo &infos);
     std::vector<DHItem> RealQuery(const std::string &dataType);
 private:
     AudioInfo spkInfos_;
     AudioInfo micInfos_;
+    std::vector<std::string> supportedStream_;
+    std::vector<std::string> codec_;
     std::shared_ptr<PluginListener> listener_ = nullptr;
 };
 

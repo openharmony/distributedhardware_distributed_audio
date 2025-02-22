@@ -54,7 +54,7 @@ void DSpeakerClient::OnEngineTransMessage(const std::shared_ptr<AVTransMessage> 
 
 void DSpeakerClient::OnEngineTransDataAvailable(const std::shared_ptr<AudioData> &audioData)
 {
-    DHLOGI("On Engine Data available");
+    DHLOGD("On Engine Data available");
     OnDecodeTransDataDone(audioData);
 }
 
@@ -343,7 +343,7 @@ void DSpeakerClient::PlayThreadRunning()
         }
         int64_t endTime = GetNowTimeUs();
         if (IsOutDurationRange(startTime, endTime, lastPlayStartTime_)) {
-            DHLOGE("This time play spend: %{public}" PRId64" us, The interval of play this time and "
+            DHLOGD("This time play spend: %{public}" PRId64" us, The interval of play this time and "
                 "the last time: %{public}" PRId64" us", endTime - startTime, startTime - lastPlayStartTime_);
         }
         lastPlayStartTime_ = startTime;
@@ -378,7 +378,7 @@ void DSpeakerClient::FlushJitterQueue()
 
 int32_t DSpeakerClient::OnDecodeTransDataDone(const std::shared_ptr<AudioData> &audioData)
 {
-    DHLOGI("Write stream buffer.");
+    DHLOGD("Write stream buffer.");
     int64_t startTime = GetNowTimeUs();
     CHECK_NULL_RETURN(audioData, ERR_DH_AUDIO_NULLPTR);
 
@@ -393,7 +393,7 @@ int32_t DSpeakerClient::OnDecodeTransDataDone(const std::shared_ptr<AudioData> &
     DHLOGD("Push new spk data, buf len: %{public}" PRIu64, queueSize);
     int64_t endTime = GetNowTimeUs();
     if (IsOutDurationRange(startTime, endTime, lastReceiveStartTime_)) {
-        DHLOGE("This time receivce data spend: %{public}" PRId64" us, Receivce data this time and "
+        DHLOGD("This time receivce data spend: %{public}" PRId64" us, Receivce data this time and "
             "the last time: %{public}" PRId64" us", endTime - startTime, startTime - lastReceiveStartTime_);
     }
     lastReceiveStartTime_ = startTime;
