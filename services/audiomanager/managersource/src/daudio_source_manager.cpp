@@ -42,9 +42,9 @@ IMPLEMENT_SINGLE_INSTANCE(DAudioSourceManager);
 using AVTransProviderClass = IAVEngineProvider *(*)(const std::string &);
 
 const std::string SENDER_SO_NAME = "libdistributed_av_sender.z.so";
-const std::string GET_SENDER_PROVIDER_FUNC = "GetAVSenderEngineProvider";
+const std::string GET_SENDER_PROVIDER_FUNC = "GetAVAudioSenderEngineProvider";
 const std::string RECEIVER_SO_NAME = "libdistributed_av_receiver.z.so";
-const std::string GET_RECEIVER_PROVIDER_FUNC = "GetAVReceiverEngineProvider";
+const std::string GET_RECEIVER_PROVIDER_FUNC = "GetAVAudioReceiverEngineProvider";
 
 DAudioSourceManager::DAudioSourceManager()
 {
