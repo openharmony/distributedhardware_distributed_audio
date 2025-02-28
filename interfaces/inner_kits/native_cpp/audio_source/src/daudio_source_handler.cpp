@@ -23,6 +23,7 @@
 #include "daudio_hisysevent.h"
 #include "daudio_hitrace.h"
 #include "daudio_log.h"
+#include "daudio_radar.h"
 #include "daudio_util.h"
 #include "daudio_source_load_callback.h"
 
@@ -58,6 +59,8 @@ int32_t DAudioSourceHandler::InitSource(const std::string &params)
         sptr<DAudioSourceLoadCallback> loadCallback = sptr<DAudioSourceLoadCallback>(
             new DAudioSourceLoadCallback(params));
         int32_t ret = samgr->LoadSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SOURCE_SA_ID, loadCallback);
+        DaudioRadar::GetInstance().ReportDaudioInit("LoadSystemAbility", AudioInit::SERVICE_INIT,
+            BizState::BIZ_STATE_START, ret);
         if (ret != ERR_OK) {
             DHLOGE("Failed to Load systemAbility, ret code: %{public}d", ret);
             DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_INIT_FAIL,

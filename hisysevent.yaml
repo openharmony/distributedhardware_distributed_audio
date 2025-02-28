@@ -98,3 +98,27 @@ DAUDIO_OPT_FAIL:
   __BASE: {type: FAULT, level: CRITICAL, desc: daudio operate fail occured}
   ERROR_CODE: {type: INT32, desc: daudio init process fail error code}
   MSG: {type: STRING, desc: daudio operate fail info}
+
+DISTRIBUTED_AUDIO_BEHAVIOR:
+  __BASE: {type: BEHAVIOR, level: CRITICAL, desc: distributed audio behavior, preserve: false}
+  ORG_PKG: {type: STRING, desc: The package of the current module}
+  FUNC: {type: STRING, desc: Function name}
+  BIZ_SCENE: {type: INT32, desc: Identify the current business scenario}
+  BIZ_STAGE: {type: INT32, desc: process stage}
+  STAGE_RES: {type: INT32, desc: stage result}
+  BIZ_STATE: {type: INT32, desc: state of business}
+  TO_CALL_PKG: {type: STRING, desc: call module}
+  ERROR_CODE: {type: INT32, desc: error code}
+  LOCAL_UDID: {type: STRING, desc: local device udid}
+  PEER_UDID: {type: STRING, desc: Peer device udid}
+  LOCAL_DEV_TYPE: {type: STRING, desc: local device type}
+  PEER_DEV_TYPE: {type: STRING, desc: Peer device type}
+  LOCAL_NET_ID: {type: STRING, desc: Local device Net_ID}
+  PEER_NET_ID: {type: STRING, desc: Peer device Net_ID}
+  PEER_BT_MAC: {type: STRING, desc: Peer device btMac}
+  IS_TRUST: {type: INT32, desc: Credible state}
+  LOCAL_SESS_NAME: {type: STRING, desc: Local session name}
+  PEER_SESS_NAME: {type: STRING, desc: Peer session name}
+  CONFIG_INFO: {type: STRING, desc: Config information}
+  CONCURRENT_ID: {type: STRING, desc: Concurrent transaction ID}
+  SERVICE_DURATION: {type: STRING, desc: Duration time of service}

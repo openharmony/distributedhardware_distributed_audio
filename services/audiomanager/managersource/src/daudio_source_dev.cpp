@@ -23,6 +23,7 @@
 #include "daudio_errorcode.h"
 #include "daudio_hitrace.h"
 #include "daudio_log.h"
+#include "daudio_radar.h"
 #include "daudio_source_manager.h"
 #include "daudio_util.h"
 
@@ -896,11 +897,13 @@ int32_t DAudioSourceDev::CreateSpkEngine(std::shared_ptr<DAudioIoDev> speaker)
 {
     CHECK_NULL_RETURN(speaker, ERR_DH_AUDIO_NULLPTR);
     int32_t ret = speaker->InitSenderEngine(DAudioSourceManager::GetInstance().getSenderProvider());
+    DaudioRadar::GetInstance().ReportSpeakerOpenProgress("InitSenderEngine", SpeakerOpen::INIT_ENGINE, ret);
     if (ret != DH_SUCCESS) {
         DHLOGE("Speaker init sender Engine, error code %{public}d.", ret);
         return ret;
     }
     ret = speaker->InitCtrlTrans();
+    DaudioRadar::GetInstance().ReportSpeakerOpenProgress("InitCtrlTrans", SpeakerOpen::TRANS_CONTROL, ret);
     if (ret != DH_SUCCESS) {
         DHLOGE("Speaker InitCtrlTrans, error code %{public}d.", ret);
         return ret;
@@ -999,6 +1002,8 @@ int32_t DAudioSourceDev::OpenDSpeakerInner(std::shared_ptr<DAudioIoDev> &speaker
         return ret;
     }
     ret = speaker->Start();
+    DaudioRadar::GetInstance().ReportSpeakerOpen("Start", SpeakerOpen::NOTIFY_HDF,
+        BizState::BIZ_STATE_END, ret);
     if (ret != DH_SUCCESS) {
         DHLOGE("Speaker start failed, error code %{public}d.", ret);
         speaker->Stop();
@@ -1055,6 +1060,8 @@ int32_t DAudioSourceDev::TaskCloseDSpeaker(const std::string &args)
         return ERR_DH_AUDIO_SA_PARAM_INVALID;
     }
     int32_t ret = CloseSpkNew(args);
+    DaudioRadar::GetInstance().ReportSpeakerClose("CloseSpkNew", SpeakerClose::NOTIFY_HDF,
+        BizState::BIZ_STATE_END, ret);
     if (ret != DH_SUCCESS) {
         DHLOGE("Close spk failed.");
         NotifyHDF(NOTIFY_CLOSE_SPEAKER_RESULT, HDF_EVENT_RESULT_FAILED, dhId);
@@ -1072,11 +1079,13 @@ int32_t DAudioSourceDev::CreateMicEngine(std::shared_ptr<DAudioIoDev> mic)
         return ERR_DH_AUDIO_NULLPTR;
     }
     int32_t ret = mic->InitReceiverEngine(DAudioSourceManager::GetInstance().getReceiverProvider());
+    DaudioRadar::GetInstance().ReportMicOpenProgress("InitReceiverEngine", MicOpen::INIT_ENGINE, ret);
     if (ret != DH_SUCCESS) {
         DHLOGE("Init receiver engine failed.");
         return ret;
     }
     ret = mic->InitCtrlTrans();
+    DaudioRadar::GetInstance().ReportMicOpenProgress("InitCtrlTrans", MicOpen::TRANS_CONTROL, ret);
     if (ret != DH_SUCCESS) {
         DHLOGE("mic InitCtrlTrans, error code %{public}d.", ret);
         return ret;
@@ -1126,6 +1135,8 @@ int32_t DAudioSourceDev::TaskOpenDMic(const std::string &args)
         return ret;
     }
     ret = mic->Start();
+    DaudioRadar::GetInstance().ReportMicOpen("Start", MicOpen::NOTIFY_HDF,
+        BizState::BIZ_STATE_END, ret);
     if (ret != DH_SUCCESS) {
         DHLOGE("Mic start failed, error code %{public}d.", ret);
         mic->Stop();
@@ -1176,6 +1187,8 @@ int32_t DAudioSourceDev::TaskCloseDMic(const std::string &args)
         return DH_SUCCESS;
     }
     int32_t ret = CloseMicNew(args);
+    DaudioRadar::GetInstance().ReportMicClose("CloseMicNew", MicClose::NOTIFY_HDF,
+        BizState::BIZ_STATE_END, ret);
     if (ret != DH_SUCCESS) {
         DHLOGE("Task close mic error.");
         NotifyHDF(NOTIFY_CLOSE_MIC_RESULT, HDF_EVENT_RESULT_FAILED, dhId);

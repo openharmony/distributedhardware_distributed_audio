@@ -72,7 +72,7 @@ HWTEST_F(DAudioIpcCallbackTest, OnNotifyRegResult_002, TestSize.Level1)
     int32_t status = 0;
     const std::string data = "data";
     int32_t ret = dAudioIpcCallback_->OnNotifyRegResult(devId, dhId, reqId, status, data);
-    EXPECT_EQ(ERR_DH_AUDIO_SA_CALLBACK_NOT_FOUND, ret);
+    EXPECT_EQ(ERR_DH_AUDIO_SA_REGISTERCALLBACK_NOT_FOUND, ret);
 }
 
 /**
@@ -140,7 +140,7 @@ HWTEST_F(DAudioIpcCallbackTest, OnNotifyUnregResult_002, TestSize.Level1)
     int32_t status = 0;
     const std::string data = "data";
     int32_t ret = dAudioIpcCallback_->OnNotifyUnregResult(devId, dhId, reqId, status, data);
-    EXPECT_EQ(ERR_DH_AUDIO_SA_CALLBACK_NOT_FOUND, ret);
+    EXPECT_EQ(ERR_DH_AUDIO_SA_UNREGISTERCALLBACK_NOT_FOUND, ret);
 }
 
 /**

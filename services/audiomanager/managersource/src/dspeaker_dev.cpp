@@ -28,6 +28,7 @@
 #include "daudio_hisysevent.h"
 #include "daudio_hitrace.h"
 #include "daudio_log.h"
+#include "daudio_radar.h"
 #include "daudio_source_manager.h"
 #include "daudio_util.h"
 
@@ -165,6 +166,8 @@ int32_t DSpeakerDev::CreateStream(const int32_t streamId)
     streamId_ = streamId;
     cJSON_Delete(jParam);
     cJSON_free(jsonData);
+    DaudioRadar::GetInstance().ReportSpeakerOpen("CreateStream", SpeakerOpen::CREATE_STREAM,
+        BizState::BIZ_STATE_START, DH_SUCCESS);
     return DH_SUCCESS;
 }
 
@@ -191,6 +194,8 @@ int32_t DSpeakerDev::DestroyStream(const int32_t streamId)
     curPort_ = 0;
     cJSON_Delete(jParam);
     cJSON_free(jsonData);
+    DaudioRadar::GetInstance().ReportSpeakerClose("DestroyStream", SpeakerClose::DESTROY_STREAM,
+        BizState::BIZ_STATE_START, DH_SUCCESS);
     return DH_SUCCESS;
 }
 
@@ -248,6 +253,7 @@ int32_t DSpeakerDev::Start()
     DHLOGI("Start speaker device.");
     CHECK_NULL_RETURN(speakerTrans_, ERR_DH_AUDIO_NULLPTR);
     int32_t ret = speakerTrans_->Start();
+    DaudioRadar::GetInstance().ReportSpeakerOpenProgress("Start", SpeakerOpen::TRANS_START, ret);
     if (ret != DH_SUCCESS) {
         DHLOGE("Speaker trans start failed, ret: %{public}d.", ret);
         return ret;
@@ -270,6 +276,7 @@ int32_t DSpeakerDev::Stop()
     isOpened_.store(false);
     isTransReady_.store(false);
     int32_t ret = speakerTrans_->Stop();
+    DaudioRadar::GetInstance().ReportSpeakerCloseProgress("Stop", SpeakerClose::STOP_TRANS, ret);
     if (ret != DH_SUCCESS) {
         DHLOGE("Stop speaker trans failed, ret: %{public}d.", ret);
         return ret;
@@ -292,6 +299,7 @@ int32_t DSpeakerDev::Release()
     }
     CHECK_NULL_RETURN(speakerTrans_, DH_SUCCESS);
     int32_t ret = speakerTrans_->Release();
+    DaudioRadar::GetInstance().ReportSpeakerCloseProgress("Release", SpeakerClose::RELEASE_TRANS, ret);
     if (ret != DH_SUCCESS) {
         DHLOGE("Release speaker trans failed, ret: %{public}d.", ret);
     }

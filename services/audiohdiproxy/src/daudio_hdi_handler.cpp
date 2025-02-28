@@ -28,6 +28,7 @@
 #include "daudio_hdi_handler.h"
 #include "daudio_hitrace.h"
 #include "daudio_log.h"
+#include "daudio_radar.h"
 #include "daudio_util.h"
 
 #undef DH_LOG_TAG
@@ -57,6 +58,8 @@ int32_t DAudioHdiHandler::InitHdiHandler()
 
     DHLOGD("Load hdf driver start.");
     int32_t ret = DaudioHdfOperate::GetInstance().LoadDaudioHDFImpl();
+    DaudioRadar::GetInstance().ReportDaudioInit("LoadDaudioHDFImpl", AudioInit::LOAD_HDF_DRIVER,
+        BizState::BIZ_STATE_END, ret);
     if (ret != DH_SUCCESS) {
         DHLOGE("Load hdf driver failed, ret: %{public}d", ret);
         return ret;
@@ -80,6 +83,7 @@ int32_t DAudioHdiHandler::UninitHdiHandler()
     CHECK_NULL_RETURN(audioSrvHdf_, DH_SUCCESS);
 
     int32_t ret = DaudioHdfOperate::GetInstance().UnLoadDaudioHDFImpl();
+    DaudioRadar::GetInstance().ReportDaudioUnInitProgress("UnLoadDaudioHDFImpl", AudioUnInit::UNLOAD_HDF_DRIVER, ret);
     if (ret != DH_SUCCESS) {
         DHLOGE("Unload hdf driver failed, ret: %{public}d", ret);
         return ret;
@@ -139,6 +143,8 @@ int32_t DAudioHdiHandler::UnRegisterAudioDevice(const std::string &devId, const 
     DHLOGI("Unregister audio device, adpname: %{public}s, dhId: %{public}d", GetAnonyString(devId).c_str(), dhId);
     CHECK_NULL_RETURN(audioSrvHdf_, ERR_DH_AUDIO_NULLPTR);
     int32_t res = audioSrvHdf_->UnRegisterAudioDevice(devId, dhId);
+    DaudioRadar::GetInstance().ReportDaudioUnInitProgress("UnRegisterAudioDevice",
+        AudioUnInit::UNLOAD_HDF_DRIVER, res);
     if (res != HDF_SUCCESS) {
         DHLOGE("Call hdf proxy unregister failed, res: %{public}d", res);
         return ERR_DH_AUDIO_HDI_CALL_FAILED;
@@ -149,7 +155,7 @@ int32_t DAudioHdiHandler::UnRegisterAudioDevice(const std::string &devId, const 
         auto iter = mapAudioMgrDhIds_.find(devId);
         if (iter == mapAudioMgrDhIds_.end()) {
             DHLOGE("Can not find register devId. devId: %{public}s", GetAnonyString(devId).c_str());
-            return ERR_DH_AUDIO_SA_CALLBACK_NOT_FOUND;
+            return ERR_DH_AUDIO_SA_UNREGISTERCALLBACK_NOT_FOUND;
         }
 
         iter->second.erase(dhId);

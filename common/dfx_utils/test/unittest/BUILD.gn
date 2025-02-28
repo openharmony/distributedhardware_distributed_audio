@@ -61,6 +61,7 @@ ohos_unittest("DAudioDfxTest") {
   sources = [
     "${common_path}/dfx_utils/test/unittest/src/daudio_hidumper_test.cpp",
     "${common_path}/dfx_utils/test/unittest/src/daudio_hitrace_test.cpp",
+    "${common_path}/dfx_utils/test/unittest/src/daudio_radar_test.cpp",
   ]
   configs = [ ":module_private_config" ]
 

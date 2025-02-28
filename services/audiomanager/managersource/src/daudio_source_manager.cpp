@@ -24,6 +24,7 @@
 #include "daudio_errorcode.h"
 #include "daudio_log.h"
 #include "daudio_util.h"
+#include "daudio_radar.h"
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DAudioSourceManager"
@@ -398,6 +399,7 @@ int32_t DAudioSourceManager::OnDisableDAudio(const std::string &devId, const std
     }
 
     CHECK_NULL_RETURN(ipcCallback_, ERR_DH_AUDIO_NULLPTR);
+    DaudioRadar::GetInstance().ReportDaudioUnInitProgress("OnDisableDAudio", AudioUnInit::DISABLED, result);
     return ipcCallback_->OnNotifyUnregResult(devId, dhId, reqId, result, "");
 }
 

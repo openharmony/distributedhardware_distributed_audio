@@ -50,6 +50,7 @@ ohos_shared_library("distributed_audio_utils") {
   sources = [
     "${common_path}/dfx_utils/src/daudio_hisysevent.cpp",
     "${common_path}/dfx_utils/src/daudio_hitrace.cpp",
+    "${common_path}/dfx_utils/src/daudio_radar.cpp",
     "${common_path}/src/daudio_latency_test.cpp",
     "${common_path}/src/daudio_ringbuffer.cpp",
     "${common_path}/src/daudio_util.cpp",

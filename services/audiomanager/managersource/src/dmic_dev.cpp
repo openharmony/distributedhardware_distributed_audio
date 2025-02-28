@@ -26,6 +26,7 @@
 #include "daudio_hisysevent.h"
 #include "daudio_hitrace.h"
 #include "daudio_log.h"
+#include "daudio_radar.h"
 #include "daudio_source_manager.h"
 #include "daudio_util.h"
 
@@ -220,6 +221,8 @@ int32_t DMicDev::CreateStream(const int32_t streamId)
     streamId_ = streamId;
     cJSON_Delete(jParam);
     cJSON_free(jsonData);
+    DaudioRadar::GetInstance().ReportMicOpen("Start", MicOpen::CREATE_STREAM,
+        BizState::BIZ_STATE_START, DH_SUCCESS);
     return DH_SUCCESS;
 }
 
@@ -246,6 +249,8 @@ int32_t DMicDev::DestroyStream(const int32_t streamId)
     cJSON_Delete(jParam);
     cJSON_free(jsonData);
     curPort_ = 0;
+    DaudioRadar::GetInstance().ReportMicClose("DestroyStream", MicClose::DESTROY_STREAM,
+        BizState::BIZ_STATE_START, DH_SUCCESS);
     return DH_SUCCESS;
 }
 
@@ -347,6 +352,7 @@ int32_t DMicDev::Start()
     DHLOGI("Start mic device.");
     CHECK_NULL_RETURN(micTrans_, ERR_DH_AUDIO_NULLPTR);
     int32_t ret = micTrans_->Start();
+    DaudioRadar::GetInstance().ReportMicOpenProgress("Start", MicOpen::TRANS_START, ret);
     if (ret != DH_SUCCESS) {
         DHLOGE("Mic trans start failed, ret: %{public}d.", ret);
         return ret;
@@ -387,6 +393,7 @@ int32_t DMicDev::Stop()
 #ifdef ECHO_CANNEL_ENABLE
     CHECK_NULL_RETURN(echoManager_, DH_SUCCESS);
     ret = echoManager_->Stop();
+    DaudioRadar::GetInstance().ReportMicCloseProgress("Stop", MicClose::STOP_TRANS, ret);
     if (ret != DH_SUCCESS) {
         DHLOGE("Echo manager stop failed. ret: %{public}d.", ret);
         return ret;
@@ -411,6 +418,7 @@ int32_t DMicDev::Release()
     CHECK_NULL_RETURN(micTrans_, DH_SUCCESS);
 
     int32_t ret = micTrans_->Release();
+    DaudioRadar::GetInstance().ReportMicCloseProgress("Release", MicClose::RELEASE_TRANS, ret);
     if (ret != DH_SUCCESS) {
         DHLOGE("Release mic trans failed, ret: %{public}d.", ret);
         return ret;
