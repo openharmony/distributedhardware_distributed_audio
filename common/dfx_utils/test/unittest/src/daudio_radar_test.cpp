@@ -84,6 +84,33 @@ HWTEST_F(DaudioRadarTest, ReportDaudioInit_002, TestSize.Level1)
 }
 
 /**
+ * @tc.name: ReportDaudioInitProgress_001
+ * @tc.desc: check ReportDaudioInitProgress
+ * @tc.type: FUNC
+ */
+HWTEST_F(DaudioRadarTest, ReportDaudioInitProgress_001, TestSize.Level1)
+{
+    DHLOGI("DaudioRadarTest ReportDaudioInitProgress_001 begin");
+    bool ret = DaudioRadar::GetInstance().ReportDaudioInitProgress(FUNC, AudioInit::SERVICE_INIT, DH_SUCCESS);
+    EXPECT_EQ(ret, true);
+    DHLOGI("DaudioRadarTest ReportDaudioInitProgress_001 end");
+}
+
+/**
+ * @tc.name: ReportDaudioInitProgress_002
+ * @tc.desc: check ReportDaudioInitProgress
+ * @tc.type: FUNC
+ */
+HWTEST_F(DaudioRadarTest, ReportDaudioInitProgress_002, TestSize.Level1)
+{
+    DHLOGI("DaudioRadarTest ReportDaudioInitProgress_002 begin");
+    bool ret = DaudioRadar::GetInstance().ReportDaudioInitProgress(FUNC, AudioInit::SERVICE_INIT,
+        ERR_DH_AUDIO_FAILED);
+    EXPECT_EQ(ret, true);
+    DHLOGI("DaudioRadarTest ReportDaudioInitProgress_002 end");
+}
+
+/**
  * @tc.name: ReportSpeakerOpen_001
  * @tc.desc: check ReportSpeakerOpen
  * @tc.type: FUNC
@@ -109,6 +136,33 @@ HWTEST_F(DaudioRadarTest, ReportSpeakerOpen_002, TestSize.Level1)
         BizState::BIZ_STATE_START, ERR_DH_AUDIO_FAILED);
     EXPECT_EQ(ret, true);
     DHLOGI("DaudioRadarTest ReportSpeakerOpen_002 end");
+}
+
+/**
+ * @tc.name: ReportSpeakerOpenProgress_001
+ * @tc.desc: check ReportSpeakerOpenProgress
+ * @tc.type: FUNC
+ */
+HWTEST_F(DaudioRadarTest, ReportSpeakerOpenProgress_001, TestSize.Level1)
+{
+    DHLOGI("DaudioRadarTest ReportSpeakerOpenProgress_001 begin");
+    bool ret = DaudioRadar::GetInstance().ReportSpeakerOpenProgress(FUNC, SpeakerOpen::CREATE_STREAM, DH_SUCCESS);
+    EXPECT_EQ(ret, true);
+    DHLOGI("DaudioRadarTest ReportSpeakerOpenProgress_001 end");
+}
+
+/**
+ * @tc.name: ReportSpeakerOpenProgress_002
+ * @tc.desc: check ReportSpeakerOpenProgress
+ * @tc.type: FUNC
+ */
+HWTEST_F(DaudioRadarTest, ReportSpeakerOpenProgress_002, TestSize.Level1)
+{
+    DHLOGI("DaudioRadarTest ReportSpeakerOpenProgress_002 begin");
+    bool ret = DaudioRadar::GetInstance().ReportSpeakerOpenProgress(FUNC, SpeakerOpen::CREATE_STREAM,
+        ERR_DH_AUDIO_FAILED);
+    EXPECT_EQ(ret, true);
+    DHLOGI("DaudioRadarTest ReportSpeakerOpenProgress_002 end");
 }
 
 /**
@@ -140,6 +194,33 @@ HWTEST_F(DaudioRadarTest, ReportSpeakerClose_002, TestSize.Level1)
 }
 
 /**
+ * @tc.name: ReportSpeakerCloseProgress_001
+ * @tc.desc: check ReportSpeakerCloseProgress
+ * @tc.type: FUNC
+ */
+HWTEST_F(DaudioRadarTest, ReportSpeakerCloseProgress_001, TestSize.Level1)
+{
+    DHLOGI("DaudioRadarTest ReportSpeakerCloseProgress_001 begin");
+    bool ret = DaudioRadar::GetInstance().ReportSpeakerCloseProgress(FUNC, SpeakerClose::DESTROY_STREAM, DH_SUCCESS);
+    EXPECT_EQ(ret, true);
+    DHLOGI("DaudioRadarTest ReportSpeakerCloseProgress_001 end");
+}
+
+/**
+ * @tc.name: ReportSpeakerCloseProgress_002
+ * @tc.desc: check ReportSpeakerCloseProgress
+ * @tc.type: FUNC
+ */
+HWTEST_F(DaudioRadarTest, ReportSpeakerCloseProgress_002, TestSize.Level1)
+{
+    DHLOGI("DaudioRadarTest ReportSpeakerCloseProgress_002 begin");
+    bool ret = DaudioRadar::GetInstance().ReportSpeakerCloseProgress(FUNC, SpeakerClose::DESTROY_STREAM,
+        ERR_DH_AUDIO_FAILED);
+    EXPECT_EQ(ret, true);
+    DHLOGI("DaudioRadarTest ReportSpeakerCloseProgress_002 end");
+}
+
+/**
  * @tc.name: ReportMicOpen_001
  * @tc.desc: check ReportMicOpen
  * @tc.type: FUNC
@@ -165,6 +246,34 @@ HWTEST_F(DaudioRadarTest, ReportMicOpen_002, TestSize.Level1)
         BizState::BIZ_STATE_START, ERR_DH_AUDIO_FAILED);
     EXPECT_EQ(ret, true);
     DHLOGI("DaudioRadarTest ReportMicOpen_002 end");
+}
+
+/**
+ * @tc.name: ReportMicOpenProgress_001
+ * @tc.desc: check ReportMicOpenProgress
+ * @tc.type: FUNC
+ */
+HWTEST_F(DaudioRadarTest, ReportMicOpenProgress_001, TestSize.Level1)
+{
+    DHLOGI("DaudioRadarTest ReportMicOpenProgress_001 begin");
+    bool ret = DaudioRadar::GetInstance().ReportMicOpenProgress(FUNC, MicOpen::CREATE_STREAM,
+        DH_SUCCESS);
+    EXPECT_EQ(ret, true);
+    DHLOGI("DaudioRadarTest ReportMicOpenProgress_001 end");
+}
+
+/**
+ * @tc.name: ReportMicOpenProgress_002
+ * @tc.desc: check ReportMicOpenProgress
+ * @tc.type: FUNC
+ */
+HWTEST_F(DaudioRadarTest, ReportMicOpenProgress_002, TestSize.Level1)
+{
+    DHLOGI("DaudioRadarTest ReportMicOpenProgress_002 begin");
+    bool ret = DaudioRadar::GetInstance().ReportMicOpenProgress(FUNC, MicOpen::CREATE_STREAM,
+        ERR_DH_AUDIO_FAILED);
+    EXPECT_EQ(ret, true);
+    DHLOGI("DaudioRadarTest ReportMicOpenProgress_002 end");
 }
 
 /**
@@ -196,6 +305,34 @@ HWTEST_F(DaudioRadarTest, ReportMicClose_002, TestSize.Level1)
 }
 
 /**
+ * @tc.name: ReportMicCloseProgress_001
+ * @tc.desc: check ReportMicCloseProgress
+ * @tc.type: FUNC
+ */
+HWTEST_F(DaudioRadarTest, ReportMicCloseProgress_001, TestSize.Level1)
+{
+    DHLOGI("DaudioRadarTest ReportMicCloseProgress_001 begin");
+    bool ret = DaudioRadar::GetInstance().ReportMicCloseProgress(FUNC, MicClose::DESTROY_STREAM,
+        DH_SUCCESS);
+    EXPECT_EQ(ret, true);
+    DHLOGI("DaudioRadarTest ReportMicCloseProgress_001 end");
+}
+
+/**
+ * @tc.name: ReportMicCloseProgress_002
+ * @tc.desc: check ReportMicCloseProgress
+ * @tc.type: FUNC
+ */
+HWTEST_F(DaudioRadarTest, ReportMicCloseProgress_002, TestSize.Level1)
+{
+    DHLOGI("DaudioRadarTest ReportMicCloseProgress_002 begin");
+    bool ret = DaudioRadar::GetInstance().ReportMicCloseProgress(FUNC, MicClose::DESTROY_STREAM,
+        ERR_DH_AUDIO_FAILED);
+    EXPECT_EQ(ret, true);
+    DHLOGI("DaudioRadarTest ReportMicCloseProgress_002 end");
+}
+
+/**
  * @tc.name: ReportDaudioUnInit_001
  * @tc.desc: check ReportDaudioUnInit
  * @tc.type: FUNC
@@ -221,6 +358,34 @@ HWTEST_F(DaudioRadarTest, ReportDaudioUnInit_002, TestSize.Level1)
         BizState::BIZ_STATE_START, ERR_DH_AUDIO_FAILED);
     EXPECT_EQ(ret, true);
     DHLOGI("DaudioRadarTest ReportDaudioUnInit_002 end");
+}
+
+/**
+ * @tc.name: ReportDaudioUnInitProgress_001
+ * @tc.desc: check ReportDaudioUnInitProgress
+ * @tc.type: FUNC
+ */
+HWTEST_F(DaudioRadarTest, ReportDaudioUnInitProgress_001, TestSize.Level1)
+{
+    DHLOGI("DaudioRadarTest ReportDaudioUnInitProgress_001 begin");
+    bool ret = DaudioRadar::GetInstance().ReportDaudioUnInitProgress(FUNC, AudioUnInit::UNREGISTER,
+        DH_SUCCESS);
+    EXPECT_EQ(ret, true);
+    DHLOGI("DaudioRadarTest ReportDaudioUnInitProgress_001 end");
+}
+
+/**
+ * @tc.name: ReportDaudioUnInitProgress_002
+ * @tc.desc: check ReportDaudioUnInitProgress
+ * @tc.type: FUNC
+ */
+HWTEST_F(DaudioRadarTest, ReportDaudioUnInitProgress_002, TestSize.Level1)
+{
+    DHLOGI("DaudioRadarTest ReportDaudioUnInitProgress_002 begin");
+    bool ret = DaudioRadar::GetInstance().ReportDaudioUnInitProgress(FUNC, AudioUnInit::UNREGISTER,
+        ERR_DH_AUDIO_FAILED);
+    EXPECT_EQ(ret, true);
+    DHLOGI("DaudioRadarTest ReportDaudioUnInitProgress_002 end");
 }
 }
 }

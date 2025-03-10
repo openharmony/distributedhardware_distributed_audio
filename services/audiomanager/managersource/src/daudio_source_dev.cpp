@@ -361,7 +361,7 @@ int32_t DAudioSourceDev::HandleAudioStart(const AudioEvent &event)
 {
     DHLOGI("Audio start, content: %{public}s.", event.content.c_str());
     int32_t dhId = ParseDhidFromEvent(event.content);
-    if (dhId < 0) {
+    if (dhId == ERR_DH_AUDIO_FAILED) {
         DHLOGE("Failed to parse dhardware id.");
         return ERR_DH_AUDIO_SA_PARAM_INVALID;
     }
@@ -384,7 +384,7 @@ int32_t DAudioSourceDev::HandleAudioStop(const AudioEvent &event)
 {
     DHLOGI("Audio mmap stop, content: %{public}s.", event.content.c_str());
     int32_t dhId = ParseDhidFromEvent(event.content);
-    if (dhId < 0) {
+    if (dhId == ERR_DH_AUDIO_FAILED) {
         DHLOGE("Failed to parse dhardware id.");
         return ERR_DH_AUDIO_SA_PARAM_INVALID;
     }
@@ -444,7 +444,7 @@ int32_t DAudioSourceDev::HandleDSpeakerClosed(const AudioEvent &event)
 {
     DHLOGI("Speaker device closed, event.content = %{public}s.", event.content.c_str());
     int32_t dhId = ParseDhidFromEvent(event.content);
-    if (dhId < 0) {
+    if (dhId == ERR_DH_AUDIO_FAILED) {
         DHLOGE("Failed to parse dhardware id.");
         return ERR_DH_AUDIO_FAILED;
     }
@@ -456,7 +456,7 @@ int32_t DAudioSourceDev::HandleDSpeakerClosed(const AudioEvent &event)
 std::shared_ptr<DAudioIoDev> DAudioSourceDev::FindIoDevImpl(std::string args)
 {
     int32_t dhId = ParseDhidFromEvent(args);
-    if (dhId < 0) {
+    if (dhId == ERR_DH_AUDIO_FAILED) {
         DHLOGE("Failed to parse dhardware id.");
         return nullptr;
     }
@@ -925,7 +925,7 @@ int32_t DAudioSourceDev::TaskOpenDSpeaker(const std::string &args)
         return ERR_DH_AUDIO_SA_PARAM_INVALID;
     }
     int32_t dhId = ParseDhidFromEvent(args);
-    if (dhId < 0) {
+    if (dhId == ERR_DH_AUDIO_FAILED) {
         return ERR_DH_AUDIO_FAILED;
     }
     auto speaker = FindIoDevImpl(args);
@@ -1044,7 +1044,7 @@ int32_t DAudioSourceDev::TaskCloseDSpeaker(const std::string &args)
 {
     DHLOGI("Task close speaker, args: %{public}s.", args.c_str());
     int32_t dhId = ParseDhidFromEvent(args);
-    if (dhId < 0) {
+    if (dhId == ERR_DH_AUDIO_FAILED) {
         DHLOGE("Failed to parse dhardware id.");
         return ERR_DH_AUDIO_FAILED;
     }
@@ -1110,7 +1110,8 @@ int32_t DAudioSourceDev::TaskOpenDMic(const std::string &args)
         return ERR_DH_AUDIO_SA_PARAM_INVALID;
     }
     int32_t dhId = ParseDhidFromEvent(args);
-    CHECK_AND_RETURN_RET_LOG(dhId < 0, ERR_DH_AUDIO_FAILED, "%{public}s", "Failed to parse dhardware id.");
+    CHECK_AND_RETURN_RET_LOG(dhId == ERR_DH_AUDIO_FAILED, ERR_DH_AUDIO_FAILED,
+        "%{public}s", "Failed to parse dhardware id.");
     auto mic = FindIoDevImpl(args);
     if (mic == nullptr) {
         DHLOGE("Mic device not init");
@@ -1176,7 +1177,7 @@ int32_t DAudioSourceDev::TaskCloseDMic(const std::string &args)
         return ERR_DH_AUDIO_SA_PARAM_INVALID;
     }
     int32_t dhId = ParseDhidFromEvent(args);
-    if (dhId < 0) {
+    if (dhId == ERR_DH_AUDIO_FAILED) {
         DHLOGE("Failed to parse dhardware id.");
         return ERR_DH_AUDIO_FAILED;
     }
@@ -1207,7 +1208,7 @@ int32_t DAudioSourceDev::TaskDMicClosed(const std::string &args)
         return ERR_DH_AUDIO_SA_PARAM_INVALID;
     }
     int32_t dhId = ParseDhidFromEvent(args);
-    if (dhId < 0) {
+    if (dhId == ERR_DH_AUDIO_FAILED) {
         DHLOGE("Failed to parse dhardware id.");
         return ERR_DH_AUDIO_FAILED;
     }
@@ -1249,7 +1250,7 @@ int32_t DAudioSourceDev::TaskChangeFocus(const std::string &args)
 {
     DHLOGD("Task change focus, args: %{public}s.", args.c_str());
     int32_t dhId = ParseDhidFromEvent(args);
-    if (dhId < 0) {
+    if (dhId == ERR_DH_AUDIO_FAILED) {
         DHLOGE("Failed to parse dhardware id.");
         return ERR_DH_AUDIO_FAILED;
     }
