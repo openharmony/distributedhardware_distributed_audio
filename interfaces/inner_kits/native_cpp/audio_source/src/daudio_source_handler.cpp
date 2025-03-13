@@ -202,6 +202,7 @@ void DAudioSourceHandler::FinishStartSA(const std::string &param, const sptr<IRe
             ERR_DH_AUDIO_SA_PROXY_NOT_INIT, "daudio source get proxy failed.");
         return;
     }
+    DaudioRadar::GetInstance().ReportDaudioInitProgress("InitSource", AudioInit::SOURCE_AUDIO_INIT, DH_SUCCESS);
     dAudioSourceProxy_->InitSource(param, dAudioIpcCallback_);
     sourceProxyConVar_.notify_one();
     DAudioHisysevent::GetInstance().SysEventWriteBehavior(DAUDIO_INIT, "daudio source sa load success.");

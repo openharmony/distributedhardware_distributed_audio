@@ -161,7 +161,7 @@ int32_t DAudioSinkDev::TaskCloseDSpeaker(const std::string &args)
 {
     DHLOGI("Close speaker device.");
     int32_t dhId = ParseDhidFromEvent(args);
-    if (dhId < 0) {
+    if (dhId == ERR_DH_AUDIO_FAILED) {
         DHLOGE("Failed to parse dhardware id.");
         return ERR_DH_AUDIO_FAILED;
     }
@@ -191,7 +191,7 @@ int32_t DAudioSinkDev::ParseDhidFromEvent(std::string args)
     if (!CJsonParamCheck(jParam, { KEY_DH_ID })) {
         DHLOGE("Not found the keys of dhId.");
         cJSON_Delete(jParam);
-        return -1;
+        return ERR_DH_AUDIO_FAILED;
     }
     cJSON *dhIdItem = cJSON_GetObjectItem(jParam, KEY_DH_ID);
     if (dhIdItem == NULL || !cJSON_IsString(dhIdItem)) {
@@ -231,7 +231,7 @@ int32_t DAudioSinkDev::ParseResultFromEvent(std::string args)
 int32_t DAudioSinkDev::TaskStartRender(const std::string &args)
 {
     int32_t dhId = ParseDhidFromEvent(args);
-    if (dhId < 0) {
+    if (dhId == ERR_DH_AUDIO_FAILED) {
         DHLOGE("Failed to parse dhardware id.");
         return ERR_DH_AUDIO_FAILED;
     }
@@ -302,7 +302,7 @@ int32_t DAudioSinkDev::TaskCloseDMic(const std::string &args)
 {
     DHLOGI("Close mic device.");
     int32_t dhId = ParseDhidFromEvent(args);
-    if (dhId < 0) {
+    if (dhId == ERR_DH_AUDIO_FAILED) {
         DHLOGE("Failed to parse dhardware id.");
         return ERR_DH_AUDIO_FAILED;
     }
@@ -331,7 +331,7 @@ int32_t DAudioSinkDev::TaskSetParameter(const std::string &args)
     DHLOGD("Set audio param.");
     AudioEvent event(AudioEventType::EVENT_UNKNOWN, args);
     int32_t dhId = ParseDhidFromEvent(args);
-    if (dhId < 0) {
+    if (dhId == ERR_DH_AUDIO_FAILED) {
         DHLOGE("Failed to parse dhardware id.");
         return ERR_DH_AUDIO_FAILED;
     }
@@ -415,7 +415,7 @@ int32_t DAudioSinkDev::TaskPlayStatusChange(const std::string &args)
 {
     DHLOGD("Play status change, content: %{public}s.", args.c_str());
     int32_t dhId = ParseDhidFromEvent(args);
-    if (dhId < 0) {
+    if (dhId == ERR_DH_AUDIO_FAILED) {
         DHLOGE("Failed to parse dhardware id.");
         return ERR_DH_AUDIO_FAILED;
     }
@@ -435,7 +435,7 @@ int32_t DAudioSinkDev::SendAudioEventToRemote(const AudioEvent &event)
     // because: type: VOLUME_CHANGE / AUDIO_FOCUS_CHANGE / AUDIO_RENDER_STATE_CHANGE
     // so speakerClient
     int32_t dhId = ParseDhidFromEvent(event.content);
-    if (dhId < 0) {
+    if (dhId == ERR_DH_AUDIO_FAILED) {
         DHLOGE("Failed to parse dhardware id.");
         return ERR_DH_AUDIO_FAILED;
     }
@@ -473,7 +473,7 @@ int32_t DAudioSinkDev::ConvertString2Int(std::string val)
 {
     if (!CheckIsNum(val)) {
         DHLOGE("String is not number. str:%{public}s.", val.c_str());
-        return -1;
+        return ERR_DH_AUDIO_FAILED;
     }
     return std::atoi(val.c_str());
 }
