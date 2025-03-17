@@ -14,8 +14,7 @@
 import("//build/test.gni")
 import("../../../../../distributedaudio.gni")
 
-module_out_path =
-    "distributed_audio/services/audiotransport/receiver_engine_test"
+module_out_path = "distributed_audio/distributed_audio/services/audiotransport/receiver_engine_test"
 
 config("module_private_config") {
   visibility = [ ":*" ]

@@ -16,7 +16,7 @@ import("//build/ohos_var.gni")
 import("//build/test.gni")
 import("../../../../../distributedaudio.gni")
 
-module_out_path = "distributed_audio/services/audiohdiproxy/daudio_hdi_handler"
+module_out_path = "distributed_audio/distributed_audio/services/audiohdiproxy/daudio_hdi_handler"
 
 config("module_private_config") {
   visibility = [ ":*" ]
