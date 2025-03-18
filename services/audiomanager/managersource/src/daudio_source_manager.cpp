@@ -399,7 +399,6 @@ int32_t DAudioSourceManager::OnDisableDAudio(const std::string &devId, const std
     }
 
     CHECK_NULL_RETURN(ipcCallback_, ERR_DH_AUDIO_NULLPTR);
-    DaudioRadar::GetInstance().ReportDaudioUnInitProgress("OnDisableDAudio", AudioUnInit::DISABLED, result);
     return ipcCallback_->OnNotifyUnregResult(devId, dhId, reqId, result, "");
 }
 

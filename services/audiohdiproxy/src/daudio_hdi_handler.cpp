@@ -83,7 +83,6 @@ int32_t DAudioHdiHandler::UninitHdiHandler()
     CHECK_NULL_RETURN(audioSrvHdf_, DH_SUCCESS);
 
     int32_t ret = DaudioHdfOperate::GetInstance().UnLoadDaudioHDFImpl();
-    DaudioRadar::GetInstance().ReportDaudioUnInitProgress("UnLoadDaudioHDFImpl", AudioUnInit::UNLOAD_HDF_DRIVER, ret);
     if (ret != DH_SUCCESS) {
         DHLOGE("Unload hdf driver failed, ret: %{public}d", ret);
         return ret;

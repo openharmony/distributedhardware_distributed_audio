@@ -825,15 +825,18 @@ int32_t DAudioSourceDev::TaskDisableDAudio(const std::string &args)
     }
 
     DHLOGI("Parsed dhId = %{public}d", dhId);
+    int32_t ret = ERR_DH_AUDIO_NOT_SUPPORT;
     switch (GetDevTypeByDHId(dhId)) {
         case AUDIO_DEVICE_TYPE_SPEAKER:
-            return DisableDSpeaker(dhId);
+            ret = DisableDSpeaker(dhId);
         case AUDIO_DEVICE_TYPE_MIC:
-            return DisableDMic(dhId);
+            ret = DisableDMic(dhId);
         default:
             DHLOGE("Unknown audio device. hdId: %{public}d.", dhId);
-            return ERR_DH_AUDIO_NOT_SUPPORT;
     }
+    DaudioRadar::GetInstance().ReportDaudioUnInit("OnDisableDAudio", AudioUnInit::DISABLED,
+        BizState::BIZ_STATE_END, ret);
+    return ret;
 }
 
 int32_t DAudioSourceDev::DisableDSpeaker(const int32_t dhId)
