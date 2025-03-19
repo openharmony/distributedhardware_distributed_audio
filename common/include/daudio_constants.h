@@ -158,6 +158,7 @@ constexpr const char *CHANNELMASKS = "ChannelMasks";
 constexpr const char *FORMATS = "Formats";
 const std::string MUSIC = "Music";
 const std::string PCM = "PCM";
+const std::string OPUS = "OPUS";
 const std::string AAC = "AAC";
 const std::string MIC = "mic";
 const std::string SPEAKER = "speaker";

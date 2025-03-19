@@ -87,6 +87,9 @@ public:
 
 private:
     void EnqueueThread();
+    void GetCodecCaps(const std::string &capability);
+    void AddToVec(std::vector<AudioCodecType> &container, const AudioCodecType value);
+    bool IsMimeSupported(const AudioCodecType coder);
 
 private:
     static constexpr const char* ENQUEUE_THREAD = "spkEnqueueTh";
@@ -110,7 +113,6 @@ private:
 
     sptr<Ashmem> ashmem_ = nullptr;
     std::atomic<bool> isEnqueueRunning_ = false;
-    std::atomic<bool> isNeedCodec_ = true;
     int32_t ashmemLength_ = -1;
     int32_t lengthPerTrans_ = -1;
     int32_t readIndex_ = -1;
@@ -124,6 +126,7 @@ private:
     int32_t dhId_ = -1;
     FILE *dumpFileCommn_ = nullptr;
     FILE *dumpFileFast_ = nullptr;
+    std::vector<AudioCodecType> codec_;
 };
 } // DistributedHardware
 } // OHOS

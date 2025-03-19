@@ -48,14 +48,30 @@ int32_t DSpeakerDev::EnableDevice(const int32_t dhId, const std::string &capabil
         return ret;
     }
     dhId_ = dhId;
-    auto pos = capability.find(SUB_PROTOCOLVER);
-    if (pos != std::string::npos) {
-        DHLOGD("ProtocolVer : 2.0");
-    } else {
-        isNeedCodec_.store(false);
-        DHLOGD("ProtocolVer : 1.0");
-    }
+    GetCodecCaps(capability);
     return DH_SUCCESS;
+}
+
+void DSpeakerDev::AddToVec(std::vector<AudioCodecType> &container, const AudioCodecType value)
+{
+    auto it = std::find(container.begin(), container.end(), value);
+    if (it == container.end()) {
+        container.push_back(value);
+    }
+}
+
+void DSpeakerDev::GetCodecCaps(const std::string &capability)
+{
+    auto pos = capability.find(AAC);
+    if (pos != std::string::npos) {
+        AddToVec(codec_, AudioCodecType::AUDIO_CODEC_AAC_EN);
+        DHLOGI("Daudio codec cap: AAC");
+    }
+    pos = capability.find(OPUS);
+    if (pos != std::string::npos) {
+        AddToVec(codec_, AudioCodecType::AUDIO_CODEC_OPUS);
+        DHLOGI("Daudio codec cap: OPUS");
+    }
 }
 
 int32_t DSpeakerDev::DisableDevice(const int32_t dhId)
@@ -69,6 +85,16 @@ int32_t DSpeakerDev::DisableDevice(const int32_t dhId)
         return ret;
     }
     return DH_SUCCESS;
+}
+
+bool DSpeakerDev::IsMimeSupported(const AudioCodecType coder)
+{
+    auto iter = std::find(codec_.begin(), codec_.end(), coder);
+    if (iter == codec_.end()) {
+        DHLOGI("devices have no cap: %{public}d", static_cast<int>(coder));
+        return false;
+    }
+    return true;
 }
 
 int32_t DSpeakerDev::InitReceiverEngine(IAVEngineProvider *providerPtr)
@@ -216,10 +242,13 @@ int32_t DSpeakerDev::SetParameters(const int32_t streamId, const AudioParamHDF &
     param_.renderOpts.contentType = CONTENT_TYPE_MUSIC;
     param_.renderOpts.renderFlags = paramHDF_.renderFlags;
     param_.renderOpts.streamUsage = paramHDF_.streamUsage;
-    if (isNeedCodec_.load()) {
+    if (paramHDF_.streamUsage == StreamUsage::STREAM_USAGE_VOICE_COMMUNICATION &&
+        IsMimeSupported(AudioCodecType::AUDIO_CODEC_OPUS)) {
+        param_.comParam.codecType = AudioCodecType::AUDIO_CODEC_OPUS;
+    } else if (IsMimeSupported(AudioCodecType::AUDIO_CODEC_AAC_EN)) {
         param_.comParam.codecType = AudioCodecType::AUDIO_CODEC_AAC_EN;
     }
-    DHLOGD("isNeedCodec_: %{public}d", isNeedCodec_.load());
+    DHLOGI("codecType: %{public}d", static_cast<int>(param_.comParam.codecType));
     return DH_SUCCESS;
 }
 

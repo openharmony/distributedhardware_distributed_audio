@@ -292,7 +292,6 @@ int32_t DAudioSinkDev::TaskOpenDMic(const std::string &args)
     ret = micClient->StartCapture();
     CHECK_AND_FREE_RETURN_RET_LOG(ret != DH_SUCCESS, ERR_DH_AUDIO_FAILED, jParam,
         "Start capture failed, ret: %{public}d.", ret);
-    PullUpPage();
     isMicInUse_.store(true);
     cJSON_Delete(jParam);
     return ret;
@@ -315,13 +314,6 @@ int32_t DAudioSinkDev::TaskCloseDMic(const std::string &args)
     ret = micClient->Release();
     CHECK_AND_LOG(ret != DH_SUCCESS, "Release mic client failed, ret: %{public}d.", ret);
     micClientMap_.erase(dhId);
-    if (isPageStatus_.load() && ipcSinkCallback_ != nullptr) {
-        bool isSensitive = false;
-        bool isSameAccount = false;
-        ipcSinkCallback_->OnNotifyResourceInfo(ResourceEventType::EVENT_TYPE_CLOSE_PAGE, SUBTYPE, devId_,
-            isSensitive, isSameAccount);
-        isPageStatus_.store(false);
-    }
     DHLOGI("Close mic device task excute success.");
     return DH_SUCCESS;
 }

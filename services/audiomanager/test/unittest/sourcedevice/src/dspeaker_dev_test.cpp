@@ -155,6 +155,33 @@ HWTEST_F(DSpeakerDevTest, SetParameters_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: SetParameters_002
+ * @tc.desc: Verify SetParameters and GetAudioParam function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DSpeakerDevTest, SetParameters_002, TestSize.Level1)
+{
+    const AudioParamHDF param = {
+        .sampleRate = SAMPLE_RATE_8000,
+        .channelMask = STEREO,
+        .bitFormat = SAMPLE_U8,
+        .streamUsage = STREAM_USAGE_VOICE_COMMUNICATION,
+        .frameSize = 30,
+        .period = 0,
+        .ext = "Test",
+    };
+    std::vector<AudioCodecType> container = spk_->codec_;
+    spk_->codec_.clear();
+    spk_->GetCodecCaps(OHOS::DistributedHardware::AAC);
+    spk_->GetCodecCaps(OHOS::DistributedHardware::OPUS);
+    auto ret = spk_->SetParameters(streamId_, param);
+    spk_->GetAudioParam();
+    spk_->codec_ = container;
+    EXPECT_EQ(DH_SUCCESS, ret);
+}
+
+/**
  * @tc.name: NotifyEvent_001
  * @tc.desc: Verify NotifyEvent function.
  * @tc.type: FUNC
@@ -454,6 +481,56 @@ HWTEST_F(DSpeakerDevTest, SendMessage_001, TestSize.Level1)
     spk_->speakerTrans_ = std::make_shared<MockIAudioDataTransport>();
     spk_->InitCtrlTrans();
     EXPECT_EQ(DH_SUCCESS, spk_->SendMessage(OPEN_SPEAKER, content, dstDevId));
+}
+
+/**
+ * @tc.name: AddToVec_001
+ * @tc.desc: Verify AddToVec function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DSpeakerDevTest, AddToVec_001, TestSize.Level1)
+{
+    std::vector<AudioCodecType> container;
+    spk_->AddToVec(container, AudioCodecType::AUDIO_CODEC_AAC);
+    EXPECT_EQ(1, container.size());
+}
+
+/**
+ * @tc.name: GetCodecCaps_001
+ * @tc.desc: Verify GetCodecCaps function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DSpeakerDevTest, GetCodecCaps_001, TestSize.Level1)
+{
+    std::vector<AudioCodecType> container = spk_->codec_;
+    spk_->codec_.clear();
+    spk_->GetCodecCaps(OHOS::DistributedHardware::AAC);
+    auto num = spk_->codec_.size();
+    EXPECT_EQ(1, num);
+    spk_->GetCodecCaps(OHOS::DistributedHardware::OPUS);
+    num = spk_->codec_.size();
+    spk_->codec_ = container;
+    EXPECT_EQ(2, num);
+}
+
+/**
+ * @tc.name: IsMimeSupported_001
+ * @tc.desc: Verify IsMimeSupported function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DSpeakerDevTest, IsMimeSupported_001, TestSize.Level1)
+{
+    std::vector<AudioCodecType> container = spk_->codec_;
+    spk_->codec_.clear();
+    spk_->GetCodecCaps(OHOS::DistributedHardware::AAC);
+    bool ret = spk_->IsMimeSupported(AudioCodecType::AUDIO_CODEC_AAC_EN);
+    EXPECT_EQ(ret, true);
+    ret = spk_->IsMimeSupported(AudioCodecType::AUDIO_CODEC_OPUS);
+    spk_->codec_ = container;
+    EXPECT_EQ(ret, false);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

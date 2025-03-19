@@ -18,6 +18,7 @@
 #include <vector>
 
 #include "audio_system_manager.h"
+#include "avcodec_list.h"
 #include "string_ex.h"
 
 #include "daudio_constants.h"
@@ -172,6 +173,31 @@ std::vector<DHItem> DAudioHandler::ablityForDump()
     return ablityForDumpVec_;
 }
 
+bool DAudioHandler::IsMimeSupported(const std::string &coder)
+{
+    DHLOGD("Craete avCodecList start.");
+    std::shared_ptr<MediaAVCodec::AVCodecList> avCodecList = MediaAVCodec::AVCodecListFactory::CreateAVCodecList();
+    if (avCodecList == nullptr) {
+        DHLOGE("Create avCodecList failed.");
+        return false;
+    }
+    MediaAVCodec::CapabilityData *capData = avCodecList->GetCapability(coder, true,
+        MediaAVCodec::AVCodecCategory::AVCODEC_NONE);
+    if (capData == nullptr) {
+        DHLOGI("%{public}s is not supported.", coder.c_str());
+        return false;
+    }
+    return true;
+}
+
+void DAudioHandler::AddToVec(std::vector<std::string> &container, const std::string &value)
+{
+    auto it = std::find(container.begin(), container.end(), value);
+    if (it == container.end()) {
+        container.push_back(value);
+    }
+}
+
 int32_t DAudioHandler::QueryAudioInfo()
 {
     DHLOGD("Start to query codec information.");
@@ -181,9 +207,14 @@ int32_t DAudioHandler::QueryAudioInfo()
     spkInfos_.sampleRates = OHOS::AudioStandard::AudioRenderer::GetSupportedSamplingRates();
     spkInfos_.formats = OHOS::AudioStandard::AudioRenderer::GetSupportedFormats();
     spkInfos_.channels = OHOS::AudioStandard::AudioRenderer::GetSupportedChannels();
-    supportedStream_.push_back(MUSIC);
-    codec_.push_back(AAC);
-    codec_.push_back(PCM);
+    AddToVec(supportedStream_, MUSIC);
+    AddToVec(codec_, PCM);
+    if (IsMimeSupported(std::string(MediaAVCodec::CodecMimeType::AUDIO_AAC))) {
+        AddToVec(codec_, AAC);
+    }
+    if (IsMimeSupported(std::string(MediaAVCodec::CodecMimeType::AUDIO_OPUS))) {
+        AddToVec(codec_, OPUS);
+    }
     return DH_SUCCESS;
 }
 

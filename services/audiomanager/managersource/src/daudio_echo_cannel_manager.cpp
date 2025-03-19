@@ -305,7 +305,6 @@ int32_t DAudioEchoCannelManager::AudioCaptureStop()
     }
     if (!audioCapturer_->Stop()) {
         DHLOGE("Audio capturer stop failed.");
-        return ERR_DH_AUDIO_FAILED;
     }
     return DH_SUCCESS;
 }

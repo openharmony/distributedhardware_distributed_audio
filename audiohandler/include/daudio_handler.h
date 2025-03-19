@@ -54,6 +54,8 @@ private:
     bool AddItemsToObject(DHItem &dhItem, cJSON *infoJson, const int32_t &dhId);
     bool AddParamsToJson(DHItem &dhItem, cJSON* infoJson, const std::string &subtype, const AudioInfo &infos);
     std::vector<DHItem> RealQuery(const std::string &dataType);
+    bool IsMimeSupported(const std::string &coder);
+    void AddToVec(std::vector<std::string> &container, const std::string &value);
 private:
     AudioInfo spkInfos_;
     AudioInfo micInfos_;

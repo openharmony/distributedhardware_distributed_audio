@@ -96,6 +96,9 @@ private:
     void FillJitterQueue();
     void ReadFromRingbuffer();
     void SendToProcess(const std::shared_ptr<AudioData> &audioData);
+    void GetCodecCaps(const std::string &capability);
+    void AddToVec(std::vector<AudioCodecType> &container, const AudioCodecType value);
+    bool IsMimeSupported(const AudioCodecType coder);
 
 private:
     static constexpr uint8_t CHANNEL_WAIT_SECONDS = 5;
@@ -132,7 +135,6 @@ private:
     AudioParam param_;
 
     std::atomic<bool> isExistedEmpty_ = false;
-    std::atomic<bool> isNeedCodec_ = true;
     size_t dataQueSize_ = 0;
     sptr<Ashmem> ashmem_ = nullptr;
     std::atomic<bool> isEnqueueRunning_ = false;
@@ -160,6 +162,7 @@ private:
     std::thread ringbufferThread_;
     std::atomic<bool> isRingbufferOn_ = false;
     std::mutex ringbufferMutex_;
+    std::vector<AudioCodecType> codec_;
 };
 } // DistributedHardware
 } // OHOS
