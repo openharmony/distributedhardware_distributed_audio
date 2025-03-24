@@ -327,7 +327,12 @@ int32_t DMicDev::SetUp()
         CHECK_NULL_RETURN(frameData_, ERR_DH_AUDIO_NULLPTR);
     }
     isRingbufferOn_.store(true);
-    ringbufferThread_ = std::thread([this]() { this->ReadFromRingbuffer(); });
+    ringbufferThread_ = std::thread([ptr = shared_from_this()]() {
+        if (!ptr) {
+            return;
+        }
+        ptr->ReadFromRingbuffer();
+    });
     echoCannelOn_ = true;
 #ifdef ECHO_CANNEL_ENABLE
     if (echoCannelOn_ && echoManager_ == nullptr) {
@@ -529,7 +534,12 @@ int32_t DMicDev::MmapStart()
     frameIndex_ = 0;
     startTime_ = 0;
     isEnqueueRunning_.store(true);
-    enqueueDataThread_ = std::thread([this]() { this->EnqueueThread(); });
+    enqueueDataThread_ = std::thread([ptr = shared_from_this()]() {
+        if (!ptr) {
+            return;
+        }
+        ptr->EnqueueThread();
+    });
     if (pthread_setname_np(enqueueDataThread_.native_handle(), ENQUEUE_THREAD) != DH_SUCCESS) {
         DHLOGE("Enqueue data thread setname failed.");
     }
