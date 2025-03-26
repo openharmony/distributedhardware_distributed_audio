@@ -231,11 +231,6 @@ int32_t DAudioSinkManager::InitAudioDevice(std::shared_ptr<DAudioSinkDev> dev, c
     if (isSpkOrMic) {
         ret = dev->InitAVTransEngines(ChannelState::SPK_CONTROL_OPENED, rcvProviderPtr_);
     } else {
-        ret = VerifySecurityLevel(devId);
-        if (ret != DH_SUCCESS) {
-            DHLOGE("Verify security level failed.");
-            return ERR_DH_AUDIO_FAILED;
-        }
         dev->SetDevLevelStatus(true);
         ret = dev->InitAVTransEngines(ChannelState::MIC_CONTROL_OPENED, sendProviderPtr_);
     }

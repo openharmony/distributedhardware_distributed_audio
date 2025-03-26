@@ -175,14 +175,30 @@ int32_t DMicDev::EnableDevice(const int32_t dhId, const std::string &capability)
         return ret;
     }
     dhId_ = dhId;
-    auto pos = capability.find(SUB_PROTOCOLVER);
-    if (pos != std::string::npos) {
-        DHLOGD("ProtocolVer : 2.0");
-    } else {
-        isNeedCodec_.store(false);
-        DHLOGD("ProtocolVer : 1.0");
-    }
+    GetCodecCaps(capability);
     return DH_SUCCESS;
+}
+
+void DMicDev::AddToVec(std::vector<AudioCodecType> &container, const AudioCodecType value)
+{
+    auto it = std::find(container.begin(), container.end(), value);
+    if (it == container.end()) {
+        container.push_back(value);
+    }
+}
+
+void DMicDev::GetCodecCaps(const std::string &capability)
+{
+    auto pos = capability.find(AAC);
+    if (pos != std::string::npos) {
+        AddToVec(codec_, AudioCodecType::AUDIO_CODEC_AAC_EN);
+        DHLOGI("Daudio codec cap: AAC");
+    }
+    pos = capability.find(OPUS);
+    if (pos != std::string::npos) {
+        AddToVec(codec_, AudioCodecType::AUDIO_CODEC_OPUS);
+        DHLOGI("Daudio codec cap: OPUS");
+    }
 }
 
 int32_t DMicDev::DisableDevice(const int32_t dhId)
@@ -196,6 +212,16 @@ int32_t DMicDev::DisableDevice(const int32_t dhId)
         return ret;
     }
     return DH_SUCCESS;
+}
+
+bool DMicDev::IsMimeSupported(const AudioCodecType coder)
+{
+    auto iter = std::find(codec_.begin(), codec_.end(), coder);
+    if (iter == codec_.end()) {
+        DHLOGI("devices have no cap: %{public}d", static_cast<int>(coder));
+        return false;
+    }
+    return true;
 }
 
 int32_t DMicDev::CreateStream(const int32_t streamId)
@@ -269,11 +295,6 @@ int32_t DMicDev::SetParameters(const int32_t streamId, const AudioParamHDF &para
     param_.comParam.sampleRate = paramHDF_.sampleRate;
     param_.comParam.channelMask = paramHDF_.channelMask;
     param_.comParam.bitFormat = paramHDF_.bitFormat;
-    param_.comParam.codecType = AudioCodecType::AUDIO_CODEC_AAC;
-    if (isNeedCodec_.load()) {
-        param_.comParam.codecType = AudioCodecType::AUDIO_CODEC_AAC_EN;
-    }
-    DHLOGD("isNeedCodec_ : %{public}d.", isNeedCodec_.load());
     param_.comParam.frameSize = paramHDF_.frameSize;
     if (paramHDF_.streamUsage == StreamUsage::STREAM_USAGE_VOICE_COMMUNICATION) {
         param_.captureOpts.sourceType = SOURCE_TYPE_VOICE_COMMUNICATION;
@@ -285,6 +306,14 @@ int32_t DMicDev::SetParameters(const int32_t streamId, const AudioParamHDF &para
         lowLatencyHalfSize_ = LOW_LATENCY_JITTER_TIME_MS / paramHDF_.period;
         lowLatencyMaxfSize_ = LOW_LATENCY_JITTER_MAX_TIME_MS / paramHDF_.period;
     }
+    param_.comParam.codecType = AudioCodecType::AUDIO_CODEC_AAC;
+    if (paramHDF_.streamUsage == StreamUsage::STREAM_USAGE_VOICE_COMMUNICATION &&
+        IsMimeSupported(AudioCodecType::AUDIO_CODEC_OPUS)) {
+        param_.comParam.codecType = AudioCodecType::AUDIO_CODEC_OPUS;
+    } else if (IsMimeSupported(AudioCodecType::AUDIO_CODEC_AAC_EN)) {
+        param_.comParam.codecType = AudioCodecType::AUDIO_CODEC_AAC_EN;
+    }
+    DHLOGI("codecType : %{public}d.", static_cast<int>(param_.comParam.codecType));
     return DH_SUCCESS;
 }
 

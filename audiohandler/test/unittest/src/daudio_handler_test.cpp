@@ -17,6 +17,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <vector>
 
 using namespace testing::ext;
 
@@ -64,6 +65,33 @@ HWTEST_F(DAudioHandlerTest, Query_001, TestSize.Level1)
 {
     int32_t actual = DAudioHandler::GetInstance().Query().size();
     EXPECT_LE(DH_SUCCESS, actual);
+}
+
+/**
+ * @tc.name: IsMimeSupported_001
+ * @tc.desc: Verify the IsMimeSupported function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioHandlerTest, IsMimeSupported_001, TestSize.Level1)
+{
+    std::string coder = "AAAA";
+    bool isSupport = DAudioHandler::GetInstance().IsMimeSupported(coder);
+    EXPECT_EQ(false, isSupport);
+}
+
+/**
+ * @tc.name: AddToVec_001
+ * @tc.desc: Verify the AddToVec function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioHandlerTest, AddToVec_001, TestSize.Level1)
+{
+    std::vector<std::string> container;
+    std::string coder = "AAAA";
+    DAudioHandler::GetInstance().AddToVec(container, coder);
+    EXPECT_EQ(container.size(), 1);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

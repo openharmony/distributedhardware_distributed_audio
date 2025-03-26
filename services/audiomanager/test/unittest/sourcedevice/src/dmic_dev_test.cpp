@@ -153,6 +153,10 @@ HWTEST_F(DMicDevTest, SetParameters_001, TestSize.Level1)
     EXPECT_EQ(DH_SUCCESS, mic_->SetParameters(streamId_, param));
     param.period = 20;
     EXPECT_EQ(DH_SUCCESS, mic_->SetParameters(streamId_, param));
+    mic_->GetCodecCaps(AAC);
+    mic_->GetCodecCaps(OPUS);
+    param.streamUsage = StreamUsage::STREAM_USAGE_VOICE_COMMUNICATION;
+    EXPECT_EQ(DH_SUCCESS, mic_->SetParameters(streamId_, param));
 }
 
 /**
@@ -413,6 +417,56 @@ HWTEST_F(DMicDevTest, SendMessage_001, TestSize.Level1)
     mic_->micTrans_ = std::make_shared<MockIAudioDataTransport>();
     mic_->InitCtrlTrans();
     EXPECT_EQ(DH_SUCCESS, mic_->SendMessage(OPEN_MIC, content, dstDevId));
+}
+
+/**
+ * @tc.name: AddToVec001
+ * @tc.desc: Verify AddToVec function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, AddToVec001, TestSize.Level1)
+{
+    std::vector<AudioCodecType> container;
+    mic_->AddToVec(container, AudioCodecType::AUDIO_CODEC_AAC);
+    EXPECT_EQ(1, container.size());
+}
+
+/**
+ * @tc.name: GetCodecCaps001
+ * @tc.desc: Verify GetCodecCaps function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, GetCodecCaps001, TestSize.Level1)
+{
+    std::vector<AudioCodecType> container = mic_->codec_;
+    mic_->codec_.clear();
+    mic_->GetCodecCaps(AAC);
+    auto num = mic_->codec_.size();
+    EXPECT_EQ(1, num);
+    mic_->GetCodecCaps(OPUS);
+    num = mic_->codec_.size();
+    mic_->codec_ = container;
+    EXPECT_EQ(2, num);
+}
+
+/**
+ * @tc.name: IsMimeSupported001
+ * @tc.desc: Verify IsMimeSupported function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, IsMimeSupported001, TestSize.Level1)
+{
+    std::vector<AudioCodecType> container = mic_->codec_;
+    mic_->codec_.clear();
+    mic_->GetCodecCaps(AAC);
+    bool ret = mic_->IsMimeSupported(AudioCodecType::AUDIO_CODEC_AAC_EN);
+    EXPECT_EQ(ret, true);
+    ret = mic_->IsMimeSupported(AudioCodecType::AUDIO_CODEC_OPUS);
+    mic_->codec_ = container;
+    EXPECT_EQ(ret, false);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

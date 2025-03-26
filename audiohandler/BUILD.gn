@@ -38,6 +38,7 @@ ohos_shared_library("distributed_audio_handler") {
     "audio_framework:audio_capturer",
     "audio_framework:audio_client",
     "audio_framework:audio_renderer",
+    "av_codec:av_codec_client",
     "cJSON:cjson",
     "c_utils:utils",
     "distributed_hardware_fwk:distributedhardwareutils",
