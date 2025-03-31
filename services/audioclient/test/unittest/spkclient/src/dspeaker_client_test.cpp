@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -56,7 +56,7 @@ void DSpeakerClientTest::TearDown()
  * @tc.type: FUNC
  * @tc.require: AR000H0E6G
  */
-HWTEST_F(DSpeakerClientTest, InitReceiverEngine_001, TestSize.Level1)
+HWTEST_F(DSpeakerClientTest, InitReceiverEngine_001, TestSize.Level0)
 {
     ASSERT_TRUE(speakerClient_ != nullptr);
     IAVEngineProvider *providerPtr = nullptr;
@@ -87,7 +87,7 @@ HWTEST_F(DSpeakerClientTest, InitReceiverEngine_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000H0E6G
  */
-HWTEST_F(DSpeakerClientTest, OnStateChange_001, TestSize.Level1)
+HWTEST_F(DSpeakerClientTest, OnStateChange_001, TestSize.Level0)
 {
     ASSERT_TRUE(speakerClient_ != nullptr);
     AudioStandard::VolumeEvent event;
@@ -108,7 +108,7 @@ HWTEST_F(DSpeakerClientTest, OnStateChange_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000H0E6G
  */
-HWTEST_F(DSpeakerClientTest, SetUp_001, TestSize.Level1)
+HWTEST_F(DSpeakerClientTest, SetUp_001, TestSize.Level0)
 {
     ASSERT_TRUE(speakerClient_ != nullptr);
     AudioParam audioParam;
@@ -127,7 +127,7 @@ HWTEST_F(DSpeakerClientTest, SetUp_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000H0E6G
  */
-HWTEST_F(DSpeakerClientTest, StartRender001, TestSize.Level1)
+HWTEST_F(DSpeakerClientTest, StartRender001, TestSize.Level0)
 {
     ASSERT_TRUE(speakerClient_ != nullptr);
     EXPECT_NE(DH_SUCCESS, speakerClient_->StartRender());
@@ -150,7 +150,7 @@ HWTEST_F(DSpeakerClientTest, StartRender001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000H0E6G
  */
-HWTEST_F(DSpeakerClientTest, StopRender001, TestSize.Level1)
+HWTEST_F(DSpeakerClientTest, StopRender001, TestSize.Level0)
 {
     ASSERT_TRUE(speakerClient_ != nullptr);
     EXPECT_NE(DH_SUCCESS, speakerClient_->StopRender());
@@ -183,7 +183,7 @@ HWTEST_F(DSpeakerClientTest, StopRender001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000H0E6G
  */
-HWTEST_F(DSpeakerClientTest, OnDecodeTransDataDone001, TestSize.Level1)
+HWTEST_F(DSpeakerClientTest, OnDecodeTransDataDone001, TestSize.Level0)
 {
     ASSERT_TRUE(speakerClient_ != nullptr);
     std::shared_ptr<AudioData> audioData = nullptr;
@@ -202,7 +202,7 @@ HWTEST_F(DSpeakerClientTest, OnDecodeTransDataDone001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000H0E6G
  */
-HWTEST_F(DSpeakerClientTest, Release001, TestSize.Level1)
+HWTEST_F(DSpeakerClientTest, Release001, TestSize.Level0)
 {
     ASSERT_TRUE(speakerClient_ != nullptr);
     speakerClient_->speakerTrans_ = std::make_shared<MockIAudioDataTransport>();
@@ -220,7 +220,7 @@ HWTEST_F(DSpeakerClientTest, Release001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000H0E6G
  */
-HWTEST_F(DSpeakerClientTest, GetVolumeLevel_001, TestSize.Level1)
+HWTEST_F(DSpeakerClientTest, GetVolumeLevel_001, TestSize.Level0)
 {
     ASSERT_TRUE(speakerClient_ != nullptr);
     AudioStandard::InterruptEvent eventType = {static_cast<AudioStandard::InterruptType>(1),
@@ -237,7 +237,7 @@ HWTEST_F(DSpeakerClientTest, GetVolumeLevel_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000H0E6G
  */
-HWTEST_F(DSpeakerClientTest, SendMessage_001, TestSize.Level1)
+HWTEST_F(DSpeakerClientTest, SendMessage_001, TestSize.Level0)
 {
     ASSERT_TRUE(speakerClient_ != nullptr);
     std::string content = "content";

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,7 +37,7 @@ void DAudioHandlerTest::TearDown(void) {}
  * @tc.type: FUNC
  * @tc.require: AR000H0E5F
  */
-HWTEST_F(DAudioHandlerTest, Initialize_001, TestSize.Level1)
+HWTEST_F(DAudioHandlerTest, Initialize_001, TestSize.Level0)
 {
     int32_t actual = DAudioHandler::GetInstance().Initialize();
     EXPECT_EQ(DH_SUCCESS, actual);
@@ -49,7 +49,7 @@ HWTEST_F(DAudioHandlerTest, Initialize_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000H0E5F
  */
-HWTEST_F(DAudioHandlerTest, QueryAudioInfo_001, TestSize.Level1)
+HWTEST_F(DAudioHandlerTest, QueryAudioInfo_001, TestSize.Level0)
 {
     int32_t actual = DAudioHandler::GetInstance().QueryAudioInfo();
     EXPECT_EQ(DH_SUCCESS, actual);
@@ -61,7 +61,7 @@ HWTEST_F(DAudioHandlerTest, QueryAudioInfo_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000H0E5F
  */
-HWTEST_F(DAudioHandlerTest, Query_001, TestSize.Level1)
+HWTEST_F(DAudioHandlerTest, Query_001, TestSize.Level0)
 {
     int32_t actual = DAudioHandler::GetInstance().Query().size();
     EXPECT_LE(DH_SUCCESS, actual);
@@ -73,7 +73,7 @@ HWTEST_F(DAudioHandlerTest, Query_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000H0E5F
  */
-HWTEST_F(DAudioHandlerTest, IsMimeSupported_001, TestSize.Level1)
+HWTEST_F(DAudioHandlerTest, IsMimeSupported_001, TestSize.Level0)
 {
     std::string coder = "AAAA";
     bool isSupport = DAudioHandler::GetInstance().IsMimeSupported(coder);
@@ -86,7 +86,7 @@ HWTEST_F(DAudioHandlerTest, IsMimeSupported_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000H0E5F
  */
-HWTEST_F(DAudioHandlerTest, AddToVec_001, TestSize.Level1)
+HWTEST_F(DAudioHandlerTest, AddToVec_001, TestSize.Level0)
 {
     std::vector<std::string> container;
     std::string coder = "AAAA";
