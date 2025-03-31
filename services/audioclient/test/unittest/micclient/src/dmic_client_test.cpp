@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -52,7 +52,7 @@ void DMicClientTest::TearDown()
  * @tc.type: FUNC
  * @tc.require: AR000H0E6G
  */
-HWTEST_F(DMicClientTest, InitSenderEngine_001, TestSize.Level1)
+HWTEST_F(DMicClientTest, InitSenderEngine_001, TestSize.Level0)
 {
     ASSERT_TRUE(micClient_ != nullptr);
     IAVEngineProvider *providerPtr = nullptr;
@@ -67,7 +67,7 @@ HWTEST_F(DMicClientTest, InitSenderEngine_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000H0E6G
  */
-HWTEST_F(DMicClientTest, OnStateChange_001, TestSize.Level1)
+HWTEST_F(DMicClientTest, OnStateChange_001, TestSize.Level0)
 {
     ASSERT_TRUE(micClient_ != nullptr);
     EXPECT_NE(DH_SUCCESS, micClient_->OnStateChange(AudioEventType::NOTIFY_OPEN_SPEAKER_RESULT));
@@ -79,7 +79,7 @@ HWTEST_F(DMicClientTest, OnStateChange_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000H0E6G
  */
-HWTEST_F(DMicClientTest, OnStateChange_002, TestSize.Level1)
+HWTEST_F(DMicClientTest, OnStateChange_002, TestSize.Level0)
 {
     ASSERT_TRUE(micClient_ != nullptr);
     EXPECT_EQ(DH_SUCCESS, micClient_->OnStateChange(AudioEventType::DATA_CLOSED));
@@ -91,7 +91,7 @@ HWTEST_F(DMicClientTest, OnStateChange_002, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000H0E6G
  */
-HWTEST_F(DMicClientTest, SetUp_001, TestSize.Level1)
+HWTEST_F(DMicClientTest, SetUp_001, TestSize.Level0)
 {
     ASSERT_TRUE(micClient_ != nullptr);
     std::string devId = "testID";
@@ -108,7 +108,7 @@ HWTEST_F(DMicClientTest, SetUp_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000H0E6G
  */
-HWTEST_F(DMicClientTest, StartCapture001, TestSize.Level1)
+HWTEST_F(DMicClientTest, StartCapture001, TestSize.Level0)
 {
     ASSERT_TRUE(micClient_ != nullptr);
     micClient_->CaptureThreadRunning();
@@ -145,7 +145,7 @@ HWTEST_F(DMicClientTest, StartCapture001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000H0E6G
  */
-HWTEST_F(DMicClientTest, StopCapture001, TestSize.Level1)
+HWTEST_F(DMicClientTest, StopCapture001, TestSize.Level0)
 {
     ASSERT_TRUE(micClient_ != nullptr);
     std::shared_ptr<AudioData> audioData = nullptr;
@@ -163,7 +163,7 @@ HWTEST_F(DMicClientTest, StopCapture001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000H0E6G
  */
-HWTEST_F(DMicClientTest, StopCapture002, TestSize.Level1)
+HWTEST_F(DMicClientTest, StopCapture002, TestSize.Level0)
 {
     ASSERT_TRUE(micClient_ != nullptr);
     micClient_->clientStatus_ = STATUS_START;
@@ -180,7 +180,7 @@ HWTEST_F(DMicClientTest, StopCapture002, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000H0E6G
  */
-HWTEST_F(DMicClientTest, Release001, TestSize.Level1)
+HWTEST_F(DMicClientTest, Release001, TestSize.Level0)
 {
     ASSERT_TRUE(micClient_ != nullptr);
     micClient_->clientStatus_ = AudioStatus::STATUS_START;
@@ -219,7 +219,7 @@ HWTEST_F(DMicClientTest, Release001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000H0E6G
  */
-HWTEST_F(DMicClientTest, SendMessage_001, TestSize.Level1)
+HWTEST_F(DMicClientTest, SendMessage_001, TestSize.Level0)
 {
     ASSERT_TRUE(micClient_ != nullptr);
     std::string content = "content";
@@ -237,7 +237,7 @@ HWTEST_F(DMicClientTest, SendMessage_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000H0E6G
  */
-HWTEST_F(DMicClientTest, AudioFwkClientSetUp_001, TestSize.Level1)
+HWTEST_F(DMicClientTest, AudioFwkClientSetUp_001, TestSize.Level0)
 {
     ASSERT_TRUE(micClient_ != nullptr);
     audioParam_.captureOpts.capturerFlags = MMAP_MODE;
@@ -254,7 +254,7 @@ HWTEST_F(DMicClientTest, AudioFwkClientSetUp_001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require: AR000H0E6G
  */
-HWTEST_F(DMicClientTest, TransSetUp_001, TestSize.Level1)
+HWTEST_F(DMicClientTest, TransSetUp_001, TestSize.Level0)
 {
     ASSERT_TRUE(micClient_ != nullptr);
     int32_t actual = micClient_->TransSetUp();
