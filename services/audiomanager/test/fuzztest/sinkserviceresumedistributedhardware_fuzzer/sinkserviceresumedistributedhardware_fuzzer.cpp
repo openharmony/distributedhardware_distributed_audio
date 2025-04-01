@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "daudio_sink_service.h"
 #include "if_system_ability_manager.h"
@@ -29,10 +30,12 @@ void SinkServiceResumeDistributedHardwareFuzzTest(const uint8_t* data, size_t si
     if ((data == nullptr) || size < (sizeof(int32_t))) {
         return;
     }
-    std::string networkId(reinterpret_cast<const char*>(data), size);
-    int32_t saId = *(reinterpret_cast<const int32_t*>(data));
-    bool runOnCreate = *(reinterpret_cast<const bool*>(data));
-    
+
+    FuzzedDataProvider fdp(data, size);
+    int32_t saId = fdp.ConsumeIntegral<int32_t>();
+    std::string networkId = fdp.ConsumeRandomLengthString();
+    bool runOnCreate = fdp.ConsumeBool();
+
     auto dAudioSinkService = std::make_shared<DAudioSinkService>(saId, runOnCreate);
 
     dAudioSinkService->ResumeDistributedHardware(networkId);
