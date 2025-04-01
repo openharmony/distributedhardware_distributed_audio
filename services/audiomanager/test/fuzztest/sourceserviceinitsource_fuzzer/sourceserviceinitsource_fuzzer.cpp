@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "daudio_ipc_callback.h"
 #include "daudio_source_service.h"
@@ -31,10 +32,11 @@ void SourceServiceInitSourceFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
-    int32_t saId = *(reinterpret_cast<const int32_t*>(data));
-    std::string params(reinterpret_cast<const char*>(data), size);
-    bool runOnCreate = *(reinterpret_cast<const bool*>(data));
-    
+    FuzzedDataProvider fdp(data, size);
+    int32_t saId = fdp.ConsumeIntegral<int32_t>();
+    std::string params = fdp.ConsumeRandomLengthString();
+    bool runOnCreate = fdp.ConsumeBool();
+
     auto dAudioSourceService = std::make_shared<DAudioSourceService>(saId, runOnCreate);
     sptr<IDAudioIpcCallback> callback(new DAudioIpcCallback());
     dAudioSourceService->InitSource(params, callback);

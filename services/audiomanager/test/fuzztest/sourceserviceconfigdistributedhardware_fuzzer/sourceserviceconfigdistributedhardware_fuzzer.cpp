@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "daudio_source_service.h"
 #include "if_system_ability_manager.h"
@@ -30,13 +31,14 @@ void SourceServiceConfigDistributedHardwareFuzzTest(const uint8_t* data, size_t 
         return;
     }
 
-    int32_t saId = *(reinterpret_cast<const int32_t*>(data));
-    bool runOnCreate = *(reinterpret_cast<const bool*>(data));
-    std::string devId(reinterpret_cast<const char*>(data), size);
-    std::string dhId(reinterpret_cast<const char*>(data), size);
-    std::string key(reinterpret_cast<const char*>(data), size);
-    std::string value(reinterpret_cast<const char*>(data), size);
-    
+    FuzzedDataProvider fdp(data, size);
+    int32_t saId = fdp.ConsumeIntegral<int32_t>();
+    std::string devId = fdp.ConsumeRandomLengthString();
+    std::string dhId = fdp.ConsumeRandomLengthString();
+    std::string key = fdp.ConsumeRandomLengthString();
+    std::string value = fdp.ConsumeRandomLengthString();
+    bool runOnCreate = fdp.ConsumeBool();
+
     auto dAudioSourceService = std::make_shared<DAudioSourceService>(saId, runOnCreate);
     dAudioSourceService->ConfigDistributedHardware(devId, dhId, key, value);
 }
