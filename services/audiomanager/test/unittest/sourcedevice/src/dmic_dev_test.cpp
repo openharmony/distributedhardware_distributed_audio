@@ -307,6 +307,12 @@ HWTEST_F(DMicDevTest, Release_001, TestSize.Level1)
 
     mic_->micTrans_ = std::make_shared<MockIAudioDataTransport>();
     EXPECT_EQ(DH_SUCCESS, mic_->Release());
+
+    int32_t fd = 10;
+    int32_t ashmemLength = 10;
+    int32_t streamId = 1;
+    int32_t lengthPerTrans = 10;
+    EXPECT_EQ(DH_SUCCESS, mic_->RefreshAshmemInfo(streamId, fd, ashmemLength, lengthPerTrans));
 }
 
 
@@ -468,5 +474,32 @@ HWTEST_F(DMicDevTest, IsMimeSupported001, TestSize.Level1)
     mic_->codec_ = container;
     EXPECT_EQ(ret, false);
 }
+
+/**
+ * @tc.name: ReadMmapPosition001
+ * @tc.desc: Verify ReadMmapPosition function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, ReadMmapPosition001, TestSize.Level1)
+{
+    int32_t streamId = 0;
+    uint64_t frames = 0;
+    CurrentTimeHDF time;
+    EXPECT_EQ(DH_SUCCESS, mic_->ReadMmapPosition(streamId, frames, time));
+}
+
+/**
+ * @tc.name: MmapStart_001
+ * @tc.desc: Verify MmapStart function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, MmapStart_001, TestSize.Level1)
+{
+    mic_->ashmem_ = nullptr;
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->MmapStart());
+}
+
 } // namespace DistributedHardware
 } // namespace OHOS
