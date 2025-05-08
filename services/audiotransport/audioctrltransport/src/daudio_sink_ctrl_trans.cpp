@@ -41,6 +41,7 @@ int32_t DaudioSinkCtrlTrans::Release()
     DHLOGI("Release.");
     SoftbusChannelAdapter::GetInstance().CloseSoftbusChannel(sessionName_, devId_);
     SoftbusChannelAdapter::GetInstance().UnRegisterChannelListener(sessionName_, devId_);
+    ctrlTransCallback_.reset();
     return DH_SUCCESS;
 }
 

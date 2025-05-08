@@ -228,7 +228,6 @@ int32_t DSpeakerClient::Release()
             DHLOGE("Speaker trans release failed.");
             isSucess = false;
         }
-        speakerCtrlTrans_ = nullptr;
     }
 
     int32_t ret = AudioStandard::AudioSystemManager::GetInstance()->UnregisterVolumeKeyEventCallback(getprocpid());
