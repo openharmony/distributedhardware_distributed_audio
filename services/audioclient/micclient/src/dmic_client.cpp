@@ -234,7 +234,6 @@ int32_t DMicClient::Release()
             DHLOGE("Mic trans release failed.");
             isReleaseError = true;
         }
-        micCtrlTrans_ = nullptr;
     }
     clientStatus_ = AudioStatus::STATUS_IDLE;
     if (isReleaseError) {
