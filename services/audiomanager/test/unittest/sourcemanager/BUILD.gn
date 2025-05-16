@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Huawei Device Co., Ltd.
+# Copyright (c) 2024-2025 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -44,6 +44,7 @@ config("module_private_config") {
     "${services_path}/common/audioeventcallback",
     "${services_path}/common/audioparam",
     "${services_path}/common/taskProcessor/include",
+    "${services_path}/audiohdiproxy/test/unittest/daudio_hdi_handler/include",
   ]
 }
 
@@ -51,7 +52,11 @@ config("module_private_config") {
 ohos_unittest("DaudioSourceMgrTest") {
   module_out_path = module_out_path
 
-  sources = [ "src/daudio_source_mgr_test.cpp" ]
+  sources = [
+    "src/daudio_source_mgr_test.cpp",
+    "../../../../audiohdiproxy/test/unittest/daudio_hdi_handler/src/daudio_hdf_operate.cpp",
+    "../../../../audiohdiproxy/test/unittest/daudio_hdi_handler/src/mock_distributed_hardware_fwk_kit.cpp",
+    ]
 
   configs = [ ":module_private_config" ]
 

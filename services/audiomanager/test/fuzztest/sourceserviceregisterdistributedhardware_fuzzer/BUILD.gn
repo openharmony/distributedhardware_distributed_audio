@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2025 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -54,7 +54,9 @@ ohos_fuzztest("SourceServiceRegisterDistributedHardwareFuzzTest") {
     "audio_framework:audio_renderer",
     "cJSON:cjson",
     "c_utils:utils",
+    "distributed_hardware_fwk:distributed_av_receiver",
     "distributed_hardware_fwk:distributedhardwareutils",
+    "distributed_hardware_fwk:libdhfwk_sdk",
     "drivers_interface_distributed_audio:libdaudio_proxy_1.0",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
