@@ -12,12 +12,20 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("../distributedaudio.gni")
 
 ohos_sa_profile("daudio_sa_profile") {
-  sources = [
-    "4805.json",
-    "4806.json",
-  ]
+  if (distributed_audio_extension_sa) {
+    sources = [
+      "4805.json",
+      "4806.json",
+    ]
+  } else {
+    sources = [
+      "common/4805.json",
+      "common/4806.json",
+    ]
+  }
 
   part_name = "distributed_audio"
 }

@@ -5,7 +5,7 @@
             "name": 4805,
             "libpath": "libdistributed_audio_source.z.so",
             "run-on-create": false,
-            "distributed": true,
+            "distributed": false,
             "dump_level": 1
         }
     ]
