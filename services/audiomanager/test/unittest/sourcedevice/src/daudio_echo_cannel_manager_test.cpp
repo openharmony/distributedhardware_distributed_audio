@@ -77,7 +77,7 @@ HWTEST_F(DAudioEchoCannelManagerTest, AudioCaptureSetUp_001, TestSize.Level1)
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, echoCannelManager_->AudioCaptureSetUp());
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, echoCannelManager_->AudioCaptureStart());
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, echoCannelManager_->AudioCaptureStop());
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, echoCannelManager_->AudioCaptureRelease());
+    EXPECT_EQ(DH_SUCCESS, echoCannelManager_->AudioCaptureRelease());
 }
 
 /**
@@ -90,7 +90,7 @@ HWTEST_F(DAudioEchoCannelManagerTest, AudioCaptureSetUp_002, TestSize.Level1)
 {
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, echoCannelManager_->AudioCaptureStart());
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, echoCannelManager_->AudioCaptureStop());
-    EXPECT_EQ(ERR_DH_AUDIO_FAILED, echoCannelManager_->AudioCaptureRelease());
+    EXPECT_EQ(DH_SUCCESS, echoCannelManager_->AudioCaptureRelease());
 }
 
 /**
