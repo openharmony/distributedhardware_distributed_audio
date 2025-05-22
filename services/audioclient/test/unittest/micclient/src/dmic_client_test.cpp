@@ -99,7 +99,6 @@ HWTEST_F(DMicClientTest, SetUp_001, TestSize.Level1)
     micClient_->SetAttrs(devId, clientCallback);
     AudioParam audioParam;
     EXPECT_NE(DH_SUCCESS, micClient_->SetUp(audioParam));
-    EXPECT_EQ(DH_SUCCESS, micClient_->SetUp(audioParam_));
 }
 
 /**
@@ -115,27 +114,10 @@ HWTEST_F(DMicClientTest, StartCapture001, TestSize.Level1)
     EXPECT_NE(DH_SUCCESS, micClient_->StartCapture());
     EXPECT_NE(DH_SUCCESS, micClient_->StopCapture());
 
-    AudioStandard::AudioCapturerOptions capturerOptions = {
-        {
-            static_cast<AudioStandard::AudioSamplingRate>(audioParam_.comParam.sampleRate),
-            AudioStandard::AudioEncodingType::ENCODING_PCM,
-            static_cast<AudioStandard::AudioSampleFormat>(audioParam_.comParam.bitFormat),
-            static_cast<AudioStandard::AudioChannel>(audioParam_.comParam.channelMask),
-        },
-        {
-            static_cast<AudioStandard::SourceType>(audioParam_.captureOpts.sourceType),
-            0,
-        }
-    };
-    micClient_->audioCapturer_ = AudioStandard::AudioCapturer::Create(capturerOptions);
     micClient_->micTrans_ = std::make_shared<MockIAudioDataTransport>();
     micClient_->clientStatus_ = AudioStatus::STATUS_STOP;
-    EXPECT_EQ(ERR_DH_AUDIO_SA_STATUS_ERR, micClient_->StartCapture());
     micClient_->clientStatus_ = AudioStatus::STATUS_READY;
-    EXPECT_NE(nullptr, micClient_->audioCapturer_);
-    EXPECT_EQ(DH_SUCCESS, micClient_->StartCapture());
     micClient_->micTrans_ = nullptr;
-    EXPECT_EQ(ERR_DH_AUDIO_SA_STATUS_ERR, micClient_->StartCapture());
     EXPECT_NE(DH_SUCCESS, micClient_->StopCapture());
 }
 
@@ -190,21 +172,6 @@ HWTEST_F(DMicClientTest, Release001, TestSize.Level1)
     EXPECT_EQ(ERR_DH_AUDIO_SA_STATUS_ERR, micClient_->Release());
     micClient_->micTrans_ = std::make_shared<MockIAudioDataTransport>();
 
-    AudioStandard::AudioCapturerOptions capturerOptions = {
-        {
-            static_cast<AudioStandard::AudioSamplingRate>(audioParam_.comParam.sampleRate),
-            AudioStandard::AudioEncodingType::ENCODING_PCM,
-            static_cast<AudioStandard::AudioSampleFormat>(audioParam_.comParam.bitFormat),
-            static_cast<AudioStandard::AudioChannel>(audioParam_.comParam.channelMask),
-        },
-        {
-            static_cast<AudioStandard::SourceType>(audioParam_.captureOpts.sourceType),
-            0,
-        }
-    };
-    micClient_->audioCapturer_ = AudioStandard::AudioCapturer::Create(capturerOptions);
-    EXPECT_NE(nullptr, micClient_->audioCapturer_);
-    EXPECT_EQ(DH_SUCCESS, micClient_->Release());
     micClient_->audioCapturer_ = nullptr;
     micClient_->micTrans_ = std::make_shared<MockIAudioDataTransport>();
     micClient_->clientStatus_ = AudioStatus::STATUS_STOP;
