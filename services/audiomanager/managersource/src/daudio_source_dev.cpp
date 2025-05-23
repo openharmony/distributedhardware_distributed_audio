@@ -829,8 +829,10 @@ int32_t DAudioSourceDev::TaskDisableDAudio(const std::string &args)
     switch (GetDevTypeByDHId(dhId)) {
         case AUDIO_DEVICE_TYPE_SPEAKER:
             ret = DisableDSpeaker(dhId);
+            break;
         case AUDIO_DEVICE_TYPE_MIC:
             ret = DisableDMic(dhId);
+            break;
         default:
             DHLOGE("Unknown audio device. hdId: %{public}d.", dhId);
     }
