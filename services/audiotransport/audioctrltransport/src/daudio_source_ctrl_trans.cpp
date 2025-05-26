@@ -64,7 +64,7 @@ int32_t DaudioSourceCtrlTrans::Stop()
 
 int32_t DaudioSourceCtrlTrans::SendAudioEvent(uint32_t type, const std::string &content, const std::string &dstDevId)
 {
-    DHLOGI("SendAudioEvent, type: %{public}u, content: %{public}s.", type, content.c_str());
+    DHLOGI("SendAudioEvent, type: %{public}u.", type);
     auto message = std::make_shared<AVTransMessage>(type, content, dstDevId);
     std::string msgData = message->MarshalMessage();
     return SoftbusChannelAdapter::GetInstance().SendBytesData(sessionName_, message->dstDevId_, msgData);

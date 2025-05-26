@@ -143,8 +143,8 @@ void DAudioSinkManager::OnSinkDevReleased(const std::string &devId)
 int32_t DAudioSinkManager::HandleDAudioNotify(const std::string &devId, const std::string &dhId,
     const int32_t eventType, const std::string &eventContent)
 {
-    DHLOGD("Receive audio event from devId: %{public}s, event type: %{public}d. event content: %{public}s.",
-        GetAnonyString(devId).c_str(), eventType, eventContent.c_str());
+    DHLOGD("Receive audio event from devId: %{public}s, event type: %{public}d.",
+        GetAnonyString(devId).c_str(), eventType);
 
     if (eventContent.length() > DAUDIO_MAX_JSON_LEN || eventContent.empty()
         || !CheckDevIdIsLegal(devId) || eventType < 0 || eventType > MAX_EVENT_TYPE_NUM) {
@@ -187,6 +187,7 @@ int32_t DAudioSinkManager::CreateAudioDevice(const std::string &devId)
             audioDevMap_.emplace(devId, dev);
         }
     }
+    dev->SetTokenId(callerTokenId_);
     int32_t dhId;
     bool isSpkOrMic = false;
     if (channelState_ == ChannelState::MIC_CONTROL_OPENED) {
@@ -562,6 +563,11 @@ int32_t DAudioSinkManager::VerifySecurityLevel(const std::string &devId)
         }
     }
     return DH_SUCCESS;
+}
+
+void DAudioSinkManager::SetCallerTokenId(uint64_t tokenId)
+{
+    callerTokenId_ = tokenId;
 }
 
 void DeviceInitCallback::OnRemoteDied()

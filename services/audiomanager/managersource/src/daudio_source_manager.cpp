@@ -222,6 +222,7 @@ int32_t DAudioSourceManager::DoEnableDAudio(const std::string &args)
         DHLOGE("Source dev is nullptr.");
         return ERR_DH_AUDIO_FAILED;
     }
+    sourceDev->SetTokenId(callerTokenId_);
     int32_t result = sourceDev->EnableDAudio(dhId, attrs);
     return OnEnableDAudio(devId, dhId, result);
 }
@@ -565,6 +566,11 @@ int32_t DAudioSourceManager::UnloadAVReceiverEngineProvider()
         pRHandler_ = nullptr;
     }
     return DH_SUCCESS;
+}
+
+void DAudioSourceManager::SetCallerTokenId(uint64_t tokenId)
+{
+    callerTokenId_ = tokenId;
 }
 
 IAVEngineProvider *DAudioSourceManager::getSenderProvider()

@@ -30,6 +30,8 @@
 #include "daudio_source_manager.h"
 #include "daudio_util.h"
 
+#include "token_setproc.h"
+
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DAudioSourceService"
 
@@ -102,6 +104,8 @@ int32_t DAudioSourceService::RegisterDistributedHardware(const std::string &devI
         dhId.c_str());
     std::string version = param.sinkVersion;
     std::string attrs = param.sinkAttrs;
+    auto callerTokenId = GetFirstCallerTokenID();
+    DAudioSourceManager::GetInstance().SetCallerTokenId(callerTokenId);
     return DAudioSourceManager::GetInstance().EnableDAudio(devId, dhId, version, attrs, reqId);
 }
 

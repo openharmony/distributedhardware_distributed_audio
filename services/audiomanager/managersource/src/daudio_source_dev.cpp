@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,6 +26,10 @@
 #include "daudio_radar.h"
 #include "daudio_source_manager.h"
 #include "daudio_util.h"
+
+#include "ohos_account_kits.h"
+#include "os_account_manager.h"
+#include "ipc_skeleton.h"
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DAudioSourceDev"
@@ -407,16 +411,66 @@ int32_t DAudioSourceDev::HandleAudioStop(const AudioEvent &event)
 int32_t DAudioSourceDev::HandleOpenDSpeaker(const AudioEvent &event)
 {
     DHLOGI("Open speaker device.");
-    CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
+    CHECK_AND_RETURN_RET_LOG(!CheckAclRight(), ERR_DH_AUDIO_FAILED, "ACL check failed.");
 
+    CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
     auto eventParam = std::make_shared<AudioEvent>(event);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_OPEN_SPEAKER, eventParam, 0);
-    if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
-        DHLOGE("Send event failed.");
-        return ERR_DH_AUDIO_FAILED;
-    }
+    CHECK_AND_RETURN_RET_LOG(!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE),
+        ERR_DH_AUDIO_FAILED, "Send event failed.");
     DHLOGD("Opening DSpeaker event is sent successfully.");
     return DH_SUCCESS;
+}
+
+bool DAudioSourceDev::CheckAclRight()
+{
+    CHECK_AND_RETURN_RET_LOG(!GetOsAccountInfo(), false, "GetOsAccountInfo failed.");
+    std::shared_ptr<DmInitCallback> initCallback = std::make_shared<DeviceInitCallback>();
+    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(PKG_NAME, initCallback);
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, false, "InitDeviceManager failed ret = %{public}d", ret);
+    GetLocalDeviceNetworkId(srcDevId_);
+    DmAccessCaller dmSrcCaller = {
+        .accountId = accountId_,
+        .pkgName = PKG_NAME,
+        .networkId = srcDevId_,
+        .userId = userId_,
+        .tokenId = tokenId_,
+    };
+    DmAccessCallee dmDstCallee = {
+        .networkId = devId_,
+    };
+    DHLOGI("CheckAclRight dmSrcCaller networkId: %{public}s, accountId: %{public}s, devId: %{public}s",
+        GetAnonyString(srcDevId_).c_str(), GetAnonyString(accountId_).c_str(), GetAnonyString(devId_).c_str());
+    CHECK_AND_RETURN_RET_LOG(DeviceManager::GetInstance().CheckSrcAccessControl(dmSrcCaller, dmDstCallee),
+        true, "ACL pass");
+    return false;
+}
+
+bool DAudioSourceDev::GetOsAccountInfo()
+{
+#ifdef OS_ACCOUNT_PART
+    std::vector<int32_t> ids;
+    int32_t ret = AccountSA::OsAccountManager::QueryActiveOsAccountIds(ids);
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, false,
+        "Get userId from active os accountIds fail, ret: %{public}d", ret);
+    if (ids.empty()) {
+        userId_ = 0;
+    } else {
+        userId_ = ids[0];
+    }
+
+    AccountSA::OhosAccountInfo osAccountInfo;
+    ret = AccountSA::OhosAccountKits::GetInstance().GetOhosAccountInfo(osAccountInfo);
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, false,
+        "Get accountId from ohos account info fail, ret: %{public}d", ret);
+    accountId_ = osAccountInfo.uid_;
+#endif
+    return true;
+}
+
+void DeviceInitCallback::OnRemoteDied()
+{
+    DHLOGI("DeviceInitCallback OnRemoteDied");
 }
 
 int32_t DAudioSourceDev::HandleCloseDSpeaker(const AudioEvent &event)
@@ -471,14 +525,13 @@ std::shared_ptr<DAudioIoDev> DAudioSourceDev::FindIoDevImpl(std::string args)
 int32_t DAudioSourceDev::HandleOpenDMic(const AudioEvent &event)
 {
     DHLOGI("Open mic device.");
-    CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
+    CHECK_AND_RETURN_RET_LOG(!CheckAclRight(), ERR_DH_AUDIO_FAILED, "ACL check failed.");
 
+    CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
     auto eventParam = std::make_shared<AudioEvent>(event);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_OPEN_MIC, eventParam, 0);
-    if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
-        DHLOGE("Send event failed.");
-        return ERR_DH_AUDIO_FAILED;
-    }
+    CHECK_AND_RETURN_RET_LOG(!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE),
+        ERR_DH_AUDIO_FAILED, "Send event failed.");
     DHLOGD("Opening DMic event is sent successfully.");
     return DH_SUCCESS;
 }
@@ -1392,11 +1445,7 @@ void DAudioSourceDev::OnTaskResult(int32_t resultCode, const std::string &result
 
 int32_t DAudioSourceDev::NotifySinkDev(const AudioEventType type, const cJSON *Param, const std::string dhId)
 {
-    if (!isRpcOpen_.load()) {
-        DHLOGE("Network connection failure, rpc is not open!");
-        return ERR_DH_AUDIO_FAILED;
-    }
-
+    CHECK_AND_RETURN_RET_LOG(!isRpcOpen_.load(), ERR_DH_AUDIO_FAILED, "Network connection failure, rpc is not open!");
     std::random_device rd;
     const uint32_t randomTaskCode = rd();
     constexpr uint32_t eventOffset = 4;
@@ -1404,30 +1453,22 @@ int32_t DAudioSourceDev::NotifySinkDev(const AudioEventType type, const cJSON *P
     CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
     cJSON_AddStringToObject(jParam, KEY_DH_ID, dhId.c_str());
     cJSON_AddNumberToObject(jParam, KEY_EVENT_TYPE, static_cast<int32_t>(type));
+    cJSON_AddNumberToObject(jParam, KEY_USERID, static_cast<int32_t>(userId_));
+    cJSON_AddNumberToObject(jParam, KEY_TOKENID, static_cast<int32_t>(tokenId_));
+    cJSON_AddStringToObject(jParam, KEY_ACCOUNTID, accountId_.c_str());
     cJSON *jParamCopy = cJSON_Duplicate(Param, 1);
     cJSON_AddItemToObject(jParam, KEY_AUDIO_PARAM, jParamCopy);
     cJSON_AddStringToObject(jParam, KEY_RANDOM_TASK_CODE, std::to_string(randomTaskCode).c_str());
     DHLOGI("Notify sink dev, new engine, random task code:%{public}s", std::to_string(randomTaskCode).c_str());
-
     std::lock_guard<std::mutex> devLck(ioDevMtx_);
     int32_t dhIdInt = ConvertString2Int(dhId);
-    if (deviceMap_.find(dhIdInt) == deviceMap_.end()) {
-        DHLOGE("speaker or mic dev is null. find index: %{public}d.", dhIdInt);
-        cJSON_Delete(jParam);
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_AND_FREE_RETURN_RET_LOG(deviceMap_.find(dhIdInt) == deviceMap_.end(), ERR_DH_AUDIO_NULLPTR,
+        jParam, "speaker or mic dev is null. find index: %{public}d.", dhIdInt);
     auto ioDev = deviceMap_[dhIdInt];
-    if (type == OPEN_CTRL || type == CLOSE_CTRL) {
-        DHLOGE("In new engine mode, ctrl is not allowed.");
-        cJSON_Delete(jParam);
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_AND_FREE_RETURN_RET_LOG(type == OPEN_CTRL || type == CLOSE_CTRL, ERR_DH_AUDIO_NULLPTR,
+        jParam, "In new engine mode, ctrl is not allowed.");
     char *content = cJSON_PrintUnformatted(jParam);
-    if (content == nullptr) {
-        DHLOGE("Failed to create JSON data");
-        cJSON_Delete(jParam);
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_AND_FREE_RETURN_RET_LOG(content == nullptr, ERR_DH_AUDIO_NULLPTR, jParam, "Failed to create JSON data");
     if (ioDev == nullptr) {
         cJSON_Delete(jParam);
         cJSON_free(content);
@@ -1495,6 +1536,11 @@ void DAudioSourceDev::to_json(cJSON *j, const AudioParam &param)
     cJSON_AddNumberToObject(j, KEY_RENDER_FLAGS, param.renderOpts.renderFlags);
     cJSON_AddNumberToObject(j, KEY_CAPTURE_FLAGS, param.captureOpts.capturerFlags);
     cJSON_AddNumberToObject(j, KEY_SOURCE_TYPE, param.captureOpts.sourceType);
+}
+
+void DAudioSourceDev::SetTokenId(uint64_t value)
+{
+    tokenId_ = value;
 }
 
 DAudioSourceDev::SourceEventHandler::SourceEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner,

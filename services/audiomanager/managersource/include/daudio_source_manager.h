@@ -53,6 +53,7 @@ public:
     int32_t UnloadAVReceiverEngineProvider();
     IAVEngineProvider *getSenderProvider();
     IAVEngineProvider *getReceiverProvider();
+    void SetCallerTokenId(uint64_t tokenId);
 
 private:
     DAudioSourceManager();
@@ -95,6 +96,7 @@ private:
     void *pSHandler_ = nullptr;
     void *pRHandler_ = nullptr;
     std::atomic<bool> isHicollieRunning_ = true;
+    uint64_t callerTokenId_;
 
     class SourceManagerHandler : public AppExecFwk::EventHandler {
     public:

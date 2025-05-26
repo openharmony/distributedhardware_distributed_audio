@@ -122,6 +122,9 @@ constexpr const char *KEY_EVENT_TYPE = "eventType";
 constexpr const char *KEY_AUDIO_PARAM = "audioParam";
 constexpr const char *KEY_ATTRS = "attrs";
 constexpr const char *KEY_RANDOM_TASK_CODE = "randomTaskCode";
+constexpr const char *KEY_USERID = "userId";
+constexpr const char *KEY_TOKENID = "tokenId";
+constexpr const char *KEY_ACCOUNTID = "accountId";
 
 constexpr const char *KEY_SAMPLING_RATE = "samplingRate";
 constexpr const char *KEY_CHANNELS = "channels";
