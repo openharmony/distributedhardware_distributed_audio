@@ -48,6 +48,7 @@
                 "hilog",
                 "init",
                 "ipc",
+                "os_account",
                 "player_framework",
                 "safwk",
                 "samgr"

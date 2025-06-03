@@ -66,7 +66,7 @@ HWTEST_F(DAudioSourceDevTest, CreatTasks_001, TestSize.Level1)
     EXPECT_EQ(DH_SUCCESS, sourceDev_->EnableDAudio(DH_ID_SPK, ATTRS));
 
     AudioEvent event = AudioEvent(OPEN_SPEAKER, "{\"dhId\":\"1\"}");
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleOpenDSpeaker(event));
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->HandleOpenDSpeaker(event));
     event.type = SPEAKER_OPENED;
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleDSpeakerOpened(event));
     event.type = CLOSE_SPEAKER;
@@ -75,7 +75,7 @@ HWTEST_F(DAudioSourceDevTest, CreatTasks_001, TestSize.Level1)
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->HandleDSpeakerClosed(event));
 
     event.type = OPEN_MIC;
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleOpenDMic(event));
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->HandleOpenDMic(event));
     event.type = MIC_OPENED;
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleDMicOpened(event));
     event.type = CLOSE_MIC;
@@ -121,7 +121,7 @@ HWTEST_F(DAudioSourceDevTest, CreatTasks_002, TestSize.Level1)
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->EnableDAudio(DH_ID_SPK, ATTRS));
 
     AudioEvent event = AudioEvent(OPEN_SPEAKER, "{\"dhId\":\"1\"}");
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->HandleOpenDSpeaker(event));
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->HandleOpenDSpeaker(event));
     event.type = SPEAKER_OPENED;
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleDSpeakerOpened(event));
     event.type = CLOSE_SPEAKER;
@@ -130,7 +130,7 @@ HWTEST_F(DAudioSourceDevTest, CreatTasks_002, TestSize.Level1)
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->HandleDSpeakerClosed(event));
 
     event.type = OPEN_MIC;
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->HandleOpenDMic(event));
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->HandleOpenDMic(event));
     event.type = MIC_OPENED;
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleDMicOpened(event));
     event.type = CLOSE_MIC;
@@ -166,10 +166,10 @@ HWTEST_F(DAudioSourceDevTest, CreatTasks_003, TestSize.Level1)
 {
     sourceDev_->AwakeAudioDev();
     AudioEvent event = AudioEvent(OPEN_SPEAKER, "");
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleOpenDSpeaker(event));
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->HandleOpenDSpeaker(event));
 
     event.type = OPEN_MIC;
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleOpenDMic(event));
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->HandleOpenDMic(event));
 }
 
 /**

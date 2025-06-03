@@ -29,6 +29,8 @@
 #include "daudio_sink_manager.h"
 #include "daudio_util.h"
 
+#include "token_setproc.h"
+
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DAudioSinkService"
 
@@ -75,6 +77,8 @@ bool DAudioSinkService::Init()
 int32_t DAudioSinkService::InitSink(const std::string &params, const sptr<IDAudioSinkIpcCallback> &sinkCallback)
 {
     DAudioSinkManager::GetInstance().Init(sinkCallback);
+    auto callerTokenId = GetFirstCallerTokenID();
+    DAudioSinkManager::GetInstance().SetCallerTokenId(callerTokenId);
     return DH_SUCCESS;
 }
 

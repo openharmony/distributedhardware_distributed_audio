@@ -15,7 +15,6 @@
 
 #include "daudio_sink_dev.h"
 
-
 #include <random>
 
 #include "daudio_constants.h"
@@ -23,6 +22,11 @@
 #include "daudio_log.h"
 #include "daudio_sink_manager.h"
 #include "daudio_util.h"
+
+#include "ohos_account_kits.h"
+#include "os_account_manager.h"
+#include "ipc_skeleton.h"
+#include "token_setproc.h"
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DAudioSinkDev"
@@ -121,20 +125,16 @@ int32_t DAudioSinkDev::TaskDisableDevice(const std::string &args)
 
 int32_t DAudioSinkDev::TaskOpenDSpeaker(const std::string &args)
 {
-    DHLOGI("Open speaker device, args = %{public}s.", args.c_str());
+    DHLOGI("Open speaker device");
     if (args.length() > DAUDIO_MAX_JSON_LEN || args.empty()) {
         return ERR_DH_AUDIO_SA_PARAM_INVALID;
     }
     cJSON *jParam = cJSON_Parse(args.c_str());
     CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
-    if (!CJsonParamCheck(jParam, { KEY_DH_ID, KEY_AUDIO_PARAM })) {
-        cJSON_Delete(jParam);
-        DHLOGE("Not found the keys.");
-        return ERR_DH_AUDIO_FAILED;
-    }
+    CHECK_AND_FREE_RETURN_RET_LOG(!CJsonParamCheck(jParam, { KEY_DH_ID, KEY_AUDIO_PARAM }), ERR_DH_AUDIO_FAILED,
+        jParam, "Not found the keys.");
     int32_t dhId = ConvertString2Int(std::string(cJSON_GetObjectItem(jParam, KEY_DH_ID)->valuestring));
-    CHECK_AND_FREE_RETURN_RET_LOG(dhId == -1, ERR_DH_AUDIO_NULLPTR, jParam,
-        "%{public}s", "Parse dhId error.");
+    CHECK_AND_FREE_RETURN_RET_LOG(dhId == -1, ERR_DH_AUDIO_NULLPTR, jParam, "Parse dhId error.");
     std::shared_ptr<ISpkClient> speakerClient = nullptr;
     {
         std::lock_guard<std::mutex> devLck(spkClientMutex_);
@@ -143,17 +143,14 @@ int32_t DAudioSinkDev::TaskOpenDSpeaker(const std::string &args)
     cJSON *audioParamJson = cJSON_GetObjectItem(jParam, KEY_AUDIO_PARAM);
     AudioParam audioParam;
     int32_t ret = from_json(audioParamJson, audioParam);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Get audio param from cjson failed, error code %{public}d.", ret);
-        cJSON_Delete(jParam);
-        return ret;
-    }
-    CHECK_NULL_FREE_RETURN(speakerClient, ERR_DH_AUDIO_NULLPTR, jParam);
-    ret = speakerClient->SetUp(audioParam);
     CHECK_AND_FREE_RETURN_RET_LOG(ret != DH_SUCCESS, ret, jParam,
-        "Setup speaker failed, ret: %{public}d.", ret);
-    isSpkInUse_.store(true);
+        "Get audio param from cjson failed, error code %{public}d.", ret);
     cJSON_Delete(jParam);
+    CHECK_AND_RETURN_RET_LOG(!CheckAclRight(), ERR_DH_AUDIO_FAILED, "ACL check failed.");
+    CHECK_NULL_RETURN(speakerClient, ERR_DH_AUDIO_NULLPTR);
+    ret = speakerClient->SetUp(audioParam);
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Setup speaker failed, ret: %{public}d.", ret);
+    isSpkInUse_.store(true);
     return ret;
 }
 
@@ -184,7 +181,7 @@ int32_t DAudioSinkDev::TaskCloseDSpeaker(const std::string &args)
 
 int32_t DAudioSinkDev::ParseDhidFromEvent(std::string args)
 {
-    DHLOGI("ParseDhidFrom args : %{public}s", args.c_str());
+    DHLOGI("ParseDhidFromEvent");
     cJSON *jParam = cJSON_Parse(args.c_str());
     CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_FAILED);
 
@@ -228,6 +225,34 @@ int32_t DAudioSinkDev::ParseResultFromEvent(std::string args)
     return ret;
 }
 
+int32_t DAudioSinkDev::SinkEventHandler::ParseValueFromEvent(std::string args, std::string key)
+{
+    DHLOGD("ParseValueFromEvent");
+    cJSON *jParam = cJSON_Parse(args.c_str());
+    CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_FAILED);
+    CHECK_AND_FREE_RETURN_RET_LOG(!CJsonParamCheck(jParam, { key }), ERR_DH_AUDIO_FAILED, jParam, "Not found key");
+    cJSON *retItem = cJSON_GetObjectItem(jParam, key.c_str());
+    CHECK_AND_FREE_RETURN_RET_LOG(retItem == NULL || !cJSON_IsNumber(retItem),
+        ERR_DH_AUDIO_FAILED, jParam, "Not found key result");
+    int32_t ret = retItem->valueint;
+    cJSON_Delete(jParam);
+    return ret;
+}
+
+std::string DAudioSinkDev::SinkEventHandler::ParseStringFromEvent(std::string args, std::string key)
+{
+    DHLOGD("ParseStringFromEvent");
+    cJSON *jParam = cJSON_Parse(args.c_str());
+    CHECK_NULL_RETURN(jParam, "");
+
+    CHECK_AND_FREE_RETURN_RET_LOG(!CJsonParamCheck(jParam, { key }), "", jParam, "Not found key");
+    cJSON *retItem = cJSON_GetObjectItem(jParam, key.c_str());
+    CHECK_AND_FREE_RETURN_RET_LOG(retItem == NULL || !cJSON_IsString(retItem), "", jParam, "Not found key result");
+    auto ret = std::string(retItem->valuestring);
+    cJSON_Delete(jParam);
+    return ret;
+}
+
 int32_t DAudioSinkDev::TaskStartRender(const std::string &args)
 {
     int32_t dhId = ParseDhidFromEvent(args);
@@ -261,39 +286,30 @@ int32_t DAudioSinkDev::TaskOpenDMic(const std::string &args)
     }
     cJSON *jParam = cJSON_Parse(args.c_str());
     CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
-    if (!CJsonParamCheck(jParam, { KEY_DH_ID, KEY_AUDIO_PARAM })) {
-        DHLOGE("Not found the keys.");
-        cJSON_Delete(jParam);
-        return ERR_DH_AUDIO_FAILED;
-    }
+    CHECK_AND_FREE_RETURN_RET_LOG(!CJsonParamCheck(jParam, { KEY_DH_ID, KEY_AUDIO_PARAM }), ERR_DH_AUDIO_FAILED,
+        jParam, "Not found the keys.");
     AudioParam audioParam;
     cJSON *audioParamJson = cJSON_GetObjectItem(jParam, KEY_AUDIO_PARAM);
     int32_t ret = from_json(audioParamJson, audioParam);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Get audio param from cjson failed, error code %{public}d.", ret);
-        cJSON_Delete(jParam);
-        return ret;
-    }
     CHECK_AND_FREE_RETURN_RET_LOG(ret != DH_SUCCESS, ret, jParam,
         "Get audio param from cjson failed, error code %{public}d.", ret);
     int32_t dhId = ParseDhidFromEvent(args);
     CHECK_AND_FREE_RETURN_RET_LOG(dhId == -1, ERR_DH_AUDIO_NULLPTR, jParam,
         "%{public}s", "Parse dhId error.");
+    cJSON_Delete(jParam);
     micDhId_ = std::to_string(dhId);
     std::shared_ptr<DMicClient> micClient = nullptr;
     {
         std::lock_guard<std::mutex> devLck(micClientMutex_);
         micClient = micClientMap_[dhId];
     }
-    CHECK_NULL_FREE_RETURN(micClient, ERR_DH_AUDIO_NULLPTR, jParam);
+    CHECK_AND_RETURN_RET_LOG(!CheckAclRight(), ERR_DH_AUDIO_FAILED, "ACL check failed.");
+    CHECK_NULL_RETURN(micClient, ERR_DH_AUDIO_NULLPTR);
     ret = micClient->SetUp(audioParam);
-    CHECK_AND_FREE_RETURN_RET_LOG(ret != DH_SUCCESS, ERR_DH_AUDIO_FAILED, jParam,
-        "Set up mic failed, ret: %{public}d.", ret);
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ERR_DH_AUDIO_FAILED, "Set up mic failed, ret: %{public}d.", ret);
     ret = micClient->StartCapture();
-    CHECK_AND_FREE_RETURN_RET_LOG(ret != DH_SUCCESS, ERR_DH_AUDIO_FAILED, jParam,
-        "Start capture failed, ret: %{public}d.", ret);
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ERR_DH_AUDIO_FAILED, "Start capture failed, ret: %{public}d.", ret);
     isMicInUse_.store(true);
-    cJSON_Delete(jParam);
     return ret;
 }
 
@@ -735,10 +751,67 @@ void DAudioSinkDev::SinkEventHandler::NotifyOpenSpeaker(const AppExecFwk::InnerE
 
     int32_t dhId = sinkDevObj->ParseDhidFromEvent(eventParam);
     CHECK_AND_RETURN_LOG(dhId == -1, "%{public}s", "Parse dhId error.");
+    sinkDevObj->SetUserId(ParseValueFromEvent(eventParam, KEY_USERID));
+    sinkDevObj->SetTokenId(ParseValueFromEvent(eventParam, KEY_TOKENID));
+    sinkDevObj->SetAccountId(ParseStringFromEvent(eventParam, KEY_ACCOUNTID));
     int32_t ret = sinkDevObj->TaskOpenDSpeaker(eventParam);
     sinkDevObj->NotifySourceDev(NOTIFY_OPEN_SPEAKER_RESULT, std::to_string(dhId), ret);
     DHLOGI("Open speaker device task end, notify source ret %{public}d.", ret);
     CHECK_AND_RETURN_LOG(ret != DH_SUCCESS, "%{public}s", "Open speaker failed.");
+}
+
+void DAudioSinkDev::SetUserId(int32_t value)
+{
+    userId_ = value;
+}
+
+void DAudioSinkDev::SetTokenId(int32_t value)
+{
+    tokenId_ = static_cast<uint64_t>(value);
+}
+
+void DAudioSinkDev::SetAccountId(string value)
+{
+    accountId_ = value;
+}
+
+bool DAudioSinkDev::CheckAclRight()
+{
+    CHECK_AND_RETURN_RET_LOG(userId_ == -1, true, "ACL not support");
+    std::string sinkDevId;
+    int32_t ret = GetLocalDeviceNetworkId(sinkDevId);
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, false, "GetLocalDeviceNetworkId failed, ret: %{public}d", ret);
+#ifdef OS_ACCOUNT_PART
+    std::vector<int32_t> ids;
+    ret = AccountSA::OsAccountManager::QueryActiveOsAccountIds(ids);
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, false, "Get userId fail, ret: %{public}d", ret);
+    int32_t userId = -1;
+    userId = ids.empty() ? 0 : ids[0];
+    AccountSA::OhosAccountInfo osAccountInfo;
+    ret = AccountSA::OhosAccountKits::GetInstance().GetOhosAccountInfo(osAccountInfo);
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, false, "Get accountId fail, ret: %{public}d", ret);
+    std::string accountId = osAccountInfo.uid_;
+#endif
+    std::shared_ptr<DmInitCallback> initCallback = std::make_shared<DeviceInitCallback>();
+    ret = DeviceManager::GetInstance().InitDeviceManager(PKG_NAME, initCallback);
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, false, "InitDeviceManager failed ret = %{public}d", ret);
+    DmAccessCaller dmSrcCaller = {
+        .accountId = accountId_,
+        .pkgName = PKG_NAME,
+        .networkId = devId_,
+        .userId = userId_,
+        .tokenId = tokenId_,
+    };
+    DmAccessCallee dmDstCallee = {
+        .networkId = sinkDevId,
+        .accountId = accountId,
+        .userId = userId,
+        .tokenId = sinkTokenId_,
+        .pkgName = PKG_NAME,
+    };
+    DHLOGI("CheckAclRight srcDevId: %{public}s, accountId: %{public}s, sinkDevId: %{public}s",
+        GetAnonyString(devId_).c_str(), GetAnonyString(accountId).c_str(), GetAnonyString(sinkDevId).c_str());
+    return DeviceManager::GetInstance().CheckSinkAccessControl(dmSrcCaller, dmDstCallee);
 }
 
 void DAudioSinkDev::SinkEventHandler::NotifyCloseSpeaker(const AppExecFwk::InnerEvent::Pointer &event)
@@ -800,6 +873,9 @@ void DAudioSinkDev::SinkEventHandler::NotifyOpenMic(const AppExecFwk::InnerEvent
         cJSON_Delete(jParam);
         return;
     }
+    sinkDevObj->SetUserId(ParseValueFromEvent(eventParam, KEY_USERID));
+    sinkDevObj->SetTokenId(ParseValueFromEvent(eventParam, KEY_TOKENID));
+    sinkDevObj->SetAccountId(ParseStringFromEvent(eventParam, KEY_ACCOUNTID));
     int32_t ret = sinkDevObj->TaskOpenDMic(eventParam);
     sinkDevObj->NotifySourceDev(NOTIFY_OPEN_MIC_RESULT,
         std::string(cJSON_GetObjectItem(jParam, KEY_DH_ID)->valuestring), ret);
@@ -979,6 +1055,11 @@ int32_t DAudioSinkDev::StopDistributedHardware(const std::string &networkId)
     isPageStatus_.store(false);
     NotifySourceDev(CLOSE_MIC, micDhId_, DH_SUCCESS);
     return DH_SUCCESS;
+}
+
+void DAudioSinkDev::SetSinkTokenId(uint64_t value)
+{
+    sinkTokenId_ = value;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

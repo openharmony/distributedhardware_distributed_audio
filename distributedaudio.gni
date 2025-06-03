@@ -54,4 +54,10 @@ declare_args() {
       !defined(global_parts_info.security_device_security_level)) {
     device_security_level_control = false
   }
+  if (!defined(global_parts_info) ||
+      defined(global_parts_info.account_os_account)) {
+    daudio_os_account = true
+  } else {
+    daudio_os_account = false
+  }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,6 +29,7 @@
 #include "daudio_source_mgr_callback.h"
 #include "dmic_dev.h"
 #include "dspeaker_dev.h"
+#include "device_manager.h"
 #include "iaudio_event_callback.h"
 #include "iaudio_data_transport.h"
 #include "iaudio_datatrans_callback.h"
@@ -56,6 +57,7 @@ public:
     void SetThreadStatusFlag(bool flag);
     bool GetThreadStatusFlag();
     void NotifyEvent(const AudioEvent &event) override;
+    void SetTokenId(uint64_t value);
 
 private:
     int32_t EnableDSpeaker(const int32_t dhId, const std::string &attrs);
@@ -108,6 +110,8 @@ private:
     int32_t HandleSpkMmapStop(const AudioEvent &event);
     int32_t HandleMicMmapStart(const AudioEvent &event);
     int32_t HandleMicMmapStop(const AudioEvent &event);
+    bool CheckAclRight();
+    bool GetOsAccountInfo();
 #ifdef AUDIO_SUPPORT_SHARED_BUFFER
     void HandleAudioStatus(const AudioEvent &event);
     int32_t HandleAudioStart(const AudioEvent &event);
@@ -155,6 +159,10 @@ private:
     int32_t rpcResult_ = ERR_DH_AUDIO_FAILED;
     uint8_t rpcNotify_ = 0;
     std::atomic<bool> threadStatusFlag_ = false;
+    std::string accountId_ = "";
+    int32_t userId_ = -1;
+    std::string srcDevId_ = "";
+    uint64_t tokenId_ = 0;
 
     class SourceEventHandler : public AppExecFwk::EventHandler {
     public:
@@ -193,6 +201,10 @@ private:
     std::map<AudioEventType, DAudioSourceDevFunc> memberFuncMap_;
     std::map<AudioEventType, uint8_t> eventNotifyMap_;
     std::shared_ptr<SourceEventHandler> handler_;
+};
+
+class DeviceInitCallback : public DmInitCallback {
+    void OnRemoteDied() override;
 };
 } // DistributedHardware
 } // OHOS

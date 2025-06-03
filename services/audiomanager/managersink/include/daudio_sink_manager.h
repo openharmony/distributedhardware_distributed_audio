@@ -72,6 +72,7 @@ public:
     int32_t PauseDistributedHardware(const std::string &networkId);
     int32_t ResumeDistributedHardware(const std::string &networkId);
     int32_t StopDistributedHardware(const std::string &networkId);
+    void SetCallerTokenId(uint64_t tokenId);
 
 private:
     DAudioSinkManager();
@@ -109,6 +110,7 @@ private:
     bool isCheckSecLevel_ = false;
     sptr<IDAudioSinkIpcCallback> ipcSinkCallback_ = nullptr;
     std::shared_ptr<DmInitCallback> initCallback_;
+    uint64_t callerTokenId_;
 };
 } // DistributedHardware
 } // OHOS

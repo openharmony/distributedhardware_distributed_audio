@@ -33,6 +33,7 @@
 #include "i_av_engine_provider.h"
 #include "i_av_receiver_engine_callback.h"
 #include "idaudio_sink_ipc_callback.h"
+#include "device_manager_callback.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -56,6 +57,11 @@ public:
     int32_t StopDistributedHardware(const std::string &networkId);
     void JudgeDeviceStatus();
     void SetDevLevelStatus(bool checkStatus);
+    void SetUserId(int32_t value);
+    void SetTokenId(int32_t value);
+    void SetAccountId(string value);
+    bool CheckAclRight();
+    void SetSinkTokenId(uint64_t value);
 
 private:
     int32_t TaskOpenDSpeaker(const std::string &args);
@@ -103,6 +109,10 @@ private:
     std::atomic<bool> isSpkInUse_ = false;
     std::atomic<bool> isMicInUse_ = false;
     bool isDevLevelStatus_ = false;
+    int32_t userId_ = -1;
+    uint64_t tokenId_ = 0;
+    uint64_t sinkTokenId_ = 0;
+    std::string accountId_ = "";
 
     class SinkEventHandler : public AppExecFwk::EventHandler {
     public:
@@ -131,6 +141,8 @@ private:
         void NotifyPlayStatusChange(const AppExecFwk::InnerEvent::Pointer &event);
         int32_t GetEventParam(const AppExecFwk::InnerEvent::Pointer &event, std::string &eventParam);
         void ProcessEventInner(const AppExecFwk::InnerEvent::Pointer &event);
+        int32_t ParseValueFromEvent(std::string args, std::string key);
+        std::string ParseStringFromEvent(std::string args, std::string key);
 
     private:
         using SinkEventFunc = void (SinkEventHandler::*)(const AppExecFwk::InnerEvent::Pointer &event);
