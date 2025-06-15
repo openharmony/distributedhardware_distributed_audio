@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,7 +24,6 @@
 
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
-#include "daudio_hdf_operate.h"
 #include "daudio_hdi_handler.h"
 #include "daudio_hitrace.h"
 #include "daudio_log.h"
@@ -57,7 +56,12 @@ int32_t DAudioHdiHandler::InitHdiHandler()
     }
 
     DHLOGD("Load hdf driver start.");
-    int32_t ret = DaudioHdfOperate::GetInstance().LoadDaudioHDFImpl();
+    auto dHFwkKit = GetDHFwkKit();
+    if (dHFwkKit == nullptr) {
+        DHLOGE("Get dHFwkKit is null when load hdf driver.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    int32_t ret = dHFwkKit->LoadDistributedHDF(DHType::AUDIO);
     DaudioRadar::GetInstance().ReportDaudioInit("LoadDaudioHDFImpl", AudioInit::LOAD_HDF_DRIVER,
         BizState::BIZ_STATE_END, ret);
     if (ret != DH_SUCCESS) {
@@ -82,7 +86,12 @@ int32_t DAudioHdiHandler::UninitHdiHandler()
     remote_->RemoveDeathRecipient(audioHdiRecipient_);
     CHECK_NULL_RETURN(audioSrvHdf_, DH_SUCCESS);
 
-    int32_t ret = DaudioHdfOperate::GetInstance().UnLoadDaudioHDFImpl();
+    auto dHFwkKit = GetDHFwkKit();
+    if (dHFwkKit == nullptr) {
+        DHLOGE("Get dHFwkKit is null when unload hdf driver.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    int32_t ret = dHFwkKit->UnLoadDistributedHDF(DHType::AUDIO);
     if (ret != DH_SUCCESS) {
         DHLOGE("Unload hdf driver failed, ret: %{public}d", ret);
         return ret;
@@ -221,6 +230,17 @@ int32_t DAudioHdiHandler::NotifyEvent(const std::string &devId, const int32_t dh
         return ERR_DH_AUDIO_HDI_CALL_FAILED;
     }
     return DH_SUCCESS;
+}
+
+std::shared_ptr<DistributedHardwareFwkKit> DAudioHdiHandler::GetDHFwkKit()
+{
+    if (dHFwkKit_ == nullptr) {
+        std::lock_guard<std::mutex> lock(dHFwkKitMutex_);
+        if (dHFwkKit_ == nullptr) {
+            dHFwkKit_ = std::make_shared<DistributedHardwareFwkKit>();
+        }
+    }
+    return dHFwkKit_;
 }
 
 void DAudioHdiHandler::AudioHdiRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)

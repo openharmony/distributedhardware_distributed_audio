@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -88,9 +88,6 @@ const std::string AVENC_AAC = "avenc_aac";
 const std::string NAME = "name";
 const std::string KEY_CODECTYPE = "codecType";
 const std::string KEY_DEVICE_TYPE = "deviceType";
-
-const std::string KEY_HISTREAMER_AUDIO_ENCODER = "histmAudEnc";
-const std::string KEY_HISTREAMER_AUDIO_DECODER = "histmAudDec";
 
 const std::string HDF_EVENT_RESULT_SUCCESS = "DH_SUCCESS";
 const std::string HDF_EVENT_INIT_ENGINE_FAILED = "ERR_DH_AUDIO_INIT_ENGINE_FAILED";

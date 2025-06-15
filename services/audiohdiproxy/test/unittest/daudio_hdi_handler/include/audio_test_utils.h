@@ -26,6 +26,7 @@ namespace OHOS {
 namespace DistributedHardware {
 using OHOS::HDI::DistributedAudio::Audioext::V2_0::IDAudioCallback;
 using OHOS::HDI::DistributedAudio::Audioext::V2_0::IDAudioManager;
+using OHOS::HDI::DistributedAudio::Audioext::V2_0::IDAudioHdfCallback;
 
 class MockIDAudioManager : public IDAudioManager {
 public:
@@ -46,6 +47,19 @@ public:
     int32_t NotifyEvent(const std::string &adpName, int32_t devId, int32_t streamId,
         const OHOS::HDI::DistributedAudio::Audioext::V2_0::DAudioEvent &event) override
     {
+        return DH_SUCCESS;
+    }
+
+    int32_t RegisterAudioHdfListener(const std::string &serviceName, const sptr<IDAudioHdfCallback> &callbackObj)
+    {
+        (void)serviceName;
+        (void)callbackObj;
+        return DH_SUCCESS;
+    }
+
+    int32_t UnRegisterAudioHdfListener(const std::string &serviceName)
+    {
+        (void)serviceName;
         return DH_SUCCESS;
     }
 };

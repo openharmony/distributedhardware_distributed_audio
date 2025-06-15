@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,6 +26,7 @@
 
 #include "audio_event.h"
 #include "daudio_manager_callback.h"
+#include "distributed_hardware_fwk_kit.h"
 #include "idaudio_hdi_callback.h"
 #include "single_instance.h"
 
@@ -54,6 +55,7 @@ private:
     DAudioHdiHandler();
     ~DAudioHdiHandler();
     void ProcessEventMsg(const AudioEvent &audioEvent, DAudioEvent &newEvent);
+    std::shared_ptr<DistributedHardwareFwkKit> GetDHFwkKit();
 
     class AudioHdiRecipient : public IRemoteObject::DeathRecipient {
     public:
@@ -67,6 +69,8 @@ private:
     std::map<std::string, sptr<DAudioManagerCallback>> mapAudioMgrCallback_;
     std::map<std::string, std::set<int32_t>> mapAudioMgrDhIds_;
     sptr<IRemoteObject> remote_;
+    std::shared_ptr<DistributedHardwareFwkKit> dHFwkKit_;
+    std::mutex dHFwkKitMutex_;
 };
 } // DistributedHardware
 } // OHOS
