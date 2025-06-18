@@ -23,6 +23,7 @@
 #include "daudio_errorcode.h"
 #include "daudio_log.h"
 #include "daudio_util.h"
+#include "device_manager.h"
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DAudioSinkManager"
@@ -409,6 +410,9 @@ void CtrlChannelListener::OnCtrlChannelEvent(const AVTransEvent &event)
     if (event.type == EventType::EVENT_CHANNEL_OPENED) {
         DHLOGI("Received control channel opened event, create audio device for peerDevId=%{public}s, "
             "content=%{public}s.", GetAnonyString(event.peerDevId).c_str(), event.content.c_str());
+        bool isInvalid = false;
+        CHECK_AND_RETURN_LOG(DAudioSinkManager::GetInstance().CheckOsType(event.peerDevId, isInvalid) && isInvalid,
+            "GetOsType failed or invalid osType");
         DAudioSinkManager::GetInstance().SetChannelState(event.content);
         DAudioSinkManager::GetInstance().CreateAudioDevice(event.peerDevId);
     } else if (event.type == EventType::EVENT_CHANNEL_CLOSED) {
@@ -562,6 +566,43 @@ int32_t DAudioSinkManager::VerifySecurityLevel(const std::string &devId)
             return ERR_DH_AUDIO_FAILED;
         }
     }
+    return DH_SUCCESS;
+}
+
+int32_t DAudioSinkManager::ParseValueFromCjson(std::string args, std::string key)
+{
+    DHLOGD("ParseValueFromCjson");
+    cJSON *jParam = cJSON_Parse(args.c_str());
+    CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_FAILED);
+    CHECK_AND_FREE_RETURN_RET_LOG(!CJsonParamCheck(jParam, { key }), ERR_DH_AUDIO_FAILED, jParam, "Not found key");
+    cJSON *retItem = cJSON_GetObjectItem(jParam, key.c_str());
+    CHECK_AND_FREE_RETURN_RET_LOG(retItem == NULL || !cJSON_IsNumber(retItem),
+        ERR_DH_AUDIO_FAILED, jParam, "Not found key result");
+    int32_t ret = retItem->valueint;
+    cJSON_Delete(jParam);
+    return ret;
+}
+
+int32_t DAudioSinkManager::CheckOsType(const std::string &networkId, bool &isInvalid)
+{
+    std::shared_ptr<DmInitCallback> initCallback = std::make_shared<DeviceInitCallback>();
+    int32_t ret = DeviceManager::GetInstance().InitDeviceManager(PKG_NAME, initCallback);
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ERR_DH_AUDIO_FAILED, "InitDeviceManager failed ret = %{public}d", ret);
+    std::vector<DistributedHardware::DmDeviceInfo> dmDeviceInfoList;
+    int32_t errCode = DeviceManager::GetInstance().GetTrustedDeviceList(PKG_NAME, "", dmDeviceInfoList);
+    CHECK_AND_RETURN_RET_LOG(errCode != DH_SUCCESS, ERR_DH_AUDIO_FAILED,
+        "Get device manager trusted device list fail, errCode %{public}d", errCode);
+    for (const auto& dmDeviceInfo : dmDeviceInfoList) {
+        if (dmDeviceInfo.networkId == networkId) {
+            int32_t osType = ParseValueFromCjson(dmDeviceInfo.extraData, KEY_OS_TYPE);
+            if (osType == INVALID_OS_TYPE && osType != ERR_DH_AUDIO_FAILED) {
+                isInvalid = true;
+            }
+            DHLOGI("remote found, osType: %{public}d, isInvalid: %{public}d", osType, isInvalid);
+            return DH_SUCCESS;
+        }
+    }
+    DHLOGI("remote not found.");
     return DH_SUCCESS;
 }
 

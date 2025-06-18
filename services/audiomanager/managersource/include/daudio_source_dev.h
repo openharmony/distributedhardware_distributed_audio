@@ -89,6 +89,8 @@ private:
     void OnDisableTaskResult(int32_t resultCode, const std::string &result, const std::string &funcName);
     void OnEnableTaskResult(int32_t resultCode, const std::string &result, const std::string &funcName);
     void OnTaskResult(int32_t resultCode, const std::string &result, const std::string &funcName);
+    int32_t ParseValueFromCjson(std::string args, std::string key);
+    int32_t CheckOsType(std::string &networkId, bool &isInvalid);
 
     int32_t HandleOpenDSpeaker(const AudioEvent &event);
     int32_t HandleCloseDSpeaker(const AudioEvent &event);

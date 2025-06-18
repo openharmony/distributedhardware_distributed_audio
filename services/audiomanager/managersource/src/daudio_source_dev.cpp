@@ -413,6 +413,9 @@ int32_t DAudioSourceDev::HandleOpenDSpeaker(const AudioEvent &event)
     DHLOGI("Open speaker device.");
     CHECK_AND_RETURN_RET_LOG(!CheckAclRight(), ERR_DH_AUDIO_FAILED, "ACL check failed.");
 
+    bool isInvalid = false;
+    CHECK_AND_RETURN_RET_LOG(CheckOsType(devId_, isInvalid) && isInvalid, ERR_DH_AUDIO_FAILED,
+        "GetOsType failed or invalid osType");
     CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
     auto eventParam = std::make_shared<AudioEvent>(event);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_OPEN_SPEAKER, eventParam, 0);
@@ -527,6 +530,9 @@ int32_t DAudioSourceDev::HandleOpenDMic(const AudioEvent &event)
     DHLOGI("Open mic device.");
     CHECK_AND_RETURN_RET_LOG(!CheckAclRight(), ERR_DH_AUDIO_FAILED, "ACL check failed.");
 
+    bool isInvalid = false;
+    CHECK_AND_RETURN_RET_LOG(CheckOsType(devId_, isInvalid) && isInvalid, ERR_DH_AUDIO_FAILED,
+        "GetOsType failed or invalid osType");
     CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
     auto eventParam = std::make_shared<AudioEvent>(event);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_OPEN_MIC, eventParam, 0);
@@ -1541,6 +1547,40 @@ void DAudioSourceDev::to_json(cJSON *j, const AudioParam &param)
 void DAudioSourceDev::SetTokenId(uint64_t value)
 {
     tokenId_ = value;
+}
+
+int32_t DAudioSourceDev::ParseValueFromCjson(std::string args, std::string key)
+{
+    DHLOGD("ParseValueFromCjson");
+    cJSON *jParam = cJSON_Parse(args.c_str());
+    CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_FAILED);
+    CHECK_AND_FREE_RETURN_RET_LOG(!CJsonParamCheck(jParam, { key }), ERR_DH_AUDIO_FAILED, jParam, "Not found key");
+    cJSON *retItem = cJSON_GetObjectItem(jParam, key.c_str());
+    CHECK_AND_FREE_RETURN_RET_LOG(retItem == NULL || !cJSON_IsNumber(retItem),
+        ERR_DH_AUDIO_FAILED, jParam, "Not found key result");
+    int32_t ret = retItem->valueint;
+    cJSON_Delete(jParam);
+    return ret;
+}
+
+int32_t DAudioSourceDev::CheckOsType(std::string &networkId, bool &isInvalid)
+{
+    std::vector<DistributedHardware::DmDeviceInfo> dmDeviceInfoList;
+    int32_t errCode = DeviceManager::GetInstance().GetTrustedDeviceList(PKG_NAME, "", dmDeviceInfoList);
+    CHECK_AND_RETURN_RET_LOG(errCode != DH_SUCCESS, ERR_DH_AUDIO_FAILED,
+        "Get device manager trusted device list fail, errCode %{public}d", errCode);
+    for (const auto& dmDeviceInfo : dmDeviceInfoList) {
+        if (dmDeviceInfo.networkId == networkId) {
+            int32_t osType = ParseValueFromCjson(dmDeviceInfo.extraData, KEY_OS_TYPE);
+            if (osType == INVALID_OS_TYPE && osType != ERR_DH_AUDIO_FAILED) {
+                isInvalid = true;
+            }
+            DHLOGI("remote found, osType: %{public}d, isInvalid: %{public}d", osType, isInvalid);
+            return DH_SUCCESS;
+        }
+    }
+    DHLOGI("remote not found.");
+    return DH_SUCCESS;
 }
 
 DAudioSourceDev::SourceEventHandler::SourceEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
