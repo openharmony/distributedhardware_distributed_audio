@@ -28,7 +28,7 @@
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 
-#define CONSUME_RANDOM_STRING(fdp, maxLength) fdp.ConsumeRandomLengthString(maxLength)
+#define CONSUME_RANDOM_STRING(fdp, maxLength) (fdp.ConsumeRandomLengthString(maxLength))
 namespace OHOS {
 namespace DistributedHardware {
 void SinkStubDaudioSinkStubFuzzTest(const uint8_t* data, size_t size)
