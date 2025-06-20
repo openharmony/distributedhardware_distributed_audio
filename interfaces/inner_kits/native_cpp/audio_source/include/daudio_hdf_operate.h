@@ -20,6 +20,7 @@
 #include <condition_variable>
 #include <mutex>
 
+#include "idistributed_hardware_source.h"
 #include "iservstat_listener_hdi.h"
 #include "idevmgr_hdi.h"
 #include "iservmgr_hdi.h"
@@ -30,6 +31,7 @@ namespace OHOS {
 namespace DistributedHardware {
 const std::string AUDIO_SERVICE_NAME = "daudio_primary_service";
 const std::string AUDIOEXT_SERVICE_NAME = "daudio_ext_service";
+const std::string HDF_LISTENER_SERVICE_NAME = "DHFWK";
 constexpr uint16_t AUDIO_INVALID_VALUE = 0xffff;
 constexpr int32_t AUDIO_WAIT_TIME = 5000;
 using OHOS::HDI::DeviceManager::V1_0::IDeviceManager;
@@ -42,13 +44,17 @@ using OHOS::HDI::DistributedAudio::Audioext::V2_0::IDAudioHdfCallback;
 using OHOS::HDI::DistributedAudio::Audioext::V2_0::DAudioEvent;
 
 class FwkDAudioHdfCallback;
+class HdfDeathRecipient : public IRemoteObject::DeathRecipient {
+public:
+    void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
+};
 class DaudioHdfOperate {
 DECLARE_SINGLE_INSTANCE(DaudioHdfOperate);
 
 public:
-    int32_t LoadDaudioHDFImpl();
+    int32_t LoadDaudioHDFImpl(std::shared_ptr<HdfDeathCallback> callback);
     int32_t UnLoadDaudioHDFImpl();
-    void ResetRefCount();
+    void OnHdfHostDied();
 
 private:
     int32_t WaitLoadService(const std::string& servName);
@@ -57,18 +63,22 @@ private:
     int32_t UnLoadDevice();
     int32_t RegisterHdfListener();
     int32_t UnRegisterHdfListener();
+    int32_t AddHdfDeathBind();
+    int32_t RemoveHdfDeathBind();
+    int32_t MakeFwkDAudioHdfCallback();
 
 private:
     OHOS::sptr<IDeviceManager> devmgr_;
     OHOS::sptr<IServiceManager> servMgr_;
     OHOS::sptr<IDAudioManager> audioSrvHdf_;
+    std::mutex fwkDAudioHdfCallbackMutex_;
     OHOS::sptr<FwkDAudioHdfCallback> fwkDAudioHdfCallback_;
     std::atomic<uint16_t> audioServStatus_ = AUDIO_INVALID_VALUE;
     std::atomic<uint16_t> audioextServStatus_ = AUDIO_INVALID_VALUE;
     std::condition_variable hdfOperateCon_;
     std::mutex hdfOperateMutex_;
-    int32_t hdfLoadRef_ = 0;
-    std::mutex hdfLoadRefMutex_;
+    std::shared_ptr<HdfDeathCallback> hdfDeathCallback_;
+    sptr<HdfDeathRecipient> hdfDeathRecipient_ = sptr<HdfDeathRecipient>(new HdfDeathRecipient());
 };
 
 class DAudioHdfServStatListener : public OHOS::HDI::ServiceManager::V1_0::ServStatListenerStub {

@@ -34,6 +34,7 @@ ohos_shared_library("distributed_audio_source_sdk") {
   ]
 
   sources = [
+    "src/daudio_hdf_operate.cpp",
     "src/daudio_ipc_callback.cpp",
     "src/daudio_ipc_callback_stub.cpp",
     "src/daudio_source_handler.cpp",
@@ -53,6 +54,10 @@ ohos_shared_library("distributed_audio_source_sdk") {
     "cJSON:cjson",
     "c_utils:utils",
     "distributed_hardware_fwk:distributedhardwareutils",
+    "drivers_interface_distributed_audio:libdaudioext_proxy_2.0",
+    "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libhdi",
+    "hdf_core:libpub_utils",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",

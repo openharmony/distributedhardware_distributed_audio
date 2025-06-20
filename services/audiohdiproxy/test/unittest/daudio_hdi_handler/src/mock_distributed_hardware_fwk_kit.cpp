@@ -22,7 +22,7 @@ namespace OHOS {
 namespace DistributedHardware {
 int32_t DistributedHardwareFwkKit::LoadDistributedHDF(const DHType dhType)
 {
-    return DaudioHdfOperate::GetInstance().LoadDaudioHDFImpl();
+    return DaudioHdfOperate::GetInstance().LoadDaudioHDFImpl(nullptr);
 }
 
 int32_t DistributedHardwareFwkKit::UnLoadDistributedHDF(const DHType dhType)

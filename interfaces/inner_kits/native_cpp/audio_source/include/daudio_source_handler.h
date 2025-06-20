@@ -39,6 +39,8 @@ public:
     void UnregisterDistributedHardwareStateListener() override;
     void RegisterDataSyncTriggerListener(std::shared_ptr<DataSyncTriggerListener> listener) override;
     void UnregisterDataSyncTriggerListener() override;
+    int32_t LoadDistributedHDF(std::shared_ptr<HdfDeathCallback> callback) override;
+    int32_t UnLoadDistributedHDF() override;
     void OnRemoteSourceSvrDied(const wptr<IRemoteObject> &remote);
     void FinishStartSA(const std::string &param, const sptr<IRemoteObject> &remoteObject);
 

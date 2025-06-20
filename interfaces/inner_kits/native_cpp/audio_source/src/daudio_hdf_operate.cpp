@@ -20,6 +20,7 @@
 
 #include "daudio_errorcode.h"
 #include "daudio_log.h"
+#include "iproxy_broker.h"
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DaudioHdfOperate"
@@ -27,15 +28,9 @@
 namespace OHOS {
 namespace DistributedHardware {
 IMPLEMENT_SINGLE_INSTANCE(DaudioHdfOperate);
-int32_t DaudioHdfOperate::LoadDaudioHDFImpl()
+int32_t DaudioHdfOperate::LoadDaudioHDFImpl(std::shared_ptr<HdfDeathCallback> callback)
 {
     DHLOGI("Load daudio hdf impl begin!");
-    std::unique_lock<std::mutex> loadRefLocker(hdfLoadRefMutex_);
-    if (hdfLoadRef_ > 0) {
-        hdfLoadRef_++;
-        DHLOGI("The daudio hdf impl has been loaded, just inc ref!");
-        return DH_SUCCESS;
-    }
     int32_t ret = LoadDevice();
     if (ret != DH_SUCCESS) {
         DHLOGE("LoadDevice failed, ret: %{public}d.", ret);
@@ -47,7 +42,14 @@ int32_t DaudioHdfOperate::LoadDaudioHDFImpl()
         UnLoadDevice();
         return ret;
     }
-    hdfLoadRef_++;
+    hdfDeathCallback_ = callback;
+    ret = AddHdfDeathBind();
+    if (ret != DH_SUCCESS) {
+        DHLOGE("AddHdfDeathBind failed, ret: %{public}d.", ret);
+        UnRegisterHdfListener();
+        UnLoadDevice();
+        return ret;
+    }
     DHLOGI("Load daudio hdf impl end!");
     return DH_SUCCESS;
 }
@@ -55,17 +57,11 @@ int32_t DaudioHdfOperate::LoadDaudioHDFImpl()
 int32_t DaudioHdfOperate::UnLoadDaudioHDFImpl()
 {
     DHLOGI("UnLoad daudio hdf impl begin!");
-    std::unique_lock<std::mutex> loadRefLocker(hdfLoadRefMutex_);
-    if (hdfLoadRef_ == 0) {
-        DHLOGI("The daudio hdf impl has been unloaded!");
-        return DH_SUCCESS;
+    int32_t ret = RemoveHdfDeathBind();
+    if (ret != DH_SUCCESS) {
+        DHLOGE("RemoveHdfDeathBind failed, ret: %{public}d.", ret);
     }
-    if (hdfLoadRef_ > 1) {
-        hdfLoadRef_--;
-        DHLOGI("The daudio hdf impl has been loaded, just dec ref!");
-        return DH_SUCCESS;
-    }
-    int32_t ret = UnRegisterHdfListener();
+    ret = UnRegisterHdfListener();
     if (ret != DH_SUCCESS) {
         DHLOGE("UnRegisterHdfListener failed, ret: %{public}d.", ret);
     }
@@ -73,16 +69,18 @@ int32_t DaudioHdfOperate::UnLoadDaudioHDFImpl()
     if (ret != DH_SUCCESS) {
         DHLOGE("UnLoadDevice failed, ret: %{public}d.", ret);
     }
-    hdfLoadRef_--;
     DHLOGI("UnLoad daudio hdf impl end!");
     return DH_SUCCESS;
 }
 
-void DaudioHdfOperate::ResetRefCount()
+void DaudioHdfOperate::OnHdfHostDied()
 {
-    DHLOGI("Reset reference count for daudio.");
-    std::unique_lock<std::mutex> loadRefLocker(hdfLoadRefMutex_);
-    hdfLoadRef_ = 0;
+    DHLOGI("On hdf host died begin!");
+    if (hdfDeathCallback_) {
+        DHLOGI("Call hdf host died callback!");
+        hdfDeathCallback_->OnHdfHostDied();
+    }
+    DHLOGI("On hdf host died end!");
 }
 
 int32_t DaudioHdfOperate::WaitLoadService(const std::string& servName)
@@ -209,13 +207,12 @@ int32_t DaudioHdfOperate::RegisterHdfListener()
         return ERR_DH_AUDIO_NULLPTR;
     }
     if (fwkDAudioHdfCallback_ == nullptr) {
-        fwkDAudioHdfCallback_ = new FwkDAudioHdfCallback();
-        if (fwkDAudioHdfCallback_ == nullptr) {
+        if (MakeFwkDAudioHdfCallback() != DH_SUCCESS) {
             DHLOGE("Create FwkDAudioHdfCallback failed.");
             return ERR_DH_AUDIO_NULLPTR;
         }
     }
-    int32_t ret = audioSrvHdf_->RegisterAudioHdfListener("DHFWK", fwkDAudioHdfCallback_);
+    int32_t ret = audioSrvHdf_->RegisterAudioHdfListener(HDF_LISTENER_SERVICE_NAME, fwkDAudioHdfCallback_);
     if (ret != DH_SUCCESS) {
         DHLOGE("Call hdf proxy RegisterAudioHdfListener failed, ret: %{public}d.", ret);
         return ret;
@@ -231,12 +228,64 @@ int32_t DaudioHdfOperate::UnRegisterHdfListener()
         DHLOGE("hdi daudio manager is nullptr!");
         return ERR_DH_AUDIO_NULLPTR;
     }
-    int32_t ret = audioSrvHdf_->UnRegisterAudioHdfListener("DHFWK");
+    int32_t ret = audioSrvHdf_->UnRegisterAudioHdfListener(HDF_LISTENER_SERVICE_NAME);
     if (ret != DH_SUCCESS) {
         DHLOGE("Call hdf proxy UnRegisterAudioHdfListener failed, ret: %{public}d.", ret);
         return ret;
     }
     DHLOGI("UnRegisterHdfListener for daudio end!");
+    return DH_SUCCESS;
+}
+
+int32_t DaudioHdfOperate::AddHdfDeathBind()
+{
+    DHLOGI("AddHdfDeathBind for daudio begin!");
+    if (audioSrvHdf_ == nullptr) {
+        DHLOGE("hdi daudio manager is nullptr!");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    sptr<IRemoteObject> remote = OHOS::HDI::hdi_objcast<IDAudioManager>(audioSrvHdf_);
+    if (remote == nullptr) {
+        DHLOGE("Get remote from hdi daudio manager failed!");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    if (remote->AddDeathRecipient(hdfDeathRecipient_) == false) {
+        DHLOGE("Call AddDeathRecipient failed!");
+        return ERR_DH_AUDIO_FAILED;
+    }
+    DHLOGI("AddHdfDeathBind for daudio end!");
+    return DH_SUCCESS;
+}
+
+int32_t DaudioHdfOperate::RemoveHdfDeathBind()
+{
+    DHLOGI("RemoveHdfDeathBind for daudio begin!");
+    if (audioSrvHdf_ == nullptr) {
+        DHLOGE("hdi daudio manager is nullptr!");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    sptr<IRemoteObject> remote = OHOS::HDI::hdi_objcast<IDAudioManager>(audioSrvHdf_);
+    if (remote == nullptr) {
+        DHLOGE("Get remote from hdi daudio manager failed!");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    if (remote->RemoveDeathRecipient(hdfDeathRecipient_) == false) {
+        DHLOGE("Call RemoveDeathRecipient failed!");
+        return ERR_DH_AUDIO_FAILED;
+    }
+    DHLOGI("RemoveHdfDeathBind for daudio end!");
+    return DH_SUCCESS;
+}
+
+int32_t DaudioHdfOperate::MakeFwkDAudioHdfCallback()
+{
+    std::lock_guard<std::mutex> locker(fwkDAudioHdfCallbackMutex_);
+    if (fwkDAudioHdfCallback_ == nullptr) {
+        fwkDAudioHdfCallback_ = new FwkDAudioHdfCallback();
+        if (fwkDAudioHdfCallback_ == nullptr) {
+            return ERR_DH_AUDIO_NULLPTR;
+        }
+    }
     return DH_SUCCESS;
 }
 
@@ -253,6 +302,12 @@ int32_t FwkDAudioHdfCallback::NotifyEvent(int32_t devId, const DAudioEvent& even
     (void)devId;
     (void)event;
     return DH_SUCCESS;
+}
+
+void HdfDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
+{
+    DHLOGI("On remote died!");
+    DaudioHdfOperate::GetInstance().OnHdfHostDied();
 }
 } // namespace DistributedHardware
 } // namespace OHOS
