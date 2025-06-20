@@ -73,6 +73,7 @@ public:
     int32_t ResumeDistributedHardware(const std::string &networkId);
     int32_t StopDistributedHardware(const std::string &networkId);
     void SetCallerTokenId(uint64_t tokenId);
+    int32_t CheckOsType(const std::string &networkId, bool &isInvalid);
 
 private:
     DAudioSinkManager();
@@ -86,6 +87,7 @@ private:
     std::string GetUdidByNetworkId(const std::string &networkId);
     int32_t VerifySecurityLevel(const std::string &devId);
     int32_t InitAudioDevice(std::shared_ptr<DAudioSinkDev> dev, const std::string &devId, bool isSpkOrMic);
+    int32_t ParseValueFromCjson(std::string args, std::string key);
 
 private:
     static constexpr const char* DEVCLEAR_THREAD = "sinkClearTh";

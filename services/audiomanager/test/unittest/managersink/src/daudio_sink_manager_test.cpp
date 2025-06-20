@@ -281,5 +281,42 @@ HWTEST_F(DAudioSinkManagerTest, OnProviderEvent_001, TestSize.Level1)
     AVTransEvent event3 = { EventType::EVENT_REMOVE_STREAM, "", ""};
     EXPECT_EQ(DH_SUCCESS, daudioSinkManager.providerListener_->OnProviderEvent(event3));
 }
+
+/**
+ * @tc.name: ParseValueFromCjson_001
+ * @tc.desc: Verify the ParseValueFromCjson function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkManagerTest, ParseValueFromCjson_001, TestSize.Level1)
+{
+    int32_t volume = 50;
+    std::string jsonStr = "{\"OS_TYPE\": 50}";
+    std::string key = "OS_TYPE";
+    int32_t result = daudioSinkManager.ParseValueFromCjson(jsonStr, key);
+    EXPECT_EQ(result, volume);
+
+    jsonStr = "invalid_json";
+    key = "volume";
+    result = daudioSinkManager.ParseValueFromCjson(jsonStr, key);
+    EXPECT_EQ(result, ERR_DH_AUDIO_FAILED);
+
+    jsonStr = "{\"brightness\": 80}";
+    result = daudioSinkManager.ParseValueFromCjson(jsonStr, key);
+    EXPECT_EQ(result, ERR_DH_AUDIO_FAILED);
+
+    jsonStr = "{\"volume\": \"high\"}";
+    result = daudioSinkManager.ParseValueFromCjson(jsonStr, key);
+    EXPECT_EQ(result, ERR_DH_AUDIO_FAILED);
+
+    jsonStr = "";
+    result = daudioSinkManager.ParseValueFromCjson(jsonStr, key);
+    EXPECT_EQ(result, ERR_DH_AUDIO_FAILED);
+
+    jsonStr = "null";
+    key = "volume";
+    result = daudioSinkManager.ParseValueFromCjson(jsonStr, key);
+    EXPECT_EQ(result, ERR_DH_AUDIO_FAILED);
+}
 } // DistributedHardware
 } // OHOS

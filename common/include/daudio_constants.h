@@ -73,6 +73,9 @@ static constexpr int32_t LOW_LATENCY_RENDER_ID = 1 << 1 | 1 << 0;
 static constexpr int32_t DEFAULT_RENDER_ID = 1;
 static constexpr int32_t DEFAULT_CAPTURE_ID = 1 << 27 | 1 << 0;
 
+constexpr int32_t VALID_OS_TYPE = 10;
+constexpr int32_t INVALID_OS_TYPE = -1;
+
 const std::string DAUDIO_LOG_TITLE_TAG = "DAUDIO";
 const std::string DAUDIO_PREFIX = "DISTRIBUTED_AUDIO";
 const std::string AUDIO_PREFIX = "AUDIO";
@@ -122,6 +125,7 @@ constexpr const char *KEY_RANDOM_TASK_CODE = "randomTaskCode";
 constexpr const char *KEY_USERID = "userId";
 constexpr const char *KEY_TOKENID = "tokenId";
 constexpr const char *KEY_ACCOUNTID = "accountId";
+constexpr const char *KEY_OS_TYPE = "OS_TYPE";
 
 constexpr const char *KEY_SAMPLING_RATE = "samplingRate";
 constexpr const char *KEY_CHANNELS = "channels";
