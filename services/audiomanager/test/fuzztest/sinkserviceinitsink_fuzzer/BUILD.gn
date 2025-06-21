@@ -27,6 +27,8 @@ ohos_fuzztest("SinkServiceInitSinkFuzzTest") {
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
+    "-Dprivate=public",
+    "-Dprotected=public",
   ]
   sources = [ "sinkserviceinitsink_fuzzer.cpp" ]
 

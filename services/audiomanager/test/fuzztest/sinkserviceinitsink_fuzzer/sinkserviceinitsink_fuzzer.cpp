@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <fuzzer/FuzzedDataProvider.h>
 
+#include "daudio_constants.h"
 #include "daudio_sink_service.h"
 #include "daudio_sink_ipc_callback.h"
 #include "if_system_ability_manager.h"
@@ -42,6 +43,69 @@ void SinkServiceInitSinkFuzzTest(const uint8_t* data, size_t size)
 
     dAudioSinkService->InitSink(params, dAudioSinkIpcCallback);
 }
+
+void SinkServiceOnStartFuzzTest(const uint8_t* data, size_t size)
+{
+    if (data == nullptr || size < sizeof(int32_t)) {
+        return;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    int32_t saId = fdp.ConsumeIntegral<int32_t>();
+    bool runOnCreate = fdp.ConsumeBool();
+
+    auto dAudioSinkService = std::make_shared<DAudioSinkService>(saId, runOnCreate);
+    dAudioSinkService->OnStart();
+}
+
+void SinkServiceOnStopFuzzTest(const uint8_t* data, size_t size)
+{
+    if (data == nullptr || size < sizeof(int32_t)) {
+        return;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    int32_t saId = fdp.ConsumeIntegral<int32_t>();
+    bool runOnCreate = fdp.ConsumeBool();
+
+    auto dAudioSinkService = std::make_shared<DAudioSinkService>(saId, runOnCreate);
+    dAudioSinkService->OnStop();
+}
+
+void SinkServiceInitFuzzTest(const uint8_t* data, size_t size)
+{
+    if (data == nullptr || size < sizeof(int32_t)) {
+        return;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    int32_t saId = fdp.ConsumeIntegral<int32_t>();
+    bool runOnCreate = fdp.ConsumeBool();
+
+    auto dAudioSinkService = std::make_shared<DAudioSinkService>(saId, runOnCreate);
+    dAudioSinkService->Init();
+}
+
+void SinkServiceDumpFuzzTest(const uint8_t* data, size_t size)
+{
+    if (data == nullptr || size == 0) {
+        return;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    int32_t fd = fdp.ConsumeIntegral<int32_t>();
+    size_t argsCount = fdp.ConsumeIntegralInRange<size_t>(0, 10);
+    std::vector<std::u16string> args;
+
+    for (size_t i = 0; i < argsCount; ++i) {
+        std::string utf8Str = fdp.ConsumeRandomLengthString(100);
+        std::u16string utf16Str(utf8Str.begin(), utf8Str.end());
+        args.emplace_back(utf16Str);
+    }
+
+    auto dAudioSinkService = std::make_shared<DAudioSinkService>(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID, true);
+    dAudioSinkService->Dump(fd, args);
+}
 }
 }
 
@@ -50,6 +114,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
     OHOS::DistributedHardware::SinkServiceInitSinkFuzzTest(data, size);
+    OHOS::DistributedHardware::SinkServiceOnStartFuzzTest(data, size);
+    OHOS::DistributedHardware::SinkServiceOnStopFuzzTest(data, size);
+    OHOS::DistributedHardware::SinkServiceInitFuzzTest(data, size);
+    OHOS::DistributedHardware::SinkServiceDumpFuzzTest(data, size);
     return 0;
 }
 

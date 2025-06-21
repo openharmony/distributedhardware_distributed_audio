@@ -20,6 +20,7 @@
 #include <random>
 #include <fuzzer/FuzzedDataProvider.h>
 
+#include "daudio_sink_ipc_callback_proxy.h"
 #include "daudio_sink_stub.h"
 #include "daudio_sink_service.h"
 
@@ -27,6 +28,10 @@
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 
+inline std::string ConsumeRandomString(FuzzedDataProvider& fdp, size_t maxLength)
+{
+    return fdp.ConsumeRandomLengthString(maxLength);
+}
 namespace OHOS {
 namespace DistributedHardware {
 void SinkStubDaudioSinkStubFuzzTest(const uint8_t* data, size_t size)
@@ -227,6 +232,49 @@ void SinkStubStopDistributedHardwareInnerFuzzTest(const uint8_t* data, size_t si
     pdata.WriteString(resultData);
     dAudioSinkService->StopDistributedHardwareInner(pdata, reply, option);
 }
+
+void SinkStubInitSinkInnerFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size < (sizeof(int32_t)))) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+
+    int32_t saId = fdp.ConsumeIntegral<int32_t>();
+    bool runOnCreate = fdp.ConsumeBool();
+    auto dAudioSinkService = std::make_shared<DAudioSinkService>(saId, runOnCreate);
+
+    MessageParcel pdata;
+    MessageParcel reply;
+    MessageOption option;
+
+    std::string param = fdp.ConsumeRandomLengthString(100);
+    sptr<IRemoteObject> remoteObject = nullptr;
+    pdata.WriteString(param);
+    pdata.WriteRemoteObject(remoteObject);
+    dAudioSinkService->InitSinkInner(pdata, reply, option);
+}
+
+void SinkStubReleaseSinkInnerFuzzTest(const uint8_t* data, size_t size)
+{
+    if (data == nullptr || size == 0) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+
+    int32_t saId = fdp.ConsumeIntegral<int32_t>();
+    bool runOnCreate = fdp.ConsumeBool();
+    auto dAudioSinkService = std::make_shared<DAudioSinkService>(saId, runOnCreate);
+
+    MessageParcel pdata;
+    MessageParcel reply;
+    MessageOption option;
+
+    std::string dummyData = ConsumeRandomString(fdp, 100);
+    pdata.WriteString(dummyData);
+
+    dAudioSinkService->ReleaseSinkInner(pdata, reply, option);
+}
 }
 }
 
@@ -241,5 +289,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::DistributedHardware::SinkStubPauseDistributedHardwareInnerFuzzTest(data, size);
     OHOS::DistributedHardware::SinkStubResumeDistributedHardwareInnerFuzzTest(data, size);
     OHOS::DistributedHardware::SinkStubStopDistributedHardwareInnerFuzzTest(data, size);
+    OHOS::DistributedHardware::SinkStubInitSinkInnerFuzzTest(data, size);
+    OHOS::DistributedHardware::SinkStubReleaseSinkInnerFuzzTest(data, size);
     return 0;
 }
