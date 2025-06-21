@@ -28,7 +28,9 @@
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 
-#define CONSUME_RANDOM_STRING(fdp, maxLength) (fdp.ConsumeRandomLengthString((maxLength)))
+inline std::string ConsumeRandomString(FuzzDataProcessor& fdp, size_t maxLength) {
+    return fdp.ConsumeRandomLengthString(maxLength);
+}
 namespace OHOS {
 namespace DistributedHardware {
 void SinkStubDaudioSinkStubFuzzTest(const uint8_t* data, size_t size)
@@ -267,7 +269,7 @@ void SinkStubReleaseSinkInnerFuzzTest(const uint8_t* data, size_t size)
     MessageParcel reply;
     MessageOption option;
 
-    std::string dummyData = CONSUME_RANDOM_STRING(fdp, 100);
+    std::string dummyData = ConsumeRandomString(fdp, 100);
     pdata.WriteString(dummyData);
 
     dAudioSinkService->ReleaseSinkInner(pdata, reply, option);
