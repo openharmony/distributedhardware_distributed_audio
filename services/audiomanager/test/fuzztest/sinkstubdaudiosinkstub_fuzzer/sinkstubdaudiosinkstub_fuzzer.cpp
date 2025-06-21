@@ -28,7 +28,8 @@
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 
-inline std::string ConsumeRandomString(FuzzedDataProvider& fdp, size_t maxLength) {
+inline std::string ConsumeRandomString(FuzzedDataProvider& fdp, size_t maxLength)
+{
     return fdp.ConsumeRandomLengthString(maxLength);
 }
 namespace OHOS {
