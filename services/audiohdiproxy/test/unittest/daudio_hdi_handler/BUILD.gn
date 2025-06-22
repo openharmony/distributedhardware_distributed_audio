@@ -24,6 +24,7 @@ config("module_private_config") {
   include_dirs = [
     "include",
     "${common_path}/include",
+    "${interfaces_path}/inner_kits/native_cpp/audio_source/include",
     "${services_path}/common/audiodata/include",
     "${services_path}/common/audioparam",
     "${services_path}/common/audiodata/include",
@@ -36,9 +37,9 @@ ohos_unittest("DAudioHdiHandlerTest") {
   module_out_path = module_out_path
 
   sources = [
-    "src/daudio_hdf_operate.cpp",
     "src/daudio_hdi_handler_test.cpp",
     "src/mock_distributed_hardware_fwk_kit.cpp",
+    "${interfaces_path}/inner_kits/native_cpp/audio_source/src/daudio_hdf_operate.cpp",
   ]
 
   configs = [ ":module_private_config" ]

@@ -20,6 +20,7 @@
 
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
+#include "daudio_hdf_operate.h"
 #include "daudio_hisysevent.h"
 #include "daudio_hitrace.h"
 #include "daudio_log.h"
@@ -171,6 +172,16 @@ void DAudioSourceHandler::UnregisterDataSyncTriggerListener()
 {
     CHECK_AND_RETURN_LOG(dAudioIpcCallback_ == nullptr, "%{public}s", "ipc callback is null.");
     dAudioIpcCallback_->UnRegisterTriggerListener();
+}
+
+int32_t DAudioSourceHandler::LoadDistributedHDF(std::shared_ptr<HdfDeathCallback> callback)
+{
+    return DaudioHdfOperate::GetInstance().LoadDaudioHDFImpl(callback);
+}
+
+int32_t DAudioSourceHandler::UnLoadDistributedHDF()
+{
+    return DaudioHdfOperate::GetInstance().UnLoadDaudioHDFImpl();
 }
 
 void DAudioSourceHandler::OnRemoteSourceSvrDied(const wptr<IRemoteObject> &remote)

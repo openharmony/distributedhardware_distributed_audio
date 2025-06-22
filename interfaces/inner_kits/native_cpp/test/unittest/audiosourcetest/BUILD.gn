@@ -36,19 +36,29 @@ ohos_unittest("AudioSourceTest") {
   module_out_path = module_out_path
 
   sources = [
+    "${interfaces_path}/inner_kits/native_cpp/test/unittest/audiosourcetest/src/daudio_hdf_operate_test.cpp",
     "${interfaces_path}/inner_kits/native_cpp/test/unittest/audiosourcetest/src/daudio_ipc_callback_test.cpp",
     "${interfaces_path}/inner_kits/native_cpp/test/unittest/audiosourcetest/src/daudio_source_handler_test.cpp",
     "${interfaces_path}/inner_kits/native_cpp/test/unittest/audiosourcetest/src/daudio_source_proxy_test.cpp",
+    "${interfaces_path}/inner_kits/native_cpp/test/unittest/audiosourcetest/src/mock_hdfoperate_device_manager.cpp",
   ]
 
   configs = [ ":module_private_config" ]
 
   deps = [ "${interfaces_path}/inner_kits/native_cpp/audio_source:distributed_audio_source_sdk" ]
 
+  cflags = [ "-Dprivate=public" ]
+
   external_deps = [
+    "cJSON:cjson",
     "c_utils:utils",
     "distributed_hardware_fwk:distributedhardwareutils",
+    "drivers_interface_distributed_audio:libdaudioext_proxy_2.0",
     "googletest:gmock",
+    "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libhdi",
+    "hdf_core:libpub_utils",
+    "hilog:libhilog",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]

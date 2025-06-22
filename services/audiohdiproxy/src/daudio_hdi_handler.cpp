@@ -57,10 +57,7 @@ int32_t DAudioHdiHandler::InitHdiHandler()
 
     DHLOGD("Load hdf driver start.");
     auto dHFwkKit = GetDHFwkKit();
-    if (dHFwkKit == nullptr) {
-        DHLOGE("Get dHFwkKit is null when load hdf driver.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(dHFwkKit, ERR_DH_AUDIO_NULLPTR);
     int32_t ret = dHFwkKit->LoadDistributedHDF(DHType::AUDIO);
     DaudioRadar::GetInstance().ReportDaudioInit("LoadDaudioHDFImpl", AudioInit::LOAD_HDF_DRIVER,
         BizState::BIZ_STATE_END, ret);
@@ -87,10 +84,7 @@ int32_t DAudioHdiHandler::UninitHdiHandler()
     CHECK_NULL_RETURN(audioSrvHdf_, DH_SUCCESS);
 
     auto dHFwkKit = GetDHFwkKit();
-    if (dHFwkKit == nullptr) {
-        DHLOGE("Get dHFwkKit is null when unload hdf driver.");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(dHFwkKit, ERR_DH_AUDIO_NULLPTR);
     int32_t ret = dHFwkKit->UnLoadDistributedHDF(DHType::AUDIO);
     if (ret != DH_SUCCESS) {
         DHLOGE("Unload hdf driver failed, ret: %{public}d", ret);
