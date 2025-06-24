@@ -13,26 +13,37 @@
  * limitations under the License.
  */
 
-#include "sinkservice_fuzzer.h"
+#include "sinkservicedump_fuzzer.h"
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
-#include "daudio_sink_handler.h"
+#include "daudio_sink_service.h"
+#include "daydui_sink_ipc_callback.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-void SinkServiceFuzzTest(const uint8_t* data, size_t size)
+void SinkServiceDumpFuzzTest(const uint8_t* data, size_t size)
 {
-    if (data == nullptr) {
+    if (data == nullptr|| size == 0) {
         return;
     }
-    DAudioSinkService service;
+    FuzzdDataProvider fdp(data, size);
+    int32_t fd = fdp.ConsumeIntegral<int32_t>();
+    size_t argsCount = fdp.ConsumeIntegralInRange<size_t>(0,10);
     std::vector<std::u16string> args;
-    args.push_back(u"test");
-    service.Dump(1, args);
+
+    for (size_t i = 0; i<argsCount; ++i){
+        std::string utf8Str =  fdp.ConsumeRandomLengthString(100);
+        std::u16string utf16Str(utf8Str.begin(), utf8Str.end());
+        args.emplace_back(utf16Str);
+    }
+
+    auto dAudioSinkService = std::make_shared<DAudioSinkService>(fd,true);
+    dAudioSinkService->Dump(fd,args);
 }
 }
 }
@@ -41,7 +52,7 @@ void SinkServiceFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DistributedHardware::SinkHandlerInitSinkFuzzTest(data, size);
+    OHOS::DistributedHardware::SinkServiceDumpFuzzTest(data, size);
     return 0;
 }
 

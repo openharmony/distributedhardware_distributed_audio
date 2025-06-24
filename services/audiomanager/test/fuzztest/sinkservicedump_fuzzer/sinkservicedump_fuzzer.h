@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef SINKSERVICE_FUZZER_H
-#define SINKSERVICE_FUZZER_H
+#ifndef SINKSERVICEDUMP_FUZZER_H
+#define SINKSERVICEDUMP_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "sinkservice_fuzzer"
+#define FUZZ_PROJECT_NAME "sinkservicedump_fuzzer"
 
 #endif

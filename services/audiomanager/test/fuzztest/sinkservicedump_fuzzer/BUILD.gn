@@ -17,10 +17,10 @@ import("//build/test.gni")
 import("../../../../../../distributedaudio.gni")
 
 ##############################fuzztest##########################################
-ohos_fuzztest("SinkHandlerInitSinkFuzzTest") {
-  module_out_path = "${distributedaudio_fuzz_path}/sinkhandlerinitsink"
+ohos_fuzztest("SinkServiceDumpFuzzTest") {
+  module_out_path = "${distributedaudio_fuzz_path}/sinkservicedump_fuzzer"
   fuzz_config_file =
-      "${innerkits_path}/native_cpp/test/fuzztest/sinkhandlerinitsink_fuzzer"
+      "${innerkits_path}/native_cpp/test/fuzztest/sinkservicedump_fuzzer"
 
   cflags = [
     "-g",
@@ -28,16 +28,21 @@ ohos_fuzztest("SinkHandlerInitSinkFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "sinkhandlerinitsink_fuzzer.cpp" ]
+  sources = [ "sinkservicedump_fuzzer.cpp" ]
 
   include_dirs = [
     "include",
     "${common_path}/include",
     "${innerkits_path}/native_cpp/audio_sink/include",
+    "${innerkits_path}/audiomanager/servicesink/include",
+
   ]
 
   deps =
-      [ "${innerkits_path}/native_cpp/audio_sink:distributed_audio_sink_sdk" ]
+      [ "${innerkits_path}/native_cpp/audio_sink:distributed_audio_sink_sdk" 
+        "${services_path}/audiomanager/servicesink:distributed_audio_sink",  
+    ]
+
 
   external_deps = [
     "c_utils:utils",
@@ -48,7 +53,7 @@ ohos_fuzztest("SinkHandlerInitSinkFuzzTest") {
 
   defines = [
     "HI_LOG_ENABLE",
-    "DH_LOG_TAG=\"SinkHandlerInitSinkFuzzTest\"",
+    "DH_LOG_TAG=\"SinkServiceDumpFuzzTest\"",
     "LOG_DOMAIN=0xD004130",
   ]
 }
@@ -56,6 +61,6 @@ ohos_fuzztest("SinkHandlerInitSinkFuzzTest") {
 ###############################################################################
 group("fuzztest") {
   testonly = true
-  deps = [ ":SinkHandlerInitSinkFuzzTest" ]
+  deps = [ ":SinkServiceDumpFuzzTest" ]
 }
 ###############################################################################
