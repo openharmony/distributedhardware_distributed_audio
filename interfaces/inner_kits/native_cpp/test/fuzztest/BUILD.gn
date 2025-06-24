@@ -35,7 +35,7 @@ group("fuzztest") {
     "${services_path}/audiomanager/test/fuzztest/sourceserviceregisterdistributedhardware_fuzzer:fuzztest",
     "${services_path}/audiomanager/test/fuzztest/sourceservicereleasesource_fuzzer:fuzztest",
     "${services_path}/audiomanager/test/fuzztest/sourceserviceunregisterdistributedhardware_fuzzer:fuzztest",
-    "${services_path}/audiomanager/test/fuzztest/sourceservicedump_fuzzer:fuzztest",
+    "${services_path}/audiomanager/test/fuzztest/sinkservicedump_fuzzer:fuzztest",
     "${services_path}/common/test/fuzztest/audiodatasetinit64_fuzzer:fuzztest",
     "onremotesinksvrdied_fuzzer:fuzztest",
     "onremotesourcesvrdied_fuzzer:fuzztest",
