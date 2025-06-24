@@ -36,7 +36,7 @@ void SinkServiceDumpFuzzTest(const uint8_t* data, size_t size)
     size_t argsCount = fdp.ConsumeIntegralInRange<size_t>(0, 10);
     std::vector<std::u16string> args;
 
-    for ( size_t i = 0; i< argsCount; ++i) {
+    for ( size_t i = 0; i < argsCount; ++i) {
         std::string utf8Str =  fdp.ConsumeRandomLengthString(100);
         std::u16string utf16Str(utf8Str.begin(), utf8Str.end());
         args.emplace_back(utf16Str);
