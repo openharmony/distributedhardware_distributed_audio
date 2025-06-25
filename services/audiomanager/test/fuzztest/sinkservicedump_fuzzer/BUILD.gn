@@ -52,7 +52,7 @@ ohos_fuzztest("SinkServiceDumpFuzzTest") {
     "c_utils:utils",
     "distributed_hardware_fwk:distributedhardwareutils",
     "ipc:ipc_core",
-    'safwk:system_ability_fwk",
+    "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
 
