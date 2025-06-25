@@ -20,7 +20,7 @@ import("../../../../../../distributedaudio.gni")
 ohos_fuzztest("SinkServiceDumpFuzzTest") {
   module_out_path = "${distributedaudio_fuzz_path}/sinkservicedump_fuzzer"
   fuzz_config_file =
-      "${innerkits_path}/native_cpp/test/fuzztest/sinkservicedump_fuzzer"
+      "${innerkits_path}/audiomanager/test/fuzztest/sinkservicedump_fuzzer"
 
   cflags = [
     "-g",
@@ -43,19 +43,21 @@ ohos_fuzztest("SinkServiceDumpFuzzTest") {
         "${services_path}/audiomanager/servicesink:distributed_audio_sink",
     ]
 
-
-  external_deps = [
-    "c_utils:utils",
-    "distributed_hardware_fwk:distributedhardwareutils",
-    "ipc:ipc_core",
-    "samgr:samgr_proxy",
-  ]
-
   defines = [
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"SinkServiceDumpFuzzTest\"",
     "LOG_DOMAIN=0xD004130",
   ]
+
+  external_deps = [
+    "c_utils:utils",
+    "distributed_hardware_fwk:distributedhardwareutils",
+    "ipc:ipc_core",
+    'safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+  ]
+
+  
 }
 
 ###############################################################################
