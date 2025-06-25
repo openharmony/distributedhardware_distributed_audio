@@ -31,7 +31,7 @@ void SinkServiceDumpFuzzTest(const uint8_t* data, size_t size)
     if (data == nullptr || size == 0) {
         return;
     }
-    FuzzdDataProvider fdp(data, size);
+    FuzzedDataProvider fdp(data, size);
     int32_t fd = fdp.ConsumeIntegral<int32_t>();
     size_t argsCount = fdp.ConsumeIntegralInRange<size_t>(0, 10);
     std::vector<std::u16string> args;
