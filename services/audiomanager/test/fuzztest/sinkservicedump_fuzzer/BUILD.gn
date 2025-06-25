@@ -20,7 +20,7 @@ import("../../../../../distributedaudio.gni")
 ohos_fuzztest("SinkServiceDumpFuzzTest") {
   module_out_path = "${distributedaudio_fuzz_path}/sinkservicedump_fuzzer"
   fuzz_config_file =
-      "${innerkits_path}/audiomanager/test/fuzztest/sinkservicedump_fuzzer"
+      "${services_path}/audiomanager/test/fuzztest/sinkservicedump_fuzzer"
 
   cflags = [
     "-g",
