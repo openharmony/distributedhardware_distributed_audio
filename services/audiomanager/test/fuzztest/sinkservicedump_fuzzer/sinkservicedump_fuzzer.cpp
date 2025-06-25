@@ -20,7 +20,7 @@
 #include <fuzzer/FuzzedDataProvider.h>
 
 #include "daudio_sink_service.h"
-#include "daydui_sink_ipc_callback.h"
+#include "daudio_sink_ipc_callback.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 
