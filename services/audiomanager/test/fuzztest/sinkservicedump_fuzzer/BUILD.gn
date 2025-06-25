@@ -34,8 +34,7 @@ ohos_fuzztest("SinkServiceDumpFuzzTest") {
     "include",
     "${common_path}/include",
     "${innerkits_path}/native_cpp/audio_sink/include",
-    "${innerkits_path}/audiomanager/servicesink/include",
-
+    "${services_path}/audiomanager/servicesink/include",
   ]
 
   deps =
