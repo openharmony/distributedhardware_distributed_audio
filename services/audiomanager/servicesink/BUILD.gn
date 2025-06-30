@@ -101,8 +101,6 @@ ohos_shared_library("distributed_audio_sink") {
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "ipc:ipc_core",
-    "os_account:libaccountkits",
-    "os_account:os_account_innerkits",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
