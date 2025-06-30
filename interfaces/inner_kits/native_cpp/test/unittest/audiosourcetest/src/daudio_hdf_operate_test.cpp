@@ -58,6 +58,7 @@ void DAudioHdfOperateTest::SetUp(void)
 void DAudioHdfOperateTest::TearDown(void)
 {
     DHLOGI("DAudioHdfOperateTest::TearDown");
+    MockDeviceManager::ReleaseInstance();
     deviceManager_ = nullptr;
 }
 
