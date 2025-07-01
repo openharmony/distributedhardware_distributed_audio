@@ -23,7 +23,7 @@
 #include "daudio_sink_ctrl_trans.h"
 #include "sourcectrltransonchannelevent.h"
  
-#include "dlfcn.h"
+#include <dlfcn.h>
  
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
