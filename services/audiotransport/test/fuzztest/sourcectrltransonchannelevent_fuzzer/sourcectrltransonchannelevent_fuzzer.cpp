@@ -22,7 +22,6 @@
 #include <fuzzer/FuzzedDataProvider.h>
 #include "daudio_sink_ctrl_trans.h"
 #include "sourcectrltransonchannelevent_fuzzer.h"
-#include "transport/socket.h"
  
 #include <dlfcn.h>
  
@@ -42,7 +41,7 @@ void SourceCtrlTransOnChannelEventFuzzTest(const uint8_t* data, size_t size)
     std::string sessionName = "sessionName";
     std::string peerSessName = "peerSessName";
     auto sinkCtrlTransCb = std::make_shared<SourceCtrlTransOnChannelEventFuzzer>();
-    auto ctrlTrans = DaudioSourceCtrlTrans(devId, sessionName, peerSessName, sinkCtrlTransCb);
+    auto ctrlTrans = DaudioSinkCtrlTrans(devId, sessionName, peerSessName, sinkCtrlTransCb);
     FuzzedDataProvider fdp(data, size);
     AVTransEvent event;
     event.content = fdp.ConsumeRandomLengthString();
