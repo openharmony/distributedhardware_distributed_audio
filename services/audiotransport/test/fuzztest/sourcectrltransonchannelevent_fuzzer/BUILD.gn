@@ -57,7 +57,7 @@ ohos_fuzztest("SourceCtrlTransOnChannelEventFuzzTest") {
 
   defines = [
     "HI_LOG_ENABLE",
-    "DH_LOG_TAG=\"SourceCtrlTransOnChannelFuzzTest\"",
+    "DH_LOG_TAG=\"SourceCtrlTransOnChannelEventFuzzTest\"",
     "LOG_DOMAIN=0xD004130",
   ]
 
