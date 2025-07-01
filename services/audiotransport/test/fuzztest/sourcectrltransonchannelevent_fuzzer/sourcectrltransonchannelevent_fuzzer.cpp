@@ -13,26 +13,26 @@
  * limitations under the License.
  */
 
- #include <cstddef>
- #include <cstdint>
+#include <cstddef>
+#include <cstdint>
  
- #include "av_trans_message.h"
- #include "av_trans_types.h"
+#include "av_trans_message.h"
+#include "av_trans_types.h"
 
- #include <fuzzer/FuzzedDataProvider.h>
- #include "daudio_sink_ctrl_trans.h"
- #include "sinkctrltransonchannelevent.h"
+#include <fuzzer/FuzzedDataProvider.h>
+#include "daudio_sink_ctrl_trans.h"
+#include "sourcectrltransonchannelevent.h"
  
- #include "dlfcn.h"
+#include "dlfcn.h"
  
- #include "daudio_constants.h"
- #include "daudio_errorcode.h"
- #include "daudio_log.h"
- #include "daudio_util.h"
+#include "daudio_constants.h"
+#include "daudio_errorcode.h"
+#include "daudio_log.h"
+#include "daudio_util.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-void SinkCtrlTransOnChannelEventFuzzTest(const uint8_t* data, size_t size)
+void SourceCtrlTransOnChannelEventFuzzTest(const uint8_t* data, size_t size)
 {
     if (data == nullptr || size == 0) {
         return;
@@ -40,8 +40,8 @@ void SinkCtrlTransOnChannelEventFuzzTest(const uint8_t* data, size_t size)
     std::string devId = "devId";
     std::string sessionName = "sessionName";
     std::string peerSessName = "peerSessName";
-    auto sinkCtrlTransCb = std::make_shared<SinkCtrlTransOnChannelEventFuzzer>();
-    auto ctrlTrans = DaudioSinkCtrlTrans(devId, sessionName, peerSessName, sinkCtrlTransCb);
+    auto sinkCtrlTransCb = std::make_shared<SourceCtrlTransOnChannelEventFuzzer>();
+    auto ctrlTrans = DaudioSourceCtrlTrans(devId, sessionName, peerSessName, sinkCtrlTransCb);
     FuzzedDataProvider fdp(data, size);
     AVTransEvent event;
     event.content = fdp.ConsumeRandomLengthString();
@@ -56,7 +56,7 @@ void SinkCtrlTransOnChannelEventFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DistributedHardware::SinkCtrlTransOnChannelEventFuzzTest(data, size);
+    OHOS::DistributedHardware::SourceCtrlTransOnChannelEventFuzzTest(data, size);
     return 0;
 }
 
