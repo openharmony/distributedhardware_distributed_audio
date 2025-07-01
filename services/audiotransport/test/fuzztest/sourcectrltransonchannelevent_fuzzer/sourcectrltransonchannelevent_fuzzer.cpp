@@ -22,6 +22,7 @@
 #include <fuzzer/FuzzedDataProvider.h>
 #include "daudio_sink_ctrl_trans.h"
 #include "sourcectrltransonchannelevent_fuzzer.h"
+#include "transport/socket.h"
  
 #include <dlfcn.h>
  
