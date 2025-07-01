@@ -51,13 +51,13 @@ ohos_fuzztest("SinkCtrlTransOnChannelEventFuzzTest") {
     "${services_path}/common/audioparam",
   ]
 
-  deps =[ 
-        "${services_path}/audiomanager/servicesink:distributed_audio_sink",
-    ]
+  deps = [ 
+    "${services_path}/audiomanager/servicesink:distributed_audio_sink",
+  ]
 
   defines = [
     "HI_LOG_ENABLE",
-    "DH_LOG_TAG=\"SinkServiceDumpFuzzTest\"",
+    "DH_LOG_TAG=\"SinkCtrlTransOnChannelEventFuzzTest\"",
     "LOG_DOMAIN=0xD004130",
   ]
 
