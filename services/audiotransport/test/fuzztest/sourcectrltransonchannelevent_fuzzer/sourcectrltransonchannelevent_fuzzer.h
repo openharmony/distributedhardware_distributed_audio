@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef SINKCTRLTRANSONCHANNELEVENT_FUZZER_H
-#define SINKCTRLTRANSONCHANNELEVENT_FUZZER_H
+#ifndef SOURCECTRLTRANSONCHANNELEVENT_FUZZER_H
+#define SOURCECTRLTRANSONCHANNELEVENT_FUZZER_H
 
 #define FUZZ_PROJECT_NAME "sourcectrltransonchannelevent_fuzzer"
 #include "iaudio_ctrltrans_callback.h"

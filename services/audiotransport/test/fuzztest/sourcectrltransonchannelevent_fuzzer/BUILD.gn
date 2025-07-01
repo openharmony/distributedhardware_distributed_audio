@@ -52,7 +52,7 @@ ohos_fuzztest("SourceCtrlTransOnChannelEventFuzzTest") {
   ]
 
   deps = [ 
-    "${services_path}/audiomanager/servicesink:distributed_audio_sink",
+    "${services_path}/audiomanager/servicesource:distributed_audio_source",
   ]
 
   defines = [
