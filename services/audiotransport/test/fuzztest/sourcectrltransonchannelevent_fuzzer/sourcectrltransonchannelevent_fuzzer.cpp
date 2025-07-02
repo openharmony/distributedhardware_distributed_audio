@@ -22,7 +22,7 @@
 #include <fuzzer/FuzzedDataProvider.h>
 #include "daudio_sink_ctrl_trans.h"
 #include "sourcectrltransonchannelevent_fuzzer.h"
-#include "transport/socket.h
+#include "transport/socket.h"
  
 #include <dlfcn.h>
  
@@ -47,7 +47,7 @@ void SourceCtrlTransOnChannelEventFuzzTest(const uint8_t* data, size_t size)
     AVTransEvent event;
     event.content = fdp.ConsumeRandomLengthString();
     event.peerDevId = fdp.ConsumeRandomLengthString();
-    event.type = static_cast<EventType>(fdp.ConsumeIntegral<uint32_t());
+    event.type = static_cast<EventType>(fdp.ConsumeIntegral<uint32_t>());
     ctrlTrans.OnChannelEvent(event);
 }
 }
