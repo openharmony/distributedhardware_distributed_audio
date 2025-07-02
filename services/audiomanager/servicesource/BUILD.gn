@@ -117,8 +117,6 @@ ohos_shared_library("distributed_audio_source") {
     "hitrace:hitrace_meter",
     "ipc:ipc_core",
     "ipc:ipc_single",
-    "os_account:libaccountkits",
-    "os_account:os_account_innerkits",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]

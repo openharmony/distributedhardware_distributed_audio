@@ -100,7 +100,7 @@ private:
     std::string localNetworkId_;
     ChannelState channelState_ = ChannelState::UNKNOWN;
 
-    std::shared_ptr<EngineProviderListener> providerListener_;
+    std::shared_ptr<EngineProviderListener> providerListener_ = nullptr;
     std::shared_ptr<CtrlChannelListener> ctrlListenerCallback_ = nullptr;
     std::shared_ptr<DaudioCtrlChannelListener> ctrlListener_ = nullptr;
     IAVEngineProvider *sendProviderPtr_ = nullptr;
@@ -111,8 +111,8 @@ private:
     bool isSameAccount_ = false;
     bool isCheckSecLevel_ = false;
     sptr<IDAudioSinkIpcCallback> ipcSinkCallback_ = nullptr;
-    std::shared_ptr<DmInitCallback> initCallback_;
-    uint64_t callerTokenId_;
+    std::shared_ptr<DmInitCallback> initCallback_ = nullptr;
+    uint64_t callerTokenId_ = 0;
 };
 } // DistributedHardware
 } // OHOS

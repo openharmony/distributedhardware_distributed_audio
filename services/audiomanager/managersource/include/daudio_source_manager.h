@@ -96,7 +96,7 @@ private:
     void *pSHandler_ = nullptr;
     void *pRHandler_ = nullptr;
     std::atomic<bool> isHicollieRunning_ = true;
-    uint64_t callerTokenId_;
+    uint64_t callerTokenId_ = 0;
 
     class SourceManagerHandler : public AppExecFwk::EventHandler {
     public:
