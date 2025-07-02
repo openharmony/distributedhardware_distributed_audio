@@ -109,7 +109,7 @@ HWTEST_F(DAudioHdiHandlerTest, NotifyEvent_002, TestSize.Level1)
 {
     ASSERT_TRUE(hdiHandler_ != nullptr);
     EXPECT_EQ(HDF_SUCCESS, hdiHandler_->InitHdiHandler());
-    hdiHandler_->audioSrvHdf_ =sptr<MockIDAudioManager>(new MockIDAudioManager());
+    hdiHandler_->audioSrvHdf_ = sptr<MockIDAudioManager>(new MockIDAudioManager());
     AudioEvent audioEvent1(AudioEventType::NOTIFY_OPEN_SPEAKER_RESULT, "");
     EXPECT_EQ(HDF_SUCCESS, hdiHandler_->NotifyEvent(devId_, dhId_, streamId_, audioEvent1));
     AudioEvent audioEvent2(AudioEventType::NOTIFY_CLOSE_SPEAKER_RESULT, "");

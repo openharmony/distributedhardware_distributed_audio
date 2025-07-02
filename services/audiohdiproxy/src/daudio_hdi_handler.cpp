@@ -40,7 +40,7 @@ IMPLEMENT_SINGLE_INSTANCE(DAudioHdiHandler);
 DAudioHdiHandler::DAudioHdiHandler()
 {
     DHLOGD("Distributed audio hdi handler construct.");
-    audioHdiRecipient_ =sptr<AudioHdiRecipient>(new AudioHdiRecipient());
+    audioHdiRecipient_ = sptr<AudioHdiRecipient>(new AudioHdiRecipient());
 }
 
 DAudioHdiHandler::~DAudioHdiHandler()

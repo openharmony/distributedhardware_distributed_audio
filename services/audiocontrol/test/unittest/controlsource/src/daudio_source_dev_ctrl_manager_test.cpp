@@ -30,7 +30,7 @@ void DAudioSourceDevCtrlMgrTest::TearDownTestCase(void) {}
 void DAudioSourceDevCtrlMgrTest::SetUp(void)
 {
     uint64_t tokenId;
-    const char* perms[2] = {"ohos.permisson.DISTRIBUTED_DATASYNC", "ohos.permission.DISTRIBUTED_SOFTBUS_CENTER"}
+    const char* perms[2] = {"ohos.permisson.DISTRIBUTED_DATASYNC", "ohos.permission.DISTRIBUTED_SOFTBUS_CENTER"};
     perms[0] = "ohos.permission.DISTRIBUTED_DATASYNC";
     perms[1] = "ohos.permission.DISTRIBUTED_SOFTBUS_CENTER";
     NativeTokenInfoParams infoInstance = {
