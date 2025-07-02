@@ -38,7 +38,6 @@ group("fuzztest") {
     "${services_path}/audiomanager/test/fuzztest/sinkservicedump_fuzzer:fuzztest",
     "${services_path}/common/test/fuzztest/audiodatasetinit64_fuzzer:fuzztest",
     "${services_path}/audiotransport/test/fuzztest/sinkctrltransonchannelevent_fuzzer:fuzztest",
-    "${services_path}/audiotransport/test/fuzztest/sourcectrltransonchannelevent_fuzzer:fuzztest",
     "onremotesinksvrdied_fuzzer:fuzztest",
     "onremotesourcesvrdied_fuzzer:fuzztest",
     "sinkhandlerfinishstartsa_fuzzer:fuzztest",
