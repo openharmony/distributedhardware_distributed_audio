@@ -281,7 +281,7 @@ int32_t DaudioHdfOperate::MakeFwkDAudioHdfCallback()
 {
     std::lock_guard<std::mutex> locker(fwkDAudioHdfCallbackMutex_);
     if (fwkDAudioHdfCallback_ == nullptr) {
-        fwkDAudioHdfCallback_ = new FwkDAudioHdfCallback();
+        fwkDAudioHdfCallback_ = sptr<FwkDAudioHdfCallback>(new FwkDAudioHdfCallback());
         if (fwkDAudioHdfCallback_ == nullptr) {
             return ERR_DH_AUDIO_NULLPTR;
         }

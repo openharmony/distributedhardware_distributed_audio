@@ -28,7 +28,7 @@ void DAudioIpcCallbackTest::TearDownTestCase(void) {}
 
 void DAudioIpcCallbackTest::SetUp(void)
 {
-    dAudioIpcCallback_ = new DAudioIpcCallback();
+    dAudioIpcCallback_ = sptr<DAudioIpcCallback>(new DAudioIpcCallback());
 }
 
 void DAudioIpcCallbackTest::TearDown(void)

@@ -104,7 +104,7 @@ HWTEST_F(DAudioSinkProxyTest, InitSink_001, TestSize.Level1)
 {
     ASSERT_TRUE(dAudioProxy != nullptr);
     const std::string params = "params";
-    auto dAudioSinkIpcCallback = new DAudioSinkIpcCallback();
+    auto dAudioSinkIpcCallback = sptr<DAudioSinkIpcCallback>(new DAudioSinkIpcCallback());
     int32_t ret = dAudioProxy->InitSink(params, dAudioSinkIpcCallback);
     EXPECT_EQ(DH_SUCCESS, ret);
     ret = dAudioProxy->ReleaseSink();
