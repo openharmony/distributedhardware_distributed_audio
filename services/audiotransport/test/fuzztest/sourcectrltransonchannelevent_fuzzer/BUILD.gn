@@ -1,0 +1,107 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#####################hydra-fuzz###################
+import("//build/config/features.gni")
+import("//build/test.gni")
+import("../../../../../distributedaudio.gni")
+
+##############################fuzztest##########################################
+ohos_fuzztest("SourceCtrlTransOnChannelEventFuzzTest") {
+  module_out_path = "${distributedaudio_fuzz_path}/sourcectrltransonchannelevent_fuzzer"
+  fuzz_config_file =
+      "${services_path}/audiotransport/test/fuzztest/sourcectrltransonchannelevent_fuzzer"
+
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+  sources = [ "sourcectrltransonchannelevent_fuzzer.cpp" ]
+
+  include_dirs = [
+    "include",
+    "${audio_client_path}/interface",
+    "${audio_client_path}/micclient/include",
+    "${audio_client_path}/spkclient/include",
+    "${audio_control_path}/controlsink/include",
+    "${audio_processor_path}/interface",
+    "${audio_transport_path}/interface",
+    "${audio_transport_path}/audioctrltransport/include",
+    "${audio_transport_path}/receiverengine/include",
+    "${audio_transport_path}/senderengine/include",
+    "${common_path}/dfx_utils/include",
+    "${common_path}/include",
+    "${innerkits_path}/native_cpp/audio_sink/include",
+    "${innerkits_path}/native_cpp/audio_source/include",
+    "${services_path}/audiomanager/managersink/include",
+    "${services_path}/common/audioeventcallback",
+    "${services_path}/common/audiodata/include",
+    "${services_path}/common/audioparam",
+  ]
+
+  deps = [ 
+    "${services_path}/audiomanager/servicesink:distributed_audio_sink",
+  ]
+
+  defines = [
+    "HI_LOG_ENABLE",
+    "DH_LOG_TAG=\"SourceCtrlTransOnChannelEventFuzzTest\"",
+    "LOG_DOMAIN=0xD004130",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "cJSON:cjson",
+    "distributed_hardware_fwk:distributed_av_sender",
+    "distributed_hardware_fwk:distributedhardwareutils",
+    "ipc:ipc_core",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libtokenid_sdk",
+    "access_token:libtokensetproc_shared",
+    "audio_framework:audio_capturer",
+    "audio_framework:audio_client",
+    "audio_framework:audio_renderer",
+    "cJSON:cjson",
+    "c_utils:utils",
+    "device_manager:devicemanagersdk",
+    "distributed_hardware_fwk:distributed_av_receiver",
+    "distributed_hardware_fwk:distributed_av_sender",
+    "distributed_hardware_fwk:distributedhardwareutils",
+    "distributed_hardware_fwk:libdhfwk_sdk",
+    "dsoftbus:softbus_client",
+    "eventhandler:libeventhandler",
+    "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libhdi",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
+    "ipc:ipc_core",
+    "os_account:libaccountkits",
+    "os_account:os_account_innerkits",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+  ]
+
+  
+}
+
+###############################################################################
+group("fuzztest") {
+  testonly = true
+  deps = [ ":SourceCtrlTransOnChannelEventFuzzTest" ]
+}
+###############################################################################
