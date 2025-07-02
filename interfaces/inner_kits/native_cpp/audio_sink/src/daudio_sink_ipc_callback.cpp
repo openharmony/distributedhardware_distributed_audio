@@ -36,6 +36,7 @@ int32_t DAudioSinkIpcCallback::OnNotifyResourceInfo(const ResourceEventType &typ
     std::lock_guard<std::mutex> resourceLck(privacyResMtx_);
     auto iter = privacyResCallback_.begin();
     if (iter != privacyResCallback_.end()) {
+        CHECK_NULL_RETURN(*iter, ERR_DH_AUDIO_NULLPTR);
         ret = (*iter)->OnPrivaceResourceMessage(type, subType, networkId, isSensitive, isSameAccount);
     }
     return ret;
