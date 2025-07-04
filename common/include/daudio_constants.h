@@ -160,6 +160,7 @@ constexpr const char *SUPPORTEDSTREAM = "SupportedStream";
 constexpr const char *SAMPLERATES = "SampleRates";
 constexpr const char *CHANNELMASKS = "ChannelMasks";
 constexpr const char *FORMATS = "Formats";
+constexpr const char *DAUDIO = "Daudio";
 const std::string MUSIC = "Music";
 const std::string PCM = "PCM";
 const std::string OPUS = "OPUS";

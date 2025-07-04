@@ -138,6 +138,7 @@ std::vector<DHItem> DAudioHandler::RealQuery(const std::string &dataType)
         cJSON_AddNumberToObject(infoJson, INTERRUPT_GROUP_ID, dev->interruptGroupId_);
         cJSON_AddNumberToObject(infoJson, VOLUME_GROUP_ID, dev->volumeGroupId_);
         cJSON_AddStringToObject(infoJson, KEY_DATATYPE, dataType.c_str());
+        cJSON_AddStringToObject(infoJson, DAUDIO, DAUDIO);
         dhItem.dhId = std::to_string(dhId);
         char *jsonInfo = cJSON_Print(infoJson);
         if (jsonInfo == NULL) {
