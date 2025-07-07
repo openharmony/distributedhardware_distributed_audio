@@ -53,7 +53,7 @@ ohos_unittest("DAudioHdiHandlerTest") {
     "distributed_hardware_fwk:distributed_av_receiver",
     "distributed_hardware_fwk:distributedhardwareutils",
     "distributed_hardware_fwk:libdhfwk_sdk",
-    "drivers_interface_distributed_audio:libdaudioext_proxy_2.0",
+    "drivers_interface_distributed_audio:libdaudioext_proxy_2.1",
     "googletest:gmock",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdi",

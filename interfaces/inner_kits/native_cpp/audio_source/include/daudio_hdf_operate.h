@@ -25,7 +25,7 @@
 #include "idevmgr_hdi.h"
 #include "iservmgr_hdi.h"
 #include "single_instance.h"
-#include <v2_0/id_audio_manager.h>
+#include <v2_1/id_audio_manager.h>
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -39,9 +39,9 @@ using OHOS::HDI::ServiceManager::V1_0::IServiceManager;
 using OHOS::HDI::ServiceManager::V1_0::IServStatListener;
 using OHOS::HDI::ServiceManager::V1_0::ServiceStatus;
 using OHOS::HDI::ServiceManager::V1_0::ServStatListenerStub;
-using OHOS::HDI::DistributedAudio::Audioext::V2_0::IDAudioManager;
-using OHOS::HDI::DistributedAudio::Audioext::V2_0::IDAudioHdfCallback;
-using OHOS::HDI::DistributedAudio::Audioext::V2_0::DAudioEvent;
+using OHOS::HDI::DistributedAudio::Audioext::V2_1::IDAudioManager;
+using OHOS::HDI::DistributedAudio::Audioext::V2_1::IDAudioHdfCallback;
+using OHOS::HDI::DistributedAudio::Audioext::V2_1::DAudioEvent;
 
 class FwkDAudioHdfCallback;
 class HdfDeathRecipient : public IRemoteObject::DeathRecipient {

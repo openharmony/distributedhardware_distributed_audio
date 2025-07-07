@@ -53,7 +53,7 @@ ohos_unittest("AudioSourceTest") {
     "cJSON:cjson",
     "c_utils:utils",
     "distributed_hardware_fwk:distributedhardwareutils",
-    "drivers_interface_distributed_audio:libdaudioext_proxy_2.0",
+    "drivers_interface_distributed_audio:libdaudioext_proxy_2.1",
     "googletest:gmock",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdi",

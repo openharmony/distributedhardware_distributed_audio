@@ -28,7 +28,7 @@
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DAudioManagerCallback"
 
-using OHOS::HDI::DistributedAudio::Audioext::V2_0::AudioParameter;
+using OHOS::HDI::DistributedAudio::Audioext::V2_1::AudioParameter;
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -123,7 +123,7 @@ int32_t DAudioManagerCallback::SetParameters(int32_t streamId, const AudioParame
 }
 
 int32_t DAudioManagerCallback::NotifyEvent(int32_t streamId,
-    const OHOS::HDI::DistributedAudio::Audioext::V2_0::DAudioEvent& event)
+    const OHOS::HDI::DistributedAudio::Audioext::V2_1::DAudioEvent& event)
 {
     DHLOGI("Notify event.");
     CHECK_NULL_RETURN(callback_, HDF_FAILURE);
@@ -170,7 +170,7 @@ int32_t DAudioManagerCallback::NotifyEvent(int32_t streamId,
 }
 
 int32_t DAudioManagerCallback::WriteStreamData(int32_t streamId,
-    const OHOS::HDI::DistributedAudio::Audioext::V2_0::AudioData &data)
+    const OHOS::HDI::DistributedAudio::Audioext::V2_1::AudioData &data)
 {
     DHLOGD("Write Stream Data, audio data param frameSize is %{public}d.", data.param.frameSize);
     if (data.param.frameSize == 0 || data.param.frameSize > DEFAULT_AUDIO_DATA_SIZE) {
@@ -194,7 +194,7 @@ int32_t DAudioManagerCallback::WriteStreamData(int32_t streamId,
 }
 
 int32_t DAudioManagerCallback::ReadStreamData(int32_t streamId,
-    OHOS::HDI::DistributedAudio::Audioext::V2_0::AudioData &data)
+    OHOS::HDI::DistributedAudio::Audioext::V2_1::AudioData &data)
 {
     DHLOGD("Read stream data.");
     std::shared_ptr<AudioData> audioData = nullptr;
@@ -211,7 +211,7 @@ int32_t DAudioManagerCallback::ReadStreamData(int32_t streamId,
 }
 
 int32_t DAudioManagerCallback::ReadMmapPosition(int32_t streamId,
-    uint64_t &frames, OHOS::HDI::DistributedAudio::Audioext::V2_0::CurrentTime &time)
+    uint64_t &frames, OHOS::HDI::DistributedAudio::Audioext::V2_1::CurrentTime &time)
 {
     DHLOGD("Read mmap position");
     CurrentTimeHDF timeHdf;
@@ -236,6 +236,24 @@ int32_t DAudioManagerCallback::RefreshAshmemInfo(int32_t streamId, int fd, int32
         return HDF_FAILURE;
     }
     DHLOGD("Refresh ashmem info success.");
+    return HDF_SUCCESS;
+}
+
+int32_t DAudioManagerCallback::GetLatency(int32_t streamId, uint32_t& ms)
+{
+    DHLOGD("Get latency not support yet.");
+    (void)streamId;
+    (void)ms;
+    return HDF_SUCCESS;
+}
+ 
+int32_t DAudioManagerCallback::GetRenderPosition(int32_t streamId, uint64_t &frames,
+    OHOS::HDI::DistributedAudio::Audioext::V2_1::CurrentTime &time)
+{
+    DHLOGD("Get render position not support yet.");
+    (void)streamId;
+    (void)frames;
+    (void)time;
     return HDF_SUCCESS;
 }
 } // DistributedHardware

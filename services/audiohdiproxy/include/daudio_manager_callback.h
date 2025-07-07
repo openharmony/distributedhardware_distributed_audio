@@ -16,14 +16,14 @@
 #ifndef OHOS_DAUDIO_MANAGER_CALLBACK_H
 #define OHOS_DAUDIO_MANAGER_CALLBACK_H
 
-#include <v2_0/id_audio_callback.h>
-#include <v2_0/types.h>
+#include <v2_1/id_audio_callback.h>
+#include <v2_1/types.h>
 
 #include "idaudio_hdi_callback.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class DAudioManagerCallback : public OHOS::HDI::DistributedAudio::Audioext::V2_0::IDAudioCallback {
+class DAudioManagerCallback : public OHOS::HDI::DistributedAudio::Audioext::V2_1::IDAudioCallback {
 public:
     explicit DAudioManagerCallback(const std::shared_ptr<IDAudioHdiCallback> callback) : callback_(callback) {};
     ~DAudioManagerCallback() override = default;
@@ -33,24 +33,29 @@ public:
     int32_t DestroyStream(int32_t streamId) override;
 
     int32_t SetParameters(int32_t streamId,
-        const OHOS::HDI::DistributedAudio::Audioext::V2_0::AudioParameter &param) override;
+        const OHOS::HDI::DistributedAudio::Audioext::V2_1::AudioParameter &param) override;
 
     int32_t NotifyEvent(int32_t streamId,
-        const OHOS::HDI::DistributedAudio::Audioext::V2_0::DAudioEvent &event) override;
+        const OHOS::HDI::DistributedAudio::Audioext::V2_1::DAudioEvent &event) override;
 
     int32_t WriteStreamData(int32_t streamId,
-        const OHOS::HDI::DistributedAudio::Audioext::V2_0::AudioData &data) override;
+        const OHOS::HDI::DistributedAudio::Audioext::V2_1::AudioData &data) override;
 
     int32_t ReadStreamData(int32_t streamId,
-        OHOS::HDI::DistributedAudio::Audioext::V2_0::AudioData &data) override;
+        OHOS::HDI::DistributedAudio::Audioext::V2_1::AudioData &data) override;
 
     int32_t ReadMmapPosition(int32_t streamId, uint64_t &frames,
-        OHOS::HDI::DistributedAudio::Audioext::V2_0::CurrentTime &time) override;
+        OHOS::HDI::DistributedAudio::Audioext::V2_1::CurrentTime &time) override;
 
     int32_t RefreshAshmemInfo(int32_t streamId, int fd, int32_t ashmemLength, int32_t lengthPerTrans) override;
 
+    int32_t GetLatency(int32_t streamId, uint32_t& ms) override;
+
+    int32_t GetRenderPosition(int32_t streamId, uint64_t &frames,
+        OHOS::HDI::DistributedAudio::Audioext::V2_1::CurrentTime &time) override;
+
 private:
-    int32_t GetAudioParamHDF(const OHOS::HDI::DistributedAudio::Audioext::V2_0::AudioParameter& param,
+    int32_t GetAudioParamHDF(const OHOS::HDI::DistributedAudio::Audioext::V2_1::AudioParameter& param,
         AudioParamHDF& paramHDF);
 
 private:

@@ -47,7 +47,7 @@ ohos_unittest("DAudioManagerCallbackTest") {
   external_deps = [
     "c_utils:utils",
     "distributed_hardware_fwk:distributedhardwareutils",
-    "drivers_interface_distributed_audio:libdaudioext_proxy_2.0",
+    "drivers_interface_distributed_audio:libdaudioext_proxy_2.1",
     "googletest:gmock",
     "ipc:ipc_core",
   ]
