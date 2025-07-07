@@ -106,7 +106,7 @@ ohos_shared_library("distributed_audio_source") {
     "distributed_hardware_fwk:distributedhardwareutils",
     "distributed_hardware_fwk:libdhfwk_sdk",
     "drivers_interface_distributed_audio:libdaudio_proxy_1.0",
-    "drivers_interface_distributed_audio:libdaudioext_proxy_2.0",
+    "drivers_interface_distributed_audio:libdaudioext_proxy_2.1",
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
     "hdf_core:libhdf_utils",

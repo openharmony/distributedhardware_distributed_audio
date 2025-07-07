@@ -20,8 +20,8 @@
 #include <mutex>
 #include <set>
 
-#include <v2_0/id_audio_callback.h>
-#include <v2_0/id_audio_manager.h>
+#include <v2_1/id_audio_callback.h>
+#include <v2_1/id_audio_manager.h>
 #include "iremote_object.h"
 
 #include "audio_event.h"
@@ -32,9 +32,9 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-using OHOS::HDI::DistributedAudio::Audioext::V2_0::DAudioEvent;
-using OHOS::HDI::DistributedAudio::Audioext::V2_0::IDAudioCallback;
-using OHOS::HDI::DistributedAudio::Audioext::V2_0::IDAudioManager;
+using OHOS::HDI::DistributedAudio::Audioext::V2_1::DAudioEvent;
+using OHOS::HDI::DistributedAudio::Audioext::V2_1::IDAudioCallback;
+using OHOS::HDI::DistributedAudio::Audioext::V2_1::IDAudioManager;
 class DAudioHdiHandler {
     DECLARE_SINGLE_INSTANCE_BASE(DAudioHdiHandler);
 

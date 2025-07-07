@@ -16,17 +16,17 @@
 #ifndef OHOS_AUDIO_TEST_UTILS_H
 #define OHOS_AUDIO_TEST_UTILS_H
 
-#include <v2_0/id_audio_callback.h>
-#include <v2_0/id_audio_manager.h>
+#include <v2_1/id_audio_callback.h>
+#include <v2_1/id_audio_manager.h>
 
 #include "daudio_errorcode.h"
 #include "idaudio_hdi_callback.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-using OHOS::HDI::DistributedAudio::Audioext::V2_0::IDAudioCallback;
-using OHOS::HDI::DistributedAudio::Audioext::V2_0::IDAudioManager;
-using OHOS::HDI::DistributedAudio::Audioext::V2_0::IDAudioHdfCallback;
+using OHOS::HDI::DistributedAudio::Audioext::V2_1::IDAudioCallback;
+using OHOS::HDI::DistributedAudio::Audioext::V2_1::IDAudioManager;
+using OHOS::HDI::DistributedAudio::Audioext::V2_1::IDAudioHdfCallback;
 
 class MockIDAudioManager : public IDAudioManager {
 public:
@@ -34,7 +34,7 @@ public:
     ~MockIDAudioManager() {}
 
     int32_t RegisterAudioDevice(const std::string &adpName, int32_t devId, const std::string &capability,
-        const sptr<OHOS::HDI::DistributedAudio::Audioext::V2_0::IDAudioCallback> &callbackObj) override
+        const sptr<OHOS::HDI::DistributedAudio::Audioext::V2_1::IDAudioCallback> &callbackObj) override
     {
         return DH_SUCCESS;
     }
@@ -45,7 +45,7 @@ public:
     }
 
     int32_t NotifyEvent(const std::string &adpName, int32_t devId, int32_t streamId,
-        const OHOS::HDI::DistributedAudio::Audioext::V2_0::DAudioEvent &event) override
+        const OHOS::HDI::DistributedAudio::Audioext::V2_1::DAudioEvent &event) override
     {
         return DH_SUCCESS;
     }
