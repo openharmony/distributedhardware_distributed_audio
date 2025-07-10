@@ -59,6 +59,7 @@ ohos_unittest("SpeakerClientTest") {
     "audio_framework:audio_client",
     "audio_framework:audio_renderer",
     "cJSON:cjson",
+    "c_utils:utils",
     "distributed_hardware_fwk:distributed_av_receiver",
     "distributed_hardware_fwk:distributed_av_sender",
     "distributed_hardware_fwk:distributedhardwareutils",
