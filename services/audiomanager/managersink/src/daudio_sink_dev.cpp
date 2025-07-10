@@ -795,20 +795,20 @@ bool DAudioSinkDev::CheckAclRight()
     std::shared_ptr<DmInitCallback> initCallback = std::make_shared<DeviceInitCallback>();
     ret = DeviceManager::GetInstance().InitDeviceManager(PKG_NAME, initCallback);
     CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, false, "InitDeviceManager failed ret = %{public}d", ret);
-    DmAccessCaller dmSrcCaller = {
-        .accountId = accountId_,
-        .pkgName = PKG_NAME,
-        .networkId = devId_,
-        .userId = userId_,
-        .tokenId = tokenId_,
-    };
-    DmAccessCallee dmDstCallee = {
-        .networkId = sinkDevId,
-        .accountId = accountId,
-        .userId = userId,
-        .tokenId = sinkTokenId_,
-        .pkgName = PKG_NAME,
-    };
+
+    DmAccessCaller dmSrcCaller;
+    dmSrcCaller.accountId = accountId_;
+    dmSrcCaller.pkgName = PKG_NAME;
+    dmSrcCaller.networkId = devId_;
+    dmSrcCaller.userId = userId_;
+    dmSrcCaller.tokenId = tokenId_;
+
+    DmAccessCallee dmDstCallee;
+    dmDstCallee.accountId = accountId;
+    dmDstCallee.networkId = sinkDevId;
+    dmDstCallee.pkgName = PKG_NAME;
+    dmDstCallee.userId = userId;
+    dmDstCallee.tokenId = sinkTokenId_;
     DHLOGI("CheckAclRight srcDevId: %{public}s, accountId: %{public}s, sinkDevId: %{public}s",
         GetAnonyString(devId_).c_str(), GetAnonyString(accountId).c_str(), GetAnonyString(sinkDevId).c_str());
     return DeviceManager::GetInstance().CheckSinkAccessControl(dmSrcCaller, dmDstCallee);

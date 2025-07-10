@@ -432,16 +432,15 @@ bool DAudioSourceDev::CheckAclRight()
     int32_t ret = DeviceManager::GetInstance().InitDeviceManager(PKG_NAME, initCallback);
     CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, false, "InitDeviceManager failed ret = %{public}d", ret);
     GetLocalDeviceNetworkId(srcDevId_);
-    DmAccessCaller dmSrcCaller = {
-        .accountId = accountId_,
-        .pkgName = PKG_NAME,
-        .networkId = srcDevId_,
-        .userId = userId_,
-        .tokenId = tokenId_,
-    };
-    DmAccessCallee dmDstCallee = {
-        .networkId = devId_,
-    };
+    DmAccessCaller dmSrcCaller;
+    dmSrcCaller.accountId = accountId_;
+    dmSrcCaller.pkgName = PKG_NAME;
+    dmSrcCaller.networkId = srcDevId_;
+    dmSrcCaller.userId = userId_;
+    dmSrcCaller.tokenId = tokenId_;
+
+    DmAccessCallee dmDstCallee;
+    dmDstCallee.networkId = devId_;
     DHLOGI("CheckAclRight dmSrcCaller networkId: %{public}s, accountId: %{public}s, devId: %{public}s",
         GetAnonyString(srcDevId_).c_str(), GetAnonyString(accountId_).c_str(), GetAnonyString(devId_).c_str());
     CHECK_AND_RETURN_RET_LOG(DeviceManager::GetInstance().CheckSrcAccessControl(dmSrcCaller, dmDstCallee),
