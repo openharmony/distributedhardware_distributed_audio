@@ -625,6 +625,10 @@ void DMicDev::FillJitterQueue()
     while (isEnqueueRunning_.load()) {
         {
             std::lock_guard<std::mutex> lock(dataQueueMtx_);
+            if (paramHDF_.period == 0) {
+                DHLOGE("DMicDev paramHDF_.period is zero");
+                break;
+            }
             if (dataQueue_.size() >= (LOW_LATENCY_JITTER_TIME_MS / paramHDF_.period)) {
                 break;
             }
