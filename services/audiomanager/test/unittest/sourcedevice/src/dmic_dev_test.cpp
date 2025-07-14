@@ -339,7 +339,10 @@ HWTEST_F(DMicDevTest, ReadStreamData_001, TestSize.Level1)
     }
     mic_->isEnqueueRunning_ = true;
     mic_->FillJitterQueue();
-
+    mic_->paramHDF_.period = 0;
+    mic_->FillJitterQueue();
+    mic_->paramHDF_.period = 1;
+    mic_->FillJitterQueue();
     std::shared_ptr<AudioData> readData1 = nullptr;
     EXPECT_EQ(DH_SUCCESS, mic_->ReadStreamData(streamId_, readData1));
 

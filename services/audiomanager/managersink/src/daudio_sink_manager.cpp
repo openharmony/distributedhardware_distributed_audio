@@ -491,6 +491,10 @@ int32_t DAudioSinkManager::GetDeviceSecurityLevel(const std::string &udid)
     #ifdef DEVICE_SECURITY_LEVEL_ENABLE
     DeviceIdentify devIdentify;
     devIdentify.length = DEVICE_ID_MAX_LEN;
+    if (udid.size() >= DEVICE_ID_MAX_LEN) {
+        DHLOGE("udid size exceeds DEVICE_ID_MAX_LEN");
+        return DEFAULT_DEVICE_SECURITY_LEVEL;
+    }
     int32_t ret = memcpy_s(devIdentify.identity, DEVICE_ID_MAX_LEN, udid.c_str(), DEVICE_ID_MAX_LEN);
     if (ret != DH_SUCCESS) {
         DHLOGE("Str copy failed %{public}d", ret);
