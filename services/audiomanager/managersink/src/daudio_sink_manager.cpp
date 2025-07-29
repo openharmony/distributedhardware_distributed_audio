@@ -89,8 +89,6 @@ int32_t DAudioSinkManager::Init(const sptr<IDAudioSinkIpcCallback> &sinkCallback
         DHLOGE("Register av sender engine callback failed.");
         return ERR_DH_AUDIO_FAILED;
     }
-    CHECK_AND_RETURN_RET_LOG(sendProviderPtr_->RegisterProviderCallback(providerListener_) != DH_SUCCESS,
-        ERR_DH_AUDIO_FAILED, "%{public}s", "Register av sender engine callback failed.");
     DHLOGI("Load av sender engine success.");
     ctrlListenerCallback_ = std::make_shared<CtrlChannelListener>();
     ctrlListener_ = std::make_shared<DaudioCtrlChannelListener>(ctrlListenerCallback_);

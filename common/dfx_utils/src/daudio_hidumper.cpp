@@ -60,9 +60,6 @@ bool DaudioHidumper::Dump(const std::vector<std::string> &args, std::string &res
     result.clear();
     int32_t argsSize = static_cast<int32_t>(args.size());
     DHLOGI("Distributed audio hidumper dump args.size():%{public}d", argsSize);
-    for (int32_t i = 0; i < argsSize; i++) {
-        DHLOGD("Distributed audio hidumper dump args[%{public}d]: %{public}s.", i, args.at(i).c_str());
-    }
 
     if (args.empty()) {
         ShowHelp(result);

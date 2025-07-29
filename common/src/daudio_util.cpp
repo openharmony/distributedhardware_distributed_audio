@@ -361,7 +361,10 @@ bool CJsonParamCheck(const cJSON *jsonObj, const std::initializer_list<std::stri
 
 int32_t CalculateSampleNum(uint32_t sampleRate, uint32_t timems)
 {
-    return (sampleRate * timems) / AUDIO_MS_PER_SECOND;
+    uint64_t product = static_cast<uint64_t>(sampleRate) * timems;
+    uint64_t result = product / AUDIO_MS_PER_SECOND;
+    CHECK_AND_RETURN_RET_LOG(result > INT32_MAX, INT32_MAX, "CalculateSampleNum Overflow occurred");
+    return static_cast<int32_t>(result);
 }
 
 int64_t GetCurNano()
