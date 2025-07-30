@@ -62,6 +62,7 @@ ohos_unittest("MicClientTest") {
     "dsoftbus:softbus_client",
     "googletest:gmock",
     "hilog:libhilog",
+    "ipc:ipc_core",
   ]
 }
 

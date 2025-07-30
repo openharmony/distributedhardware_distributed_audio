@@ -66,6 +66,7 @@ ohos_unittest("SpeakerClientTest") {
     "dsoftbus:softbus_client",
     "googletest:gmock",
     "hilog:libhilog",
+    "ipc:ipc_core",
   ]
 }
 
