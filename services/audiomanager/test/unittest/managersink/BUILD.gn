@@ -69,7 +69,7 @@ ohos_unittest("DaudioSinkDevTest") {
     "distributed_hardware_fwk:distributed_av_receiver",
     "distributed_hardware_fwk:distributed_av_sender",
     "distributed_hardware_fwk:distributedhardwareutils",
-    "dsoftbus::softbus_client",
+    "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
     "googletest:gmock",
     "hdf_core:libhdf_ipc_adapter",
