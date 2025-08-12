@@ -59,10 +59,8 @@ void DMicDev::OnEngineTransDataAvailable(const std::shared_ptr<AudioData> &audio
 {
     std::lock_guard<std::mutex> lock(ringbufferMutex_);
     CHECK_NULL_VOID(ringBuffer_);
-    if (ringBuffer_->RingBufferInsert(audioData->Data(), static_cast<int32_t>(audioData->Capacity())) != DH_SUCCESS) {
-        DHLOGE("Insert ringbuffer failed.");
-        return;
-    }
+    CHECK_AND_RETURN_LOG(ringBuffer_->RingBufferInsert(audioData->Data(),
+        static_cast<int32_t>(audioData->Capacity())) != DH_SUCCESS, "RingBufferInsert failed.");
     DHLOGD("ringbuffer insert one");
 }
 
@@ -100,10 +98,7 @@ void DMicDev::SendToProcess(const std::shared_ptr<AudioData> &audioData)
     DHLOGD("On Engine Data available");
     if (echoCannelOn_) {
 #ifdef ECHO_CANNEL_ENABLE
-        if (echoManager_ == nullptr) {
-            DHLOGE("Echo manager is nullptr.");
-            return;
-        }
+        CHECK_NULL_VOID(echoManager_);
         echoManager_->OnMicDataReceived(audioData);
 #endif
     } else {
@@ -428,10 +423,7 @@ int32_t DMicDev::Stop()
     CHECK_NULL_RETURN(echoManager_, DH_SUCCESS);
     ret = echoManager_->Stop();
     DaudioRadar::GetInstance().ReportMicCloseProgress("Stop", MicClose::STOP_TRANS, ret);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Echo manager stop failed. ret: %{public}d.", ret);
-        return ret;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Echo manager stop failed, ret: %{public}d.", ret);
 #endif
     return DH_SUCCESS;
 }
