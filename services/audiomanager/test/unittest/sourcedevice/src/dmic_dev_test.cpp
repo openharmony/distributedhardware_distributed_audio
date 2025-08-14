@@ -52,20 +52,29 @@ HWTEST_F(DMicDevTest, InitReceiverEngine_001, TestSize.Level1)
     IAVEngineProvider *providerPtr = nullptr;
     AVTransEvent event = { EventType::EVENT_START_SUCCESS, "", "" };
     mic_->OnEngineTransEvent(event);
+    event.type = EventType::EVENT_STOP_SUCCESS;
+    mic_->OnEngineTransEvent(event);
+    event.type = EventType::EVENT_START_FAIL;
+    mic_->OnEngineTransEvent(event);
+    event.type = EventType::EVENT_CHANNEL_CLOSED;
+    mic_->OnEngineTransEvent(event);
+    event.type = EventType::EVENT_START_SUCCESS;
+    mic_->OnEngineTransEvent(event);
+
     std::shared_ptr<AVTransMessage> message = nullptr;
     mic_->OnEngineTransMessage(message);
     size_t size = 4096;
     auto audioData = std::make_shared<AudioData>(size);
     mic_->OnEngineTransDataAvailable(audioData);
+    mic_->SendToProcess(audioData);
+    mic_->echoCannelOn_ = true;
+    mic_->OnEngineTransDataAvailable(audioData);
+    mic_->SendToProcess(audioData);
+    mic_->echoCannelOn_ = false;
+    mic_->SendToProcess(audioData);
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->InitReceiverEngine(providerPtr));
     mic_->micTrans_ = std::make_shared<MockIAudioDataTransport>();
     EXPECT_EQ(DH_SUCCESS, mic_->InitReceiverEngine(providerPtr));
-
-    event = { EventType::EVENT_STOP_SUCCESS, "", "" };
-    mic_->OnEngineTransEvent(event);
-
-    mic_->echoCannelOn_ = true;
-    mic_->OnEngineTransDataAvailable(audioData);
 }
 
 /**
@@ -426,6 +435,18 @@ HWTEST_F(DMicDevTest, SendMessage_001, TestSize.Level1)
     mic_->micTrans_ = std::make_shared<MockIAudioDataTransport>();
     mic_->InitCtrlTrans();
     EXPECT_EQ(DH_SUCCESS, mic_->SendMessage(OPEN_MIC, content, dstDevId));
+    AVTransEvent event = { EventType::EVENT_START_SUCCESS, "", "" };
+    mic_->OnCtrlTransEvent(event);
+    event.type = EventType::EVENT_STOP_SUCCESS;
+    mic_->OnCtrlTransEvent(event);
+    event.type = EventType::EVENT_START_FAIL;
+    mic_->OnCtrlTransEvent(event);
+    event.type = EventType::EVENT_CHANNEL_CLOSED;
+    mic_->OnCtrlTransEvent(event);
+    event.type = EventType::EVENT_START_SUCCESS;
+    mic_->OnCtrlTransEvent(event);
+    mic_->micTrans_ = nullptr;
+    EXPECT_NE(DH_SUCCESS, mic_->InitCtrlTrans());
 }
 
 /**

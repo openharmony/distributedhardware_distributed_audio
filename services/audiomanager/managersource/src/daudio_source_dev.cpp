@@ -590,11 +590,8 @@ int32_t DAudioSourceDev::HandleNotifyRPC(const AudioEvent &event)
     }
     cJSON *jParam = cJSON_Parse(event.content.c_str());
     CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
-    if (!CJsonParamCheck(jParam, { KEY_RESULT })) {
-        DHLOGE("Not found the keys of result.");
-        cJSON_Delete(jParam);
-        return ERR_DH_AUDIO_FAILED;
-    }
+    CHECK_AND_FREE_RETURN_RET_LOG(!CJsonParamCheck(jParam, { KEY_RESULT }), ERR_DH_AUDIO_FAILED, jParam,
+        "Not found the keys of result.");
 
     rpcResult_ = cJSON_GetObjectItem(jParam, KEY_RESULT)->valueint;
     DHLOGD("Notify RPC event: %{public}d, result: %{public}d.", event.type, rpcResult_);
@@ -961,21 +958,14 @@ int32_t DAudioSourceDev::CreateSpkEngine(std::shared_ptr<DAudioIoDev> speaker)
     CHECK_NULL_RETURN(speaker, ERR_DH_AUDIO_NULLPTR);
     int32_t ret = speaker->InitSenderEngine(DAudioSourceManager::GetInstance().getSenderProvider());
     DaudioRadar::GetInstance().ReportSpeakerOpenProgress("InitSenderEngine", SpeakerOpen::INIT_ENGINE, ret);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Speaker init sender Engine, error code %{public}d.", ret);
-        return ret;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Speaker init sender Engine, error code %{public}d.", ret);
+
     ret = speaker->InitCtrlTrans();
     DaudioRadar::GetInstance().ReportSpeakerOpenProgress("InitCtrlTrans", SpeakerOpen::TRANS_CONTROL, ret);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Speaker InitCtrlTrans, error code %{public}d.", ret);
-        return ret;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Speaker InitCtrlTrans, error code %{public}d.", ret);
+
     ret = WaitForRPC(NOTIFY_OPEN_CTRL_RESULT);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Speaker init sender engine, create ctrl error.");
-        return ret;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Speaker init sender engine, create ctrl error.");
     return DH_SUCCESS;
 }
 
@@ -1137,32 +1127,21 @@ int32_t DAudioSourceDev::TaskCloseDSpeaker(const std::string &args)
 
 int32_t DAudioSourceDev::CreateMicEngine(std::shared_ptr<DAudioIoDev> mic)
 {
-    if (mic == nullptr) {
-        DHLOGE("Mic device not init");
-        return ERR_DH_AUDIO_NULLPTR;
-    }
+    CHECK_NULL_RETURN(mic, ERR_DH_AUDIO_NULLPTR);
+
     int32_t ret = mic->InitReceiverEngine(DAudioSourceManager::GetInstance().getReceiverProvider());
     DaudioRadar::GetInstance().ReportMicOpenProgress("InitReceiverEngine", MicOpen::INIT_ENGINE, ret);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Init receiver engine failed.");
-        return ret;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Init receiver engine failed.");
+
     ret = mic->InitCtrlTrans();
     DaudioRadar::GetInstance().ReportMicOpenProgress("InitCtrlTrans", MicOpen::TRANS_CONTROL, ret);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("mic InitCtrlTrans, error code %{public}d.", ret);
-        return ret;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Mic InitCtrlTrans, error code %{public}d.", ret);
+
     ret = WaitForRPC(NOTIFY_OPEN_CTRL_RESULT);
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Mic init sender engine, create ctrl error.");
-        return ret;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Mic init sender engine, create ctrl error.");
+
     ret = mic->SetUp();
-    if (ret != DH_SUCCESS) {
-        DHLOGE("Mic setup failed.");
-        return ret;
-    }
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Mic setup failed.");
     return DH_SUCCESS;
 }
 

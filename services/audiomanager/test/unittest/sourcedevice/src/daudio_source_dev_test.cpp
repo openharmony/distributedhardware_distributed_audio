@@ -183,8 +183,23 @@ HWTEST_F(DAudioSourceDevTest, NotifyEvent_001, TestSize.Level1)
     EXPECT_EQ(DH_SUCCESS, sourceDev_->AwakeAudioDev());
     AudioEvent event = AudioEvent(EVENT_UNKNOWN, "");
     sourceDev_->NotifyEvent(event);
-
     event.type = VOLUME_SET;
+    sourceDev_->NotifyEvent(event);
+    event.type = OPEN_SPEAKER;
+    sourceDev_->NotifyEvent(event);
+    event.type = CLOSE_SPEAKER;
+    sourceDev_->NotifyEvent(event);
+    event.type = SPEAKER_OPENED;
+    sourceDev_->NotifyEvent(event);
+    event.type = SPEAKER_CLOSED;
+    sourceDev_->NotifyEvent(event);
+    event.type = NOTIFY_OPEN_SPEAKER_RESULT;
+    sourceDev_->NotifyEvent(event);
+    event.type = NOTIFY_CLOSE_SPEAKER_RESULT;
+    sourceDev_->NotifyEvent(event);
+    event.type = NOTIFY_OPEN_MIC_RESULT;
+    sourceDev_->NotifyEvent(event);
+    event.type = NOTIFY_CLOSE_MIC_RESULT;
     sourceDev_->NotifyEvent(event);
     sourceDev_->SleepAudioDev();
 }
@@ -482,9 +497,9 @@ HWTEST_F(DAudioSourceDevTest, OnEnableTaskResult_001, TestSize.Level1)
 {
     sourceDev_->OnEnableTaskResult(DH_SUCCESS, "", FUNC_NAME);
     sourceDev_->OnDisableTaskResult(DH_SUCCESS, "", FUNC_NAME);
-
     std::string tempLongStr(DAUDIO_MAX_JSON_LEN + 1, 'a');
     sourceDev_->OnEnableTaskResult(DH_SUCCESS, tempLongStr, FUNC_NAME);
+    sourceDev_->OnDisableTaskResult(DH_SUCCESS, tempLongStr, FUNC_NAME);
 
     cJSON *jParam = cJSON_CreateObject();
     CHECK_NULL_VOID(jParam);
@@ -534,7 +549,12 @@ HWTEST_F(DAudioSourceDevTest, EnableDSpeaker_001, TestSize.Level1)
     sourceDev_->deviceMap_[dhId] = speaker;
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->EnableDSpeaker(dhId, ATTRS));
     sourceDev_->deviceMap_[dhId] = nullptr;
-
+    std::string stra = "123";
+    std::string strb = "1";
+    sourceDev_->isFull_ = true;
+    sourceDev_->NotifyFwkRunning(stra, strb);
+    sourceDev_->isFull_ = true;
+    sourceDev_->NotifyFwkRunning(stra, strb);
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->EnableDSpeaker(dhId, ATTRS));
 }
 
