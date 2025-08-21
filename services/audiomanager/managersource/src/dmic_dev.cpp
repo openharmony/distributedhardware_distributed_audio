@@ -357,7 +357,7 @@ int32_t DMicDev::SetUp()
         }
         ptr->ReadFromRingbuffer();
     });
-    echoCannelOn_ = true;
+    echoCannelOn_ = false;
 #ifdef ECHO_CANNEL_ENABLE
     if (echoCannelOn_ && echoManager_ == nullptr) {
         echoManager_ = std::make_shared<DAudioEchoCannelManager>();
