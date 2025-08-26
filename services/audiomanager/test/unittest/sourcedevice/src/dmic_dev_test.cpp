@@ -78,6 +78,26 @@ HWTEST_F(DMicDevTest, InitReceiverEngine_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: SendToProcess_001
+ * @tc.desc: Verify SendToProcess and EnableDevice function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, SendToProcess_001, TestSize.Level1)
+{
+    mic_->SendToProcess(nullptr);
+    const size_t capacity = 1;
+    auto writeData = std::make_shared<AudioData>(capacity);
+    mic_->SendToProcess(writeData);
+    mic_->frameIndex_ = 10;
+    mic_->ptsMap_[mic_->frameIndex_] = 10;
+    mic_->SendToProcess(writeData);
+    mic_->frameOutIndexFlag_ = 13;
+    mic_->SendToProcess(writeData);
+    EXPECT_NE(nullptr, writeData);
+}
+
+/**
  * @tc.name: EnableDMic_001
  * @tc.desc: Verify EnableDMic and EnableDevice function.
  * @tc.type: FUNC
@@ -193,7 +213,7 @@ HWTEST_F(DMicDevTest, NotifyEvent_001, TestSize.Level1)
     for (int32_t i = 0; i < NOTIFY_WAIT_FRAMES; i++) {
         size_t size = 4096;
         auto audioData = std::make_shared<AudioData>(size);
-        mic_->dataQueue_.push(audioData);
+        mic_->dataQueue_.push_back(audioData);
     }
     event.type = AUDIO_START;
     EXPECT_EQ(DH_SUCCESS, mic_->NotifyEvent(streamId_, event));
@@ -324,6 +344,28 @@ HWTEST_F(DMicDevTest, Release_001, TestSize.Level1)
     EXPECT_EQ(DH_SUCCESS, mic_->RefreshAshmemInfo(streamId, fd, ashmemLength, lengthPerTrans));
 }
 
+/**
+ * @tc.name: GetAudioDataFromQueue_001
+ * @tc.desc: Verify GetAudioDataFromQueue function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, GetAudioDataFromQueue_001, TestSize.Level1)
+{
+    mic_->scene_ = 2;
+    mic_->isFirstCaptureFrame_ = true;
+    const size_t capacity = 1;
+    auto writeData = std::make_shared<AudioData>(capacity);
+    mic_->dataQueue_.push_back(writeData);
+    std::shared_ptr<AudioData> readData = nullptr;
+    EXPECT_EQ(DH_SUCCESS, mic_->GetAudioDataFromQueue(readData));
+    mic_->dataQueue_.push_back(writeData);
+    EXPECT_EQ(DH_SUCCESS, mic_->GetAudioDataFromQueue(readData));
+    mic_->isFirstCaptureFrame_ = false;
+    EXPECT_EQ(DH_SUCCESS, mic_->GetAudioDataFromQueue(readData));
+    mic_->scene_ = 3;
+    EXPECT_EQ(DH_SUCCESS, mic_->GetAudioDataFromQueue(readData));
+}
 
 /**
  * @tc.name: ReadStreamData_001
@@ -340,11 +382,11 @@ HWTEST_F(DMicDevTest, ReadStreamData_001, TestSize.Level1)
     EXPECT_EQ(DH_SUCCESS, mic_->WriteStreamData(streamId_, writeData));
 
     std::shared_ptr<AudioData> readData = nullptr;
-    mic_->dataQueue_.push(writeData);
+    mic_->dataQueue_.push_back(writeData);
     EXPECT_EQ(DH_SUCCESS, mic_->ReadStreamData(streamId_, readData));
     for (size_t i = 0; i < 11; ++i) {
         auto data = std::make_shared<AudioData>(DEFAULT_AUDIO_DATA_SIZE);
-        mic_->dataQueue_.push(data);
+        mic_->dataQueue_.push_back(data);
     }
     mic_->isEnqueueRunning_ = true;
     mic_->FillJitterQueue();
@@ -360,7 +402,9 @@ HWTEST_F(DMicDevTest, ReadStreamData_001, TestSize.Level1)
 
     mic_->curStatus_ = AudioStatus::STATUS_START;
     EXPECT_EQ(DH_SUCCESS, mic_->ReadStreamData(streamId_, readData1));
-
+    mic_->avSyncParam_.isAVsync = 1;
+    EXPECT_EQ(DH_SUCCESS, mic_->ReadStreamData(streamId_, readData1));
+    mic_->avSyncParam_.isAVsync = 0;
     EXPECT_EQ(DH_SUCCESS, mic_->ReadStreamData(streamId_, readData1));
 }
 
@@ -411,6 +455,10 @@ HWTEST_F(DMicDevTest, OnStateChange_001, TestSize.Level1)
 HWTEST_F(DMicDevTest, OnDecodeTransDataDone_001, TestSize.Level1)
 {
     std::shared_ptr<AudioData> data = nullptr;
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->OnDecodeTransDataDone(data));
+    mic_->avSyncParam_.isAVsync = 0;
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->OnDecodeTransDataDone(data));
+    mic_->avSyncParam_.isAVsync = 1;
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->OnDecodeTransDataDone(data));
 
     const size_t capacity = 1;
@@ -510,20 +558,39 @@ HWTEST_F(DMicDevTest, ReadMmapPosition001, TestSize.Level1)
     int32_t streamId = 0;
     uint64_t frames = 0;
     CurrentTimeHDF time;
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->MmapStart());
     EXPECT_EQ(DH_SUCCESS, mic_->ReadMmapPosition(streamId, frames, time));
 }
 
 /**
- * @tc.name: MmapStart_001
- * @tc.desc: Verify MmapStart function.
+ * @tc.name: AVsyncRefreshAshmem001
+ * @tc.desc: Verify AVsyncRefreshAshmem function.
  * @tc.type: FUNC
  * @tc.require: AR000H0E5F
  */
-HWTEST_F(DMicDevTest, MmapStart_001, TestSize.Level1)
+HWTEST_F(DMicDevTest, AVsyncRefreshAshmem001, TestSize.Level1)
 {
-    mic_->ashmem_ = nullptr;
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->MmapStart());
+    int32_t fd = 10;
+    int32_t ashmemLength = 10;
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->AVsyncRefreshAshmem(fd, ashmemLength));
+    mic_->AVsyncDeintAshmem();
+    EXPECT_EQ(nullptr, mic_->avsyncAshmem_);
 }
 
+/**
+ * @tc.name: UpdateWorkModeParam001
+ * @tc.desc: Verify UpdateWorkModeParam function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, UpdateWorkModeParam001, TestSize.Level1)
+{
+    std::string devId = "devId";
+    std::string dhId = "dhId";
+    AudioAsyncParam param1{-1, 0, 0, 0};
+    EXPECT_EQ(DH_SUCCESS, mic_->UpdateWorkModeParam(devId, dhId, param1));
+    AudioAsyncParam param2{-1, 0, 0, 1};
+    EXPECT_EQ(DH_SUCCESS, mic_->UpdateWorkModeParam(devId, dhId, param2));
+}
 } // namespace DistributedHardware
 } // namespace OHOS

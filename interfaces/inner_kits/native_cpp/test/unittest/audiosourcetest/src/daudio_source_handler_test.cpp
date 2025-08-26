@@ -221,5 +221,32 @@ HWTEST_F(DAudioSourceHandlerTest, ConfigDistributedHardware_003, TestSize.Level1
     int32_t ret = DAudioSourceHandler::GetInstance().ConfigDistributedHardware(devId, dhId, key, value);
     EXPECT_EQ(DH_SUCCESS, ret);
 }
+
+/**
+ * @tc.name: UpdateDistributedHardwareWorkMode_001
+ * @tc.desc: Verify the UpdateDistributedHardwareWorkMode function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceHandlerTest, UpdateDistributedHardwareWorkMode_001, TestSize.Level1)
+{
+    std::string devId = "devId";
+    std::string dhId = "dhId";
+    WorkModeParam params(-1, 0, 0, 0);
+    DAudioSourceHandler::GetInstance().dAudioSourceProxy_ = sptr<MockIDAudioSource>(new MockIDAudioSource());
+    int32_t ret = DAudioSourceHandler::GetInstance().UpdateDistributedHardwareWorkMode(devId, dhId, params);
+    EXPECT_EQ(DH_SUCCESS, ret);
+    size_t legalLen = 10;
+    size_t illegalLen = 101;
+    devId.resize(illegalLen);
+    ret = DAudioSourceHandler::GetInstance().UpdateDistributedHardwareWorkMode(devId, dhId, params);
+    EXPECT_EQ(ERR_DH_AUDIO_SA_DEVID_ILLEGAL, ret);
+    dhId.resize(illegalLen);
+    ret = DAudioSourceHandler::GetInstance().UpdateDistributedHardwareWorkMode(devId, dhId, params);
+    EXPECT_EQ(ERR_DH_AUDIO_SA_DEVID_ILLEGAL, ret);
+    devId.resize(legalLen);
+    ret = DAudioSourceHandler::GetInstance().UpdateDistributedHardwareWorkMode(devId, dhId, params);
+    EXPECT_EQ(ERR_DH_AUDIO_SA_DEVID_ILLEGAL, ret);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -274,6 +274,21 @@ int32_t DMicClient::StartCapture()
     return DH_SUCCESS;
 }
 
+void DMicClient::CalcMicDataPts()
+{
+    micDataPts_.fetch_add(AUDIO_FRAME_INTERVAL_US);
+    if (getAudioTimeCounter_ % REVISE_PER_FIFTY_FRAME == 0) {
+        AudioStandard::Timestamp timestamp;
+        audioCapturer_->GetTimeStampInfo(timestamp, AudioStandard::Timestamp::Timestampbase::MONOTONIC);
+        int64_t ptsOrigin = timestamp.time.tv_sec * TIME_CONVERSION_STOU +
+            timestamp.time.tv_nsec / TIME_CONVERSION_NTOU;
+        int64_t frameNumOfPts = static_cast<int64_t>(timestamp.framePosition) / LENGTH_PER_TRANS;
+        int64_t ptsFinal = ptsOrigin - (frameNumOfPts - frameIndex_) * AUDIO_FRAME_INTERVAL_MS;
+        micDataPts_.store(ptsFinal);
+        getAudioTimeCounter_ = 0;
+    }
+}
+
 void DMicClient::AudioFwkCaptureData()
 {
     std::shared_ptr<AudioData> audioData = std::make_shared<AudioData>(audioParam_.comParam.frameSize);
@@ -302,6 +317,11 @@ void DMicClient::AudioFwkCaptureData()
         DHLOGE("Bytes read failed.");
         return;
     }
+    CalcMicDataPts();
+    getAudioTimeCounter_++;
+    frameIndex_++;
+    DHLOGI("micDataPts_: %{public}" PRId64, micDataPts_.load());
+    audioData->SetPts(micDataPts_.load());
     if (isPauseStatus_.load()) {
         memset_s(audioData->Data(), audioData->Size(), 0, audioData->Size());
     }

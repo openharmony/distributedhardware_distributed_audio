@@ -171,5 +171,26 @@ void DAudioSourceProxy::DAudioNotify(const std::string &devId, const std::string
     Remote()->SendRequest(static_cast<uint32_t>(IDAudioSourceInterfaceCode::DAUDIO_NOTIFY),
         data, reply, option);
 }
+
+int32_t DAudioSourceProxy::UpdateDistributedHardwareWorkMode(const std::string &devId, const std::string &dhId,
+    const WorkModeParam &param)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    CHECK_AND_RETURN_RET_LOG(!data.WriteInterfaceToken(GetDescriptor()),
+        ERR_DH_AUDIO_SA_WRITE_INTERFACE_TOKEN_FAILED, "Write InterfaceToken failed");
+    CHECK_AND_RETURN_RET_LOG(devId.length() > DAUDIO_MAX_DEVICE_ID_LEN || dhId.length() > DAUDIO_MAX_DEVICE_ID_LEN,
+        ERR_DH_AUDIO_SA_DEVID_ILLEGAL, "Id is illegal.");
+    CHECK_AND_RETURN_RET_LOG(!data.WriteString(devId) || !data.WriteString(dhId) ||
+        !data.WriteFileDescriptor(param.fd) || !data.WriteInt32(param.sharedMemLen) ||
+        !data.WriteUint32(param.scene) || !data.WriteInt32(param.isAVsync),
+        ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED, "Write params failed.");
+    CHECK_AND_RETURN_RET_LOG(Remote() == nullptr, ERR_DH_AUDIO_NULLPTR, "Remote service is null.");
+    Remote()->SendRequest(static_cast<uint32_t>(IDAudioSourceInterfaceCode::UPDATE_WORKMODE),
+        data, reply, option);
+    int32_t ret = reply.ReadInt32();
+    return ret;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

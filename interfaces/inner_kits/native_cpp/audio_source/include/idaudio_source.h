@@ -37,6 +37,8 @@ public:
         const std::string &value) = 0;
     virtual void DAudioNotify(const std::string &devId, const std::string &dhId, const int32_t eventType,
         const std::string &eventContent) = 0;
+    virtual int32_t UpdateDistributedHardwareWorkMode(const std::string &devId, const std::string &dhId,
+        const WorkModeParam &param) = 0;
 };
 } // DistributedHardware
 } // OHOS

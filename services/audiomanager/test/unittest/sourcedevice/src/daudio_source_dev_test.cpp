@@ -970,7 +970,7 @@ HWTEST_F(DAudioSourceDevTest, TaskMicMmapStart_001, TestSize.Level1)
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->TaskMicMmapStart(ARGS));
     std::shared_ptr<AudioData> data = std::make_shared<AudioData>(AUDIO_DATA_CAP);
     for (size_t i = 0; i < TASK_QUEUE_LEN; i++) {
-        mic->dataQueue_.push(data);
+        mic->dataQueue_.push_back(data);
     }
     EXPECT_EQ(DH_SUCCESS, sourceDev_->deviceMap_[dhId]->MmapStop());
 }

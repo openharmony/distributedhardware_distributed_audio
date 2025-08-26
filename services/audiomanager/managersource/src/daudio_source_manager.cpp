@@ -574,6 +574,26 @@ void DAudioSourceManager::SetCallerTokenId(uint64_t tokenId)
     callerTokenId_ = tokenId;
 }
 
+int32_t DAudioSourceManager::UpdateWorkModeParam(const std::string &devId, const std::string &dhId,
+    const AudioAsyncParam &param)
+{
+    std::shared_ptr<DAudioSourceDev> sourceDev = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(devMapMtx_);
+        auto device = audioDevMap_.find(devId);
+        if (device == audioDevMap_.end()) {
+            if (CreateAudioDevice(devId) != DH_SUCCESS) {
+                return ERR_DH_AUDIO_FAILED;
+            }
+        }
+        sourceDev = audioDevMap_[devId].dev;
+    }
+    CHECK_NULL_RETURN(sourceDev, ERR_DH_AUDIO_FAILED);
+    int32_t ret = sourceDev->UpdateWorkModeParam(devId, dhId, param);
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "UpdateWorkModeParam failed, ret: %{public}d", ret);
+    return DH_SUCCESS;
+}
+
 IAVEngineProvider *DAudioSourceManager::getSenderProvider()
 {
     return sendProviderPtr_;

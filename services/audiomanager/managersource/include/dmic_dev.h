@@ -16,7 +16,7 @@
 #ifndef OHOS_DMIC_DEV_H
 #define OHOS_DMIC_DEV_H
 
-#include <queue>
+#include <deque>
 #include <set>
 #include <thread>
 #include "cJSON.h"
@@ -90,6 +90,10 @@ public:
 
     int32_t OnStateChange(const AudioEventType type) override;
     int32_t OnDecodeTransDataDone(const std::shared_ptr<AudioData> &audioData) override;
+    int32_t UpdateWorkModeParam(const std::string &devId, const std::string &dhId,
+        const AudioAsyncParam &param) override;
+    int32_t AVsyncRefreshAshmem(int32_t fd, int32_t ashmemLength);
+    void AVsyncDeintAshmem();
 
 private:
     void EnqueueThread();
@@ -99,10 +103,12 @@ private:
     void GetCodecCaps(const std::string &capability);
     void AddToVec(std::vector<AudioCodecType> &container, const AudioCodecType value);
     bool IsMimeSupported(const AudioCodecType coder);
+    int32_t GetAudioDataFromQueue(std::shared_ptr<AudioData> &data);
 
 private:
     static constexpr uint8_t CHANNEL_WAIT_SECONDS = 5;
     static constexpr uint8_t RINGBUFFER_WAIT_SECONDS = 5;
+    static constexpr uint8_t SCENE_WAIT_SECONDS = 5;
     static constexpr size_t DATA_QUEUE_MAX_SIZE = 10;
     static constexpr size_t DATA_QUEUE_HALF_SIZE = DATA_QUEUE_MAX_SIZE >> 1U;
     static constexpr uint32_t LOW_LATENCY_JITTER_MAX_TIME_MS = 150;
@@ -110,6 +116,8 @@ private:
     static constexpr uint8_t MMAP_NORMAL_PERIOD = 5;
     static constexpr uint8_t MMAP_VOIP_PERIOD = 20;
     static constexpr uint32_t MMAP_WAIT_FRAME_US = 5000;
+    constexpr static int64_t TIMESTAMP_COMPENSATION = 1333;
+    constexpr static int64_t ONE_FRAME_COMPENSATION = 20000;
     static constexpr const char* ENQUEUE_THREAD = "micEnqueueTh";
     const std::string DUMP_DAUDIO_MIC_READ_FROM_BUF_NAME = "dump_source_mic_read_from_trans.pcm";
     const std::string DUMP_DAUDIO_LOWLATENCY_MIC_FROM_BUF_NAME = "dump_source_mic_write_to_ashmem.pcm";
@@ -128,7 +136,7 @@ private:
 #ifdef ECHO_CANNEL_ENABLE
     std::shared_ptr<DAudioEchoCannelManager> echoManager_ = nullptr;
 #endif
-    std::queue<std::shared_ptr<AudioData>> dataQueue_;
+    std::deque<std::shared_ptr<AudioData>> dataQueue_;
     AudioStatus curStatus_ = AudioStatus::STATUS_IDLE;
     // Mic capture parameters
     AudioParamHDF paramHDF_;
@@ -163,6 +171,33 @@ private:
     std::atomic<bool> isRingbufferOn_ = false;
     std::mutex ringbufferMutex_;
     std::vector<AudioCodecType> codec_;
+
+    uint64_t frameInIndex_ = 0;
+    uint64_t frameOutIndex_ = 0;
+    uint64_t framnum_ = 0;
+    uint64_t indexFlag_ = 15;
+    uint64_t frameOutIndexFlag_ = 16;
+    std::map<uint64_t, int64_t> ptsMap_;
+    std::mutex ptsMutex_;
+    AudioAsyncParam avSyncParam_ {};
+    std::mutex avSyncMutex_;
+    uint32_t scene_ = 0;
+    std::atomic<bool> isFirstCaptureFrame_ = true;
+    sptr<Ashmem> avsyncAshmem_ = nullptr;
+    constexpr static int64_t TIME_CONVERSION_NTOU = 1000;
+    constexpr static int64_t TIME_CONVERSION_STOU = 1000000;
+    struct AVsyncShareData {
+        volatile int lock = 1;
+        uint64_t audio_current_pts = 0;
+        uint64_t audio_update_clock = 0;
+        float audio_speed = 1.0f;
+        uint64_t video_current_pts = 0;
+        uint64_t video_update_clock = 0;
+        float video_speed = 1.0f;
+        uint64_t sync_strategy = 1;
+        bool reset = false;
+    };
+    std::shared_ptr<AVsyncShareData> avsyncShareData_ = nullptr;
 };
 } // DistributedHardware
 } // OHOS

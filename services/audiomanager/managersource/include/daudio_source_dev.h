@@ -58,6 +58,7 @@ public:
     bool GetThreadStatusFlag();
     void NotifyEvent(const AudioEvent &event) override;
     void SetTokenId(uint64_t value);
+    int32_t UpdateWorkModeParam(const std::string &devId, const std::string &dhId, const AudioAsyncParam &param);
 
 private:
     int32_t EnableDSpeaker(const int32_t dhId, const std::string &attrs);

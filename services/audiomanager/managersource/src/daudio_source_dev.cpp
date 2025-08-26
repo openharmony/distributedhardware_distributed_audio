@@ -1561,6 +1561,20 @@ int32_t DAudioSourceDev::CheckOsType(std::string &networkId, bool &isInvalid)
     return DH_SUCCESS;
 }
 
+int32_t DAudioSourceDev::UpdateWorkModeParam(const std::string &devId, const std::string &dhId,
+    const AudioAsyncParam &param)
+{
+    int32_t dhIdNum = ConvertString2Int(dhId);
+    CHECK_AND_RETURN_RET_LOG(dhIdNum == ERR_DH_AUDIO_FAILED, ERR_DH_AUDIO_FAILED, "dhId is invalid.");
+    std::lock_guard<std::mutex> devLck(ioDevMtx_);
+    CHECK_AND_RETURN_RET_LOG(deviceMap_.find(dhIdNum) == deviceMap_.end(), ERR_DH_AUDIO_FAILED, "map not found.");
+    auto ioDev = deviceMap_[dhIdNum];
+    CHECK_NULL_RETURN(ioDev, ERR_DH_AUDIO_FAILED);
+    int32_t ret = ioDev->UpdateWorkModeParam(devId, dhId, param);
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ERR_DH_AUDIO_FAILED, "UpdateWorkModeParam failed.");
+    return DH_SUCCESS;
+}
+
 DAudioSourceDev::SourceEventHandler::SourceEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner,
     const std::shared_ptr<DAudioSourceDev> &dev) : AppExecFwk::EventHandler(runner), sourceDev_(dev)
 {

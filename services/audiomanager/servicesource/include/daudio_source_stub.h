@@ -38,6 +38,7 @@ private:
     int32_t ConfigDistributedHardwareInner(MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int32_t DAudioNotifyInner(MessageParcel &data, MessageParcel &reply, MessageOption &option);
     bool VerifyPermission();
+    int32_t UpdateDAudioWorkModeInner(MessageParcel &data, MessageParcel &reply, MessageOption &option);
 
     using DAudioSourceServiceFunc = int32_t (DAudioSourceStub::*)(MessageParcel &data, MessageParcel &reply,
         MessageOption &option);

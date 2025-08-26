@@ -552,5 +552,14 @@ int32_t DSpeakerDev::OnDecodeTransDataDone(const std::shared_ptr<AudioData> &aud
     (void) audioData;
     return DH_SUCCESS;
 }
+
+int32_t DSpeakerDev::UpdateWorkModeParam(const std::string &devId, const std::string &dhId,
+    const AudioAsyncParam &param)
+{
+    (void)devId;
+    (void)dhId;
+    (void)param;
+    return DH_SUCCESS;
+}
 } // DistributedHardware
 } // OHOS
