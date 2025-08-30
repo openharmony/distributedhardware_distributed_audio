@@ -51,7 +51,7 @@ int32_t DAudioHandler::Initialize()
 
 bool DAudioHandler::AddItemsToObject(DHItem &dhItem, cJSON* infoJson, const int32_t &dhId)
 {
-    DHLOGD("Get dhId and then add other items into cjson object");
+    DHLOGD("get dhId and then add other items into cjson object");
     int32_t deviceType = GetDevTypeByDHId(dhId);
     if (deviceType == AUDIO_DEVICE_TYPE_MIC) {
         return AddParamsToJson(dhItem, infoJson, MIC, micInfos_);
