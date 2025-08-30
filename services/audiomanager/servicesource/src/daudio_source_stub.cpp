@@ -184,6 +184,10 @@ int32_t DAudioSourceStub::DAudioNotifyInner(MessageParcel &data, MessageParcel &
 
 int32_t DAudioSourceStub::UpdateDAudioWorkModeInner(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (!VerifyPermission()) {
+        DHLOGE("Permission verification fail.");
+        return ERR_DH_AUDIO_SA_PERMISSION_FAIED;
+    }
     int32_t ret = 0;
     do {
         std::string devId = data.ReadString();
