@@ -55,6 +55,26 @@ int32_t AudioData::SetRange(size_t offset, size_t size)
     return DH_SUCCESS;
 }
 
+void AudioData::SetPts(int64_t pts)
+{
+    pts_ = pts;
+}
+
+int64_t AudioData::GetPts()
+{
+    return pts_;
+}
+
+void AudioData::SetPtsSpecial(int64_t pts)
+{
+    ptsSpecial_ = pts;
+}
+
+int64_t AudioData::GetPtsSpecial()
+{
+    return ptsSpecial_;
+}
+
 void AudioData::SetInt64(const string name, int64_t value)
 {
     int64Map_[name] = value;

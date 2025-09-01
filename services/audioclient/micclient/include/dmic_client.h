@@ -77,6 +77,7 @@ private:
     int32_t AudioFwkClientSetUp();
     int32_t TransSetUp();
     void AudioFwkCaptureData();
+    void CalcMicDataPts();
 private:
     constexpr static uint8_t CHANNEL_WAIT_SECONDS = 5;
     static constexpr const char* CAPTURETHREAD = "captureThread";
@@ -99,6 +100,15 @@ private:
     int64_t lastTransStartTime_ = 0;
     std::atomic<bool> isPauseStatus_ = false;
     FILE *dumpFile_ = nullptr;
+    std::atomic<int64_t>  micDataPts_ = 0;
+    constexpr static int64_t AUDIO_FRAME_INTERVAL_US = 20000;
+    constexpr static int64_t TIME_CONVERSION_NTOU = 1000;
+    constexpr static int64_t TIME_CONVERSION_STOU = 1000000;
+    constexpr static int32_t REVISE_PER_FIFTY_FRAME = 50;
+    constexpr static int32_t LENGTH_PER_TRANS = 960;
+    constexpr static int32_t AUDIO_FRAME_INTERVAL_MS = 20;
+    std::atomic<int64_t> getAudioTimeCounter_ = 0;
+    int64_t frameIndex_ = 0;
 };
 } // DistributedHardware
 } // OHOS

@@ -37,6 +37,8 @@ public:
         const std::string &value) override;
     void DAudioNotify(const std::string &devId, const std::string &dhId, const int32_t eventType,
         const std::string &eventContent) override;
+    int32_t UpdateDistributedHardwareWorkMode(const std::string &networkId, const std::string &dhId,
+        const WorkModeParam &param) override;
 
 private:
     static inline BrokerDelegator<DAudioSourceProxy> delegator_;

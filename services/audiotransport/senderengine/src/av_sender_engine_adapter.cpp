@@ -112,6 +112,7 @@ int32_t AVTransSenderAdapter::PushData(std::shared_ptr<AudioData> &audioData)
     CHECK_NULL_RETURN(bufferData, ERR_DH_AUDIO_NULLPTR);
 
     bufferData->Write(audioData->Data(), audioData->Size());
+    transBuffer->SetPts(audioData->GetPts());
     return senderEngine_->PushData(transBuffer);
 }
 

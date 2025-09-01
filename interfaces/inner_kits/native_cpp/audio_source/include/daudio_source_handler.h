@@ -43,6 +43,8 @@ public:
     int32_t UnLoadDistributedHDF() override;
     void OnRemoteSourceSvrDied(const wptr<IRemoteObject> &remote);
     void FinishStartSA(const std::string &param, const sptr<IRemoteObject> &remoteObject);
+    int32_t UpdateDistributedHardwareWorkMode(const std::string &networkId, const std::string &dhId,
+        const WorkModeParam &param) override;
 
 private:
     class DAudioSourceSvrRecipient : public IRemoteObject::DeathRecipient {

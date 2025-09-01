@@ -84,6 +84,8 @@ public:
 
     AudioParam GetAudioParam() const override;
     int32_t NotifyHdfAudioEvent(const AudioEvent &event, const int32_t portId) override;
+    int32_t UpdateWorkModeParam(const std::string &devId, const std::string &dhId,
+        const AudioAsyncParam &param) override;
 
 private:
     void EnqueueThread();

@@ -44,6 +44,8 @@ DAudioSourceStub::DAudioSourceStub() : IRemoteStub(true)
         &DAudioSourceStub::ConfigDistributedHardwareInner;
     memberFuncMap_[static_cast<uint32_t>(IDAudioSourceInterfaceCode::DAUDIO_NOTIFY)] =
         &DAudioSourceStub::DAudioNotifyInner;
+    memberFuncMap_[static_cast<uint32_t>(IDAudioSourceInterfaceCode::UPDATE_WORKMODE)] =
+        &DAudioSourceStub::UpdateDAudioWorkModeInner;
 }
 
 int32_t DAudioSourceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
@@ -70,6 +72,8 @@ int32_t DAudioSourceStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Me
             return ConfigDistributedHardwareInner(data, reply, option);
         case static_cast<uint32_t>(IDAudioSourceInterfaceCode::DAUDIO_NOTIFY):
             return DAudioNotifyInner(data, reply, option);
+        case static_cast<uint32_t>(IDAudioSourceInterfaceCode::UPDATE_WORKMODE):
+            return UpdateDAudioWorkModeInner(data, reply, option);
         default:
             DHLOGE("Invalid request code.");
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -175,6 +179,29 @@ int32_t DAudioSourceStub::DAudioNotifyInner(MessageParcel &data, MessageParcel &
     std::string eventContent = data.ReadString();
 
     DAudioNotify(networkId, dhId, eventType, eventContent);
+    return DH_SUCCESS;
+}
+
+int32_t DAudioSourceStub::UpdateDAudioWorkModeInner(MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    if (!VerifyPermission()) {
+        DHLOGE("Permission verification fail.");
+        return ERR_DH_AUDIO_SA_PERMISSION_FAIED;
+    }
+    int32_t ret = 0;
+    do {
+        std::string devId = data.ReadString();
+        std::string dhId = data.ReadString();
+        WorkModeParam params(-1, 0, 0, 0);
+        params.fd = data.ReadFileDescriptor();
+
+        params.sharedMemLen = data.ReadInt32();
+        params.scene = data.ReadUint32();
+        params.isAVsync = data.ReadInt32();
+        ret = UpdateDistributedHardwareWorkMode(devId, dhId, params);
+        DHLOGI("DistributedAudioSourceStub UpdateDistributedHardwareWorkMode %{public}d", ret);
+    } while (0);
+    reply.WriteInt32(ret);
     return DH_SUCCESS;
 }
 } // namespace DistributedHardware

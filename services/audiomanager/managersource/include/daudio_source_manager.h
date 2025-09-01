@@ -54,6 +54,7 @@ public:
     IAVEngineProvider *getSenderProvider();
     IAVEngineProvider *getReceiverProvider();
     void SetCallerTokenId(uint64_t tokenId);
+    int32_t UpdateWorkModeParam(const std::string &devId, const std::string &dhId, const AudioAsyncParam &param);
 
 private:
     DAudioSourceManager();

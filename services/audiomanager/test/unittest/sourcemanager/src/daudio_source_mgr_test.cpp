@@ -371,5 +371,20 @@ HWTEST_F(DAudioSourceMgrTest, LoadAVReceiverEngineProvider_001, TestSize.Level1)
     EXPECT_EQ(DH_SUCCESS, sourceMgr.LoadAVSenderEngineProvider());
     EXPECT_EQ(DH_SUCCESS, sourceMgr.UnloadAVSenderEngineProvider());
 }
+
+/**
+ * @tc.name: UpdateWorkModeParam_001
+ * @tc.desc: Verify the UpdateWorkModeParam function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceMgrTest, UpdateWorkModeParam_001, TestSize.Level1)
+{
+    AudioAsyncParam param {-1, 0, 0, 0};
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceMgr.UpdateWorkModeParam(DEV_ID, DH_ID_SPK, param));
+    DAudioSourceManager::AudioDevice device = { DEV_ID, nullptr };
+    sourceMgr.audioDevMap_[DEV_ID] = device;
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceMgr.UpdateWorkModeParam(DEV_ID, DH_ID_SPK, param));
+}
 } // namespace DistributedHardware
 } // namespace OHOS

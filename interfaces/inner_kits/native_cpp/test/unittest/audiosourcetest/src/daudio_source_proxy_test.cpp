@@ -168,5 +168,28 @@ HWTEST_F(DAudioSourceProxyTest, ConfigDistributedHardware_002, TestSize.Level1)
     ret = dAudioProxy->ConfigDistributedHardware(devId, dhId, key, value);
     EXPECT_EQ(ERR_DH_AUDIO_SA_DEVID_ILLEGAL, ret);
 }
+
+/**
+ * @tc.name: UpdateDistributedHardwareWorkMode_001
+ * @tc.desc: Verify the UpdateDistributedHardwareWorkMode function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceProxyTest, UpdateDistributedHardwareWorkMode_001, TestSize.Level1)
+{
+    ASSERT_TRUE(dAudioProxy != nullptr);
+    size_t DAUDIO_MAX_DEVICE_ID_LEN = 101;
+    size_t DAUDIO_LEGAL_DEVICE_ID_LEN = 10;
+    WorkModeParam params(-1, 0, 0, 0);
+    std::string devId;
+    devId.resize(DAUDIO_MAX_DEVICE_ID_LEN);
+    std::string dhId = "dhId";
+    int32_t ret = dAudioProxy->UpdateDistributedHardwareWorkMode(devId, dhId, params);
+    EXPECT_EQ(ERR_DH_AUDIO_SA_DEVID_ILLEGAL, ret);
+    devId.resize(DAUDIO_LEGAL_DEVICE_ID_LEN);
+    dhId.resize(DAUDIO_MAX_DEVICE_ID_LEN);
+    ret = dAudioProxy->UpdateDistributedHardwareWorkMode(devId, dhId, params);
+    EXPECT_EQ(ERR_DH_AUDIO_SA_DEVID_ILLEGAL, ret);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -45,6 +45,8 @@ public:
     void DAudioNotify(const std::string &devId, const std::string &dhId, const int32_t eventType,
         const std::string &eventContent) override;
     int Dump(int32_t fd, const std::vector<std::u16string>& args) override;
+    int32_t UpdateDistributedHardwareWorkMode(const std::string &devId, const std::string &dhId,
+        const WorkModeParam &param) override;
 
 protected:
     void OnStart() override;

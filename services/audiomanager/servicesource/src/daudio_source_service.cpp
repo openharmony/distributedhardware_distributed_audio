@@ -157,5 +157,19 @@ int DAudioSourceService::Dump(int32_t fd, const std::vector<std::u16string>& arg
 
     return DH_SUCCESS;
 }
+
+int32_t DAudioSourceService::UpdateDistributedHardwareWorkMode(const std::string &devId, const std::string &dhId,
+    const WorkModeParam &param)
+{
+    DHLOGI("update workmode, devId: %{public}s, dhId: %{public}s.", GetAnonyString(devId).c_str(),
+        GetAnonyString(dhId).c_str());
+    AudioAsyncParam audioAsyncParam = { 0 };
+    audioAsyncParam.fd = param.fd;
+    audioAsyncParam.sharedMemLen = param.sharedMemLen;
+    audioAsyncParam.scene = param.scene;
+    audioAsyncParam.isAVsync = param.isAVsync;
+    DAudioSourceManager::GetInstance().UpdateWorkModeParam(devId, dhId, audioAsyncParam);
+    return DH_SUCCESS;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

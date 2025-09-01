@@ -111,6 +111,12 @@ public:
 
     void DAudioNotify(const std::string &devId, const std::string &dhId, const int32_t eventType,
         const std::string &eventContent) {}
+    
+    int32_t UpdateDistributedHardwareWorkMode(const std::string &devId, const std::string &dhId,
+        const WorkModeParam &param)
+    {
+        return DH_SUCCESS;
+    }
 };
 } // namespace DistributedHardware
 } // namespace OHOS

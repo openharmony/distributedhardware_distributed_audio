@@ -32,6 +32,13 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+struct AudioAsyncParam {
+    int32_t fd;
+    int32_t sharedMemLen;
+    uint32_t scene;
+    bool isAVsync;
+};
+
 class DAudioIoDev : public IDAudioHdiCallback {
 public:
     explicit DAudioIoDev(const std::string &devId)
@@ -58,6 +65,8 @@ public:
 
     virtual AudioParam GetAudioParam() const = 0;
     virtual int32_t NotifyHdfAudioEvent(const AudioEvent &event, const int32_t portId) = 0;
+    virtual int32_t UpdateWorkModeParam(const std::string &devId, const std::string &dhId,
+        const AudioAsyncParam &param) = 0;
 
 protected:
     const std::string devId_;

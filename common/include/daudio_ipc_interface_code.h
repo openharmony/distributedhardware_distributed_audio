@@ -28,6 +28,7 @@ enum class IDAudioSourceInterfaceCode : uint32_t {
     UNREGISTER_DISTRIBUTED_HARDWARE = 3,
     CONFIG_DISTRIBUTED_HARDWARE = 4,
     DAUDIO_NOTIFY = 5,
+    UPDATE_WORKMODE = 6,
 };
 
 /* SAID: 4806 */

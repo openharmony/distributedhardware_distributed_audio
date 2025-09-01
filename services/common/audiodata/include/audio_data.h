@@ -33,6 +33,10 @@ public:
     size_t Capacity() const;
     uint8_t *Data() const;
     int32_t SetRange(size_t offset, size_t size);
+    void SetPts(int64_t pts);
+    int64_t GetPts();
+    void SetPtsSpecial(int64_t pts);
+    int64_t GetPtsSpecial();
 
     void SetInt64(const string name, int64_t value);
     bool FindInt32(const string &name, int32_t &value);
@@ -45,6 +49,8 @@ private:
     size_t rangeOffset_ = 0;
     size_t rangeLength_ = 0;
     uint8_t *data_ = nullptr;
+    int64_t pts_ = 0;
+    int64_t ptsSpecial_ = 0;
 
     map<string, int32_t> int32Map_;
     map<string, int64_t> int64Map_;

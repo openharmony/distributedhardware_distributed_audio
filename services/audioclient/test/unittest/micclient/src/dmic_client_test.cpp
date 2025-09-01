@@ -231,5 +231,18 @@ HWTEST_F(DMicClientTest, TransSetUp_001, TestSize.Level0)
     actual = micClient_->TransSetUp();
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, actual);
 }
+
+/**
+ * @tc.name: CalcMicDataPts_001
+ * @tc.desc: Verify the CalcMicDataPts function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6G
+ */
+HWTEST_F(DMicClientTest, CalcMicDataPts_001, TestSize.Level0)
+{
+    micClient_->getAudioTimeCounter_ = 1;
+    micClient_->CalcMicDataPts();
+    EXPECT_NE(micClient_->getAudioTimeCounter_, 0);
+}
 } // DistributedHardware
 } // OHOS
