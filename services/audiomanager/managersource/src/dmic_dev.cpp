@@ -796,7 +796,7 @@ int32_t DMicDev::OnDecodeTransDataDone(const std::shared_ptr<AudioData> &audioDa
         dataQueSize_ = param_.captureOpts.capturerFlags == MMAP_MODE ? dataQueSize_ : DATA_QUEUE_EXT_SIZE;
     }
     uint64_t queueSize;
-    while (dataQueue_.size() > scene_) {
+    while (dataQueue_.size() > dataQueSize_) {
         queueSize = static_cast<uint64_t>(dataQueue_.size());
         DHLOGI("Data queue overflow. buf current size: %{public}" PRIu64, queueSize);
         dataQueue_.pop_front();
