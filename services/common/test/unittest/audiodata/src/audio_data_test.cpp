@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -151,6 +151,20 @@ HWTEST_F(AudioDataTest, FindString_002, TestSize.Level1)
     string value = "value";
     ASSERT_NE(audioData, nullptr);
     EXPECT_EQ(false, audioData->FindString(name, value));
+}
+
+/**
+ * @tc.name: GetPtsSpecial_001
+ * @tc.desc: Verify the GetPtsSpecial function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5U
+ */
+HWTEST_F(AudioDataTest, GetPtsSpecial_001, TestSize.Level1)
+{
+    int64_t pts = 0;
+    ASSERT_NE(audioData, nullptr);
+    audioData->SetPtsSpecial(pts);
+    EXPECT_EQ(0, audioData->GetPtsSpecial());
 }
 } // namespace DistributedHardware
 } // namespace OHOS
