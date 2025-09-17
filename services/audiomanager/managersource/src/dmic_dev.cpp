@@ -575,8 +575,8 @@ int32_t DMicDev::ReadStreamData(const int32_t streamId, std::shared_ptr<AudioDat
         clock_gettime(CLOCK_REALTIME, &time);
         int64_t updatePts = static_cast<int64_t>(time.tv_sec) * TIME_CONVERSION_STOU +
             static_cast<int64_t>(time.tv_nsec) / TIME_CONVERSION_NTOU;
-        avsyncShareData_->audio_current_pts = data->GetPts();
-        avsyncShareData_->audio_update_clock = updatePts;
+        avsyncShareData_->audio_current_pts = static_cast<uint64_t>(data->GetPts());
+        avsyncShareData_->audio_update_clock = static_cast<uint64_t>(updatePts);
         avsyncShareData_->lock = 1;
         ret = avsyncAshmem_->WriteToAshmem(static_cast<void*>(avsyncShareData_.get()), sizeof(AVsyncShareData), 0);
         CHECK_AND_RETURN_RET_LOG(!ret, ERR_DH_AUDIO_FAILED, "Write avsync data failed.");
@@ -778,8 +778,8 @@ int32_t DMicDev::SendMessage(uint32_t type, std::string content, std::string dst
 int32_t DMicDev::OnDecodeTransDataDone(const std::shared_ptr<AudioData> &audioData)
 {
     DHLOGD("On Decode Trans Data Done.");
-    int32_t scene = DATA_QUEUE_HALF_SIZE;
-    int32_t sceneMax = DATA_QUEUE_MAX_SIZE;
+    uint32_t scene = DATA_QUEUE_HALF_SIZE;
+    uint32_t sceneMax = DATA_QUEUE_MAX_SIZE;
     {
         std::lock_guard<std::mutex> lock(avSyncMutex_);
         if (avSyncParam_.isAVsync) {
