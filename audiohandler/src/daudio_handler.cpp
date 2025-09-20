@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -51,7 +51,7 @@ int32_t DAudioHandler::Initialize()
 
 bool DAudioHandler::AddItemsToObject(DHItem &dhItem, cJSON* infoJson, const int32_t &dhId)
 {
-    DHLOGD("get dhId and then add other items into cjson object");
+    DHLOGD("Get dhId and then add other items into cjson object");
     int32_t deviceType = GetDevTypeByDHId(dhId);
     if (deviceType == AUDIO_DEVICE_TYPE_MIC) {
         return AddParamsToJson(dhItem, infoJson, MIC, micInfos_);

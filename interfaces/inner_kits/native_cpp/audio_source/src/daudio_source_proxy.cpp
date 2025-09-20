@@ -180,8 +180,8 @@ int32_t DAudioSourceProxy::UpdateDistributedHardwareWorkMode(const std::string &
     MessageOption option;
     CHECK_AND_RETURN_RET_LOG(!data.WriteInterfaceToken(GetDescriptor()),
         ERR_DH_AUDIO_SA_WRITE_INTERFACE_TOKEN_FAILED, "Write InterfaceToken failed");
-    CHECK_AND_RETURN_RET_LOG(devId.length() > DAUDIO_MAX_DEVICE_ID_LEN || dhId.length() > DAUDIO_MAX_DEVICE_ID_LEN,
-        ERR_DH_AUDIO_SA_DEVID_ILLEGAL, "Id is illegal.");
+    CHECK_AND_RETURN_RET_LOG(devId.length() > DAUDIO_MAX_DEVICE_ID_LEN || dhId.length() > DAUDIO_MAX_DEVICE_ID_LEN ||
+        param.fd < 0 || param.sharedMemLen < 0, ERR_DH_AUDIO_SA_DEVID_ILLEGAL, "Id or workmode param is illegal.");
     CHECK_AND_RETURN_RET_LOG(!data.WriteString(devId) || !data.WriteString(dhId) ||
         !data.WriteFileDescriptor(param.fd) || !data.WriteInt32(param.sharedMemLen) ||
         !data.WriteUint32(param.scene) || !data.WriteInt32(param.isAVsync),

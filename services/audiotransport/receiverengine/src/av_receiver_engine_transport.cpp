@@ -138,6 +138,7 @@ void AVTransReceiverTransport::OnEngineDataAvailable(const std::shared_ptr<AVTra
         DHLOGE("Copy audio data failed, error code %{public}d.", ret);
         return;
     }
+    DHLOGD("AudioDataPts: %{public}" PRId64, buffer->GetPts());
     audioData->SetPts(buffer->GetPts());
     audioData->SetPtsSpecial(buffer->GetPtsSpecial());
     auto sourceDevObj = transCallback_.lock();

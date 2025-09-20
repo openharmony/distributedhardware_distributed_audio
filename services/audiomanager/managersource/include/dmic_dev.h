@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -104,6 +104,11 @@ private:
     void AddToVec(std::vector<AudioCodecType> &container, const AudioCodecType value);
     bool IsMimeSupported(const AudioCodecType coder);
     int32_t GetAudioDataFromQueue(std::shared_ptr<AudioData> &data);
+    int32_t WriteTimeStampToAVsync(const int64_t timePts);
+    int32_t ReadTimeStampFromAVsync(int64_t &timePts);
+    uint32_t GetQueSize();
+    bool IsAVsync();
+    int32_t AVsyncMacthScene(std::shared_ptr<AudioData> &data);
 
 private:
     static constexpr uint8_t CHANNEL_WAIT_SECONDS = 5;
@@ -111,12 +116,15 @@ private:
     static constexpr uint8_t SCENE_WAIT_SECONDS = 5;
     static constexpr size_t DATA_QUEUE_MAX_SIZE = 10;
     static constexpr size_t DATA_QUEUE_HALF_SIZE = DATA_QUEUE_MAX_SIZE >> 1U;
+    static constexpr size_t DATA_QUEUE_BROADCAST_SIZE = 20;
+    static constexpr size_t DATA_QUEUE_VIDEOCALL_SIZE = 20;
+    static constexpr int64_t TIMESTAMP_COMPENSATION = 0;
     static constexpr uint32_t LOW_LATENCY_JITTER_MAX_TIME_MS = 150;
     static constexpr uint32_t LOW_LATENCY_JITTER_TIME_MS = 50;
     static constexpr uint8_t MMAP_NORMAL_PERIOD = 5;
     static constexpr uint8_t MMAP_VOIP_PERIOD = 20;
     static constexpr uint32_t MMAP_WAIT_FRAME_US = 5000;
-    constexpr static int64_t TIMESTAMP_COMPENSATION = 1333;
+    static constexpr uint32_t DADUIO_TIME_DIFF_MAX = 5;
     constexpr static int64_t ONE_FRAME_COMPENSATION = 20000;
     static constexpr const char* ENQUEUE_THREAD = "micEnqueueTh";
     const std::string DUMP_DAUDIO_MIC_READ_FROM_BUF_NAME = "dump_source_mic_read_from_trans.pcm";
@@ -181,8 +189,8 @@ private:
     std::mutex ptsMutex_;
     AudioAsyncParam avSyncParam_ {};
     std::mutex avSyncMutex_;
-    uint32_t scene_ = 0;
-    std::atomic<bool> isFirstCaptureFrame_ = true;
+    uint32_t scene_ = DATA_QUEUE_HALF_SIZE;
+    std::atomic<bool> isStartStatus_ = true;
     sptr<Ashmem> avsyncAshmem_ = nullptr;
     constexpr static int64_t TIME_CONVERSION_NTOU = 1000;
     constexpr static int64_t TIME_CONVERSION_STOU = 1000000;

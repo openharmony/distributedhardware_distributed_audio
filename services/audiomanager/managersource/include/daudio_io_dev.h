@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,6 +37,11 @@ struct AudioAsyncParam {
     int32_t sharedMemLen;
     uint32_t scene;
     bool isAVsync;
+};
+
+enum class AudioAVScene : uint32_t {
+    BROADCAST = 1,
+    VIDEOCALL = 2,
 };
 
 class DAudioIoDev : public IDAudioHdiCallback {

@@ -228,7 +228,7 @@ int32_t DAudioSourceHandler::UpdateDistributedHardwareWorkMode(const std::string
     const WorkModeParam &param)
 {
     DHLOGI("Update distributed hardware workmode, devId: %{public}s, dhId: %{public}s.",
-        GetAnonyString(devId).c_str(), dhId.c_str());
+        GetAnonyString(devId).c_str(), GetAnonyString(dhId).c_str());
     std::lock_guard<std::mutex> lock(sourceProxyMutex_);
     CHECK_NULL_RETURN(dAudioSourceProxy_, ERR_DH_AUDIO_SA_PROXY_NOT_INIT);
     if (devId.length() > DAUDIO_MAX_DEVICE_ID_LEN || dhId.length() > DAUDIO_MAX_DEVICE_ID_LEN) {
