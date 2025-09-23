@@ -119,7 +119,7 @@ int32_t DSpeakerClient::CreateAudioRenderer(const AudioParam &param)
         },
         {
             static_cast<AudioStandard::ContentType>(audioParam_.renderOpts.contentType),
-            static_cast<AudioStandard::StreamUsage>(audioParam_.renderOpts.streamUsage),
+            static_cast<AudioStandard::StreamUsage>(AudioStandard::StreamUsage::STREAM_USAGE_UNKNOWN),
             audioParam_.renderOpts.renderFlags == MMAP_MODE ? AudioStandard::STREAM_FLAG_FAST : 0,
         }
     };
