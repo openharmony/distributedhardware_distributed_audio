@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -184,25 +184,24 @@ int32_t DAudioSourceStub::DAudioNotifyInner(MessageParcel &data, MessageParcel &
 
 int32_t DAudioSourceStub::UpdateDAudioWorkModeInner(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    if (!VerifyPermission()) {
-        DHLOGE("Permission verification fail.");
-        return ERR_DH_AUDIO_SA_PERMISSION_FAIED;
-    }
     int32_t ret = 0;
     do {
+        CHECK_AND_RETURN_RET_LOG(!VerifyPermission(), ERR_DH_AUDIO_SA_PERMISSION_FAIED,
+            "Permission verification fail.");
         std::string devId = data.ReadString();
         std::string dhId = data.ReadString();
         WorkModeParam params(-1, 0, 0, 0);
         params.fd = data.ReadFileDescriptor();
-
         params.sharedMemLen = data.ReadInt32();
         params.scene = data.ReadUint32();
         params.isAVsync = data.ReadInt32();
+        CHECK_AND_RETURN_RET_LOG(devId.length() > DAUDIO_MAX_DEVICE_ID_LEN || dhId.length() > DAUDIO_MAX_DEVICE_ID_LEN
+            || params.fd < 0 || params.sharedMemLen < 0, ERR_DH_AUDIO_SA_DEVID_ILLEGAL, "Workmode param is illegal.");
         ret = UpdateDistributedHardwareWorkMode(devId, dhId, params);
         DHLOGI("DistributedAudioSourceStub UpdateDistributedHardwareWorkMode %{public}d", ret);
     } while (0);
     reply.WriteInt32(ret);
-    return DH_SUCCESS;
+    return ret;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

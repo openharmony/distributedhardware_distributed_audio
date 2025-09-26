@@ -125,7 +125,7 @@ void DMicDev::SendToProcess(const std::shared_ptr<AudioData> &audioData)
             frameOutIndex_ = 0;
         }
     }
-    DHLOGI("Set timestamp %{public}" PRId64 " for frame index %{public}" PRIu64, audioData->GetPts(), frameOutIndex_);
+    DHLOGD("Set timestamp %{public}" PRId64 " for frame index %{public}" PRIu64, audioData->GetPts(), frameOutIndex_);
     framnum_++;
     DHLOGD("current frame index: %{public}" PRIu64, framnum_);
     if (echoCannelOn_) {
@@ -353,7 +353,7 @@ int32_t DMicDev::NotifyEvent(const int32_t streamId, const AudioEvent &event)
         case AudioEventType::AUDIO_START:
             curStatus_ = AudioStatus::STATUS_START;
             isExistedEmpty_.store(false);
-            isFirstCaptureFrame_.store(true);
+            isStartStatus_.store(true);
             break;
         case AudioEventType::AUDIO_STOP:
             curStatus_ = AudioStatus::STATUS_STOP;
@@ -523,24 +523,126 @@ int32_t DMicDev::WriteStreamData(const int32_t streamId, std::shared_ptr<AudioDa
     return DH_SUCCESS;
 }
 
-int32_t DMicDev::GetAudioDataFromQueue(std::shared_ptr<AudioData> &data)
+int32_t DMicDev::ReadTimeStampFromAVsync(int64_t &timePts)
 {
-    DHLOGI("Data queue size %{public}zu", dataQueue_.size());
-    if (dataQueue_.size() < scene_ && isFirstCaptureFrame_.load()) {
-        DHLOGI("Data queue size less than scene_");
-        data = std::make_shared<AudioData>(param_.comParam.frameSize);
+    CHECK_AND_RETURN_RET_LOG(!IsAVsync() || avsyncAshmem_ == nullptr, ERR_DH_AUDIO_FAILED,
+        "Ashmem is nullptr or IsAVsync is false.");
+    auto syncData = avsyncAshmem_->ReadFromAshmem(avSyncParam_.sharedMemLen, 0);
+    AVsyncShareData *readSyncShareData = reinterpret_cast<AVsyncShareData *>(const_cast<void *>(syncData));
+    while (!readSyncShareData->lock && IsAVsync()) {
+        DHLOGE("AVsync lock is false");
+        syncData = avsyncAshmem_->ReadFromAshmem(avSyncParam_.sharedMemLen, 0);
+        readSyncShareData = reinterpret_cast<AVsyncShareData *>(const_cast<void *>(syncData));
+    }
+    DHLOGI("AVsync lock is true");
+    readSyncShareData->lock = 0;
+    bool ret = avsyncAshmem_->WriteToAshmem(static_cast<void*>(readSyncShareData), sizeof(AVsyncShareData), 0);
+    CHECK_AND_RETURN_RET_LOG(!ret, ERR_DH_AUDIO_FAILED, "Write avsync data failed.");
+    timePts = readSyncShareData->video_current_pts;
+    readSyncShareData->lock = 1;
+    ret = avsyncAshmem_->WriteToAshmem(static_cast<void*>(readSyncShareData), sizeof(AVsyncShareData), 0);
+    CHECK_AND_RETURN_RET_LOG(!ret, ERR_DH_AUDIO_FAILED, "Write avsync data failed.");
+    DHLOGD("readSyncShareData->audio_current_pts: %{public}" PRId64", readSyncShareData->audio_update_clock: "
+        "%{public}" PRId64, readSyncShareData->audio_current_pts, readSyncShareData->audio_update_clock);
+    return DH_SUCCESS;
+}
+
+int32_t DMicDev::WriteTimeStampToAVsync(const int64_t timePts)
+{
+    CHECK_AND_RETURN_RET_LOG(!IsAVsync() || avsyncAshmem_ == nullptr, ERR_DH_AUDIO_FAILED,
+        "Ashmem is nullptr or IsAVsync is false.");
+    auto syncData = avsyncAshmem_->ReadFromAshmem(avSyncParam_.sharedMemLen, 0);
+    AVsyncShareData *readSyncShareData = reinterpret_cast<AVsyncShareData *>(const_cast<void *>(syncData));
+    while (!readSyncShareData->lock && IsAVsync()) {
+        DHLOGE("AVsync lock is false");
+        syncData = avsyncAshmem_->ReadFromAshmem(avSyncParam_.sharedMemLen, 0);
+        readSyncShareData = reinterpret_cast<AVsyncShareData *>(const_cast<void *>(syncData));
+    }
+    DHLOGI("AVsync lock is true");
+    readSyncShareData->lock = 0;
+    bool ret = avsyncAshmem_->WriteToAshmem(static_cast<void*>(readSyncShareData), sizeof(AVsyncShareData), 0);
+    CHECK_AND_RETURN_RET_LOG(!ret, ERR_DH_AUDIO_FAILED, "Write avsync data failed.");
+    struct timespec time = {0, 0};
+    clock_gettime(CLOCK_REALTIME, &time);
+    int64_t updatePts = static_cast<int64_t>(time.tv_sec) * TIME_CONVERSION_STOU +
+        static_cast<int64_t>(time.tv_nsec) / TIME_CONVERSION_NTOU;
+    readSyncShareData->lock = 1;
+    readSyncShareData->audio_current_pts = static_cast<uint64_t>(timePts);
+    readSyncShareData->audio_update_clock = static_cast<uint64_t>(updatePts);
+    ret = avsyncAshmem_->WriteToAshmem(static_cast<void*>(readSyncShareData), sizeof(AVsyncShareData), 0);
+    CHECK_AND_RETURN_RET_LOG(!ret, ERR_DH_AUDIO_FAILED, "Write avsync data failed.");
+    DHLOGD("readSyncShareData->audio_current_pts: %{public}" PRId64", readSyncShareData->audio_update_clock: "
+        "%{public}" PRId64, readSyncShareData->audio_current_pts, readSyncShareData->audio_update_clock);
+    return DH_SUCCESS;
+}
+
+uint32_t DMicDev::GetQueSize()
+{
+    return dataQueue_.size();
+}
+
+bool DMicDev::IsAVsync()
+{
+    bool isAVsync = false;
+    std::lock_guard<std::mutex> lock(avSyncMutex_);
+    isAVsync = avSyncParam_.isAVsync;
+    return isAVsync;
+}
+
+int32_t DMicDev::AVsyncMacthScene(std::shared_ptr<AudioData> &data)
+{
+    std::lock_guard<std::mutex> lock(dataQueueMtx_);
+    if (GetQueSize() < scene_ && isStartStatus_.load()) {
+        int64_t videoPts = 0;
+        int64_t audioPts = 0;
+        int32_t ret = ReadTimeStampFromAVsync(videoPts);
+        CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ERR_DH_AUDIO_FAILED, "ReadTimeStampFromAVsync failed.");
+        if (GetQueSize() != 0) {
+            CHECK_NULL_RETURN(dataQueue_.front(), ERR_DH_AUDIO_FAILED);
+            audioPts = dataQueue_.front()->GetPts();
+        }
+        int64_t diff = static_cast<int64_t>(audioPts/TIME_CONVERSION_NTOU - videoPts/TIME_CONVERSION_STOU);
+        DHLOGD("diff: %{public}" PRId64", videoPts: %{public}" PRId64
+            ", audioPts: %{public}" PRId64, diff, videoPts, audioPts);
+        if (diff > DADUIO_TIME_DIFF_MAX || GetQueSize() == 0) {
+            data = std::make_shared<AudioData>(param_.comParam.frameSize);
+        } else {
+            isStartStatus_.store(false);
+            data = dataQueue_.front();
+            dataQueue_.pop_front();
+        }
         return DH_SUCCESS;
     }
-    isFirstCaptureFrame_.store(false);
-    std::lock_guard<std::mutex> lock(dataQueueMtx_);
-    uint32_t queSize = dataQueue_.size();
-    if (queSize == 0) {
+    isStartStatus_.store(false);
+    if (GetQueSize() == 0) {
         isExistedEmpty_.store(true);
         DHLOGD("Data queue is empty");
         data = std::make_shared<AudioData>(param_.comParam.frameSize);
     } else {
         data = dataQueue_.front();
         dataQueue_.pop_front();
+    }
+    return DH_SUCCESS;
+}
+
+int32_t DMicDev::GetAudioDataFromQueue(std::shared_ptr<AudioData> &data)
+{
+    if (IsAVsync()) {
+        int32_t ret = AVsyncMacthScene(data);
+        if (ret != DH_SUCCESS) {
+            DHLOGD("AVsyncMacthScene failed, insert empty frame");
+            data = std::make_shared<AudioData>(param_.comParam.frameSize);
+        }
+    } else {
+        std::lock_guard<std::mutex> lock(dataQueueMtx_);
+        if (GetQueSize() == 0) {
+            isExistedEmpty_.store(true);
+            DHLOGD("Data queue is empty");
+            data = std::make_shared<AudioData>(param_.comParam.frameSize);
+        } else {
+            data = dataQueue_.front();
+            dataQueue_.pop_front();
+        }
     }
     return DH_SUCCESS;
 }
@@ -553,37 +655,10 @@ int32_t DMicDev::ReadStreamData(const int32_t streamId, std::shared_ptr<AudioDat
         return ERR_DH_AUDIO_FAILED;
     }
     int32_t ret = GetAudioDataFromQueue(data);
-    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS && data ==nullptr, ERR_DH_AUDIO_NULLPTR, "GetAudioData failed");
-    bool isAVsync = false;
-    {
-        std::lock_guard<std::mutex>lock(avSyncMutex_);
-        isAVsync = avSyncParam_.isAVsync;
-    }
-    if (isAVsync && avsyncAshmem_ != nullptr) {
-        auto syncData = avsyncAshmem_->ReadFromAshmem(avSyncParam_.sharedMemLen, 0);
-        AVsyncShareData *readSyncSharedData = reinterpret_cast<AVsyncShareData *>(const_cast<void *>(syncData));
-        while (!readSyncSharedData->lock) {
-            DHLOGE("readSyncSharedData->lock == false");
-            syncData = avsyncAshmem_->ReadFromAshmem(avSyncParam_.sharedMemLen, 0);
-            readSyncSharedData = reinterpret_cast<AVsyncShareData *>(const_cast<void *>(syncData));
-        }
-        avsyncShareData_ = std::make_shared<AVsyncShareData>();
-        avsyncShareData_->lock = 0;
-        ret = avsyncAshmem_->WriteToAshmem(static_cast<void *>(avsyncShareData_.get()), sizeof(AVsyncShareData), 0);
-        CHECK_AND_RETURN_RET_LOG(!ret, ERR_DH_AUDIO_FAILED, "Write avsnc data failed");
-        struct timespec time = {0, 0};
-        clock_gettime(CLOCK_REALTIME, &time);
-        int64_t updatePts = static_cast<int64_t>(time.tv_sec) * TIME_CONVERSION_STOU +
-            static_cast<int64_t>(time.tv_nsec) / TIME_CONVERSION_NTOU;
-        avsyncShareData_->audio_current_pts = static_cast<uint64_t>(data->GetPts());
-        avsyncShareData_->audio_update_clock = static_cast<uint64_t>(updatePts);
-        avsyncShareData_->lock = 1;
-        ret = avsyncAshmem_->WriteToAshmem(static_cast<void*>(avsyncShareData_.get()), sizeof(AVsyncShareData), 0);
-        CHECK_AND_RETURN_RET_LOG(!ret, ERR_DH_AUDIO_FAILED, "Write avsync data failed.");
-        DHLOGI("avsyncShareData_->audio_current_pts: %{public}" PRId64", avsyncShareData_->audio_update_clock: "
-            "%{public}" PRId64, avsyncShareData_->audio_current_pts, avsyncShareData_->audio_update_clock);
-    }
-
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS || data == nullptr, ERR_DH_AUDIO_NULLPTR, "GetAudioData failed");
+    ret = WriteTimeStampToAVsync(data->GetPts());
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ERR_DH_AUDIO_FAILED, "WriteTimeStampToAVsync failed");
+    DHLOGD("Read stream data audioPts: %{public}" PRId64, data->GetPts());
     DumpFileUtil::WriteDumpFile(dumpFileCommn_, static_cast<void *>(data->Data()), data->Size());
     int64_t endTime = GetNowTimeUs();
     if (IsOutDurationRange(startTime, endTime, lastReadStartTime_)) {
@@ -668,7 +743,6 @@ void DMicDev::EnqueueThread()
                 audioData = std::make_shared<AudioData>(param_.comParam.frameSize);
             } else {
                 audioData = dataQueue_.front();
-                DHLOGI("shared_ptr<AudioData> audioData: %{public}" PRId64, audioData->GetPts());
                 dataQueue_.pop_front();
             }
             if (audioData == nullptr) {
@@ -777,21 +851,11 @@ int32_t DMicDev::SendMessage(uint32_t type, std::string content, std::string dst
 
 int32_t DMicDev::OnDecodeTransDataDone(const std::shared_ptr<AudioData> &audioData)
 {
-    DHLOGD("On Decode Trans Data Done.");
-    uint32_t scene = DATA_QUEUE_HALF_SIZE;
-    uint32_t sceneMax = DATA_QUEUE_MAX_SIZE;
-    {
-        std::lock_guard<std::mutex> lock(avSyncMutex_);
-        if (avSyncParam_.isAVsync) {
-            scene = scene_;
-            sceneMax = scene_ + scene_;
-        }
-    }
     CHECK_NULL_RETURN(audioData, ERR_DH_AUDIO_NULLPTR);
     std::lock_guard<std::mutex> lock(dataQueueMtx_);
     dataQueSize_ = curStatus_ != AudioStatus::STATUS_START ?
-        (param_.captureOpts.capturerFlags == MMAP_MODE ? lowLatencyHalfSize_ : scene) :
-        (param_.captureOpts.capturerFlags == MMAP_MODE ? lowLatencyMaxfSize_ : sceneMax);
+        (param_.captureOpts.capturerFlags == MMAP_MODE ? lowLatencyHalfSize_ : scene_) :
+        (param_.captureOpts.capturerFlags == MMAP_MODE ? lowLatencyMaxfSize_ : scene_ + scene_);
     if (isExistedEmpty_.load()) {
         dataQueSize_ = param_.captureOpts.capturerFlags == MMAP_MODE ? dataQueSize_ : DATA_QUEUE_EXT_SIZE;
     }
@@ -808,9 +872,11 @@ int32_t DMicDev::OnDecodeTransDataDone(const std::shared_ptr<AudioData> &audioDa
     writeAudioData->SetPts(audioData->GetPts());
     dataQueue_.push_back(writeAudioData);
     queueSize = static_cast<uint64_t>(dataQueue_.size());
-    DHLOGI("Push new mic data, buf len: %{public}" PRIu64, queueSize);
+    DHLOGD("Push new mic data, buf len: %{public}" PRIu64", audioPts: %{public}" PRId64,
+        queueSize, audioData->GetPts());
     return DH_SUCCESS;
 }
+
 int32_t DMicDev::AVsyncRefreshAshmem(int32_t fd, int32_t ashmemLength)
 {
     DHLOGD("AVsync mode: fd:%{public}d, ashmemLength: %{public}d", fd, ashmemLength);
@@ -824,6 +890,7 @@ int32_t DMicDev::AVsyncRefreshAshmem(int32_t fd, int32_t ashmemLength)
     }
     return DH_SUCCESS;
 }
+
 void DMicDev::AVsyncDeintAshmem()
 {
     if (avsyncAshmem_ != nullptr) {
@@ -839,14 +906,14 @@ int32_t DMicDev::UpdateWorkModeParam(const std::string &devId, const std::string
     avSyncParam_ = param;
     if (avSyncParam_.isAVsync) {
         auto ret = AVsyncRefreshAshmem(avSyncParam_.fd, avSyncParam_.sharedMemLen);
-        scene_ = indexFlag_;
         CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "AVsyncRefreshAshmemInfo failed");
+        scene_ = avSyncParam_.scene == static_cast<int32_t>(AudioAVScene::BROADCAST) ?
+            DATA_QUEUE_BROADCAST_SIZE : DATA_QUEUE_VIDEOCALL_SIZE;
         DHLOGI("AVsync mode opened");
     } else {
         AVsyncDeintAshmem();
         avSyncParam_.fd = -1;
         avSyncParam_.sharedMemLen = 0;
-        scene_ = indexFlag_;
         DHLOGI("AVsync mode closed");
     }
     return DH_SUCCESS;
