@@ -525,7 +525,7 @@ int32_t DMicDev::WriteStreamData(const int32_t streamId, std::shared_ptr<AudioDa
 
 int32_t DMicDev::ReadTimeStampFromAVsync(int64_t &timePts)
 {
-    CHECK_AND_RETURN_RET_LOG(!IsAVsync() || avsyncAshmem_ == nullptr, ERR_DH_AUDIO_FAILED,
+    CHECK_AND_RETURN_RET_LOG(!IsAVsync() || avsyncAshmem_ == nullptr, DH_SUCCESS,
         "Ashmem is nullptr or IsAVsync is false.");
     auto syncData = avsyncAshmem_->ReadFromAshmem(avSyncParam_.sharedMemLen, 0);
     AVsyncShareData *readSyncShareData = reinterpret_cast<AVsyncShareData *>(const_cast<void *>(syncData));
@@ -549,7 +549,7 @@ int32_t DMicDev::ReadTimeStampFromAVsync(int64_t &timePts)
 
 int32_t DMicDev::WriteTimeStampToAVsync(const int64_t timePts)
 {
-    CHECK_AND_RETURN_RET_LOG(!IsAVsync() || avsyncAshmem_ == nullptr, ERR_DH_AUDIO_FAILED,
+    CHECK_AND_RETURN_RET_LOG(!IsAVsync() || avsyncAshmem_ == nullptr, DH_SUCCESS,
         "Ashmem is nullptr or IsAVsync is false.");
     auto syncData = avsyncAshmem_->ReadFromAshmem(avSyncParam_.sharedMemLen, 0);
     AVsyncShareData *readSyncShareData = reinterpret_cast<AVsyncShareData *>(const_cast<void *>(syncData));
