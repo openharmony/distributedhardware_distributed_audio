@@ -53,8 +53,8 @@ int32_t DAudioSinkIpcCallbackStub::OnNotifyResourceInfoInner(MessageParcel &data
     MessageOption &option)
 {
     int32_t ret = DH_SUCCESS;
-    bool isSensitive;
-    bool isSameAccount;
+    bool isSensitive = false;
+    bool isSameAccount = false;
     do {
         ResourceEventType type = static_cast<ResourceEventType>(data.ReadInt32());
         std::string subType = data.ReadString();
