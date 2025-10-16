@@ -133,7 +133,8 @@ void DAudioSinkManager::OnSinkDevReleased(const std::string &devId)
     if (devClearThread_.joinable()) {
         devClearThread_.join();
     }
-    devClearThread_ = std::thread([this, devId]() { this->ClearAudioDev(devId); });
+    auto self = shared_from_this();
+    devClearThread_ = std::thread([self, devId]() { self->ClearAudioDev(devId); });
     if (pthread_setname_np(devClearThread_.native_handle(), DEVCLEAR_THREAD) != DH_SUCCESS) {
         DHLOGE("Dev clear thread setname failed.");
     }
