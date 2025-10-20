@@ -481,6 +481,10 @@ int32_t DMicDev::Release()
     avSyncParam_.fd = -1;
     avSyncParam_.sharedMemLen = 0;
     DHLOGI("AVsync mode closed");
+    std::lock_guard<std::mutex> lock(dataQueueMtx_);
+    {
+        dataQueue_.clear();
+    }
 
     int32_t ret = micTrans_->Release();
     DaudioRadar::GetInstance().ReportMicCloseProgress("Release", MicClose::RELEASE_TRANS, ret);
