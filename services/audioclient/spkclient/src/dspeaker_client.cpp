@@ -637,7 +637,8 @@ void DSpeakerClient::ReStart()
     }
     if (audioParam_.renderOpts.renderFlags != MMAP_MODE) {
         isRenderReady_.store(true);
-        renderDataThread_ = std::thread([this]() { this->PlayThreadRunning(); });
+        auto self = shared_from_this();
+        renderDataThread_ = std::thread([self]() { self->PlayThreadRunning(); });
     }
     if (audioRenderer_ != nullptr) {
         audioRenderer_->Start();
