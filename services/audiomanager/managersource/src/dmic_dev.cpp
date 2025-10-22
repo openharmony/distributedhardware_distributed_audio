@@ -538,7 +538,7 @@ int32_t DMicDev::ReadTimeStampFromAVsync(int64_t &timePts)
     readSyncShareData->lock = 0;
     bool ret = avsyncAshmem_->WriteToAshmem(static_cast<void*>(readSyncShareData), sizeof(AVsyncShareData), 0);
     CHECK_AND_RETURN_RET_LOG(!ret, ERR_DH_AUDIO_FAILED, "Write avsync data failed.");
-    timePts = readSyncShareData->video_current_pts;
+    timePts = static_cast<int64_t>(readSyncShareData->video_current_pts);
     readSyncShareData->lock = 1;
     ret = avsyncAshmem_->WriteToAshmem(static_cast<void*>(readSyncShareData), sizeof(AVsyncShareData), 0);
     CHECK_AND_RETURN_RET_LOG(!ret, ERR_DH_AUDIO_FAILED, "Write avsync data failed.");
@@ -907,7 +907,7 @@ int32_t DMicDev::UpdateWorkModeParam(const std::string &devId, const std::string
     if (avSyncParam_.isAVsync) {
         auto ret = AVsyncRefreshAshmem(avSyncParam_.fd, avSyncParam_.sharedMemLen);
         CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "AVsyncRefreshAshmemInfo failed");
-        scene_ = avSyncParam_.scene == static_cast<int32_t>(AudioAVScene::BROADCAST) ?
+        scene_ = avSyncParam_.scene == static_cast<uint32_t>(AudioAVScene::BROADCAST) ?
             DATA_QUEUE_BROADCAST_SIZE : DATA_QUEUE_VIDEOCALL_SIZE;
         DHLOGI("AVsync mode opened");
     } else {
