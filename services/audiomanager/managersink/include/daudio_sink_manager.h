@@ -55,7 +55,7 @@ class DeviceInitCallback : public DmInitCallback {
     void OnRemoteDied() override;
 };
 
-class DAudioSinkManager : public std::enable_shared_from_this<DAudioSinkManager> {
+class DAudioSinkManager {
 DECLARE_SINGLE_INSTANCE_BASE(DAudioSinkManager);
 public:
     int32_t Init(const sptr<IDAudioSinkIpcCallback> &sinkCallback);
