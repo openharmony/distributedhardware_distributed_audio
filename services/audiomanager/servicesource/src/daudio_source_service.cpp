@@ -72,6 +72,7 @@ int32_t DAudioSourceService::InitSource(const std::string &params, const sptr<ID
 {
     DHLOGI("Init source service.");
     (void)params;
+    CHECK_NULL_RETURN(callback, ERR_DH_AUDIO_NULLPTR);
     int32_t ret = DAudioSourceManager::GetInstance().Init(callback);
     if (ret != DH_SUCCESS) {
         DHLOGE("Distributed audio source manager init failed.");

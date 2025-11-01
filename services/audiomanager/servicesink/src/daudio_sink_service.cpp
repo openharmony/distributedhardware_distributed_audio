@@ -76,6 +76,7 @@ bool DAudioSinkService::Init()
 
 int32_t DAudioSinkService::InitSink(const std::string &params, const sptr<IDAudioSinkIpcCallback> &sinkCallback)
 {
+    CHECK_NULL_RETURN(sinkCallback, ERR_DH_AUDIO_NULLPTR);
     DAudioSinkManager::GetInstance().Init(sinkCallback);
     auto callerTokenId = GetFirstCallerTokenID();
     DAudioSinkManager::GetInstance().SetCallerTokenId(callerTokenId);
