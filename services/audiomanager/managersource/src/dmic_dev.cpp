@@ -538,7 +538,6 @@ int32_t DMicDev::ReadTimeStampFromAVsync(int64_t &timePts)
         syncData = avsyncAshmem_->ReadFromAshmem(avSyncParam_.sharedMemLen, 0);
         readSyncShareData = reinterpret_cast<AVsyncShareData *>(const_cast<void *>(syncData));
     }
-    DHLOGI("AVsync lock is true");
     readSyncShareData->lock = 0;
     bool ret = avsyncAshmem_->WriteToAshmem(static_cast<void*>(readSyncShareData), sizeof(AVsyncShareData), 0);
     CHECK_AND_RETURN_RET_LOG(!ret, ERR_DH_AUDIO_FAILED, "Write avsync data failed.");
@@ -562,7 +561,6 @@ int32_t DMicDev::WriteTimeStampToAVsync(const int64_t timePts)
         syncData = avsyncAshmem_->ReadFromAshmem(avSyncParam_.sharedMemLen, 0);
         readSyncShareData = reinterpret_cast<AVsyncShareData *>(const_cast<void *>(syncData));
     }
-    DHLOGI("AVsync lock is true");
     readSyncShareData->lock = 0;
     bool ret = avsyncAshmem_->WriteToAshmem(static_cast<void*>(readSyncShareData), sizeof(AVsyncShareData), 0);
     CHECK_AND_RETURN_RET_LOG(!ret, ERR_DH_AUDIO_FAILED, "Write avsync data failed.");
@@ -606,7 +604,7 @@ int32_t DMicDev::AVsyncMacthScene(std::shared_ptr<AudioData> &data)
             audioPts = dataQueue_.front()->GetPts();
         }
         int64_t diff = static_cast<int64_t>(audioPts/TIME_CONVERSION_NTOU - videoPts/TIME_CONVERSION_STOU);
-        DHLOGD("diff: %{public}" PRId64", videoPts: %{public}" PRId64
+        DHLOGI("diff: %{public}" PRId64", videoPts: %{public}" PRId64
             ", audioPts: %{public}" PRId64, diff, videoPts, audioPts);
         if (diff > DADUIO_TIME_DIFF_MAX || GetQueSize() == 0) {
             data = std::make_shared<AudioData>(param_.comParam.frameSize);
