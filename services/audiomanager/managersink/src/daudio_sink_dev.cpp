@@ -751,10 +751,11 @@ void DAudioSinkDev::SinkEventHandler::NotifyOpenSpeaker(const AppExecFwk::InnerE
 
     int32_t dhId = sinkDevObj->ParseDhidFromEvent(eventParam);
     CHECK_AND_RETURN_LOG(dhId == -1, "%{public}s", "Parse dhId error.");
-    sinkDevObj->SetUserId(ParseValueFromEvent(eventParam, KEY_USERID));
+    int32_t ret = ParseValueFromEvent(eventParam, KEY_USERID);
+    sinkDevObj->SetUserId(ret == ERR_DH_AUDIO_FAILED ? -1 : ret);
     sinkDevObj->SetTokenId(ParseValueFromEvent(eventParam, KEY_TOKENID));
     sinkDevObj->SetAccountId(ParseStringFromEvent(eventParam, KEY_ACCOUNTID));
-    int32_t ret = sinkDevObj->TaskOpenDSpeaker(eventParam);
+    ret = sinkDevObj->TaskOpenDSpeaker(eventParam);
     sinkDevObj->NotifySourceDev(NOTIFY_OPEN_SPEAKER_RESULT, std::to_string(dhId), ret);
     DHLOGI("Open speaker device task end, notify source ret %{public}d.", ret);
     CHECK_AND_RETURN_LOG(ret != DH_SUCCESS, "%{public}s", "Open speaker failed.");
@@ -873,10 +874,11 @@ void DAudioSinkDev::SinkEventHandler::NotifyOpenMic(const AppExecFwk::InnerEvent
         cJSON_Delete(jParam);
         return;
     }
-    sinkDevObj->SetUserId(ParseValueFromEvent(eventParam, KEY_USERID));
+    int32_t ret = ParseValueFromEvent(eventParam, KEY_USERID);
+    sinkDevObj->SetUserId(ret == ERR_DH_AUDIO_FAILED ? -1 : ret);
     sinkDevObj->SetTokenId(ParseValueFromEvent(eventParam, KEY_TOKENID));
     sinkDevObj->SetAccountId(ParseStringFromEvent(eventParam, KEY_ACCOUNTID));
-    int32_t ret = sinkDevObj->TaskOpenDMic(eventParam);
+    ret = sinkDevObj->TaskOpenDMic(eventParam);
     sinkDevObj->NotifySourceDev(NOTIFY_OPEN_MIC_RESULT,
         std::string(cJSON_GetObjectItem(jParam, KEY_DH_ID)->valuestring), ret);
     DHLOGI("Open mic device task end, notify source ret %{public}d.", ret);
