@@ -471,21 +471,19 @@ int32_t DMicDev::Release()
         ashmem_ = nullptr;
         DHLOGI("UnInit ashmem success.");
     }
+    AVsyncDeintAshmem();
+    avSyncParam_.fd = -1;
+    avSyncParam_.sharedMemLen = 0;
+    DHLOGI("AVsync mode closed");
+    {
+        std::lock_guard<std::mutex> lock(dataQueueMtx_);
+        dataQueue_.clear();
+    }
     if (micCtrlTrans_ != nullptr) {
         int32_t res = micCtrlTrans_->Release();
         CHECK_AND_RETURN_RET_LOG(res != DH_SUCCESS, res, "Mic ctrl Release failed.");
     }
     CHECK_NULL_RETURN(micTrans_, DH_SUCCESS);
-
-    AVsyncDeintAshmem();
-    avSyncParam_.fd = -1;
-    avSyncParam_.sharedMemLen = 0;
-    DHLOGI("AVsync mode closed");
-    std::lock_guard<std::mutex> lock(dataQueueMtx_);
-    {
-        dataQueue_.clear();
-    }
-
     int32_t ret = micTrans_->Release();
     DaudioRadar::GetInstance().ReportMicCloseProgress("Release", MicClose::RELEASE_TRANS, ret);
     if (ret != DH_SUCCESS) {
