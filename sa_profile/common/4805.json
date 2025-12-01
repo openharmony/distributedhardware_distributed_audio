@@ -6,7 +6,11 @@
             "libpath": "libdistributed_audio_source.z.so",
             "run-on-create": false,
             "distributed": true,
-            "dump_level": 1
+            "dump_level": 1,
+            "min_hdi_proxy_version": [
+                "libdaudio_proxy_1.0.z.so",
+                "libdaudioext_proxy_2.1.z.so"
+            ]
         }
     ]
 }
