@@ -8,7 +8,7 @@
             "distributed": false,
             "dump_level": 1,
             "min_hdi_proxy_version": [
-                "libdaudioext_proxy_2.1.z.so",
+                "libdaudio_proxy_1.0.z.so",
                 "libdaudioext_proxy_2.1.z.so"
             ]
         }
