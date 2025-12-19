@@ -15,6 +15,7 @@
 
 #include "daudio_sink_proxy.h"
 
+#include "anonymous_string.h"
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
 #include "daudio_ipc_interface_code.h"
@@ -202,6 +203,65 @@ int32_t DAudioSinkProxy::StopDistributedHardware(const std::string &networkId)
         return ERR_DH_AUDIO_NULLPTR;
     }
     Remote()->SendRequest(static_cast<uint32_t>(IDAudioSinkInterfaceCode::STOP_DISTRIBUTED_HARDWARE),
+        data, reply, option);
+    return reply.ReadInt32();
+}
+
+int32_t DAudioSinkProxy::SetAccessListener(const sptr<IAccessListener> &listener, int32_t timeOut,
+    const std::string &pkgName)
+{
+    DHLOGI("SetAccessListener");
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+
+    CHECK_AND_RETURN_RET_LOG(!data.WriteInterfaceToken(GetDescriptor()), ERR_DH_AUDIO_SA_WRITE_INTERFACE_TOKEN_FAILED,
+        "write token failed.");
+    CHECK_AND_RETURN_RET_LOG(listener == nullptr, ERR_DH_AUDIO_NULLPTR, "listener is null.");
+    CHECK_AND_RETURN_RET_LOG(!data.WriteRemoteObject(listener->AsObject()), ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED,
+        "write listener failed.");
+    CHECK_AND_RETURN_RET_LOG(!data.WriteInt32(timeOut), ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED, "write timeOut failed.");
+    CHECK_AND_RETURN_RET_LOG(!data.WriteString(pkgName), ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED, "write pkgName failed.");
+    CHECK_AND_RETURN_RET_LOG(Remote() == nullptr, ERR_DH_AUDIO_NULLPTR, "remote service is null.");
+
+    Remote()->SendRequest(static_cast<uint32_t>(IDAudioSinkInterfaceCode::SET_ACCESS_LISTENER),
+        data, reply, option);
+    return reply.ReadInt32();
+}
+
+int32_t DAudioSinkProxy::RemoveAccessListener(const std::string &pkgName)
+{
+    DHLOGI("RemoveAccessListener");
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+
+    CHECK_AND_RETURN_RET_LOG(!data.WriteInterfaceToken(GetDescriptor()), ERR_DH_AUDIO_SA_WRITE_INTERFACE_TOKEN_FAILED,
+        "write token failed.");
+    CHECK_AND_RETURN_RET_LOG(!data.WriteString(pkgName), ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED, "write pkgName failed.");
+    CHECK_AND_RETURN_RET_LOG(Remote() == nullptr, ERR_DH_AUDIO_NULLPTR, "remote service is null.");
+
+    Remote()->SendRequest(static_cast<uint32_t>(IDAudioSinkInterfaceCode::REMOVE_ACCESS_LISTENER),
+        data, reply, option);
+    return reply.ReadInt32();
+}
+
+int32_t DAudioSinkProxy::SetAuthorizationResult(const std::string &requestId, bool granted)
+{
+    DHLOGI("SetAuthorizationResult, requestId: %{public}s, granted: %{public}d",
+        GetAnonyString(requestId).c_str(), granted);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+
+    CHECK_AND_RETURN_RET_LOG(!data.WriteInterfaceToken(GetDescriptor()), ERR_DH_AUDIO_SA_WRITE_INTERFACE_TOKEN_FAILED,
+        "write token failed.");
+    CHECK_AND_RETURN_RET_LOG(!data.WriteString(requestId), ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED,
+        "write requestId failed.");
+    CHECK_AND_RETURN_RET_LOG(!data.WriteBool(granted), ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED, "write granted failed.");
+    CHECK_AND_RETURN_RET_LOG(Remote() == nullptr, ERR_DH_AUDIO_NULLPTR, "remote service is null.");
+
+    Remote()->SendRequest(static_cast<uint32_t>(IDAudioSinkInterfaceCode::SET_AUTHORIZATION_RESULT),
         data, reply, option);
     return reply.ReadInt32();
 }

@@ -74,6 +74,10 @@ public:
     int32_t StopDistributedHardware(const std::string &networkId);
     void SetCallerTokenId(uint64_t tokenId);
     int32_t CheckOsType(const std::string &networkId, bool &isInvalid);
+    void SetAccessListener(const sptr<IAccessListener> &listener, int32_t timeOut,
+        const std::string &pkgName);
+    void RemoveAccessListener(const std::string &pkgName);
+    void SetAuthorizationResult(const std::string &requestId, bool granted);
 
 private:
     DAudioSinkManager();

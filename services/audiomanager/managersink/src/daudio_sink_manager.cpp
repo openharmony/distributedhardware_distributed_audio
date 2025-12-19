@@ -19,6 +19,7 @@
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 
+#include "av_sync_utils.h"
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
 #include "daudio_log.h"
@@ -611,6 +612,36 @@ int32_t DAudioSinkManager::CheckOsType(const std::string &networkId, bool &isInv
 void DAudioSinkManager::SetCallerTokenId(uint64_t tokenId)
 {
     callerTokenId_ = tokenId;
+}
+
+void DAudioSinkManager::SetAccessListener(const sptr<IAccessListener> &listener, int32_t timeOut,
+    const std::string &pkgName)
+{
+    DHLOGI("SetAccessListener timeOut:%{public}d, pkgName:%{public}s.", timeOut, pkgName.c_str());
+    int32_t ret = DAudioAccessConfigManager::GetInstance().SetAccessConfig(listener, timeOut, pkgName);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("SetAccessConfig failed, ret: %{public}d", ret);
+    }
+}
+
+void DAudioSinkManager::RemoveAccessListener(const std::string &pkgName)
+{
+    DHLOGI("RemoveAccessListener pkgName:%{public}s.", pkgName.c_str());
+    DAudioAccessConfigManager::GetInstance().ClearAccessConfigByPkgName(pkgName);
+}
+
+void DAudioSinkManager::SetAuthorizationResult(const std::string &requestId, bool granted)
+{
+    DHLOGI("SetAuthorizationResult requestId:%{public}s, granted:%{public}d.",
+        requestId.c_str(), granted);
+
+    if (requestId.empty()) {
+        DHLOGE("requestId is empty");
+        return;
+    }
+    SoftbusChannelAdapter::GetInstance().ProcessAuthorizationResult(requestId, granted);
+    DHLOGI("SetAuthorizationResult completed for requestId: %{public}s",
+        requestId.c_str());
 }
 
 void DeviceInitCallback::OnRemoteDied()

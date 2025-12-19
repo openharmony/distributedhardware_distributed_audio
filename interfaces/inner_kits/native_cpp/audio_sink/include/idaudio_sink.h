@@ -18,6 +18,7 @@
 
 #include "idaudio_sink_ipc_callback.h"
 #include "iremote_broker.h"
+#include "iaccess_listener.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -35,6 +36,10 @@ public:
     virtual int32_t PauseDistributedHardware(const std::string &networkId) = 0;
     virtual int32_t ResumeDistributedHardware(const std::string &networkId) = 0;
     virtual int32_t StopDistributedHardware(const std::string &networkId) = 0;
+    virtual int32_t SetAccessListener(const sptr<IAccessListener> &listener, int32_t timeOut,
+        const std::string &pkgName) = 0;
+    virtual int32_t RemoveAccessListener(const std::string &pkgName) = 0;
+    virtual int32_t SetAuthorizationResult(const std::string &requestId, bool granted) = 0;
 };
 } // DistributedHardware
 } // OHOS

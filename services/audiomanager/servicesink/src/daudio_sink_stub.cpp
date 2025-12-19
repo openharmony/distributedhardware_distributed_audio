@@ -49,6 +49,12 @@ DAudioSinkStub::DAudioSinkStub() : IRemoteStub(true)
         &DAudioSinkStub::ResumeDistributedHardwareInner;
     memberFuncMap_[static_cast<uint32_t>(IDAudioSinkInterfaceCode::STOP_DISTRIBUTED_HARDWARE)] =
         &DAudioSinkStub::StopDistributedHardwareInner;
+    memberFuncMap_[static_cast<uint32_t>(IDAudioSinkInterfaceCode::SET_ACCESS_LISTENER)] =
+        &DAudioSinkStub::SetAccessListenerInner;
+    memberFuncMap_[static_cast<uint32_t>(IDAudioSinkInterfaceCode::REMOVE_ACCESS_LISTENER)] =
+        &DAudioSinkStub::RemoveAccessListenerInner;
+    memberFuncMap_[static_cast<uint32_t>(IDAudioSinkInterfaceCode::SET_AUTHORIZATION_RESULT)] =
+        &DAudioSinkStub::SetAuthorizationResultInner;
 }
 
 DAudioSinkStub::~DAudioSinkStub()
@@ -83,6 +89,12 @@ int32_t DAudioSinkStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Mess
             return ResumeDistributedHardwareInner(data, reply, option);
         case static_cast<uint32_t>(IDAudioSinkInterfaceCode::STOP_DISTRIBUTED_HARDWARE):
             return StopDistributedHardwareInner(data, reply, option);
+        case static_cast<uint32_t>(IDAudioSinkInterfaceCode::SET_ACCESS_LISTENER):
+            return SetAccessListenerInner(data, reply, option);
+        case static_cast<uint32_t>(IDAudioSinkInterfaceCode::REMOVE_ACCESS_LISTENER):
+            return RemoveAccessListenerInner(data, reply, option);
+        case static_cast<uint32_t>(IDAudioSinkInterfaceCode::SET_AUTHORIZATION_RESULT):
+            return SetAuthorizationResultInner(data, reply, option);
         default:
             DHLOGE("Invalid request code.");
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -194,6 +206,47 @@ int32_t DAudioSinkStub::StopDistributedHardwareInner(MessageParcel &data, Messag
     }
     std::string networkId = data.ReadString();
     int32_t ret = StopDistributedHardware(networkId);
+    reply.WriteInt32(ret);
+    return DH_SUCCESS;
+}
+
+int32_t DAudioSinkStub::SetAccessListenerInner(MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    if (!VerifyPermission()) {
+        DHLOGE("Permission verification fail.");
+        return ERR_DH_AUDIO_SA_PERMISSION_FAIED;
+    }
+    sptr<IRemoteObject> remoteObject = data.ReadRemoteObject();
+    CHECK_NULL_RETURN(remoteObject, ERR_DH_AUDIO_NULLPTR);
+    sptr<IAccessListener> listener = iface_cast<IAccessListener>(remoteObject);
+    int32_t timeOut = data.ReadInt32();
+    std::string pkgName = data.ReadString();
+    int32_t ret = SetAccessListener(listener, timeOut, pkgName);
+    reply.WriteInt32(ret);
+    return DH_SUCCESS;
+}
+
+int32_t DAudioSinkStub::RemoveAccessListenerInner(MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    if (!VerifyPermission()) {
+        DHLOGE("Permission verification fail.");
+        return ERR_DH_AUDIO_SA_PERMISSION_FAIED;
+    }
+    std::string pkgName = data.ReadString();
+    int32_t ret = RemoveAccessListener(pkgName);
+    reply.WriteInt32(ret);
+    return DH_SUCCESS;
+}
+
+int32_t DAudioSinkStub::SetAuthorizationResultInner(MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    if (!VerifyPermission()) {
+        DHLOGE("Permission verification fail.");
+        return ERR_DH_AUDIO_SA_PERMISSION_FAIED;
+    }
+    std::string requestId = data.ReadString();
+    bool granted = data.ReadBool();
+    int32_t ret = SetAuthorizationResult(requestId, granted);
     reply.WriteInt32(ret);
     return DH_SUCCESS;
 }

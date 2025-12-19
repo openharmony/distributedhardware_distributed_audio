@@ -21,6 +21,7 @@
 
 #include "daudio_errorcode.h"
 #include "daudio_sink_proxy.h"
+#include "iaccess_listener.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -32,6 +33,22 @@ public:
     void TearDown();
 
     std::shared_ptr<DAudioSinkProxy> dAudioProxy = nullptr;
+
+    class TestAccessListener : public IAccessListener {
+        sptr<IRemoteObject> AsObject()
+        {
+            return nullptr;
+        }
+
+        void OnRequestHardwareAccess(const std::string &requestId, AuthDeviceInfo info, const DHType dhType,
+            const std::string &pkgName)
+        {
+            (void)requestId;
+            (void)info;
+            (void)dhType;
+            (void)pkgName;
+        }
+    };
 };
 } // namespace DistributedHardware
 } // namespace OHOS

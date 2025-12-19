@@ -162,5 +162,28 @@ int32_t DAudioSinkService::StopDistributedHardware(const std::string &networkId)
     DAudioSinkManager::GetInstance().StopDistributedHardware(networkId);
     return DH_SUCCESS;
 }
+
+int32_t DAudioSinkService::SetAccessListener(const sptr<IAccessListener> &listener, int32_t timeOut,
+    const std::string &pkgName)
+{
+    DHLOGI("SetAccessListener timeOut:%{public}d, pkgName:%{public}s.", timeOut, pkgName.c_str());
+    DAudioSinkManager::GetInstance().SetAccessListener(listener, timeOut, pkgName);
+    return DH_SUCCESS;
+}
+
+int32_t DAudioSinkService::RemoveAccessListener(const std::string &pkgName)
+{
+    DHLOGI("RemoveAccessListener pkgName:%{public}s.", pkgName.c_str());
+    DAudioSinkManager::GetInstance().RemoveAccessListener(pkgName);
+    return DH_SUCCESS;
+}
+
+int32_t DAudioSinkService::SetAuthorizationResult(const std::string &requestId, bool granted)
+{
+    DHLOGI("SetAuthorizationResult requestId:%{public}s, granted:%{public}d.",
+        requestId.c_str(), granted);
+    DAudioSinkManager::GetInstance().SetAuthorizationResult(requestId, granted);
+    return DH_SUCCESS;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

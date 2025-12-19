@@ -21,6 +21,7 @@
 #define private public
 #include "daudio_sink_manager.h"
 #undef private
+#include "iaccess_listener.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -33,6 +34,22 @@ public:
 
     DAudioSinkManager daudioSinkManager;
     sptr<IRemoteObject> remoteObject_ = nullptr;
+
+    class TestAccessListener : public IAccessListener {
+        sptr<IRemoteObject> AsObject()
+        {
+            return nullptr;
+        }
+
+        void OnRequestHardwareAccess(const std::string &requestId, AuthDeviceInfo info, const DHType dhType,
+            const std::string &pkgName)
+        {
+            (void)requestId;
+            (void)info;
+            (void)dhType;
+            (void)pkgName;
+        }
+    };
 };
 } // namespace DistributedHardware
 } // namespace OHOS
