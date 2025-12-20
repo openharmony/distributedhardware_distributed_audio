@@ -45,6 +45,7 @@ ohos_unittest("AudioSinkTest") {
     "c_utils:utils",
     "distributed_hardware_fwk:distributedhardwareutils",
     "googletest:gmock",
+    "googletest:gmock_main",
     "hilog:libhilog",
     "ipc:ipc_core",
     "samgr:samgr_proxy",

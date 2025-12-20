@@ -318,5 +318,79 @@ HWTEST_F(DAudioSinkManagerTest, ParseValueFromCjson_001, TestSize.Level1)
     result = daudioSinkManager.ParseValueFromCjson(jsonStr, key);
     EXPECT_EQ(result, ERR_DH_AUDIO_FAILED);
 }
+
+/**
+ * @tc.name: SetAccessListener_001
+ * @tc.desc: Verify the SetAccessListener function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DAudioSinkManagerTest, SetAccessListener_001, TestSize.Level1)
+{
+    sptr<IAccessListener> listener = nullptr;
+    int32_t timeOut = 5000;
+    std::string pkgName = "com.example.test";
+    daudioSinkManager.SetAccessListener(listener, timeOut, pkgName);
+
+    timeOut = 0;
+    pkgName = "";
+    daudioSinkManager.SetAccessListener(listener, timeOut, pkgName);
+
+    timeOut = -1;
+    pkgName = "com.test.empty";
+    daudioSinkManager.SetAccessListener(listener, timeOut, pkgName);
+
+    timeOut = 30000;
+    sptr<IAccessListener> accessListener(new TestAccessListener());
+    pkgName = "com.test.empty";
+    EXPECT_NO_FATAL_FAILURE(daudioSinkManager.SetAccessListener(accessListener, timeOut, pkgName));
+}
+
+/**
+ * @tc.name: RemoveAccessListener_001
+ * @tc.desc: Verify the RemoveAccessListener function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DAudioSinkManagerTest, RemoveAccessListener_001, TestSize.Level1)
+{
+    std::string pkgName = "com.example.test";
+    daudioSinkManager.RemoveAccessListener(pkgName);
+
+    pkgName = "";
+    daudioSinkManager.RemoveAccessListener(pkgName);
+
+    pkgName = "very.long.package.name.that.exceeds.normal.length.for.testing.purposes";
+    daudioSinkManager.RemoveAccessListener(pkgName);
+
+    pkgName = "com.test123.special!@#$%^&*()_+";
+    EXPECT_NO_FATAL_FAILURE(daudioSinkManager.RemoveAccessListener(pkgName));
+}
+
+/**
+ * @tc.name: SetAuthorizationResult_001
+ * @tc.desc: Verify the SetAuthorizationResult function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DAudioSinkManagerTest, SetAuthorizationResult_001, TestSize.Level1)
+{
+    std::string requestId = "123";
+    bool granted = true;
+    daudioSinkManager.SetAuthorizationResult(requestId, granted);
+
+    granted = false;
+    daudioSinkManager.SetAuthorizationResult(requestId, granted);
+
+    requestId = "empty.request.test";
+    daudioSinkManager.SetAuthorizationResult(requestId, granted);
+
+    requestId = "";
+    daudioSinkManager.SetAuthorizationResult(requestId, granted);
+
+    requestId = "very.long.request.id.that.exceeds.normal.length.for.testing.purposes";
+    granted = true;
+    EXPECT_NO_FATAL_FAILURE(daudioSinkManager.SetAuthorizationResult(requestId, granted));
+}
 } // DistributedHardware
 } // OHOS

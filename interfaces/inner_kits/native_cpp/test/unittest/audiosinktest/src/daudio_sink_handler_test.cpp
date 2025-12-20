@@ -164,5 +164,167 @@ HWTEST_F(DAudioSinkHandlerTest, LocalHardware_006, TestSize.Level1)
     EXPECT_EQ(DH_SUCCESS, ret);
     EXPECT_EQ(DH_SUCCESS, DAudioSinkHandler::GetInstance().StopDistributedHardware(networkId));
 }
+
+/**
+ * @tc.name: LocalHardware_007
+ * @tc.desc: Verify the SetAccessListener function with valid parameters.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DAudioSinkHandlerTest, LocalHardware_007, TestSize.Level1)
+{
+    sptr<IAccessListener> listener = nullptr;
+    int32_t timeOut = 5000;
+    std::string pkgName = "com.example.test";
+    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    ASSERT_TRUE(samgr != nullptr);
+    sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID);
+    sptr<IDAudioSink> proxy(new DAudioSinkProxy(remoteObject));
+    DAudioSinkHandler::GetInstance().dAudioSinkProxy_ = proxy;
+    int32_t ret = DAudioSinkHandler::GetInstance().SetAccessListener(listener, timeOut, pkgName);
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, ret);
+}
+
+/**
+ * @tc.name: LocalHardware_008
+ * @tc.desc: Verify the SetAccessListener function with null proxy.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DAudioSinkHandlerTest, LocalHardware_008, TestSize.Level1)
+{
+    sptr<IAccessListener> listener = nullptr;
+    int32_t timeOut = 3000;
+    std::string pkgName = "com.example.test";
+    DAudioSinkHandler::GetInstance().dAudioSinkProxy_ = nullptr;
+    int32_t ret = DAudioSinkHandler::GetInstance().SetAccessListener(listener, timeOut, pkgName);
+    EXPECT_EQ(ERR_DH_AUDIO_SA_PROXY_NOT_INIT, ret);
+}
+
+/**
+ * @tc.name: LocalHardware_009
+ * @tc.desc: Verify the SetAccessListener function with different parameters.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DAudioSinkHandlerTest, LocalHardware_009, TestSize.Level1)
+{
+    sptr<IAccessListener> listener = nullptr;
+    int32_t timeOut = 0;
+    std::string emptyPkgName = "";
+    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    ASSERT_TRUE(samgr != nullptr);
+    sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID);
+    sptr<IDAudioSink> proxy(new DAudioSinkProxy(remoteObject));
+    DAudioSinkHandler::GetInstance().dAudioSinkProxy_ = proxy;
+    int32_t ret = DAudioSinkHandler::GetInstance().SetAccessListener(listener, timeOut, emptyPkgName);
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, ret);
+}
+
+/**
+ * @tc.name: LocalHardware_010
+ * @tc.desc: Verify the RemoveAccessListener function with valid parameters.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DAudioSinkHandlerTest, LocalHardware_010, TestSize.Level1)
+{
+    std::string pkgName = "com.example.test";
+    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    ASSERT_TRUE(samgr != nullptr);
+    sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID);
+    sptr<IDAudioSink> proxy(new DAudioSinkProxy(remoteObject));
+    DAudioSinkHandler::GetInstance().dAudioSinkProxy_ = proxy;
+    int32_t ret = DAudioSinkHandler::GetInstance().RemoveAccessListener(pkgName);
+    EXPECT_EQ(DH_SUCCESS, ret);
+}
+
+/**
+ * @tc.name: LocalHardware_011
+ * @tc.desc: Verify the RemoveAccessListener function with null proxy.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DAudioSinkHandlerTest, LocalHardware_011, TestSize.Level1)
+{
+    std::string pkgName = "com.example.test";
+    DAudioSinkHandler::GetInstance().dAudioSinkProxy_ = nullptr;
+    int32_t ret = DAudioSinkHandler::GetInstance().RemoveAccessListener(pkgName);
+    EXPECT_EQ(ERR_DH_AUDIO_SA_PROXY_NOT_INIT, ret);
+}
+
+/**
+ * @tc.name: LocalHardware_012
+ * @tc.desc: Verify the RemoveAccessListener function with empty package name.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DAudioSinkHandlerTest, LocalHardware_012, TestSize.Level1)
+{
+    std::string emptyPkgName = "";
+    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    ASSERT_TRUE(samgr != nullptr);
+    sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID);
+    sptr<IDAudioSink> proxy(new DAudioSinkProxy(remoteObject));
+    DAudioSinkHandler::GetInstance().dAudioSinkProxy_ = proxy;
+    int32_t ret = DAudioSinkHandler::GetInstance().RemoveAccessListener(emptyPkgName);
+    EXPECT_EQ(DH_SUCCESS, ret);
+}
+
+/**
+ * @tc.name: LocalHardware_013
+ * @tc.desc: Verify the SetAuthorizationResult function with valid parameters.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DAudioSinkHandlerTest, LocalHardware_013, TestSize.Level1)
+{
+    std::string requestId = "123";
+    bool granted = true;
+    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    ASSERT_TRUE(samgr != nullptr);
+    sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID);
+    sptr<IDAudioSink> proxy(new DAudioSinkProxy(remoteObject));
+    DAudioSinkHandler::GetInstance().dAudioSinkProxy_ = proxy;
+    int32_t ret = DAudioSinkHandler::GetInstance().SetAuthorizationResult(requestId, granted);
+    EXPECT_EQ(DH_SUCCESS, ret);
+}
+
+/**
+ * @tc.name: LocalHardware_014
+ * @tc.desc: Verify the SetAuthorizationResult function with null proxy.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DAudioSinkHandlerTest, LocalHardware_014, TestSize.Level1)
+{
+    std::string requestId = "456";
+    bool granted = false;
+    DAudioSinkHandler::GetInstance().dAudioSinkProxy_ = nullptr;
+    int32_t ret = DAudioSinkHandler::GetInstance().SetAuthorizationResult(requestId, granted);
+    EXPECT_EQ(ERR_DH_AUDIO_SA_PROXY_NOT_INIT, ret);
+}
+
+/**
+ * @tc.name: LocalHardware_015
+ * @tc.desc: Verify the SetAuthorizationResult function with different parameters.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DAudioSinkHandlerTest, LocalHardware_015, TestSize.Level1)
+{
+    std::string emptyRequestId = "";
+    bool granted = true;
+    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    ASSERT_TRUE(samgr != nullptr);
+    sptr<IRemoteObject> remoteObject = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_AUDIO_SINK_SA_ID);
+    sptr<IDAudioSink> proxy(new DAudioSinkProxy(remoteObject));
+    DAudioSinkHandler::GetInstance().dAudioSinkProxy_ = proxy;
+    int32_t ret = DAudioSinkHandler::GetInstance().SetAuthorizationResult(emptyRequestId, granted);
+    EXPECT_EQ(DH_SUCCESS, ret);
+    std::string requestId2 = "789";
+    ret = DAudioSinkHandler::GetInstance().SetAuthorizationResult(requestId2, false);
+    EXPECT_EQ(DH_SUCCESS, ret);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

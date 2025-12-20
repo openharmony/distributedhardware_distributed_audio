@@ -41,6 +41,10 @@ public:
     int32_t PauseDistributedHardware(const std::string &networkId) override;
     int32_t ResumeDistributedHardware(const std::string &networkId) override;
     int32_t StopDistributedHardware(const std::string &networkId) override;
+    int32_t SetAccessListener(const sptr<IAccessListener> &listener, int32_t timeOut,
+        const std::string &pkgName) override;
+    int32_t RemoveAccessListener(const std::string &pkgName) override;
+    int32_t SetAuthorizationResult(const std::string &requestId, bool granted) override;
 
 protected:
     void OnStart() override;

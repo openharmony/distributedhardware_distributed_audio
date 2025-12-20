@@ -193,5 +193,31 @@ int32_t DAudioSinkHandler::StopDistributedHardware(const std::string &networkId)
     CHECK_NULL_RETURN(dAudioSinkProxy_, ERR_DH_AUDIO_SA_PROXY_NOT_INIT);
     return dAudioSinkProxy_->StopDistributedHardware(networkId);
 }
+
+int32_t DAudioSinkHandler::SetAccessListener(sptr<IAccessListener> listener, int32_t &timeOut,
+    const std::string &pkgName)
+{
+    DHLOGI("SetAccessListener timeOut:%{public}d, pkgName:%{public}s.", timeOut, pkgName.c_str());
+    std::lock_guard<std::mutex> lock(sinkProxyMutex_);
+    CHECK_NULL_RETURN(dAudioSinkProxy_, ERR_DH_AUDIO_SA_PROXY_NOT_INIT);
+    return dAudioSinkProxy_->SetAccessListener(listener, timeOut, pkgName);
+}
+
+int32_t DAudioSinkHandler::RemoveAccessListener(const std::string &pkgName)
+{
+    DHLOGI("RemoveAccessListener pkgName:%{public}s.", pkgName.c_str());
+    std::lock_guard<std::mutex> lock(sinkProxyMutex_);
+    CHECK_NULL_RETURN(dAudioSinkProxy_, ERR_DH_AUDIO_SA_PROXY_NOT_INIT);
+    return dAudioSinkProxy_->RemoveAccessListener(pkgName);
+}
+
+int32_t DAudioSinkHandler::SetAuthorizationResult(const std::string &requestId, bool granted)
+{
+    DHLOGI("SetAuthorizationResult requestId:%{public}s, granted:%{public}d.",
+        requestId.c_str(), granted);
+    std::lock_guard<std::mutex> lock(sinkProxyMutex_);
+    CHECK_NULL_RETURN(dAudioSinkProxy_, ERR_DH_AUDIO_SA_PROXY_NOT_INIT);
+    return dAudioSinkProxy_->SetAuthorizationResult(requestId, granted);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

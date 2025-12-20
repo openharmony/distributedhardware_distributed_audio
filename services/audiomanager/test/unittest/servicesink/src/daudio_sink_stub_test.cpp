@@ -121,5 +121,47 @@ HWTEST_F(DAudioSinkStubTest, SubscribeLocalHardwareInner_001, TestSize.Level1)
     EXPECT_EQ(ERR_DH_AUDIO_SA_PERMISSION_FAIED, sinkStub_->UnsubscribeLocalHardwareInner(data, reply, option));
     EXPECT_EQ(DH_SUCCESS, sinkStub_->DAudioNotifyInner(data, reply, option));
 }
+
+/**
+ * @tc.name: SetAccessListenerInner_001
+ * @tc.desc: Verify the SetAccessListenerInner function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DAudioSinkStubTest, SetAccessListenerInner_001, TestSize.Level1)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    EXPECT_EQ(ERR_DH_AUDIO_SA_PERMISSION_FAIED, sinkStub_->SetAccessListenerInner(data, reply, option));
+}
+
+/**
+ * @tc.name: RemoveAccessListenerInner_001
+ * @tc.desc: Verify the RemoveAccessListenerInner function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DAudioSinkStubTest, RemoveAccessListenerInner_001, TestSize.Level1)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    EXPECT_EQ(ERR_DH_AUDIO_SA_PERMISSION_FAIED, sinkStub_->RemoveAccessListenerInner(data, reply, option));
+}
+
+/**
+ * @tc.name: SetAuthorizationResultInner_001
+ * @tc.desc: Verify the SetAuthorizationResultInner function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DAudioSinkStubTest, SetAuthorizationResultInner_001, TestSize.Level1)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    EXPECT_EQ(ERR_DH_AUDIO_SA_PERMISSION_FAIED, sinkStub_->SetAuthorizationResultInner(data, reply, option));
+}
 } // DistributedHardware
 } // OHOS

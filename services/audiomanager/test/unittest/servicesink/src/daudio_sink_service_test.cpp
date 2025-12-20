@@ -171,5 +171,78 @@ HWTEST_F(DAudioSinkServiceTest, PauseDistributedHardware_001, TestSize.Level1)
     EXPECT_EQ(DH_SUCCESS, sinkSrv_->ResumeDistributedHardware(networkId));
     EXPECT_EQ(DH_SUCCESS, sinkSrv_->StopDistributedHardware(networkId));
 }
+
+/**
+ * @tc.name: SetAccessListener_001
+ * @tc.desc: Verify the SetAccessListener function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DAudioSinkServiceTest, SetAccessListener_001, TestSize.Level1)
+{
+    sptr<IAccessListener> listener = nullptr;
+    int32_t timeOut = 5000;
+    std::string pkgName = "com.example.test";
+    EXPECT_EQ(DH_SUCCESS, sinkSrv_->SetAccessListener(listener, timeOut, pkgName));
+
+    timeOut = 0;
+    pkgName = "";
+    EXPECT_EQ(DH_SUCCESS, sinkSrv_->SetAccessListener(listener, timeOut, pkgName));
+
+    timeOut = -1;
+    pkgName = "com.test.empty";
+    EXPECT_EQ(DH_SUCCESS, sinkSrv_->SetAccessListener(listener, timeOut, pkgName));
+
+    timeOut = 30000;
+    pkgName = "very.long.package.name.that.exceeds.normal.length.for.testing";
+    EXPECT_EQ(DH_SUCCESS, sinkSrv_->SetAccessListener(listener, timeOut, pkgName));
+}
+
+/**
+ * @tc.name: RemoveAccessListener_001
+ * @tc.desc: Verify the RemoveAccessListener function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DAudioSinkServiceTest, RemoveAccessListener_001, TestSize.Level1)
+{
+    std::string pkgName = "com.example.test";
+    EXPECT_EQ(DH_SUCCESS, sinkSrv_->RemoveAccessListener(pkgName));
+
+    pkgName = "";
+    EXPECT_EQ(DH_SUCCESS, sinkSrv_->RemoveAccessListener(pkgName));
+
+    pkgName = "very.long.package.name.that.exceeds.normal.length.for.testing.purposes";
+    EXPECT_EQ(DH_SUCCESS, sinkSrv_->RemoveAccessListener(pkgName));
+
+    pkgName = "com.test123.special!@#$%^&*()_+";
+    EXPECT_EQ(DH_SUCCESS, sinkSrv_->RemoveAccessListener(pkgName));
+}
+
+/**
+ * @tc.name: SetAuthorizationResult_001
+ * @tc.desc: Verify the SetAuthorizationResult function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DAudioSinkServiceTest, SetAuthorizationResult_001, TestSize.Level1)
+{
+    std::string requestId = "123";
+    bool granted = true;
+    EXPECT_EQ(DH_SUCCESS, sinkSrv_->SetAuthorizationResult(requestId, granted));
+
+    granted = false;
+    EXPECT_EQ(DH_SUCCESS, sinkSrv_->SetAuthorizationResult(requestId, granted));
+
+    requestId = "empty.request.test";
+    EXPECT_EQ(DH_SUCCESS, sinkSrv_->SetAuthorizationResult(requestId, granted));
+
+    requestId = "";
+    EXPECT_EQ(DH_SUCCESS, sinkSrv_->SetAuthorizationResult(requestId, granted));
+
+    requestId = "very.long.request.id.that.exceeds.normal.length.for.testing.purposes";
+    granted = true;
+    EXPECT_EQ(DH_SUCCESS, sinkSrv_->SetAuthorizationResult(requestId, granted));
+}
 } // DistributedHardware
 } // OHOS

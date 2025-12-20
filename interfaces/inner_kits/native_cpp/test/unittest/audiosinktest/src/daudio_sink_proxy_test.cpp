@@ -125,5 +125,66 @@ HWTEST_F(DAudioSinkProxyTest, PauseDistributedHardware_001, TestSize.Level1)
     EXPECT_EQ(DH_SUCCESS, dAudioProxy->ResumeDistributedHardware(networkId));
     EXPECT_EQ(DH_SUCCESS, dAudioProxy->StopDistributedHardware(networkId));
 }
+
+/**
+ * @tc.name: SetAccessListener_001
+ * @tc.desc: Verify SetAccessListener function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DAudioSinkProxyTest, SetAccessListener_001, TestSize.Level1)
+{
+    ASSERT_TRUE(dAudioProxy != nullptr);
+    sptr<IAccessListener> listener = nullptr;
+    int32_t timeOut = 5000;
+    std::string pkgName = "com.example.test";
+    int32_t ret = dAudioProxy->SetAccessListener(listener, timeOut, pkgName);
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, ret);
+}
+
+/**
+ * @tc.name: SetAccessListener_002
+ * @tc.desc: Verify SetAccessListener function.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DAudioSinkProxyTest, SetAccessListener_002, TestSize.Level1)
+{
+    ASSERT_TRUE(dAudioProxy != nullptr);
+    sptr<IAccessListener> listener(new TestAccessListener());
+    int32_t timeOut = -1;
+    std::string pkgName = "com.example.test";
+    int32_t ret = dAudioProxy->SetAccessListener(listener, timeOut, pkgName);
+    EXPECT_EQ(ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED, ret);
+}
+
+/**
+ * @tc.name: RemoveAccessListener_001
+ * @tc.desc: Verify RemoveAccessListener function with valid package name.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DAudioSinkProxyTest, RemoveAccessListener_001, TestSize.Level1)
+{
+    ASSERT_TRUE(dAudioProxy != nullptr);
+    std::string pkgName = "com.example.test";
+    int32_t ret = dAudioProxy->RemoveAccessListener(pkgName);
+    EXPECT_EQ(DH_SUCCESS, ret);
+}
+
+/**
+ * @tc.name: SetAuthorizationResult_001
+ * @tc.desc: Verify SetAuthorizationResult function with valid parameters and granted true.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DAudioSinkProxyTest, SetAuthorizationResult_001, TestSize.Level1)
+{
+    ASSERT_TRUE(dAudioProxy != nullptr);
+    std::string requestId = "123";
+    bool granted = true;
+    int32_t ret = dAudioProxy->SetAuthorizationResult(requestId, granted);
+    EXPECT_EQ(DH_SUCCESS, ret);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

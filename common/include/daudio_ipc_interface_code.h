@@ -41,6 +41,9 @@ enum class IDAudioSinkInterfaceCode : uint32_t {
     PAUSE_DISTRIBUTED_HARDWARE = 5,
     RESUME_DISTRIBUTED_HARDWARE = 6,
     STOP_DISTRIBUTED_HARDWARE = 7,
+    SET_ACCESS_LISTENER = 8,
+    REMOVE_ACCESS_LISTENER = 9,
+    SET_AUTHORIZATION_RESULT = 10,
 };
 } // namespace DistributedHardware
 } // namespace OHOS
