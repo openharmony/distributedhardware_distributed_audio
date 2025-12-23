@@ -62,6 +62,7 @@ public:
     void SetAccountId(string value);
     bool CheckAclRight();
     void SetSinkTokenId(uint64_t value);
+    bool IsIdenticalAccount(const std::string &networkId);
 
 private:
     int32_t TaskOpenDSpeaker(const std::string &args);
