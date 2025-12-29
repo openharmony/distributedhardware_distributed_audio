@@ -54,6 +54,12 @@ ohos_unittest("SpeakerClientTest") {
     "${services_path}/common:distributed_audio_utils",
   ]
 
+  defines = []
+
+  if (distributed_audio_extension_sa) {
+    defines += [ "UT_COVER_SPECIAL" ]
+  }
+
   external_deps = [
     "audio_framework:audio_capturer",
     "audio_framework:audio_client",
