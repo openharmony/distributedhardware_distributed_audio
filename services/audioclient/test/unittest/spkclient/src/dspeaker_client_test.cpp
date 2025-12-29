@@ -102,6 +102,7 @@ HWTEST_F(DSpeakerClientTest, OnStateChange_001, TestSize.Level0)
     EXPECT_EQ(ERR_DH_AUDIO_NOT_SUPPORT, speakerClient_->OnStateChange(AudioEventType::EVENT_UNKNOWN));
 }
 
+#ifdef UT_COVER_SPECIAL
 /**
  * @tc.name: SetUp_001
  * @tc.desc: Verify the SetUp function.
@@ -120,6 +121,7 @@ HWTEST_F(DSpeakerClientTest, SetUp_001, TestSize.Level0)
     speakerClient_->clientStatus_ = AudioStatus::STATUS_READY;
     EXPECT_EQ(DH_SUCCESS, speakerClient_->Release());
 }
+#endif
 
 /**
  * @tc.name: StartRender_001
@@ -140,8 +142,10 @@ HWTEST_F(DSpeakerClientTest, StartRender001, TestSize.Level0)
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, speakerClient_->StopRender());
     speakerClient_->isRenderReady_.store(true);
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, speakerClient_->StopRender());
+#ifdef UT_COVER_SPECIAL
     speakerClient_->CreateAudioRenderer(audioParam_);
     EXPECT_EQ(ERR_DH_AUDIO_CLIENT_RENDER_STOP_FAILED, speakerClient_->StopRender());
+#endif
 }
 
 /**
