@@ -833,5 +833,20 @@ HWTEST_F(DAudioSinkDevTest, NotifyCtrlClosed_001, TestSize.Level1)
     sinkDev_->micClientMap_.insert(std::make_pair(DEFAULT_CAPTURE_ID, micClient));
     EXPECT_EQ(DH_SUCCESS, sinkDev_->handler_->GetEventParam(msg, paramResult));
 }
+
+/**
+ * @tc.name: IsIdenticalAccounte_001
+ * @tc.desc: Verify the IsIdenticalAccount function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkDevTest, IsIdenticalAccount_001, TestSize.Level1)
+{
+    ASSERT_NE(sinkDev_, nullptr);
+    std::string networkId = "";
+    EXPECT_EQ(false, sinkDev_->IsIdenticalAccount(networkId));
+    networkId = "networkId";
+    EXPECT_EQ(false, sinkDev_->IsIdenticalAccount(networkId));
+}
 } // DistributedHardware
 } // OHOS

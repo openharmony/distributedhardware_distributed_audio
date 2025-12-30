@@ -150,6 +150,9 @@ int32_t DAudioSinkDev::TaskOpenDSpeaker(const std::string &args)
         "Get audio param from cjson failed, error code %{public}d.", ret);
     cJSON_Delete(jParam);
     CHECK_AND_RETURN_RET_LOG(!CheckAclRight(), ERR_DH_AUDIO_FAILED, "ACL check failed.");
+#ifdef DAUDIO_OPEN_SAME_ACCOUNT
+    CHECK_AND_RETURN_RET_LOG(!IsIdenticalAccount(devId_), ERR_DH_AUDIO_FAILED, "Account check failed.");
+#endif
     CHECK_NULL_RETURN(speakerClient, ERR_DH_AUDIO_NULLPTR);
     ret = speakerClient->SetUp(audioParam);
     CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Setup speaker failed, ret: %{public}d.", ret);
@@ -307,6 +310,9 @@ int32_t DAudioSinkDev::TaskOpenDMic(const std::string &args)
         micClient = micClientMap_[dhId];
     }
     CHECK_AND_RETURN_RET_LOG(!CheckAclRight(), ERR_DH_AUDIO_FAILED, "ACL check failed.");
+#ifdef DAUDIO_OPEN_SAME_ACCOUNT
+    CHECK_AND_RETURN_RET_LOG(!IsIdenticalAccount(devId_), ERR_DH_AUDIO_FAILED, "Account check failed.");
+#endif
     CHECK_NULL_RETURN(micClient, ERR_DH_AUDIO_NULLPTR);
     ret = micClient->SetUp(audioParam);
     CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ERR_DH_AUDIO_FAILED, "Set up mic failed, ret: %{public}d.", ret);
@@ -816,6 +822,26 @@ bool DAudioSinkDev::CheckAclRight()
     DHLOGI("CheckAclRight srcDevId: %{public}s, accountId: %{public}s, sinkDevId: %{public}s",
         GetAnonyString(devId_).c_str(), GetAnonyString(accountId).c_str(), GetAnonyString(sinkDevId).c_str());
     return DeviceManager::GetInstance().CheckSinkAccessControl(dmSrcCaller, dmDstCallee);
+}
+
+bool DAudioSinkDev::IsIdenticalAccount(const std::string &networkId)
+{
+    CHECK_AND_RETURN_RET_LOG(networkId.empty() || networkId.length() > DAUDIO_MAX_DEVICE_ID_LEN,
+        false, "NetworkId is invalid.");
+    DmAuthForm authForm = DmAuthForm::INVALID_TYPE;
+    std::vector<DmDeviceInfo> deviceList;
+    DeviceManager::GetInstance().GetTrustedDeviceList(PKG_NAME, "", deviceList);
+    CHECK_AND_RETURN_RET_LOG(deviceList.size() == 0 || deviceList.size() > MAX_ONLINE_DEVICE_SIZE,
+        false, "DeviceList size is invalid!");
+    for (const auto &deviceInfo : deviceList) {
+        if (std::string(deviceInfo.networkId) == networkId) {
+            authForm = deviceInfo.authForm;
+            break;
+        }
+    }
+    CHECK_AND_RETURN_RET_LOG(authForm == DmAuthForm::IDENTICAL_ACCOUNT,
+        true, "Account check success.");
+    return false;
 }
 
 void DAudioSinkDev::SinkEventHandler::NotifyCloseSpeaker(const AppExecFwk::InnerEvent::Pointer &event)

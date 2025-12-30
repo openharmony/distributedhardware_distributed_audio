@@ -49,6 +49,7 @@ declare_args() {
   distributed_audio_extension_sa = false
   device_security_level_control = true
   distributed_audio_shared_buffer = false
+  distributed_audio_same_account = false
 
   if (defined(global_parts_info) &&
       !defined(global_parts_info.security_device_security_level)) {
