@@ -103,6 +103,7 @@ private:
     std::map<int32_t, std::shared_ptr<DMicClient>> micClientMap_;
     std::shared_ptr<DAudioSinkDevCtrlMgr> audioCtrlMgr_ = nullptr;
     static constexpr size_t WAIT_HANDLER_IDLE_TIME_US = 10000;
+    static constexpr size_t MININUM_SECURITY_LEVEL = 3;
     const std::string SUBTYPE = "mic";
     sptr<IDAudioSinkIpcCallback> ipcSinkCallback_ = nullptr;
     std::atomic<bool> isPageStatus_ = false;
