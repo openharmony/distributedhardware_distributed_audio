@@ -78,6 +78,8 @@ public:
         const std::string &pkgName);
     void RemoveAccessListener(const std::string &pkgName);
     void SetAuthorizationResult(const std::string &requestId, bool granted);
+    int32_t GetDeviceSecurityLevel(const std::string &udid);
+    std::string GetUdidByNetworkId(const std::string &networkId);
 
 private:
     DAudioSinkManager();
@@ -87,8 +89,6 @@ private:
     int32_t LoadAVReceiverEngineProvider();
     int32_t UnloadAVReceiverEngineProvider();
     bool CheckDeviceSecurityLevel(const std::string &srcDeviceId, const std::string &dstDeviceId);
-    int32_t GetDeviceSecurityLevel(const std::string &udid);
-    std::string GetUdidByNetworkId(const std::string &networkId);
     int32_t VerifySecurityLevel(const std::string &devId);
     int32_t InitAudioDevice(std::shared_ptr<DAudioSinkDev> dev, const std::string &devId, bool isSpkOrMic);
     int32_t ParseValueFromCjson(std::string args, std::string key);

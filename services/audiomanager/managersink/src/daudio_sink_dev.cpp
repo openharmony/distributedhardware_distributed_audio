@@ -313,6 +313,13 @@ int32_t DAudioSinkDev::TaskOpenDMic(const std::string &args)
 #ifdef DAUDIO_OPEN_SAME_ACCOUNT
     CHECK_AND_RETURN_RET_LOG(!IsIdenticalAccount(devId_), ERR_DH_AUDIO_FAILED, "Account check failed.");
 #endif
+#ifdef distributed_audio_extension_sa
+    std::string srcUdid = DAudioSinkManager::GetInstance().GetUdidByNetworkId(devId_);
+    CHECK_AND_RETURN_RET_LOG(srcUdid.empty(), ERR_DH_AUDIO_FAILED, "Src udid is empty");
+    int32_t sourceSecurityLevel = DAudioSinkManager::GetInstance().GetDeviceSecurityLevel(srcUdid);
+    CHECK_AND_RETURN_RET_LOG(sourceSecurityLevel < MININUM_SECURITY_LEVEL,
+        ERR_DH_AUDIO_ACCESS_PERMISSION_CHECK_FAIL, "Source security level less than three");
+#endif
     CHECK_NULL_RETURN(micClient, ERR_DH_AUDIO_NULLPTR);
     ret = micClient->SetUp(audioParam);
     CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ERR_DH_AUDIO_FAILED, "Set up mic failed, ret: %{public}d.", ret);
