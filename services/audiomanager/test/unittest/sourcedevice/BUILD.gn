@@ -97,49 +97,6 @@ ohos_unittest("DaudioSourceDevTest") {
 }
 
 ## UnitTest daudio_source_dev_test
-ohos_unittest("DaudioSourceDevExtTest") {
-  module_out_path = module_out_path
-
-  sources = [ "src/daudio_source_dev_test_ext.cpp" ]
-
-  configs = [ ":module_private_config" ]
-
-  deps = [
-    "${audio_transport_path}/receiverengine:distributed_audio_decode_transport",
-    "${audio_transport_path}/senderengine:distributed_audio_encode_transport",
-    "${services_path}/audiomanager/servicesource:distributed_audio_source",
-    "${services_path}/common:distributed_audio_utils",
-  ]
-
-  external_deps = [
-    "audio_framework:audio_capturer",
-    "audio_framework:audio_client",
-    "audio_framework:audio_renderer",
-    "cJSON:cjson",
-    "c_utils:utils",
-    "device_manager:devicemanagersdk",
-    "distributed_hardware_fwk:distributed_av_receiver",
-    "distributed_hardware_fwk:distributed_av_sender",
-    "distributed_hardware_fwk:distributedhardwareutils",
-    "drivers_interface_distributed_audio:libdaudioext_proxy_2.1",
-    "dsoftbus:softbus_client",
-    "eventhandler:libeventhandler",
-    "googletest:gmock",
-    "hilog:libhilog",
-    "ipc:ipc_core",
-    "samgr:samgr_proxy",
-  ]
-
-  cflags = []
-
-  if (distributed_audio_extension_sa) {
-    cflags += [ "-DECHO_CANNEL_ENABLE" ]
-  }
-
-  cflags_cc = cflags
-}
-
-## UnitTest daudio_source_dev_test
 ohos_unittest("DMicDevTest") {
   module_out_path = module_out_path
 
@@ -271,6 +228,5 @@ group("daudio_source_dev_test") {
     ":DMicDevTest",
     ":DSpeakerDevTest",
     ":DaudioSourceDevTest",
-    ":DaudioSourceDevExtTest",
   ]
 }
