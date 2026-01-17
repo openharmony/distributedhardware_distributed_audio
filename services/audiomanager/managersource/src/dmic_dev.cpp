@@ -453,10 +453,11 @@ int32_t DMicDev::Stop()
     if (ret != DH_SUCCESS) {
         DHLOGE("Stop mic trans failed, ret: %{public}d.", ret);
     }
+    DaudioRadar::GetInstance().ReportMicCloseProgress("Stop", MicClose::STOP_TRANS, ret);
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "micTrans stop failed, ret: %{public}d.", ret);
 #ifdef ECHO_CANNEL_ENABLE
     CHECK_NULL_RETURN(echoManager_, DH_SUCCESS);
     ret = echoManager_->Stop();
-    DaudioRadar::GetInstance().ReportMicCloseProgress("Stop", MicClose::STOP_TRANS, ret);
     CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret, "Echo manager stop failed, ret: %{public}d.", ret);
 #endif
     return DH_SUCCESS;
