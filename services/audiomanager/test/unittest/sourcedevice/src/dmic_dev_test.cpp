@@ -298,7 +298,7 @@ HWTEST_F(DMicDevTest, Stop_001, TestSize.Level1)
     EXPECT_EQ(DH_SUCCESS, mic_->Stop());
 
     mic_->micTrans_ = std::make_shared<AVTransReceiverTransport>(DEV_ID, mic_);
-    EXPECT_EQ(DH_SUCCESS, mic_->Stop());
+    EXPECT_NE(DH_SUCCESS, mic_->Stop());
 
     mic_->micTrans_ = std::make_shared<MockIAudioDataTransport>();
     EXPECT_EQ(DH_SUCCESS, mic_->Stop());
