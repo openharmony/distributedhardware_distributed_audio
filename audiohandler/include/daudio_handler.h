@@ -20,7 +20,7 @@
 #include "cJSON.h"
 
 #include "ihardware_handler.h"
-#include "single_instance.h"
+#include "dhfwk_single_instance.h"
 #include "audio_param.h"
 #include "audio_capturer.h"
 #include "audio_info.h"
@@ -35,7 +35,7 @@ typedef struct {
 } AudioInfo;
 
 class DAudioHandler : public IHardwareHandler {
-DECLARE_SINGLE_INSTANCE_BASE(DAudioHandler);
+FWK_DECLARE_SINGLE_INSTANCE_BASE(DAudioHandler);
 
 public:
     int32_t Initialize() override;

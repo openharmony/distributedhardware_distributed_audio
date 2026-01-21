@@ -35,7 +35,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(DAudioHdiHandler);
+FWK_IMPLEMENT_SINGLE_INSTANCE(DAudioHdiHandler);
 
 DAudioHdiHandler::DAudioHdiHandler()
 {

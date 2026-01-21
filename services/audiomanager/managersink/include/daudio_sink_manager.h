@@ -19,7 +19,7 @@
 #include <map>
 #include <mutex>
 
-#include "single_instance.h"
+#include "dhfwk_single_instance.h"
 #include "device_manager.h"
 #include "device_manager_callback.h"
 #ifdef DEVICE_SECURITY_LEVEL_ENABLE
@@ -56,7 +56,7 @@ class DeviceInitCallback : public DmInitCallback {
 };
 
 class DAudioSinkManager {
-DECLARE_SINGLE_INSTANCE_BASE(DAudioSinkManager);
+FWK_DECLARE_SINGLE_INSTANCE_BASE(DAudioSinkManager);
 public:
     int32_t Init(const sptr<IDAudioSinkIpcCallback> &sinkCallback);
     int32_t UnInit();
