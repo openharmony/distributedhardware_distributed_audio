@@ -28,7 +28,7 @@
 #include "daudio_manager_callback.h"
 #include "distributed_hardware_fwk_kit.h"
 #include "idaudio_hdi_callback.h"
-#include "single_instance.h"
+#include "dhfwk_single_instance.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -36,7 +36,7 @@ using OHOS::HDI::DistributedAudio::Audioext::V2_1::DAudioEvent;
 using OHOS::HDI::DistributedAudio::Audioext::V2_1::IDAudioCallback;
 using OHOS::HDI::DistributedAudio::Audioext::V2_1::IDAudioManager;
 class DAudioHdiHandler {
-    DECLARE_SINGLE_INSTANCE_BASE(DAudioHdiHandler);
+    FWK_DECLARE_SINGLE_INSTANCE_BASE(DAudioHdiHandler);
 
 public:
     int32_t InitHdiHandler();

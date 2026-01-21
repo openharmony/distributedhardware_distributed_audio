@@ -26,12 +26,12 @@
 #include "daudio_source_dev.h"
 #include "daudio_source_mgr_callback.h"
 #include "idaudio_sink.h"
-#include "single_instance.h"
+#include "dhfwk_single_instance.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 class DAudioSourceManager {
-    DECLARE_SINGLE_INSTANCE_BASE(DAudioSourceManager);
+    FWK_DECLARE_SINGLE_INSTANCE_BASE(DAudioSourceManager);
 
 public:
     int32_t Init(const sptr<IDAudioIpcCallback> &callback);

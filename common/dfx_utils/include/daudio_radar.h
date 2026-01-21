@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-#include "single_instance.h"
+#include "dhfwk_single_instance.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -103,7 +103,7 @@ enum class AudioUnInit : int32_t {
 };
 
 class DaudioRadar {
-    DECLARE_SINGLE_INSTANCE(DaudioRadar);
+    FWK_DECLARE_SINGLE_INSTANCE(DaudioRadar);
 public:
     bool ReportDaudioInit(const std::string& func, AudioInit bizStage, BizState bizState, int32_t errCode);
     bool ReportDaudioInitProgress(const std::string& func, AudioInit bizStage, int32_t errCode);

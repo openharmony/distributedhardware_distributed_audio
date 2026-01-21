@@ -27,7 +27,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(DaudioHdfOperate);
+FWK_IMPLEMENT_SINGLE_INSTANCE(DaudioHdfOperate);
 int32_t DaudioHdfOperate::LoadDaudioHDFImpl(std::shared_ptr<HdfDeathCallback> callback)
 {
     DHLOGI("Load daudio hdf impl begin!");

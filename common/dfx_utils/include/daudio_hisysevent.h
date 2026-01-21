@@ -23,7 +23,7 @@
 #include "daudio_log.h"
 #include "daudio_util.h"
 #include "hisysevent.h"
-#include "single_instance.h"
+#include "av_single_instance.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -40,7 +40,7 @@ const std::string DAUDIO_REGISTER_FAIL = "DAUDIO_REGISTER_FAIL";
 const std::string DAUDIO_UNREGISTER_FAIL = "DAUDIO_UNREGISTER_FAIL";
 
 class DAudioHisysevent {
-    DECLARE_SINGLE_INSTANCE_BASE(DAudioHisysevent);
+    AV_DECLARE_SINGLE_INSTANCE_BASE(DAudioHisysevent);
 
 public:
     void SysEventWriteBehavior(const std::string &eventName, const std::string &msg);

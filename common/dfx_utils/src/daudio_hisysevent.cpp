@@ -17,7 +17,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(DAudioHisysevent);
+AV_IMPLEMENT_SINGLE_INSTANCE(DAudioHisysevent);
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DAudioHisysevent"
