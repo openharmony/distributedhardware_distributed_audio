@@ -1,0 +1,71 @@
+/*
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include "sinkservicesetaccesslistener_fuzzer.h"
+
+#include <cstddef>
+#include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
+
+#include "daudio_sink_service.h"
+#include "iaccess_listener.h"
+#include "if_system_ability_manager.h"
+#include "iservice_registry.h"
+
+namespace OHOS {
+namespace DistributedHardware {
+class TestAccessListener : public IAccessListener {
+    sptr<IRemoteObject> AsObject()
+    {
+        return nullptr;
+    }
+
+    void OnRequestHardwareAccess(const std::string &requestId, AuthDeviceInfo info, const DHType dhType,
+        const std::string &pkgName)
+    {
+        (void)requestId;
+        (void)info;
+        (void)dhType;
+        (void)pkgName;
+    }
+};
+void SinkServiceSetAccessListenerFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size < (sizeof(int32_t)))) {
+        return;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    int32_t saId = fdp.ConsumeIntegral<int32_t>();
+    bool runOnCreate = fdp.ConsumeBool();
+    std::string pkgName = fdp.ConsumeRandomLengthString();
+    int32_t timeOut = fdp.ConsumeIntegral<int32_t>();
+
+    auto dAudioSinkService = std::make_shared<DAudioSinkService>(saId, runOnCreate);
+    sptr<IAccessListener> listener(new TestAccessListener());
+
+    dAudioSinkService->SetAccessListener(listener, timeOut, pkgName);
+}
+}
+}
+
+/* Fuzzer entry point */
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+{
+    /* Run your code on data */
+    OHOS::DistributedHardware::SinkServiceSetAccessListenerFuzzTest(data, size);
+    return 0;
+}
+
