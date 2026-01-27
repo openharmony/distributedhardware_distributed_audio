@@ -22,7 +22,7 @@ namespace OHOS {
 namespace DistributedHardware {
 void SinkHandlerSetAccessListenerFuzzTest(const uint8_t* data, size_t size)
 {
-    if (data == nullptr) {
+    if ((data == nullptr) || (size < (sizeof(int32_t)))) {
         return;
     }
     sptr<IAccessListener> listener(new TestAccessListener());
