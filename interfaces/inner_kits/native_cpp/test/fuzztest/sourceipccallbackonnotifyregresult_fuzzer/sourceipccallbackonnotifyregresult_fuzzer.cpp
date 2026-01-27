@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "daudio_ipc_callback.h"
 #include "if_system_ability_manager.h"
@@ -29,12 +30,12 @@ void SourceIpcCallbackOnNotifyRegResultFuzzTest(const uint8_t* data, size_t size
     if ((data == nullptr) || (size < (sizeof(int32_t)))) {
         return;
     }
-
-    std::string devId(reinterpret_cast<const char*>(data), size);
-    std::string dhId(reinterpret_cast<const char*>(data), size);
-    std::string reqId(reinterpret_cast<const char*>(data), size);
-    int32_t status = *(reinterpret_cast<const int32_t *>(data));
-    std::string resultData(reinterpret_cast<const char*>(data), size);
+    FuzzedDataProvider fdp(data, size);
+    std::string devId = fdp.ConsumeRandomLengthString();
+    std::string dhId = fdp.ConsumeRandomLengthString();
+    std::string reqId = fdp.ConsumeRandomLengthString();
+    int32_t status = fdp.ConsumeIntegral<int32_t>();
+    std::string resultData = fdp.ConsumeRandomLengthString();
     std::shared_ptr<DAudioIpcCallback> callback = std::make_shared<DAudioIpcCallback>();
 
     callback->OnNotifyRegResult(devId, dhId, reqId, status, resultData);

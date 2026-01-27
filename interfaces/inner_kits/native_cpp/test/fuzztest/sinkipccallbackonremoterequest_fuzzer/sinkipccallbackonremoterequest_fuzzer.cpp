@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "daudio_sink_ipc_callback.h"
 #include "daudio_sink_ipc_callback_stub.h"
@@ -39,14 +40,14 @@ void SinkIpcCallbackOnRemoteRequestFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < (sizeof(int32_t)))) {
         return;
     }
-
+    FuzzedDataProvider fdp(data, size);
     MessageParcel pdata;
     MessageParcel reply;
     MessageOption option;
     uint32_t code = 0;
     int32_t resType = static_cast<int32_t>(resourceEventType[data[0] % DC_RESOURCE_SIZE]);
-    std::string subtype(reinterpret_cast<const char*>(data), size);
-    std::string networkId(reinterpret_cast<const char*>(data), size);
+    std::string subtype = fdp.ConsumeRandomLengthString();
+    std::string networkId = fdp.ConsumeRandomLengthString();
     bool isSensitive = data[0] % DC_RESOURCE_VALUE;
     bool isSameAccout = data[0] % DC_RESOURCE_VALUE;
     pdata.WriteInt32(resType);

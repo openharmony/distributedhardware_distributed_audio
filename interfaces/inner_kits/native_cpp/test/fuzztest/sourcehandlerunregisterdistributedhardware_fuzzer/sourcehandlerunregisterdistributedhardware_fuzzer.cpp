@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "daudio_source_handler.h"
 #include "daudio_constants.h"
@@ -29,8 +30,9 @@ void SourceHandlerUnregisterDistributedHardwareFuzzTest(const uint8_t* data, siz
     if (data == nullptr) {
         return;
     }
-    std::string devId(reinterpret_cast<const char*>(data), size);
-    std::string dhId(reinterpret_cast<const char*>(data), size);
+    FuzzedDataProvider fdp(data, size);
+    std::string devId = fdp.ConsumeRandomLengthString();
+    std::string dhId = fdp.ConsumeRandomLengthString();
     std::shared_ptr<UnregisterCallback> callback = std::make_shared<MockComponentDisable>();
 
     DAudioSourceHandler::GetInstance().UnregisterDistributedHardware(devId, dhId, callback);

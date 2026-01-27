@@ -15,6 +15,8 @@
 
 #include "sinkipccallbackonnotifyresourceinfo_fuzzer.h"
 
+#include <fuzzer/FuzzedDataProvider.h>
+
 #include "daudio_sink_ipc_callback.h"
 
 namespace OHOS {
@@ -33,9 +35,10 @@ void SinkIpcCallbackOnNotifyResourceInfoFuzzTest(const uint8_t* data, size_t siz
         return;
     }
 
+    FuzzedDataProvider fdp(data, size);
     ResourceEventType type = resourceEventType[data[0] % DC_RESOURCE_SIZE];
-    std::string subtype(reinterpret_cast<const char*>(data), size);
-    std::string networkId(reinterpret_cast<const char*>(data), size);
+    std::string subtype = fdp.ConsumeRandomLengthString();
+    std::string networkId = fdp.ConsumeRandomLengthString();
     bool isSensitive = data[0] % DC_RESOURCE_VALUE;
     bool isSameAccout = data[0] % DC_RESOURCE_VALUE;
     std::shared_ptr<DAudioSinkIpcCallback> callback = std::make_shared<DAudioSinkIpcCallback>();
