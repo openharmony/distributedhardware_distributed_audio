@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "daudio_constants.h"
 #include "daudio_source_proxy.h"
@@ -31,9 +32,10 @@ void SourceProxyUnregisterDistributedHardwareFuzzTest(const uint8_t* data, size_
         return;
     }
 
-    std::string dhId(reinterpret_cast<const char*>(data), size);
-    std::string devId(reinterpret_cast<const char*>(data), size);
-    std::string reqId(reinterpret_cast<const char*>(data), size);
+    FuzzedDataProvider fdp(data, size);
+    std::string dhId = fdp.ConsumeRandomLengthString();
+    std::string devId = fdp.ConsumeRandomLengthString();
+    std::string reqId = fdp.ConsumeRandomLengthString();
 
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgr == nullptr) {

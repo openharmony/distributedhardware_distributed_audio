@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "daudio_sink_handler.h"
 #include "if_system_ability_manager.h"
@@ -29,8 +30,9 @@ void SinkHandlerSubscribeLocalHardwareFuzzTest(const uint8_t* data, size_t size)
     if (data == nullptr) {
         return;
     }
-    std::string param(reinterpret_cast<const char*>(data), size);
-    std::string dhId(reinterpret_cast<const char*>(data), size);
+    FuzzedDataProvider fdp(data, size);
+    std::string param = fdp.ConsumeRandomLengthString();
+    std::string dhId = fdp.ConsumeRandomLengthString();
 
     DAudioSinkHandler::GetInstance().SubscribeLocalHardware(dhId, param);
 }
