@@ -18,14 +18,14 @@
 
 #include "idistributed_hardware_sink.h"
 #include "daudio_sink_ipc_callback.h"
-#include "single_instance.h"
+#include "dhfwk_single_instance.h"
 
 #include "idaudio_sink.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 class DAudioSinkHandler : public IDistributedHardwareSink {
-DECLARE_SINGLE_INSTANCE_BASE(DAudioSinkHandler);
+FWK_DECLARE_SINGLE_INSTANCE_BASE(DAudioSinkHandler);
 public:
     int32_t InitSink(const std::string &params) override;
     int32_t ReleaseSink() override;

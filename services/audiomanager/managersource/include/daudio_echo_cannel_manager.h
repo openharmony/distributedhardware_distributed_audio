@@ -18,7 +18,7 @@
 
 #include <queue>
 
-#include "single_instance.h"
+#include "dhfwk_single_instance.h"
 
 #include "audio_capturer.h"
 #include "audio_info.h"

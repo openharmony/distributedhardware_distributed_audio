@@ -24,7 +24,7 @@
 #include "iservstat_listener_hdi.h"
 #include "idevmgr_hdi.h"
 #include "iservmgr_hdi.h"
-#include "single_instance.h"
+#include "dhfwk_single_instance.h"
 #include <v2_1/id_audio_manager.h>
 
 namespace OHOS {
@@ -49,7 +49,7 @@ public:
     void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
 };
 class DaudioHdfOperate {
-DECLARE_SINGLE_INSTANCE(DaudioHdfOperate);
+FWK_DECLARE_SINGLE_INSTANCE(DaudioHdfOperate);
 
 public:
     int32_t LoadDaudioHDFImpl(std::shared_ptr<HdfDeathCallback> callback);

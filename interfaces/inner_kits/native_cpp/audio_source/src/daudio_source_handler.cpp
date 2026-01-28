@@ -33,7 +33,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(DAudioSourceHandler);
+FWK_IMPLEMENT_SINGLE_INSTANCE(DAudioSourceHandler);
 DAudioSourceHandler::DAudioSourceHandler()
 {
     DHLOGD("Audio source handler constructed.");

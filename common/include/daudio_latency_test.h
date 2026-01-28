@@ -18,12 +18,12 @@
 
 #include <vector>
 
-#include "single_instance.h"
+#include "dhfwk_single_instance.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 class DAudioLatencyTest {
-DECLARE_SINGLE_INSTANCE_BASE(DAudioLatencyTest);
+FWK_DECLARE_SINGLE_INSTANCE_BASE(DAudioLatencyTest);
 public:
     int32_t AddPlayTime(const int64_t playBeepTime);
     int32_t AddRecordTime(const int64_t recordBeepTime);

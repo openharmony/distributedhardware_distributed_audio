@@ -38,7 +38,7 @@ constexpr uint32_t EVENT_MANAGER_ENABLE_DAUDIO = 11;
 constexpr uint32_t EVENT_MANAGER_DISABLE_DAUDIO = 12;
 constexpr uint32_t DAUDIO_SINK_SERVICE_MAX_SIZE = 64;
 }
-IMPLEMENT_SINGLE_INSTANCE(DAudioSourceManager);
+FWK_IMPLEMENT_SINGLE_INSTANCE(DAudioSourceManager);
 using AVTransProviderClass = IAVEngineProvider *(*)(const std::string &);
 
 const std::string SENDER_SO_NAME = "libdistributed_av_sender.z.so";

@@ -25,7 +25,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(DaudioHidumper);
+FWK_IMPLEMENT_SINGLE_INSTANCE(DaudioHidumper);
 
 namespace {
 const std::string ARGS_HELP = "-h";
