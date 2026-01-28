@@ -31,7 +31,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(DAudioSinkHandler);
+FWK_IMPLEMENT_SINGLE_INSTANCE(DAudioSinkHandler);
 
 DAudioSinkHandler::DAudioSinkHandler()
 {

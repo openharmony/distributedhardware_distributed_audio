@@ -23,7 +23,7 @@
 #include <v1_0/iaudio_manager.h>
 #include <v1_0/audio_types.h>
 #include "daudio_handler.h"
-#include "single_instance.h"
+#include "dhfwk_single_instance.h"
 
 using OHOS::HDI::DistributedAudio::Audio::V1_0::IAudioManager;
 using OHOS::HDI::DistributedAudio::Audio::V1_0::AudioAdapterDescriptor;
@@ -40,7 +40,7 @@ enum class HidumpFlag {
     DUMP_AUDIO_DATA_STOP,
 };
 class DaudioHidumper {
-    DECLARE_SINGLE_INSTANCE_BASE(DaudioHidumper);
+    FWK_DECLARE_SINGLE_INSTANCE_BASE(DaudioHidumper);
 
 public:
     bool Dump(const std::vector<std::string> &args, std::string &result);

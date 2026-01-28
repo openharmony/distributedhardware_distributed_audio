@@ -24,7 +24,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(DaudioRadar);
+FWK_IMPLEMENT_SINGLE_INSTANCE(DaudioRadar);
 
 bool DaudioRadar::ReportDaudioInit(const std::string& func, AudioInit bizStage, BizState bizState, int32_t errCode)
 {

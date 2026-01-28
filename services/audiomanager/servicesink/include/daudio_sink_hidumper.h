@@ -21,7 +21,7 @@
 #include <vector>
 #include "sys/stat.h"
 
-#include "single_instance.h"
+#include "dhfwk_single_instance.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -32,7 +32,7 @@ enum class HidumpFlag {
     DUMP_AUDIO_DATA_STOP,
 };
 class DaudioSinkHidumper {
-    DECLARE_SINGLE_INSTANCE_BASE(DaudioSinkHidumper);
+    FWK_DECLARE_SINGLE_INSTANCE_BASE(DaudioSinkHidumper);
 
 public:
     bool Dump(const std::vector<std::string> &args, std::string &result);

@@ -26,7 +26,7 @@
 #define DH_LOG_TAG "DAudioLatencyTest"
 namespace OHOS {
 namespace DistributedHardware {
-IMPLEMENT_SINGLE_INSTANCE(DAudioLatencyTest);
+FWK_IMPLEMENT_SINGLE_INSTANCE(DAudioLatencyTest);
 constexpr int32_t MAXSIZE = 8192;
 
 DAudioLatencyTest::DAudioLatencyTest()
