@@ -20,14 +20,15 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+const int32_t TIMEOUT_MS = 5;
 void SinkHandlerSetAccessListenerFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size < (sizeof(int32_t)))) {
         return;
     }
-    sptr<IAccessListener> listener(new TestAccessListener());
+    sptr<IAccessListener> listener = nullptr;
     std::string pkgName(reinterpret_cast<const char*>(data), size);
-    int32_t timeOut = *(reinterpret_cast<const int32_t*>(data));
+    int32_t timeOut = TIMEOUT_MS;
     DAudioSinkHandler::GetInstance().SetAccessListener(listener, timeOut, pkgName);
 }
 }
