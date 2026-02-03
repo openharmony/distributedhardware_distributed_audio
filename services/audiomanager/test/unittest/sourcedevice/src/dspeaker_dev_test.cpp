@@ -532,5 +532,318 @@ HWTEST_F(DSpeakerDevTest, IsMimeSupported_001, TestSize.Level1)
     spk_->codec_ = container;
     EXPECT_EQ(ret, false);
 }
+
+/**
+ * @tc.name: GetCodecCaps_002
+ * @tc.desc: Verify GetCodecCaps with empty capability.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DSpeakerDevTest, GetCodecCaps_002, TestSize.Level1)
+{
+    std::vector<AudioCodecType> container = spk_->codec_;
+    spk_->codec_.clear();
+    spk_->GetCodecCaps("EmptyCapability");
+    spk_->codec_ = container;
+    EXPECT_EQ(0, spk_->codec_.size());
+}
+
+/**
+ * @tc.name: AddToVec_002
+ * @tc.desc: Verify AddToVec with duplicate value.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DSpeakerDevTest, AddToVec_002, TestSize.Level1)
+{
+    std::vector<AudioCodecType> container;
+    spk_->AddToVec(container, AudioCodecType::AUDIO_CODEC_AAC);
+    EXPECT_EQ(1, container.size());
+    spk_->AddToVec(container, AudioCodecType::AUDIO_CODEC_AAC);
+    EXPECT_EQ(1, container.size());
+}
+
+/**
+ * @tc.name: OnCtrlTransEvent_001
+ * @tc.desc: Verify OnCtrlTransEvent with EVENT_START_SUCCESS.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DSpeakerDevTest, OnCtrlTransEvent_001, TestSize.Level1)
+{
+    AVTransEvent event = { EventType::EVENT_START_SUCCESS, "", "" };
+    spk_->OnCtrlTransEvent(event);
+    EXPECT_TRUE(spk_->isTransReady_.load());
+}
+
+/**
+ * @tc.name: OnCtrlTransEvent_002
+ * @tc.desc: Verify OnCtrlTransEvent with EVENT_STOP_SUCCESS.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DSpeakerDevTest, OnCtrlTransEvent_002, TestSize.Level1)
+{
+    spk_->isOpened_.store(true);
+    AVTransEvent event = { EventType::EVENT_STOP_SUCCESS, "", "" };
+    spk_->OnCtrlTransEvent(event);
+    EXPECT_FALSE(spk_->isOpened_.load());
+}
+
+/**
+ * @tc.name: OnCtrlTransEvent_003
+ * @tc.desc: Verify OnCtrlTransEvent with EVENT_CHANNEL_CLOSED.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DSpeakerDevTest, OnCtrlTransEvent_003, TestSize.Level1)
+{
+    spk_->isOpened_.store(true);
+    AVTransEvent event = { EventType::EVENT_CHANNEL_CLOSED, "", "" };
+    spk_->OnCtrlTransEvent(event);
+    EXPECT_FALSE(spk_->isOpened_.load());
+}
+
+/**
+ * @tc.name: OnCtrlTransEvent_004
+ * @tc.desc: Verify OnCtrlTransEvent with EVENT_START_FAIL.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DSpeakerDevTest, OnCtrlTransEvent_004, TestSize.Level1)
+{
+    spk_->isOpened_.store(true);
+    AVTransEvent event = { EventType::EVENT_START_FAIL, "", "" };
+    spk_->OnCtrlTransEvent(event);
+    EXPECT_FALSE(spk_->isOpened_.load());
+}
+
+/**
+ * @tc.name: OnCtrlTransMessage_001
+ * @tc.desc: Verify OnCtrlTransMessage with nullptr message.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DSpeakerDevTest, OnCtrlTransMessage_001, TestSize.Level1)
+{
+    std::shared_ptr<AVTransMessage> message = nullptr;
+    spk_->OnCtrlTransMessage(message);
+    EXPECT_EQ(nullptr, message);
+}
+
+/**
+ * @tc.name: OnCtrlTransMessage_002
+ * @tc.desc: Verify OnCtrlTransMessage with valid message.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DSpeakerDevTest, OnCtrlTransMessage_002, TestSize.Level1)
+{
+    auto message = std::make_shared<AVTransMessage>();
+    message->type_ = OPEN_SPEAKER;
+    message->content_ = "TestContent";
+    message->dstDevId_ = DEV_ID;
+    spk_->OnCtrlTransMessage(message);
+    EXPECT_EQ(OPEN_SPEAKER, message->type_);
+}
+
+/**
+ * @tc.name: OnEngineTransEvent_001
+ * @tc.desc: Verify OnEngineTransEvent with different event types.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DSpeakerDevTest, OnEngineTransEvent_001, TestSize.Level1)
+{
+    AVTransEvent event = { EventType::EVENT_START_SUCCESS, "", "" };
+    spk_->OnEngineTransEvent(event);
+    EXPECT_TRUE(spk_->isTransReady_.load());
+
+    event.type = EventType::EVENT_STOP_SUCCESS;
+    spk_->OnEngineTransEvent(event);
+
+    event.type = EventType::EVENT_CHANNEL_CLOSED;
+    spk_->OnEngineTransEvent(event);
+
+    event.type = EventType::EVENT_START_FAIL;
+    spk_->OnEngineTransEvent(event);
+    EXPECT_EQ(EventType::EVENT_START_FAIL, event.type);
+}
+
+/**
+ * @tc.name: OnEngineTransMessage_001
+ * @tc.desc: Verify OnEngineTransMessage with nullptr message.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DSpeakerDevTest, OnEngineTransMessage_001, TestSize.Level1)
+{
+    std::shared_ptr<AVTransMessage> message = nullptr;
+    spk_->OnEngineTransMessage(message);
+    EXPECT_EQ(nullptr, message);
+}
+
+/**
+ * @tc.name: OnEngineTransMessage_002
+ * @tc.desc: Verify OnEngineTransMessage with valid message.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DSpeakerDevTest, OnEngineTransMessage_002, TestSize.Level1)
+{
+    auto message = std::make_shared<AVTransMessage>();
+    message->type_ = CLOSE_SPEAKER;
+    message->content_ = "TestContent";
+    message->dstDevId_ = DEV_ID;
+    spk_->OnEngineTransMessage(message);
+    EXPECT_EQ(CLOSE_SPEAKER, message->type_);
+}
+
+/**
+ * @tc.name: CreateStream_002
+ * @tc.desc: Verify CreateStream success path.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DSpeakerDevTest, CreateStream_002, TestSize.Level1)
+{
+    spk_->dhId_ = DH_ID_SPK;
+    EXPECT_EQ(DH_SUCCESS, spk_->CreateStream(streamId_));
+    EXPECT_EQ(streamId_, spk_->streamId_);
+}
+
+/**
+ * @tc.name: DestroyStream_002
+ * @tc.desc: Verify DestroyStream success path.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DSpeakerDevTest, DestroyStream_002, TestSize.Level1)
+{
+    spk_->dhId_ = DH_ID_SPK;
+    spk_->curPort_ = DH_ID_SPK;
+    EXPECT_EQ(DH_SUCCESS, spk_->DestroyStream(streamId_));
+    EXPECT_EQ(0, spk_->curPort_);
+}
+
+/**
+ * @tc.name: SetParameters_003
+ * @tc.desc: Verify SetParameters with STREAM_USAGE_VOICE_COMMUNICATION and OPUS not supported.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DSpeakerDevTest, SetParameters_003, TestSize.Level1)
+{
+    const AudioParamHDF param = {
+        .sampleRate = SAMPLE_RATE_8000,
+        .channelMask = STEREO,
+        .bitFormat = SAMPLE_U8,
+        .streamUsage = STREAM_USAGE_VOICE_COMMUNICATION,
+        .frameSize = 30,
+        .period = 0,
+        .ext = "Test",
+    };
+    std::vector<AudioCodecType> container = spk_->codec_;
+    spk_->codec_.clear();
+    spk_->GetCodecCaps(OHOS::DistributedHardware::AAC);
+    EXPECT_EQ(DH_SUCCESS, spk_->SetParameters(streamId_, param));
+    EXPECT_EQ(AudioCodecType::AUDIO_CODEC_AAC_EN, spk_->param_.comParam.codecType);
+}
+
+/**
+ * @tc.name: SetParameters_004
+ * @tc.desc: Verify SetParameters with STREAM_USAGE_VOICE_COMMUNICATION and OPUS supported.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DSpeakerDevTest, SetParameters_004, TestSize.Level1)
+{
+    const AudioParamHDF param = {
+        .sampleRate = SAMPLE_RATE_8000,
+        .channelMask = STEREO,
+        .bitFormat = SAMPLE_U8,
+        .streamUsage = STREAM_USAGE_VOICE_COMMUNICATION,
+        .frameSize = 30,
+        .period = 0,
+        .ext = "Test",
+    };
+    std::vector<AudioCodecType> container = spk_->codec_;
+    spk_->codec_.clear();
+    spk_->GetCodecCaps(OHOS::DistributedHardware::OPUS);
+    EXPECT_EQ(DH_SUCCESS, spk_->SetParameters(streamId_, param));
+    EXPECT_EQ(AudioCodecType::AUDIO_CODEC_OPUS, spk_->param_.comParam.codecType);
+}
+
+/**
+ * @tc.name: SendMessage_002
+ * @tc.desc: Verify SendMessage with valid message types.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DSpeakerDevTest, SendMessage_002, TestSize.Level1)
+{
+    std::string content = "content";
+    std::string dstDevId = "dstDevId";
+    spk_->speakerCtrlTrans_ = std::make_shared<DaudioSourceCtrlTrans>(DEV_ID,
+        SESSIONNAME_SPK_SOURCE, SESSIONNAME_SPK_SINK, spk_);
+    EXPECT_EQ(DH_SUCCESS, spk_->SendMessage(CLOSE_SPEAKER, content, dstDevId));
+    EXPECT_EQ(DH_SUCCESS, spk_->SendMessage(CHANGE_PLAY_STATUS, content, dstDevId));
+    EXPECT_EQ(DH_SUCCESS, spk_->SendMessage(VOLUME_SET, content, dstDevId));
+    EXPECT_EQ(DH_SUCCESS, spk_->SendMessage(VOLUME_MUTE_SET, content, dstDevId));
+}
+
+/**
+ * @tc.name: OnStateChange_002
+ * @tc.desc: Verify OnStateChange with DATA_OPENED.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DSpeakerDevTest, OnStateChange_002, TestSize.Level1)
+{
+    spk_->dhId_ = DH_ID_SPK;
+    EXPECT_EQ(DH_SUCCESS, spk_->OnStateChange(DATA_OPENED));
+    EXPECT_TRUE(spk_->isTransReady_.load());
+}
+
+/**
+ * @tc.name: OnStateChange_003
+ * @tc.desc: Verify OnStateChange with DATA_CLOSED.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DSpeakerDevTest, OnStateChange_003, TestSize.Level1)
+{
+    spk_->isOpened_.store(true);
+    spk_->dhId_ = DH_ID_SPK;
+    EXPECT_EQ(DH_SUCCESS, spk_->OnStateChange(DATA_CLOSED));
+    EXPECT_FALSE(spk_->isOpened_.load());
+    EXPECT_FALSE(spk_->isTransReady_.load());
+}
+
+/**
+ * @tc.name: OnStateChange_004
+ * @tc.desc: Verify OnStateChange with EVENT_UNKNOWN.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DSpeakerDevTest, OnStateChange_004, TestSize.Level1)
+{
+    spk_->dhId_ = DH_ID_SPK;
+    EXPECT_EQ(DH_SUCCESS, spk_->OnStateChange(EVENT_UNKNOWN));
+}
+
+/**
+ * @tc.name: UpdateWorkModeParam_001
+ * @tc.desc: Verify UpdateWorkModeParam function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DSpeakerDevTest, UpdateWorkModeParam_001, TestSize.Level1)
+{
+    std::string devId = "devId";
+    std::string dhId = "dhId";
+    AudioAsyncParam param;
+    EXPECT_EQ(DH_SUCCESS, spk_->UpdateWorkModeParam(devId, dhId, param));
+}
 } // namespace DistributedHardware
 } // namespace OHOS
