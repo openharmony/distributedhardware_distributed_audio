@@ -667,5 +667,409 @@ HWTEST_F(DMicDevTest, UpdateWorkModeParam001, TestSize.Level1)
     AudioAsyncParam param2{-1, 0, 0, 1};
     EXPECT_EQ(DH_SUCCESS, mic_->UpdateWorkModeParam(devId, dhId, param2));
 }
+
+/**
+ * @tc.name: OnCtrlTransMessage_001
+ * @tc.desc: Verify OnCtrlTransMessage function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, OnCtrlTransMessage_001, TestSize.Level1)
+{
+    std::shared_ptr<AVTransMessage> message = nullptr;
+    mic_->OnCtrlTransMessage(message);
+
+    message = std::make_shared<AVTransMessage>();
+    message->type_ = OPEN_MIC;
+    message->dstDevId_ = DEV_ID;
+    message->content_ = "TestContent";
+    mic_->OnCtrlTransMessage(message);
+    EXPECT_NE(nullptr, message);
+}
+
+/**
+ * @tc.name: InitSenderEngine_001
+ * @tc.desc: Verify InitSenderEngine function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, InitSenderEngine_001, TestSize.Level1)
+{
+    IAVEngineProvider *providerPtr = nullptr;
+    EXPECT_EQ(DH_SUCCESS, mic_->InitSenderEngine(providerPtr));
+}
+
+/**
+ * @tc.name: Pause_001
+ * @tc.desc: Verify Pause function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, Pause_001, TestSize.Level1)
+{
+    EXPECT_EQ(DH_SUCCESS, mic_->Pause());
+}
+
+/**
+ * @tc.name: Restart_001
+ * @tc.desc: Verify Restart function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, Restart_001, TestSize.Level1)
+{
+    EXPECT_EQ(DH_SUCCESS, mic_->Restart());
+}
+
+/**
+ * @tc.name: GetQueSize_001
+ * @tc.desc: Verify GetQueSize function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, GetQueSize_001, TestSize.Level1)
+{
+    uint32_t size = mic_->GetQueSize();
+    EXPECT_EQ(0, size);
+
+    auto data = std::make_shared<AudioData>(DEFAULT_AUDIO_DATA_SIZE);
+    mic_->dataQueue_.push_back(data);
+    size = mic_->GetQueSize();
+    EXPECT_EQ(1, size);
+}
+
+/**
+ * @tc.name: IsAVsync_001
+ * @tc.desc: Verify IsAVsync function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, IsAVsync_001, TestSize.Level1)
+{
+    mic_->avSyncParam_.isAVsync = 0;
+    EXPECT_FALSE(mic_->IsAVsync());
+
+    mic_->avSyncParam_.isAVsync = 1;
+    EXPECT_TRUE(mic_->IsAVsync());
+}
+
+/**
+ * @tc.name: OnEngineTransDataAvailable_002
+ * @tc.desc: Verify OnEngineTransDataAvailable with index flag.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, OnEngineTransDataAvailable_002, TestSize.Level1)
+{
+    size_t size = 4096;
+    auto audioData = std::make_shared<AudioData>(size);
+    audioData->SetPts(1000);
+    audioData->SetPtsSpecial(2000);
+
+    mic_->frameInIndex_ = 14;
+    mic_->ringBuffer_ = std::make_unique<DaudioRingBuffer>();
+    mic_->ringBuffer_->RingBufferInit(mic_->frameData_);
+    mic_->OnEngineTransDataAvailable(audioData);
+    EXPECT_EQ(0, mic_->frameInIndex_);
+
+    mic_->frameInIndex_ = 15;
+    mic_->OnEngineTransDataAvailable(audioData);
+    EXPECT_EQ(16, mic_->frameInIndex_);
+}
+
+/**
+ * @tc.name: SendToProcess_002
+ * @tc.desc: Verify SendToProcess with ptsMap scenarios.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, SendToProcess_002, TestSize.Level1)
+{
+    const size_t capacity = 1;
+    auto audioData = std::make_shared<AudioData>(capacity);
+
+    mic_->ptsMap_.clear();
+    mic_->frameOutIndex_ = 0;
+    mic_->SendToProcess(audioData);
+
+    mic_->ptsMap_[0] = 100;
+    mic_->SendToProcess(audioData);
+    EXPECT_EQ(1, mic_->ptsMap_.size());
+
+    mic_->ptsMap_[15] = 200;
+    mic_->frameOutIndex_ = 15;
+    mic_->frameOutIndexFlag_ = 16;
+    mic_->SendToProcess(audioData);
+    EXPECT_EQ(0, mic_->frameOutIndex_);
+}
+
+/**
+ * @tc.name: OnDecodeTransDataDone_002
+ * @tc.desc: Verify OnDecodeTransDataDone with MMAP_MODE.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, OnDecodeTransDataDone_002, TestSize.Level1)
+{
+    AudioParamHDF param = {
+        .sampleRate = SAMPLE_RATE_48000,
+        .channelMask = STEREO,
+        .bitFormat = SAMPLE_S16LE,
+        .streamUsage = STREAM_USAGE_UNKNOWN,
+        .frameSize = 4096,
+        .period = 5,
+        .capturerFlags = MMAP_MODE,
+    };
+    mic_->SetParameters(streamId_, param);
+
+    mic_->curStatus_ = AudioStatus::STATUS_START;
+    const size_t capacity = 4096;
+    auto data = std::make_shared<AudioData>(capacity);
+    EXPECT_EQ(DH_SUCCESS, mic_->OnDecodeTransDataDone(data));
+
+    mic_->curStatus_ = AudioStatus::STATUS_IDLE;
+    EXPECT_EQ(DH_SUCCESS, mic_->OnDecodeTransDataDone(data));
+
+    mic_->isExistedEmpty_.store(true);
+    EXPECT_EQ(DH_SUCCESS, mic_->OnDecodeTransDataDone(data));
+}
+
+/**
+ * @tc.name: AVsyncRefreshAshmem_002
+ * @tc.desc: Verify AVsyncRefreshAshmem with various parameters.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, AVsyncRefreshAshmem_002, TestSize.Level1)
+{
+    int32_t fd = -1;
+    int32_t ashmemLength = 8192;
+    EXPECT_EQ(DH_SUCCESS, mic_->AVsyncRefreshAshmem(fd, ashmemLength));
+
+    fd = 10;
+    ashmemLength = 1024;
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->AVsyncRefreshAshmem(fd, ashmemLength));
+    EXPECT_NE(nullptr, mic_->avsyncAshmem_);
+
+    mic_->AVsyncDeintAshmem();
+    EXPECT_EQ(nullptr, mic_->avsyncAshmem_);
+}
+
+/**
+ * @tc.name: UpdateWorkModeParam_002
+ * @tc.desc: Verify UpdateWorkModeParam with AVsync scene types.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, UpdateWorkModeParam_002, TestSize.Level1)
+{
+    std::string devId = "devId";
+    std::string dhId = "dhId";
+    AudioAsyncParam param1{10, 1024, static_cast<uint32_t>(AudioAVScene::BROADCAST), 1};
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->UpdateWorkModeParam(devId, dhId, param1));
+    EXPECT_NE(DMicDev::DATA_QUEUE_BROADCAST_SIZE, mic_->scene_);
+
+    AudioAsyncParam param2{10, 1024, static_cast<uint32_t>(AudioAVScene::VIDEOCALL), 1};
+    EXPECT_EQ(DH_SUCCESS, mic_->UpdateWorkModeParam(devId, dhId, param2));
+    EXPECT_EQ(DMicDev::DATA_QUEUE_VIDEOCALL_SIZE, mic_->scene_);
+
+    AudioAsyncParam param3{-1, 0, 0, 0};
+    EXPECT_EQ(DH_SUCCESS, mic_->UpdateWorkModeParam(devId, dhId, param3));
+}
+
+/**
+ * @tc.name: OnEngineTransMessage_002
+ * @tc.desc: Verify OnEngineTransMessage with valid message.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, OnEngineTransMessage_002, TestSize.Level1)
+{
+    auto message = std::make_shared<AVTransMessage>();
+    message->type_ = CLOSE_MIC;
+    message->dstDevId_ = DEV_ID;
+    message->content_ = "TestContent";
+    mic_->OnEngineTransMessage(message);
+    EXPECT_NE(nullptr, message);
+}
+
+/**
+ * @tc.name: WriteStreamData_001
+ * @tc.desc: Verify WriteStreamData function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, WriteStreamData_001, TestSize.Level1)
+{
+    const size_t capacity = 4096;
+    auto data = std::make_shared<AudioData>(capacity);
+    EXPECT_EQ(DH_SUCCESS, mic_->WriteStreamData(streamId_, data));
+}
+
+/**
+ * @tc.name: MmapStop_001
+ * @tc.desc: Verify MmapStop function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, MmapStop_001, TestSize.Level1)
+{
+    EXPECT_EQ(DH_SUCCESS, mic_->MmapStop());
+
+    mic_->isEnqueueRunning_.store(true);
+    EXPECT_EQ(DH_SUCCESS, mic_->MmapStop());
+}
+
+/**
+ * @tc.name: RefreshAshmemInfo_002
+ * @tc.desc: Verify RefreshAshmemInfo with existing ashmem.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, RefreshAshmemInfo_002, TestSize.Level1)
+{
+    AudioParamHDF param = {
+        .sampleRate = SAMPLE_RATE_48000,
+        .channelMask = STEREO,
+        .bitFormat = SAMPLE_S16LE,
+        .streamUsage = STREAM_USAGE_UNKNOWN,
+        .frameSize = 4096,
+        .period = 5,
+        .capturerFlags = MMAP_MODE,
+    };
+    mic_->SetParameters(streamId_, param);
+
+    int32_t fd = 10;
+    int32_t ashmemLength = 1024;
+    int32_t lengthPerTrans = 512;
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->RefreshAshmemInfo(streamId_, fd, ashmemLength, lengthPerTrans));
+
+    // Call again with ashmem already created
+    EXPECT_EQ(DH_SUCCESS, mic_->RefreshAshmemInfo(streamId_, fd, ashmemLength, lengthPerTrans));
+}
+
+/**
+ * @tc.name: GetAudioParam_001
+ * @tc.desc: Verify GetAudioParam function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, GetAudioParam_001, TestSize.Level1)
+{
+    AudioParamHDF paramHdf = {
+        .sampleRate = SAMPLE_RATE_48000,
+        .channelMask = STEREO,
+        .bitFormat = SAMPLE_S16LE,
+        .streamUsage = STREAM_USAGE_UNKNOWN,
+        .frameSize = 4096,
+        .period = 5,
+    };
+    mic_->SetParameters(streamId_, paramHdf);
+
+    AudioParam param = mic_->GetAudioParam();
+    EXPECT_EQ(SAMPLE_RATE_48000, param.comParam.sampleRate);
+    EXPECT_EQ(STEREO, param.comParam.channelMask);
+    EXPECT_EQ(SAMPLE_S16LE, param.comParam.bitFormat);
+}
+
+/**
+ * @tc.name: OnDecodeTransDataDone_003
+ * @tc.desc: Verify OnDecodeTransDataDone with queue overflow.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, OnDecodeTransDataDone_003, TestSize.Level1)
+{
+    mic_->curStatus_ = AudioStatus::STATUS_START;
+    const size_t capacity = 4096;
+
+    // Fill queue beyond max size
+    for (size_t i = 0; i < 20; i++) {
+        auto data = std::make_shared<AudioData>(capacity);
+        mic_->OnDecodeTransDataDone(data);
+    }
+
+    EXPECT_GT(mic_->dataQueue_.size(), 0);
+}
+
+/**
+ * @tc.name: FillJitterQueue_001
+ * @tc.desc: Verify FillJitterQueue function behavior.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, FillJitterQueue_001, TestSize.Level1)
+{
+    AudioParamHDF param = {
+        .sampleRate = SAMPLE_RATE_48000,
+        .channelMask = STEREO,
+        .bitFormat = SAMPLE_S16LE,
+        .streamUsage = STREAM_USAGE_UNKNOWN,
+        .frameSize = 4096,
+        .period = 5,
+        .capturerFlags = MMAP_MODE,
+    };
+    mic_->SetParameters(streamId_, param);
+
+    mic_->isEnqueueRunning_ = true;
+    mic_->paramHDF_.period = 0;
+    mic_->FillJitterQueue();
+
+    mic_->paramHDF_.period = 5;
+    for (size_t i = 0; i < 15; i++) {
+        auto data = std::make_shared<AudioData>(DEFAULT_AUDIO_DATA_SIZE);
+        mic_->dataQueue_.push_back(data);
+    }
+    mic_->FillJitterQueue();
+
+    mic_->isEnqueueRunning_ = false;
+    EXPECT_EQ(false, mic_->isEnqueueRunning_);
+}
+
+/**
+ * @tc.name: SetParameters_002
+ * @tc.desc: Verify SetParameters with AAC codec.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, SetParameters_002, TestSize.Level1)
+{
+    AudioParamHDF param = {
+        .sampleRate = SAMPLE_RATE_48000,
+        .channelMask = STEREO,
+        .bitFormat = SAMPLE_S16LE,
+        .streamUsage = STREAM_USAGE_MEDIA,
+        .frameSize = 4096,
+        .period = 5,
+    };
+    mic_->codec_.clear();
+    mic_->GetCodecCaps("AAC");
+
+    EXPECT_EQ(DH_SUCCESS, mic_->SetParameters(streamId_, param));
+    EXPECT_EQ(AudioCodecType::AUDIO_CODEC_AAC_EN, mic_->param_.comParam.codecType);
+}
+
+/**
+ * @tc.name: SetParameters_003
+ * @tc.desc: Verify SetParameters with OPUS codec.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, SetParameters_003, TestSize.Level1)
+{
+    AudioParamHDF param = {
+        .sampleRate = SAMPLE_RATE_48000,
+        .channelMask = STEREO,
+        .bitFormat = SAMPLE_S16LE,
+        .streamUsage = STREAM_USAGE_VOICE_COMMUNICATION,
+        .frameSize = 4096,
+        .period = 5,
+    };
+    mic_->codec_.clear();
+    mic_->GetCodecCaps("OPUS");
+
+    EXPECT_EQ(DH_SUCCESS, mic_->SetParameters(streamId_, param));
+    EXPECT_EQ(AudioCodecType::AUDIO_CODEC_OPUS, mic_->param_.comParam.codecType);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
