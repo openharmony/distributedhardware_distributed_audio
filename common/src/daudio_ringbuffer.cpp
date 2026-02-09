@@ -34,12 +34,22 @@ DaudioRingBuffer::~DaudioRingBuffer()
 int32_t DaudioRingBuffer::RingBufferInit(uint8_t *&audioData)
 {
     array_ = new (std::nothrow) uint8_t[RINGBUFFERLEN] {0};
-    CHECK_AND_RETURN_RET_LOG(array_ == nullptr, ERR_DH_AUDIO_FAILED, "Buffer is malloced failed.");
+    if (array_ == nullptr) {
+        DHLOGE("Buffer is malloced failed.");
+        return ERR_DH_AUDIO_FAILED;
+    }
+
+    audioData = new (std::nothrow) uint8_t[DAUDIO_DATA_SIZE] {0};
+    if (audioData == nullptr) {
+        DHLOGE("Audio data is malloced failed.");
+        delete[] array_;
+        array_ = nullptr;
+        return ERR_DH_AUDIO_FAILED;
+    }
+
     writePos_ = 0;
     readPos_ = 0;
     tag_ = 0;
-    audioData = new (std::nothrow) uint8_t[DAUDIO_DATA_SIZE] {0};
-    CHECK_AND_RETURN_RET_LOG(audioData == nullptr, ERR_DH_AUDIO_FAILED, "Audio data is malloced failed.");
     return DH_SUCCESS;
 }
 
