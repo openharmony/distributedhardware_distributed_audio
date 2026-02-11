@@ -534,11 +534,11 @@ HWTEST_F(DSpeakerDevTest, IsMimeSupported_001, TestSize.Level1)
 }
 
 /**
-* @tc.name: GetCodecCaps_002
-* @tc.desc: Verify GetCodecCaps with empty capability.
-* @tc.type: FUNC
-* @tc.require: AR000H0E5F
-*/
+ * @tc.name: GetCodecCaps_002
+ * @tc.desc: Verify GetCodecCaps with empty capability.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
 HWTEST_F(DSpeakerDevTest, GetCodecCaps_002, TestSize.Level1)
 {
     std::vector<AudioCodecType> container = spk_->codec_;
