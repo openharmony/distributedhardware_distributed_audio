@@ -298,8 +298,10 @@ int32_t DAudioSourceManager::HandleDAudioNotify(const std::string &devId, const 
     cJSON *jParam = cJSON_Parse(eventContent.c_str());
     CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
     if (CJsonParamCheck(jParam, { KEY_RANDOM_TASK_CODE })) {
-        DHLOGD("Receive audio notify from sink, random task code: %{public}s",
-            cJSON_GetObjectItemCaseSensitive(jParam, KEY_RANDOM_TASK_CODE)->valuestring);
+        cJSON *item = cJSON_GetObjectItemCaseSensitive(jParam, KEY_RANDOM_TASK_CODE);
+        if (item != nullptr && item->valuestring != nullptr) {
+            DHLOGD("Random task code: %{public}s", item->valuestring);
+        }
     }
 
     std::shared_ptr<DAudioSourceDev> sourceDev = nullptr;
