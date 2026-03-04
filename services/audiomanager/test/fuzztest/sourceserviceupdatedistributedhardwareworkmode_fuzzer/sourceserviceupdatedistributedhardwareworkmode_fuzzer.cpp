@@ -36,7 +36,7 @@ void SourceServiceUpdateDistributedHardwareWorkModeFuzzTest(const uint8_t* data,
     std::string devId = fdp.ConsumeRandomLengthString();
     std::string dhId = fdp.ConsumeRandomLengthString();
     bool runOnCreate = fdp.ConsumeBool();
-    int32_t f = fdp.ConsumeIntegral<int32_t>();
+    int32_t f = -1;
     int32_t sm = fdp.ConsumeIntegral<int32_t>();
     uint32_t s = fdp.ConsumeIntegral<uint32_t>();
     bool av = fdp.ConsumeBool();
