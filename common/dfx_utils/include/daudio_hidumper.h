@@ -20,13 +20,13 @@
 #include <vector>
 #include "sys/stat.h"
 
-#include <v1_0/iaudio_manager.h>
-#include <v1_0/audio_types.h>
+#include <v2_0/iaudio_manager.h>
+#include <v2_0/audio_types.h>
 #include "daudio_handler.h"
 #include "dhfwk_single_instance.h"
 
-using OHOS::HDI::DistributedAudio::Audio::V1_0::IAudioManager;
-using OHOS::HDI::DistributedAudio::Audio::V1_0::AudioAdapterDescriptor;
+using OHOS::HDI::DistributedAudio::Audio::V2_0::IAudioManager;
+using OHOS::HDI::DistributedAudio::Audio::V2_0::AudioAdapterDescriptor;
 
 namespace OHOS {
 namespace DistributedHardware {

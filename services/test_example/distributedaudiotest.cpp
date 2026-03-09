@@ -31,26 +31,26 @@
 #include "daudio_errorcode.h"
 #include "daudio_log.h"
 
-using OHOS::HDI::DistributedAudio::Audio::V1_0::IAudioAdapter;
-using OHOS::HDI::DistributedAudio::Audio::V1_0::AudioAdapterDescriptor;
-using OHOS::HDI::DistributedAudio::Audio::V1_0::AudioFormat;
-using OHOS::HDI::DistributedAudio::Audio::V1_0::AudioPort;
-using OHOS::HDI::DistributedAudio::Audio::V1_0::AudioPortDirection;
-using OHOS::HDI::DistributedAudio::Audio::V1_0::IAudioManager;
-using OHOS::HDI::DistributedAudio::Audio::V1_0::IAudioRender;
-using OHOS::HDI::DistributedAudio::Audio::V1_0::IAudioCapture;
-using OHOS::HDI::DistributedAudio::Audio::V1_0::AudioSampleAttributes;
-using OHOS::HDI::DistributedAudio::Audio::V1_0::AudioDeviceDescriptor;
-using OHOS::HDI::DistributedAudio::Audio::V1_0::AudioCategory;
-using OHOS::HDI::DistributedAudio::Audio::V1_0::AudioRouteNode;
-using OHOS::HDI::DistributedAudio::Audio::V1_0::AudioExtParamKey;
-using OHOS::HDI::DistributedAudio::Audio::V1_0::AudioRoute;
-using OHOS::HDI::DistributedAudio::Audio::V1_0::AudioSceneDescriptor;
-using OHOS::HDI::DistributedAudio::Audio::V1_0::IAudioCallback;
-using OHOS::HDI::DistributedAudio::Audio::V1_0::AudioPortPin;
-using OHOS::HDI::DistributedAudio::Audio::V1_0::AudioPortType;
-using OHOS::HDI::DistributedAudio::Audio::V1_0::AudioPortRole;
-using OHOS::HDI::DistributedAudio::Audio::V1_0::AudioCallbackType;
+using OHOS::HDI::DistributedAudio::Audio::V2_0::IAudioAdapter;
+using OHOS::HDI::DistributedAudio::Audio::V2_0::AudioAdapterDescriptor;
+using OHOS::HDI::DistributedAudio::Audio::V2_0::AudioFormat;
+using OHOS::HDI::DistributedAudio::Audio::V2_0::AudioPort;
+using OHOS::HDI::DistributedAudio::Audio::V2_0::AudioPortDirection;
+using OHOS::HDI::DistributedAudio::Audio::V2_0::IAudioManager;
+using OHOS::HDI::DistributedAudio::Audio::V2_0::IAudioRender;
+using OHOS::HDI::DistributedAudio::Audio::V2_0::IAudioCapture;
+using OHOS::HDI::DistributedAudio::Audio::V2_0::AudioSampleAttributes;
+using OHOS::HDI::DistributedAudio::Audio::V2_0::AudioDeviceDescriptor;
+using OHOS::HDI::DistributedAudio::Audio::V2_0::AudioCategory;
+using OHOS::HDI::DistributedAudio::Audio::V2_0::AudioRouteNode;
+using OHOS::HDI::DistributedAudio::Audio::V2_0::AudioExtParamKey;
+using OHOS::HDI::DistributedAudio::Audio::V2_0::AudioRoute;
+using OHOS::HDI::DistributedAudio::Audio::V2_0::AudioSceneDescriptor;
+using OHOS::HDI::DistributedAudio::Audio::V2_0::IAudioCallback;
+using OHOS::HDI::DistributedAudio::Audio::V2_0::AudioPortPin;
+using OHOS::HDI::DistributedAudio::Audio::V2_0::AudioPortType;
+using OHOS::HDI::DistributedAudio::Audio::V2_0::AudioPortRole;
+using OHOS::HDI::DistributedAudio::Audio::V2_0::AudioCallbackType;
 
 namespace {
 using namespace OHOS::DistributedHardware;
@@ -110,6 +110,7 @@ constexpr int32_t RENDER_FRAME_SIZE = 3840;
 constexpr int32_t RENDER_INTER_LEAVED = 1;
 constexpr int32_t RENDER_STREAM_ID = 0;
 constexpr int32_t RENDER_CHANNEL_MASK = 2;
+constexpr int32_t RENDER_CHANNEL_LAYOUT = 10;
 constexpr int32_t CAPTURE_INTER_LEAVED = 1;
 constexpr int32_t CAPTURE_STREAM_ID = 2;
 constexpr int32_t CAPTURE_CHANNEL_MASK = 2;
@@ -307,6 +308,7 @@ static void OpenSpk(const std::string &devId)
     g_rattrs.channelCount = RENDER_CHANNEL_MASK;
     g_rattrs.sampleRate = AUDIO_SAMPLE_RATE;
     g_rattrs.format = AudioFormat::AUDIO_FORMAT_TYPE_PCM_16_BIT;
+    g_rattrs.channelLayout = RENDER_CHANNEL_LAYOUT;
     ret = g_adapter->CreateRender(renderDesc, g_rattrs, g_render, g_renderId);
     if (ret != DH_SUCCESS || g_render == nullptr) {
         std::cout << "Open SPK device failed, ret: " << ret << std::endl;
