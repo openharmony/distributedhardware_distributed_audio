@@ -158,7 +158,9 @@ int32_t DMicClient::AudioFwkClientSetUp()
         }
     };
     std::lock_guard<std::mutex> lck(devMtx_);
-    audioCapturer_ = AudioStandard::AudioCapturer::Create(capturerOptions);
+    AudioStandard::AppInfo appInfo = {};
+    appInfo.deviceId = devId_;
+    audioCapturer_ = AudioStandard::AudioCapturer::Create(capturerOptions, appInfo);
     CHECK_NULL_RETURN(audioCapturer_, ERR_DH_AUDIO_CLIENT_CAPTURER_CREATE_FAILED);
     if (audioParam_.captureOpts.capturerFlags == MMAP_MODE) {
         int32_t ret = audioCapturer_->SetCapturerReadCallback(shared_from_this());
