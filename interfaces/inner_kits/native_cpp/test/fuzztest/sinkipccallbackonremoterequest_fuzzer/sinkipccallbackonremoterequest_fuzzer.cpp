@@ -28,12 +28,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 const uint32_t DC_RESOURCE_VALUE = 2;
-const uint32_t DC_RESOURCE_SIZE = 3;
-const ResourceEventType resourceEventType[DC_RESOURCE_SIZE] {
-    ResourceEventType::EVENT_TYPE_QUERY_RESOURCE,
-    ResourceEventType::EVENT_TYPE_PULL_UP_PAGE,
-    ResourceEventType::EVENT_TYPE_CLOSE_PAGE
-};
+const uint32_t MIN_DH_TYPE = 0;
 
 void SinkIpcCallbackOnRemoteRequestFuzzTest(const uint8_t* data, size_t size)
 {
@@ -45,7 +40,7 @@ void SinkIpcCallbackOnRemoteRequestFuzzTest(const uint8_t* data, size_t size)
     MessageParcel reply;
     MessageOption option;
     uint32_t code = 0;
-    int32_t resType = static_cast<int32_t>(resourceEventType[data[0] % DC_RESOURCE_SIZE]);
+    int32_t resType = fdp.ConsumeIntegralInRange<int32_t>(MIN_DH_TYPE, DC_RESOURCE_VALUE);
     std::string subtype = fdp.ConsumeRandomLengthString();
     std::string networkId = fdp.ConsumeRandomLengthString();
     bool isSensitive = data[0] % DC_RESOURCE_VALUE;
