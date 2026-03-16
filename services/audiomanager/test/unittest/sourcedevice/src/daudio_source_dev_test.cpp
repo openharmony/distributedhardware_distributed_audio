@@ -212,10 +212,14 @@ HWTEST_F(DAudioSourceDevTest, NotifyEvent_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, HandlePlayStatusChange_001, TestSize.Level1)
 {
+    // Create play status change event with empty content
     AudioEvent event = AudioEvent(CHANGE_PLAY_STATUS, "");
+    // Verify the function returns null pointer error
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->HandlePlayStatusChange(event));
 
+    // Wake up the audio device
     sourceDev_->AwakeAudioDev();
+    // Verify the function returns success after device wakeup
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandlePlayStatusChange(event));
 }
 
@@ -227,15 +231,23 @@ HWTEST_F(DAudioSourceDevTest, HandlePlayStatusChange_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, WaitForRPC_001, TestSize.Level1)
 {
+    // Set event type to open speaker result
     AudioEventType type = NOTIFY_OPEN_SPEAKER_RESULT;
+    // Verify RPC wait timeout
     EXPECT_EQ(ERR_DH_AUDIO_SA_WAIT_TIMEOUT, sourceDev_->WaitForRPC(type));
 
+    // Change event type to play status change
     type = CHANGE_PLAY_STATUS;
+    // Verify RPC wait timeout
     EXPECT_EQ(ERR_DH_AUDIO_SA_WAIT_TIMEOUT, sourceDev_->WaitForRPC(type));
 
+    // Set RPC result to failed
     sourceDev_->rpcResult_ = ERR_DH_AUDIO_FAILED;
+    // Set event type to open speaker result
     type = NOTIFY_OPEN_SPEAKER_RESULT;
+    // Set RPC notify event for speaker open
     sourceDev_->rpcNotify_ = sourceDev_->EVENT_NOTIFY_OPEN_SPK;
+    // Verify the function returns failed result
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->WaitForRPC(type));
 }
 
@@ -247,34 +259,58 @@ HWTEST_F(DAudioSourceDevTest, WaitForRPC_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, WaitForRPC_002, TestSize.Level1)
 {
+    // Set RPC result to success
     sourceDev_->rpcResult_ = DH_SUCCESS;
+    // Set event type to open speaker result
     AudioEventType type = NOTIFY_OPEN_SPEAKER_RESULT;
+    // Set RPC notify event for speaker open
     sourceDev_->rpcNotify_ = sourceDev_->EVENT_NOTIFY_OPEN_SPK;
+    // Verify the function returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->WaitForRPC(type));
 
+    // Keep RPC result as success
     sourceDev_->rpcResult_ = DH_SUCCESS;
+    // Change event type to close speaker result
     type = NOTIFY_CLOSE_SPEAKER_RESULT;
+    // Set RPC notify event for speaker close
     sourceDev_->rpcNotify_ = sourceDev_->EVENT_NOTIFY_CLOSE_SPK;
+    // Verify the function returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->WaitForRPC(type));
 
+    // Keep RPC result as success
     sourceDev_->rpcResult_ = DH_SUCCESS;
+    // Change event type to open mic result
     type = NOTIFY_OPEN_MIC_RESULT;
+    // Set RPC notify event for mic open
     sourceDev_->rpcNotify_ = sourceDev_->EVENT_NOTIFY_OPEN_MIC;
+    // Verify the function returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->WaitForRPC(type));
 
+    // Keep RPC result as success
     sourceDev_->rpcResult_ = DH_SUCCESS;
+    // Change event type to close mic result
     type = NOTIFY_CLOSE_MIC_RESULT;
+    // Set RPC notify event for mic close
     sourceDev_->rpcNotify_ = sourceDev_->EVENT_NOTIFY_CLOSE_MIC;
+    // Verify the function returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->WaitForRPC(type));
 
+    // Keep RPC result as success
     sourceDev_->rpcResult_ = DH_SUCCESS;
+    // Change event type to open ctrl result
     type = NOTIFY_OPEN_CTRL_RESULT;
+    // Set RPC notify event for ctrl open
     sourceDev_->rpcNotify_ = sourceDev_->EVENT_NOTIFY_OPEN_CTRL;
+    // Verify the function returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->WaitForRPC(type));
 
+    // Keep RPC result as success
     sourceDev_->rpcResult_ = DH_SUCCESS;
+    // Change event type to close ctrl result
     type = NOTIFY_CLOSE_CTRL_RESULT;
+    // Set RPC notify event for ctrl close
     sourceDev_->rpcNotify_ = sourceDev_->EVENT_NOTIFY_CLOSE_CTRL;
+    // Verify the function returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->WaitForRPC(type));
 }
 
@@ -286,21 +322,35 @@ HWTEST_F(DAudioSourceDevTest, WaitForRPC_002, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, HandleCtrlTransClosed_001, TestSize.Level1)
 {
+    // Create ctrl closed event with empty content
     AudioEvent event = AudioEvent(CTRL_CLOSED, "");
+    // Verify the function returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleCtrlTransClosed(event));
 
+    // Create speaker device instance
     auto speaker = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
+    // Set DH ID to default render ID
     int32_t dhId = DEFAULT_RENDER_ID;
+    // Add speaker device to device map
     sourceDev_->deviceMap_[dhId] = speaker;
+    // Mark speaker as not opened
     speaker->isOpened_ = false;
+    // Verify the function returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleCtrlTransClosed(event));
+    // Mark speaker as opened
     speaker->isOpened_ = true;
+    // Verify the function returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleCtrlTransClosed(event));
 
+    // Create mic device instance
     sourceDev_->mic_ = std::make_shared<DMicDev>(DEV_ID, sourceDev_);
+    // Mark speaker as not opened
     speaker->isOpened_ = false;
+    // Verify the function returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleCtrlTransClosed(event));
+    // Mark speaker as opened
     speaker->isOpened_ = true;
+    // Verify the function returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleCtrlTransClosed(event));
 }
 
@@ -312,11 +362,16 @@ HWTEST_F(DAudioSourceDevTest, HandleCtrlTransClosed_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, HandleNotifyRPC_001, TestSize.Level1)
 {
+    // Create RPC event with empty content
     AudioEvent event(NOTIFY_OPEN_SPEAKER_RESULT, "");
+    // Verify invalid parameter error
     EXPECT_EQ(ERR_DH_AUDIO_SA_PARAM_INVALID, sourceDev_->HandleNotifyRPC(event));
 
+    // Create string exceeding max JSON length
     std::string tempLongStr(DAUDIO_MAX_JSON_LEN + 1, 'a');
+    // Set over-length content to event
     event.content = tempLongStr;
+    // Verify invalid parameter error
     EXPECT_EQ(ERR_DH_AUDIO_SA_PARAM_INVALID, sourceDev_->HandleNotifyRPC(event));
 }
 
@@ -328,7 +383,9 @@ HWTEST_F(DAudioSourceDevTest, HandleNotifyRPC_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, HandleNotifyRPC_002, TestSize.Level1)
 {
+    // Create RPC event with invalid content
     AudioEvent event(NOTIFY_OPEN_SPEAKER_RESULT, "result");
+    // Verify null pointer error
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->HandleNotifyRPC(event));
 }
 
@@ -340,17 +397,28 @@ HWTEST_F(DAudioSourceDevTest, HandleNotifyRPC_002, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, HandleNotifyRPC_003, TestSize.Level1)
 {
+    // Create JSON object
     cJSON *jParam = cJSON_CreateObject();
+    // Check JSON object is not null
     CHECK_NULL_VOID(jParam);
+    // Add success result to JSON object
     cJSON_AddNumberToObject(jParam, KEY_RESULT, DH_SUCCESS);
+    // Convert JSON to unformatted string
     char *jsonString = cJSON_PrintUnformatted(jParam);
+    // Check JSON string is not null
     CHECK_NULL_AND_FREE_VOID(jsonString, jParam);
+    // Create event with JSON content
     AudioEvent event(CHANGE_PLAY_STATUS, std::string(jsonString));
+    // Release JSON object
     cJSON_Delete(jParam);
+    // Release JSON string
     cJSON_free(jsonString);
+    // Verify key not found error
     EXPECT_EQ(ERR_DH_AUDIO_NOT_FOUND_KEY, sourceDev_->HandleNotifyRPC(event));
 
+    // Change event type to open speaker result
     event.type = NOTIFY_OPEN_SPEAKER_RESULT;
+    // Verify the function returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleNotifyRPC(event));
 }
 
@@ -362,10 +430,14 @@ HWTEST_F(DAudioSourceDevTest, HandleNotifyRPC_003, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, HandleSpkMmapStart_001, TestSize.Level1)
 {
+    // Create empty audio event
     AudioEvent event;
+    // Verify null pointer error
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->HandleSpkMmapStart(event));
 
+    // Wake up the audio device
     sourceDev_->AwakeAudioDev();
+    // Verify the function returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleSpkMmapStart(event));
 }
 
@@ -377,10 +449,14 @@ HWTEST_F(DAudioSourceDevTest, HandleSpkMmapStart_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, HandleSpkMmapStop_001, TestSize.Level1)
 {
+    // Create empty audio event
     AudioEvent event;
+    // Verify null pointer error
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->HandleSpkMmapStop(event));
 
+    // Wake up the audio device
     sourceDev_->AwakeAudioDev();
+    // Verify the function returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleSpkMmapStop(event));
 }
 
@@ -392,10 +468,14 @@ HWTEST_F(DAudioSourceDevTest, HandleSpkMmapStop_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, HandleMicMmapStart_001, TestSize.Level1)
 {
+    // Create empty audio event
     AudioEvent event;
+    // Verify null pointer error
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->HandleMicMmapStart(event));
 
+    // Wake up the audio device
     sourceDev_->AwakeAudioDev();
+    // Verify the function returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleMicMmapStart(event));
 }
 
@@ -407,10 +487,14 @@ HWTEST_F(DAudioSourceDevTest, HandleMicMmapStart_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, HandleMicMmapStop_001, TestSize.Level1)
 {
+    // Create empty audio event
     AudioEvent event;
+    // Verify null pointer error
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->HandleMicMmapStop(event));
 
+    // Wake up the audio device
     sourceDev_->AwakeAudioDev();
+    // Verify the function returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleMicMmapStop(event));
 }
 
@@ -422,11 +506,16 @@ HWTEST_F(DAudioSourceDevTest, HandleMicMmapStop_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, TaskEnableDAudio_001, TestSize.Level1)
 {
+    // Verify enable function with empty string returns invalid param
     EXPECT_EQ(ERR_DH_AUDIO_SA_PARAM_INVALID, sourceDev_->TaskEnableDAudio(""));
+    // Verify disable function with empty string returns invalid param
     EXPECT_EQ(ERR_DH_AUDIO_SA_PARAM_INVALID, sourceDev_->TaskDisableDAudio(""));
 
+    // Create string exceeding max JSON length
     std::string tempLongStr(DAUDIO_MAX_JSON_LEN + 1, 'a');
+    // Verify enable function with over-length string returns invalid param
     EXPECT_EQ(ERR_DH_AUDIO_SA_PARAM_INVALID, sourceDev_->TaskEnableDAudio(tempLongStr));
+    // Verify disable function with over-length string returns invalid param
     EXPECT_EQ(ERR_DH_AUDIO_SA_PARAM_INVALID, sourceDev_->TaskDisableDAudio(tempLongStr));
 }
 
@@ -543,18 +632,30 @@ HWTEST_F(DAudioSourceDevTest, OnEnableTaskResult_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, EnableDSpeaker_001, TestSize.Level1)
 {
+    // Set default render device ID
     int32_t dhId = DEFAULT_RENDER_ID;
+    // Verify enable speaker function returns failed
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->EnableDSpeaker(dhId, ATTRS));
+    // Create speaker device instance
     auto speaker = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
+    // Add speaker to device map
     sourceDev_->deviceMap_[dhId] = speaker;
+    // Verify enable speaker function returns failed
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->EnableDSpeaker(dhId, ATTRS));
+    // Remove speaker from device map
     sourceDev_->deviceMap_[dhId] = nullptr;
+    // Define test string parameters
     std::string stra = "123";
     std::string strb = "1";
+    // Set device full status to true
     sourceDev_->isFull_ = true;
+    // Notify framework running status
     sourceDev_->NotifyFwkRunning(stra, strb);
+    // Keep device full status as true
     sourceDev_->isFull_ = true;
+    // Notify framework running status again
     sourceDev_->NotifyFwkRunning(stra, strb);
+    // Verify enable speaker function returns null pointer error
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->EnableDSpeaker(dhId, ATTRS));
 }
 
@@ -566,13 +667,20 @@ HWTEST_F(DAudioSourceDevTest, EnableDSpeaker_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, EnableDMic_001, TestSize.Level1)
 {
+    // Set default capture device ID
     int32_t dhId = DEFAULT_CAPTURE_ID;
+    // Verify enable mic function returns failed
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->EnableDMic(dhId, ATTRS));
+    // Create mic device instance
     auto mic = std::make_shared<DMicDev>(DEV_ID, sourceDev_);
+    // Add mic to device map
     sourceDev_->deviceMap_[dhId] = mic;
+    // Verify enable mic function returns failed
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->EnableDMic(dhId, ATTRS));
+    // Remove mic from device map
     sourceDev_->deviceMap_[dhId] = nullptr;
 
+    // Verify enable mic function returns null pointer error
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->EnableDMic(dhId, ATTRS));
 }
 
@@ -584,11 +692,16 @@ HWTEST_F(DAudioSourceDevTest, EnableDMic_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, DisableDSpeaker_001, TestSize.Level1)
 {
+    // Set test device ID to 0
     int32_t dhId = 0;
+    // Verify disable speaker function returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->DisableDSpeaker(dhId));
 
+    // Create and set speaker device instance
     sourceDev_->speaker_ = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
+    // Verify disable speaker function returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->DisableDSpeaker(dhId));
+    // Release speaker device instance
     sourceDev_->speaker_ = nullptr;
 }
 
@@ -600,13 +713,20 @@ HWTEST_F(DAudioSourceDevTest, DisableDSpeaker_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, DisableDMic_001, TestSize.Level1)
 {
+    // Set test device ID to 0
     int32_t dhId = 0;
+    // Verify disable mic function returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->DisableDMic(dhId));
 
+    // Create and set mic device instance
     sourceDev_->mic_ = std::make_shared<DMicDev>(DEV_ID, sourceDev_);
+    // Create another mic device instance
     auto mic = std::make_shared<DMicDev>(DEV_ID, sourceDev_);
+    // Add mic to device map
     sourceDev_->deviceMap_[dhId] = mic;
+    // Verify disable mic function returns null pointer error
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->DisableDMic(dhId));
+    // Release mic device instance
     sourceDev_->mic_ = nullptr;
 }
 
@@ -777,18 +897,30 @@ HWTEST_F(DAudioSourceDevTest, TaskCloseDMic_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, TaskCloseDMic_002, TestSize.Level1)
 {
+    // Create microphone device instance
     auto mic = std::make_shared<DMicDev>(DEV_ID, sourceDev_);
+    // Set default capture device ID
     int32_t dhId = DEFAULT_CAPTURE_ID;
+    // Add microphone to device map
     sourceDev_->deviceMap_[dhId] = mic;
+    // Initialize microphone transport instance
     mic->micTrans_ = std::make_shared<AVTransReceiverTransport>(DEV_ID, mic);
 
+    // Create JSON parameter object
     cJSON *jParam = cJSON_CreateObject();
+    // Check JSON object is not null
     CHECK_NULL_VOID(jParam);
+    // Add microphone DH ID to JSON object
     cJSON_AddStringToObject(jParam, KEY_DH_ID, DH_ID_MIC.c_str());
+    // Convert JSON object to unformatted string
     char *jsonString = cJSON_PrintUnformatted(jParam);
+    // Check JSON string is not null
     CHECK_NULL_AND_FREE_VOID(jsonString, jParam);
+    // Verify close microphone task returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskCloseDMic(std::string(jsonString)));
+    // Release JSON object
     cJSON_Delete(jParam);
+    // Release JSON string
     cJSON_free(jsonString);
 }
 
@@ -800,9 +932,13 @@ HWTEST_F(DAudioSourceDevTest, TaskCloseDMic_002, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, TaskDMicClosed_001, TestSize.Level1)
 {
+    // Define audio event object
     AudioEvent event;
+    // Set event content with DH ID
     event.content = "{\"dhId\":\"1\"}";
+    // Verify microphone closed task returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskDMicClosed(event.content));
+    // Put audio device into sleep mode
     sourceDev_->SleepAudioDev();
 }
 
@@ -814,9 +950,13 @@ HWTEST_F(DAudioSourceDevTest, TaskDMicClosed_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, TaskDMicClosed_002, TestSize.Level1)
 {
+    // Define audio event object
     AudioEvent event;
+    // Set event content with DH ID
     event.content = "{\"dhId\":\"1\"}";
+    // Create and set microphone device instance
     sourceDev_->mic_ = std::make_shared<DMicDev>(DEV_ID, sourceDev_);
+    // Verify microphone closed task returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskDMicClosed(event.content));
 }
 
@@ -828,20 +968,35 @@ HWTEST_F(DAudioSourceDevTest, TaskDMicClosed_002, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, TaskSetVolume_001, TestSize.Level1)
 {
+    // Set test device ID
     int32_t dhId = 3;
+    // Create JSON parameter object
     cJSON *jParam = cJSON_CreateObject();
+    // Check JSON object is not null
     CHECK_NULL_VOID(jParam);
+    // Add mute status to JSON object
     cJSON_AddNumberToObject(jParam, STREAM_MUTE_STATUS.c_str(), 3);
+    // Add device ID to JSON object
     cJSON_AddStringToObject(jParam, "dhId", "3");
+    // Convert JSON object to unformatted string
     char *jsonString = cJSON_PrintUnformatted(jParam);
+    // Check JSON string is not null
     CHECK_NULL_AND_FREE_VOID(jsonString, jParam);
+    // Create speaker device instance
     auto speaker = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
+    // Add speaker to device map
     sourceDev_->deviceMap_[dhId] = speaker;
+    // Initialize speaker transport instance
     speaker->speakerTrans_ = std::make_shared<AVTransSenderTransport>(DEV_ID, speaker);
+    // Initialize control transport for speaker
     speaker->InitCtrlTrans();
+    // Construct parameter string
     std::string param = "dhId=3;" + std::string(jsonString);
+    // Verify set volume task returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskSetVolume(param));
+    // Release JSON object
     cJSON_Delete(jParam);
+    // Release JSON string
     cJSON_free(jsonString);
 }
 
@@ -853,17 +1008,28 @@ HWTEST_F(DAudioSourceDevTest, TaskSetVolume_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, TaskSetVolume_002, TestSize.Level1)
 {
+    // Create and set audio control manager
     sourceDev_->audioCtrlMgr_ = std::make_shared<DAudioSourceDevCtrlMgr>(DEV_ID, sourceDev_);
+    // Verify set volume task does not return success
     EXPECT_NE(DH_SUCCESS, sourceDev_->TaskSetVolume(ARGS));
 
+    // Create JSON parameter object
     cJSON *jParam = cJSON_CreateObject();
+    // Check JSON object is not null
     CHECK_NULL_VOID(jParam);
+    // Add mute status to JSON object
     cJSON_AddNumberToObject(jParam, STREAM_MUTE_STATUS.c_str(), 1);
+    // Convert JSON object to unformatted string
     char *jsonString = cJSON_PrintUnformatted(jParam);
+    // Check JSON string is not null
     CHECK_NULL_AND_FREE_VOID(jsonString, jParam);
+    // Verify set volume task does not return success
     EXPECT_NE(DH_SUCCESS, sourceDev_->TaskSetVolume(std::string(jsonString)));
+    // Release JSON object
     cJSON_Delete(jParam);
+    // Release JSON string
     cJSON_free(jsonString);
+    // Notify task result with null pointer error
     sourceDev_->OnTaskResult(ERR_DH_AUDIO_NULLPTR, "", FUNC_NAME);
 }
 
@@ -875,8 +1041,11 @@ HWTEST_F(DAudioSourceDevTest, TaskSetVolume_002, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, TaskChangeVolume_001, TestSize.Level1)
 {
+    // Verify change volume task does not return success
     EXPECT_NE(DH_SUCCESS, sourceDev_->TaskChangeVolume(ARGS));
+    // Define test argument string
     std::string args = "{\"devId\":\"10\"}";
+    // Verify change volume task returns failed
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->TaskChangeVolume(args));
 }
 
@@ -888,8 +1057,11 @@ HWTEST_F(DAudioSourceDevTest, TaskChangeVolume_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, TaskChangeFocus_001, TestSize.Level1)
 {
+    // Verify change focus task does not return success
     EXPECT_NE(DH_SUCCESS, sourceDev_->TaskChangeFocus(ARGS));
+    // Define test argument string
     std::string args = "{\"devId\":\"10\"}";
+    // Verify change focus task returns failed
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->TaskChangeFocus(args));
 }
 
@@ -901,6 +1073,7 @@ HWTEST_F(DAudioSourceDevTest, TaskChangeFocus_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, TaskChangeRenderState_001, TestSize.Level1)
 {
+    // Verify change render state task does not return success
     EXPECT_NE(DH_SUCCESS, sourceDev_->TaskChangeRenderState(ARGS));
 }
 
@@ -912,15 +1085,24 @@ HWTEST_F(DAudioSourceDevTest, TaskChangeRenderState_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, TaskPlayStatusChange_001, TestSize.Level1)
 {
+    // Verify play status change task returns failed
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->TaskPlayStatusChange(AUDIO_EVENT_PAUSE));
 
+    // Create and set audio control manager
     sourceDev_->audioCtrlMgr_ = std::make_shared<DAudioSourceDevCtrlMgr>(DEV_ID, sourceDev_);
+    // Create and set speaker device instance
     sourceDev_->speaker_ = std::make_shared<DSpeakerDev>(DEV_ID, nullptr);
+    // Verify pause play status change task does not return success
     EXPECT_NE(DH_SUCCESS, sourceDev_->TaskPlayStatusChange(AUDIO_EVENT_PAUSE));
+    // Verify restart play status change task does not return success
     EXPECT_NE(DH_SUCCESS, sourceDev_->TaskPlayStatusChange(AUDIO_EVENT_RESTART));
+    // Create speaker device instance
     auto speaker = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
+    // Define test argument string
     std::string args = "{\"devId\":\"1\"}";
+    // Add speaker to device map
     sourceDev_->deviceMap_[1] = speaker;
+    // Verify play status change task does not return success
     EXPECT_NE(DH_SUCCESS, sourceDev_->TaskPlayStatusChange(args));
 }
 
@@ -932,10 +1114,14 @@ HWTEST_F(DAudioSourceDevTest, TaskPlayStatusChange_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, TaskSpkMmapStart_001, TestSize.Level1)
 {
+    // Verify speaker MMAP start task returns null pointer error
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->TaskSpkMmapStart(ARGS));
 
+    // Create speaker device instance
     auto speaker = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
+    // Add speaker to device map
     sourceDev_->deviceMap_[1] = speaker;
+    // Verify speaker MMAP start task returns null pointer error
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->TaskSpkMmapStart(ARGS));
 }
 
@@ -947,10 +1133,14 @@ HWTEST_F(DAudioSourceDevTest, TaskSpkMmapStart_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, TaskSpkMmapStop_001, TestSize.Level1)
 {
+    // Verify speaker MMAP stop task returns null pointer error
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->TaskSpkMmapStop(ARGS));
 
+    // Create speaker device instance
     auto speaker = std::make_shared<DSpeakerDev>(DEV_ID, nullptr);
+    // Add speaker to device map
     sourceDev_->deviceMap_[1] = speaker;
+    // Verify speaker MMAP stop task returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskSpkMmapStop(ARGS));
 }
 
@@ -962,16 +1152,24 @@ HWTEST_F(DAudioSourceDevTest, TaskSpkMmapStop_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, TaskMicMmapStart_001, TestSize.Level1)
 {
+    // Verify microphone MMAP start task returns null pointer error
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->TaskMicMmapStart(ARGS));
 
+    // Create microphone device instance
     auto mic = std::make_shared<DMicDev>(DEV_ID, nullptr);
+    // Set default capture device ID
     int32_t dhId = DEFAULT_CAPTURE_ID;
+    // Add microphone to device map
     sourceDev_->deviceMap_[dhId] = mic;
+    // Verify microphone MMAP start task returns null pointer error
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->TaskMicMmapStart(ARGS));
+    // Create audio data instance
     std::shared_ptr<AudioData> data = std::make_shared<AudioData>(AUDIO_DATA_CAP);
+    // Fill data queue to maximum length
     for (size_t i = 0; i < TASK_QUEUE_LEN; i++) {
         mic->dataQueue_.push_back(data);
     }
+    // Verify MMAP stop returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->deviceMap_[dhId]->MmapStop());
 }
 
@@ -983,11 +1181,16 @@ HWTEST_F(DAudioSourceDevTest, TaskMicMmapStart_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, TaskMicMmapStop_001, TestSize.Level1)
 {
+    // Verify microphone MMAP stop task returns null pointer error
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->TaskMicMmapStop(ARGS));
+    // Create microphone device instance
     auto mic = std::make_shared<DMicDev>(DEV_ID, nullptr);
+    // Set test device ID
     int32_t dhId = 1;
+    // Add microphone to device map
     sourceDev_->deviceMap_[dhId] = mic;
 
+    // Verify microphone MMAP stop task returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskMicMmapStop(ARGS));
 }
 
@@ -1000,13 +1203,20 @@ HWTEST_F(DAudioSourceDevTest, TaskMicMmapStop_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, NotifyHDF_001, TestSize.Level1)
 {
+    // Set event type to close microphone result
     AudioEventType type = NOTIFY_CLOSE_MIC_RESULT;
+    // Define result string
     std::string result = "result";
+    // Set test device ID
     int32_t dhId = 1;
+    // Verify HDF notification does not return success
     EXPECT_NE(DH_SUCCESS, sourceDev_->NotifyHDF(type, result, dhId));
 
+    // Create and set microphone device instance
     sourceDev_->mic_ = std::make_shared<DMicDev>(DEV_ID, sourceDev_);
+    // Add microphone to device map
     sourceDev_->deviceMap_[dhId] = sourceDev_->mic_;
+    // Verify HDF notification returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->NotifyHDF(type, result, dhId));
 }
 
@@ -1018,13 +1228,20 @@ HWTEST_F(DAudioSourceDevTest, NotifyHDF_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, NotifyHDF_002, TestSize.Level1)
 {
+    // Set event type to audio focus change
     AudioEventType type = AUDIO_FOCUS_CHANGE;
+    // Define result string
     std::string result = "result";
+    // Set test device ID
     int32_t dhId = 1;
+    // Verify HDF notification does not return success
     EXPECT_NE(DH_SUCCESS, sourceDev_->NotifyHDF(type, result, dhId));
 
+    // Create and set speaker device instance
     sourceDev_->speaker_ = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
+    // Add speaker to device map
     sourceDev_->deviceMap_[dhId] = sourceDev_->speaker_;
+    // Verify HDF notification returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->NotifyHDF(type, result, dhId));
 }
 
@@ -1036,12 +1253,18 @@ HWTEST_F(DAudioSourceDevTest, NotifyHDF_002, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, NotifyHDF_003, TestSize.Level1)
 {
+    // Set event type to unknown
     AudioEventType type = EVENT_UNKNOWN;
+    // Define result string
     std::string result = "result";
+    // Set test device ID
     int32_t dhId = 1;
 
+    // Create and set speaker device instance
     sourceDev_->speaker_ = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
+    // Add speaker to device map
     sourceDev_->deviceMap_[dhId] = sourceDev_->speaker_;
+    // Verify HDF notification returns failed
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->NotifyHDF(type, result, dhId));
 }
 
@@ -1053,16 +1276,26 @@ HWTEST_F(DAudioSourceDevTest, NotifyHDF_003, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, NotifySinkDev_001, TestSize.Level1)
 {
+    // Define null JSON parameter
     cJSON *jAudioParam = nullptr;
+    // Set test device ID
     int32_t dhId = 1;
+    // Set RPC open status to false
     sourceDev_->isRpcOpen_.store(false);
+    // Verify sink device notification returns failed
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->NotifySinkDev(CLOSE_MIC, jAudioParam, DH_ID_SPK));
 
+    // Set RPC open status to true
     sourceDev_->isRpcOpen_.store(true);
+    // Verify sink device notification returns null pointer error
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->NotifySinkDev(CLOSE_MIC, jAudioParam, DH_ID_SPK));
+    // Create and set microphone device instance
     sourceDev_->mic_ = std::make_shared<DMicDev>(DEV_ID, sourceDev_);
+    // Create and set speaker device instance
     sourceDev_->speaker_ = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
+    // Add speaker to device map
     sourceDev_->deviceMap_[dhId] = sourceDev_->speaker_;
+    // Verify sink device notification returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->NotifySinkDev(CLOSE_MIC, jAudioParam, DH_ID_SPK));
 }
 
@@ -1074,10 +1307,15 @@ HWTEST_F(DAudioSourceDevTest, NotifySinkDev_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, SendAudioEventToRemote_002, TestSize.Level1)
 {
+    // Define audio event object
     AudioEvent event;
+    // Set speaker instance to null
     sourceDev_->speaker_ = nullptr;
+    // Verify send audio event returns null pointer error
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->SendAudioEventToRemote(event));
+    // Create and set speaker device instance
     sourceDev_->speaker_ = std::make_shared<DSpeakerDev>(DEV_ID, sourceDev_);
+    // Verify send audio event returns null pointer error
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->SendAudioEventToRemote(event));
 }
 
@@ -1162,17 +1400,29 @@ HWTEST_F(DAudioSourceDevTest, TaskDMicClosed_004, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, EnableDMic_002, TestSize.Level1)
 {
+    // Set test device ID
     int32_t dhId = 1;
+    // Define test device ID string
     std::string devId = "123";
+    // Define test attribute string
     std::string attrs = "1234";
+    // Wake up the audio device
     sourceDev_->AwakeAudioDev();
+    // Create microphone closed audio event
     AudioEvent event = AudioEvent(MIC_CLOSED, "{\"dhId\":\"1\"}");
+    // Create audio event shared pointer
     auto eventParam = std::make_shared<AudioEvent>(event);
+    // Get inner event for microphone closed
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_DMIC_CLOSED, eventParam, 0);
+    // Call microphone closed callback
     sourceDev_->handler_->DMicClosedCallback(msgEvent);
+    // Put audio device into sleep mode
     sourceDev_->SleepAudioDev();
+    // Create microphone device instance
     auto mic = std::make_shared<DMicDev>(devId, sourceDev_);
+    // Insert microphone into device map
     sourceDev_->deviceMap_.insert(std::make_pair(dhId, mic));
+    // Verify enable microphone function returns failed
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->EnableDMic(dhId, attrs));
 }
 
@@ -1184,22 +1434,39 @@ HWTEST_F(DAudioSourceDevTest, EnableDMic_002, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, EnableDMic_003, TestSize.Level1)
 {
+    // Set test device ID
     int32_t dhId = 1;
+    // Wake up the audio device
     sourceDev_->AwakeAudioDev();
+    // Define empty audio event
     AudioEvent event;
+    // Create audio event shared pointer
     auto eventParam = std::make_shared<AudioEvent>(event);
+    // Get inner event for microphone closed
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_DMIC_CLOSED, eventParam, 0);
+    // Call microphone closed callback
     sourceDev_->handler_->DMicClosedCallback(msgEvent);
+    // Call set volume callback
     sourceDev_->handler_->SetVolumeCallback(msgEvent);
+    // Call change volume callback
     sourceDev_->handler_->ChangeVolumeCallback(msgEvent);
+    // Call change focus callback
     sourceDev_->handler_->ChangeFocusCallback(msgEvent);
+    // Call change render state callback
     sourceDev_->handler_->ChangeRenderStateCallback(msgEvent);
+    // Call play status change callback
     sourceDev_->handler_->PlayStatusChangeCallback(msgEvent);
+    // Call speaker MMAP start callback
     sourceDev_->handler_->SpkMmapStartCallback(msgEvent);
+    // Call speaker MMAP stop callback
     sourceDev_->handler_->SpkMmapStopCallback(msgEvent);
+    // Call microphone MMAP start callback
     sourceDev_->handler_->MicMmapStartCallback(msgEvent);
+    // Call microphone MMAP stop callback
     sourceDev_->handler_->MicMmapStopCallback(msgEvent);
+    // Put audio device into sleep mode
     sourceDev_->SleepAudioDev();
+    // Verify enable microphone function returns failed
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->EnableDMic(dhId, ATTRS));
 }
 
@@ -1211,13 +1478,21 @@ HWTEST_F(DAudioSourceDevTest, EnableDMic_003, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, HandleDSpeakerClosed_002, TestSize.Level1)
 {
+    // Create speaker closed audio event
     AudioEvent event = AudioEvent(SPEAKER_CLOSED, "{\"dhId\":\"-1\"}");
+    // Wake up the audio device
     sourceDev_->AwakeAudioDev();
+    // Verify handle speaker closed returns failed
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->HandleDSpeakerClosed(event));
+    // Verify disable audio returns not support
     EXPECT_EQ(ERR_DH_AUDIO_NOT_SUPPORT, sourceDev_->DisableDAudio(event.content));
+    // Verify open speaker task returns failed
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->TaskOpenDSpeaker(event.content));
+    // Define test argument string
     std::string args = "{\"dhId\":\"10\"}";
+    // Verify disable audio returns not support
     EXPECT_EQ(ERR_DH_AUDIO_NOT_SUPPORT, sourceDev_->DisableDAudio(event.content));
+    // Put audio device into sleep mode
     sourceDev_->SleepAudioDev();
 }
 
@@ -1229,9 +1504,13 @@ HWTEST_F(DAudioSourceDevTest, HandleDSpeakerClosed_002, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, ParseDhidFromEvent_001, TestSize.Level1)
 {
+    // Define test argument string
     std::string args = "{\"dhId\":\"10\"}";
+    // Verify parsed DH ID is correct
     EXPECT_EQ(10, sourceDev_->ParseDhidFromEvent(args));
+    // Define test argument with devId
     std::string args1 = "{\"devId\":\"10\"}";
+    // Verify disable audio returns not support
     EXPECT_EQ(ERR_DH_AUDIO_NOT_SUPPORT, sourceDev_->DisableDAudio(args1));
 }
 
@@ -1243,14 +1522,23 @@ HWTEST_F(DAudioSourceDevTest, ParseDhidFromEvent_001, TestSize.Level1)
  */
 HWTEST_F(DAudioSourceDevTest, EnableDAudio_001, TestSize.Level1)
 {
+    // Verify wake up audio device returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->AwakeAudioDev());
+    // Set device full status to true
     sourceDev_->isFull_.store(true);
+    // Verify enable audio returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->EnableDAudio(DH_ID_SPK, ATTRS));
+    // Set device full status to false
     sourceDev_->isFull_.store(false);
+    // Verify enable audio returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->EnableDAudio(DH_ID_SPK, ATTRS));
+    // Define meta data type argument
     std::string argsMeta = "{\"dataType\":\"meta\"}";
+    // Verify enable audio returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->EnableDAudio(DH_ID_SPK, argsMeta));
+    // Define full data type argument
     std::string argsFull = "{\"dataType\":\"full\"}";
+    // Verify enable audio returns success
     EXPECT_EQ(DH_SUCCESS, sourceDev_->EnableDAudio(DH_ID_SPK, argsFull));
 }
 
