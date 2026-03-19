@@ -106,7 +106,7 @@ int32_t DAudioManagerCallback::GetAudioParamHDF(const AudioParameter& param, Aud
 
 int32_t DAudioManagerCallback::SetParameters(int32_t streamId, const AudioParameter& param)
 {
-    DHLOGI("Set Parameters channelLayout:%{public}", PRIu64, param.channelLayout);
+    DHLOGI("Set Parameters channelLayout:%{public}" PRIu64, param.channelLayout);
     CHECK_NULL_RETURN(callback_, HDF_FAILURE);
     AudioParamHDF paramHDF;
     int32_t ret = GetAudioParamHDF(param, paramHDF);
