@@ -37,6 +37,7 @@ constexpr uint32_t MAX_DISTRIBUTED_HARDWARE_ID_LENGTH = 100;
 constexpr uint32_t EVENT_MANAGER_ENABLE_DAUDIO = 11;
 constexpr uint32_t EVENT_MANAGER_DISABLE_DAUDIO = 12;
 constexpr uint32_t DAUDIO_SINK_SERVICE_MAX_SIZE = 64;
+constexpr uint32_t DAUDIO_SOURCE_DEVICE_MAX_SIZE = 1024;
 }
 FWK_IMPLEMENT_SINGLE_INSTANCE(DAudioSourceManager);
 using AVTransProviderClass = IAVEngineProvider *(*)(const std::string &);
@@ -409,6 +410,10 @@ int32_t DAudioSourceManager::OnDisableDAudio(const std::string &devId, const std
 int32_t DAudioSourceManager::CreateAudioDevice(const std::string &devId)
 {
     DHLOGI("Create audio device.");
+    if (audioDevMap_.size() >= DAUDIO_SOURCE_DEVICE_MAX_SIZE) {
+        DHLOGE("Audio device map is full, not allow to create more devices.");
+        return ERR_DH_AUDIO_FAILED;
+    }
     auto sourceDev = std::make_shared<DAudioSourceDev>(devId, daudioMgrCallback_);
     if (sourceDev->AwakeAudioDev() != DH_SUCCESS) {
         DHLOGE("Create new audio device failed.");
