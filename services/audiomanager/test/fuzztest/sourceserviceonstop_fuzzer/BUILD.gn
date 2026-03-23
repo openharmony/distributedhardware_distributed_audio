@@ -57,7 +57,7 @@ ohos_fuzztest("SourceServiceOnStopFuzzTest") {
     "cJSON:cjson",
     "c_utils:utils",
     "distributed_hardware_fwk:distributedhardwareutils",
-    "drivers_interface_distributed_audio:libdaudio_proxy_1.0",
+    "drivers_interface_distributed_audio:libdaudio_proxy_2.0",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",

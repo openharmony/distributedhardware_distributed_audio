@@ -57,7 +57,7 @@ ohos_fuzztest("SourceServiceRegisterDistributedHardwareFuzzTest") {
     "distributed_hardware_fwk:distributed_av_receiver",
     "distributed_hardware_fwk:distributedhardwareutils",
     "distributed_hardware_fwk:libdhfwk_sdk",
-    "drivers_interface_distributed_audio:libdaudio_proxy_1.0",
+    "drivers_interface_distributed_audio:libdaudio_proxy_2.0",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
