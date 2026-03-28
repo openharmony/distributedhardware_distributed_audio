@@ -882,7 +882,7 @@ int32_t DMicDev::AVsyncRefreshAshmem(int32_t fd, int32_t ashmemLength)
 {
     DHLOGD("AVsync mode: fd:%{public}d, ashmemLength: %{public}d", fd, ashmemLength);
     CHECK_AND_RETURN_RET_LOG(avsyncAshmem_ != nullptr, DH_SUCCESS, "AvsyncAshmem_ is not nullptr");
-    if (ashmemLength < ASHMEM_MAX_LEN && fd > 0) {
+    if (ashmemLength >= static_cast<int32_t>(sizeof(AVsyncShareData)) && ashmemLength < ASHMEM_MAX_LEN && fd > 0) {
         avsyncAshmem_ = sptr<Ashmem>(new Ashmem(fd, ashmemLength));
         ashmemLength_ = ashmemLength;
         DHLOGD("Create ashmem success. fd:%{public}d, ashmem length: %{public}d", fd, ashmemLength_);

@@ -165,6 +165,8 @@ int32_t DAudioSinkStub::UnsubscribeLocalHardwareInner(MessageParcel &data, Messa
 
 int32_t DAudioSinkStub::DAudioNotifyInner(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    CHECK_AND_RETURN_RET_LOG(!VerifyPermission(), ERR_DH_AUDIO_SA_PERMISSION_FAIED,
+        "Permission verification fail.");
     std::string networkId = data.ReadString();
     std::string dhId = data.ReadString();
     int32_t eventType = data.ReadInt32();

@@ -173,6 +173,8 @@ int32_t DAudioSourceStub::ConfigDistributedHardwareInner(MessageParcel &data, Me
 
 int32_t DAudioSourceStub::DAudioNotifyInner(MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    CHECK_AND_RETURN_RET_LOG(!VerifyPermission(), ERR_DH_AUDIO_SA_PERMISSION_FAIED,
+        "Permission verification fail.");
     std::string networkId = data.ReadString();
     std::string dhId = data.ReadString();
     int32_t eventType = data.ReadInt32();
@@ -196,7 +198,8 @@ int32_t DAudioSourceStub::UpdateDAudioWorkModeInner(MessageParcel &data, Message
         params.scene = data.ReadUint32();
         params.isAVsync = data.ReadInt32();
         CHECK_AND_RETURN_RET_LOG(devId.length() > DAUDIO_MAX_DEVICE_ID_LEN || dhId.length() > DAUDIO_MAX_DEVICE_ID_LEN
-            || params.fd < 0 || params.sharedMemLen < 0, ERR_DH_AUDIO_SA_DEVID_ILLEGAL, "Workmode param is illegal.");
+            || params.fd < 0 || params.sharedMemLen < DAUDIO_MIN_SHAREDMEMLEN_LEN, ERR_DH_AUDIO_SA_DEVID_ILLEGAL,
+            "Update Workmode param is illegal.");
         ret = UpdateDistributedHardwareWorkMode(devId, dhId, params);
         DHLOGI("DistributedAudioSourceStub UpdateDistributedHardwareWorkMode %{public}d", ret);
     } while (0);
