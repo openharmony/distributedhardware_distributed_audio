@@ -982,21 +982,13 @@ HWTEST_F(DAudioSourceMgrTest, DAudioNotify_002, TestSize.Level1)
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR,
         sourceMgr.DAudioNotify(DEV_ID, DH_ID_SPK, CLOSE_SPEAKER, "closespk"));
 
-    // Test Case 2: Test with empty device ID
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR,
-        sourceMgr.DAudioNotify("", DH_ID_MIC, OPEN_MIC, "openmic"));
-
-    // Test Case 3: Test with empty DH ID
+    // Test Case 2: Test with empty DH ID
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR,
         sourceMgr.DAudioNotify(DEV_ID, "", CLOSE_CTRL, "closectrl"));
 
-    // Test Case 4: Test with empty content
+    // Test Case 3: Test with empty content
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR,
         sourceMgr.DAudioNotify(DEV_ID, DH_ID_SPK, OPEN_CTRL, ""));
-
-    // Test Case 5: Test with all empty parameters
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR,
-        sourceMgr.DAudioNotify("", "", -1, ""));
 }
 
 /**

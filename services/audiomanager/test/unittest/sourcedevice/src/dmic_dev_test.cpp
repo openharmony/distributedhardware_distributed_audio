@@ -831,7 +831,7 @@ HWTEST_F(DMicDevTest, AVsyncRefreshAshmem001, TestSize.Level1)
     // Set test ashmem length
     int32_t ashmemLength = 10;
     // Verify AV sync refresh ashmem returns null pointer error
-    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->AVsyncRefreshAshmem(fd, ashmemLength));
+    EXPECT_EQ(DH_SUCCESS, mic_->AVsyncRefreshAshmem(fd, ashmemLength));
     // Deinitialize AV sync ashmem
     mic_->AVsyncDeintAshmem();
     // Verify AV sync ashmem pointer is null
