@@ -115,7 +115,7 @@ HWTEST_F(DAudioSourceStubTest, ConfigDistributedHardwareInner_001, TestSize.Leve
     MessageParcel reply;
     MessageOption option;
     EXPECT_EQ(ERR_DH_AUDIO_SA_PERMISSION_FAIED, sourceStub_->ConfigDistributedHardwareInner(data, reply, option));
-    EXPECT_EQ(DH_SUCCESS, sourceStub_->DAudioNotifyInner(data, reply, option));
+    EXPECT_EQ(ERR_DH_AUDIO_SA_PERMISSION_FAIED, sourceStub_->DAudioNotifyInner(data, reply, option));
 }
 } // DistributedHardware
 } // OHOS

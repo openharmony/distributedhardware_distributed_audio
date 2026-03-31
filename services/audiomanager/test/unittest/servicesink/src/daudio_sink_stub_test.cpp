@@ -119,7 +119,7 @@ HWTEST_F(DAudioSinkStubTest, SubscribeLocalHardwareInner_001, TestSize.Level1)
     MessageOption option;
     EXPECT_EQ(ERR_DH_AUDIO_SA_PERMISSION_FAIED, sinkStub_->SubscribeLocalHardwareInner(data, reply, option));
     EXPECT_EQ(ERR_DH_AUDIO_SA_PERMISSION_FAIED, sinkStub_->UnsubscribeLocalHardwareInner(data, reply, option));
-    EXPECT_EQ(DH_SUCCESS, sinkStub_->DAudioNotifyInner(data, reply, option));
+    EXPECT_EQ(ERR_DH_AUDIO_SA_PERMISSION_FAIED, sinkStub_->DAudioNotifyInner(data, reply, option));
 }
 
 /**
