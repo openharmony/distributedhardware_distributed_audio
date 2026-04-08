@@ -73,6 +73,28 @@ public:
     }
 };
 
+class DistributedHardwareStateListenerDeadlock : public DistributedHardwareStateListener {
+public:
+    DistributedHardwareStateListenerDeadlock() = default;
+    virtual ~DistributedHardwareStateListenerDeadlock() = default;
+
+    void OnStateChanged(const std::string &uuid, const std::string &dhId, const BusinessState state)
+    {
+        return;
+    }
+};
+
+class DataSyncTriggerListenerDeadlock : public DataSyncTriggerListener {
+public:
+    DataSyncTriggerListenerDeadlock() = default;
+    virtual ~DataSyncTriggerListenerDeadlock() = default;
+
+    void OnDataSyncTrigger(const std::string &uuid)
+    {
+        return;
+    }
+};
+
 class MockIDAudioSource : public IDAudioSource {
 public:
     ~MockIDAudioSource() = default;

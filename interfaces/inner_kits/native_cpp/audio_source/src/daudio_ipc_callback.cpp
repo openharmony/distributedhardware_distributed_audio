@@ -86,13 +86,17 @@ int32_t DAudioIpcCallback::OnHardwareStateChanged(const std::string &devId, cons
     if (devId.length() > DAUDIO_MAX_DEVICE_ID_LEN || dhId.length() > DAUDIO_MAX_DEVICE_ID_LEN) {
         return ERR_DH_AUDIO_SA_DEVID_ILLEGAL;
     }
-    std::lock_guard<std::mutex> stateLck(stateListenerMtx_);
-    if (stateListener_ == nullptr) {
-        DHLOGE("State listener is null.");
-        return ERR_DH_AUDIO_NULLPTR;
+    std::shared_ptr<DistributedHardwareStateListener> listener;
+    {
+        std::lock_guard<std::mutex> stateLck(stateListenerMtx_);
+        if (stateListener_ == nullptr) {
+            DHLOGE("State listener is null.");
+            return ERR_DH_AUDIO_NULLPTR;
+        }
+        listener = stateListener_;
     }
     BusinessState currentState = static_cast<BusinessState>(status);
-    stateListener_->OnStateChanged(devId, dhId, currentState);
+    listener->OnStateChanged(devId, dhId, currentState);
     return DH_SUCCESS;
 }
 
@@ -103,12 +107,16 @@ int32_t DAudioIpcCallback::OnDataSyncTrigger(const std::string &devId)
     if (devId.length() > DAUDIO_MAX_DEVICE_ID_LEN) {
         return ERR_DH_AUDIO_SA_DEVID_ILLEGAL;
     }
-    std::lock_guard<std::mutex> triggerLck(triggerListenerMtx_);
-    if (triggerListener_ == nullptr) {
-        DHLOGE("Trigger listener is null.");
-        return ERR_DH_AUDIO_NULLPTR;
+    std::shared_ptr<DataSyncTriggerListener> listener;
+    {
+        std::lock_guard<std::mutex> triggerLck(triggerListenerMtx_);
+        if (triggerListener_ == nullptr) {
+            DHLOGE("Trigger listener is null.");
+            return ERR_DH_AUDIO_NULLPTR;
+        }
+        listener = triggerListener_;
     }
-    triggerListener_->OnDataSyncTrigger(devId);
+    listener->OnDataSyncTrigger(devId);
     return DH_SUCCESS;
 }
 
