@@ -17,6 +17,9 @@
 #include "daudio_ipc_callback_test.h"
 #undef private
 
+#include <thread>
+#include <chrono>
+
 using namespace testing;
 using namespace testing::ext;
 
@@ -323,6 +326,58 @@ HWTEST_F(DAudioIpcCallbackTest, OnDataSyncTrigger_002, TestSize.Level1)
     devId.resize(DAUDIO_LEGAL_DEVICE_ID_LEN);
     dAudioIpcCallback_->triggerListener_ = nullptr;
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, dAudioIpcCallback_->OnDataSyncTrigger(devId));
+}
+
+/**
+ * @tc.name: OnHardwareStateChanged_DeadlockTest
+ * @tc.desc: Verify no deadlock when OnStateChanged callback calls UnRegisterStateListener.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DAudioIpcCallbackTest, OnHardwareStateChanged_DeadlockTest, TestSize.Level1)
+{
+    ASSERT_TRUE(dAudioIpcCallback_ != nullptr);
+    const std::string devId = "123";
+    const std::string dhId = "1";
+    int32_t status = 0;
+
+    auto callback = std::make_shared<DistributedHardwareStateListenerDeadlock>();
+    dAudioIpcCallback_->RegisterStateListener(callback);
+
+    std::thread unregThread([this]() {
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        dAudioIpcCallback_->UnRegisterStateListener();
+    });
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    int32_t ret = dAudioIpcCallback_->OnHardwareStateChanged(devId, dhId, status);
+
+    unregThread.join();
+    EXPECT_EQ(DH_SUCCESS, ret);
+}
+
+/**
+ * @tc.name: OnDataSyncTrigger_DeadlockTest
+ * @tc.desc: Verify no deadlock when OnDataSyncTrigger callback calls UnRegisterTriggerListener.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DAudioIpcCallbackTest, OnDataSyncTrigger_DeadlockTest, TestSize.Level1)
+{
+    ASSERT_TRUE(dAudioIpcCallback_ != nullptr);
+    const std::string devId = "123";
+
+    auto callback = std::make_shared<DataSyncTriggerListenerDeadlock>();
+    dAudioIpcCallback_->RegisterTriggerListener(callback);
+
+    std::thread unregThread([this]() {
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        dAudioIpcCallback_->UnRegisterTriggerListener();
+    });
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    int32_t ret = dAudioIpcCallback_->OnDataSyncTrigger(devId);
+
+    unregThread.join();
+    EXPECT_EQ(DH_SUCCESS, ret);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
