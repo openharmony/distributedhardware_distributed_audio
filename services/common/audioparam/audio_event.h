@@ -60,6 +60,7 @@ typedef enum {
 
     SET_PARAM = 51,
     SEND_PARAM = 52,
+    ENHANCE_PARAM_CHANGE = 53,
 
     AUDIO_ENCODER_ERR = 61,
     AUDIO_DECODER_ERR = 62,
@@ -97,6 +98,7 @@ typedef enum {
     AUDIO_EVENT_STOP = 19,
     AUDIO_EVENT_SPK_DUMP = 20,
     AUDIO_EVENT_MIC_DUMP = 21,
+    AUDIO_EVENT_ENHANC = 35,
 } AudioEventHDF;
 class AudioEvent {
 public:

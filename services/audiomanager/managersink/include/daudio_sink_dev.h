@@ -78,6 +78,9 @@ private:
     int32_t TaskSetMute(const std::string &args);
     int32_t TaskPlayStatusChange(const std::string &args);
     int32_t TaskDisableDevice(const std::string &args);
+    int32_t TaskSetEnhanceParam(const std::string &args);
+    int32_t ProcessEnhanceParamValue(const std::string &paramValue);
+    int32_t SendEnhanceParamToMicClient(const int32_t dhId, const std::string &args);
 
     void NotifySourceDev(const AudioEventType type, const std::string dhId, const int32_t result);
     int32_t from_json(const cJSON *j, AudioParam &audioParam);
@@ -138,6 +141,7 @@ private:
         void NotifyVolumeChange(const AppExecFwk::InnerEvent::Pointer &event);
         void NotifySetParam(const AppExecFwk::InnerEvent::Pointer &event);
         void NotifySetMute(const AppExecFwk::InnerEvent::Pointer &event);
+        void NotifyEnhanceParamChange(const AppExecFwk::InnerEvent::Pointer &event);
         void NotifyFocusChange(const AppExecFwk::InnerEvent::Pointer &event);
         void NotifyRenderStateChange(const AppExecFwk::InnerEvent::Pointer &event);
         void NotifyPlayStatusChange(const AppExecFwk::InnerEvent::Pointer &event);

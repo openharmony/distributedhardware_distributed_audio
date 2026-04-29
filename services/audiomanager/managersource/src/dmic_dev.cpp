@@ -841,8 +841,9 @@ int32_t DMicDev::OnStateChange(const AudioEventType type)
 int32_t DMicDev::SendMessage(uint32_t type, std::string content, std::string dstDevId)
 {
     DHLOGD("Send message to remote.");
-    if (type != static_cast<uint32_t>(OPEN_MIC) && type != static_cast<uint32_t>(CLOSE_MIC)) {
-        DHLOGE("Send message to remote. not OPEN_MIC or CLOSE_MIC. type: %{public}u", type);
+    if (type != static_cast<uint32_t>(OPEN_MIC) && type != static_cast<uint32_t>(CLOSE_MIC) &&
+        type != static_cast<uint32_t>(ENHANCE_PARAM_CHANGE)) {
+        DHLOGE("Send message to remote. unsupported type: %{public}u", type);
         return ERR_DH_AUDIO_NULLPTR;
     }
     CHECK_NULL_RETURN(micCtrlTrans_, ERR_DH_AUDIO_NULLPTR);

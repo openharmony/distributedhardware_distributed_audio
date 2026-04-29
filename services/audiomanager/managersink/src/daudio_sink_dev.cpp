@@ -33,6 +33,8 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+const std::string RECORD_KEY = "audio_effect";
+const std::string RECORD_SCENE_VALUE = "high-definition-record";
 DAudioSinkDev::DAudioSinkDev(const std::string &devId, const sptr<IDAudioSinkIpcCallback> &sinkCallback)
     : devId_(devId), ipcSinkCallback_(sinkCallback)
 {
@@ -454,6 +456,56 @@ int32_t DAudioSinkDev::TaskPlayStatusChange(const std::string &args)
     return DH_SUCCESS;
 }
 
+int32_t DAudioSinkDev::TaskSetEnhanceParam(const std::string &args)
+{
+    DHLOGI("Set enhance param, content: %{public}s.", args.c_str());
+    cJSON *jParam = cJSON_Parse(args.c_str());
+    CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
+    cJSON *paramItem = cJSON_GetObjectItem(jParam, RECORD_KEY.c_str());
+    if (paramItem != nullptr && cJSON_IsString(paramItem)) {
+        ProcessEnhanceParamValue(std::string(paramItem->valuestring));
+    }
+    cJSON *dhIdItem = cJSON_GetObjectItem(jParam, KEY_DH_ID);
+    int32_t ret = DH_SUCCESS;
+    if (dhIdItem != nullptr && cJSON_IsString(dhIdItem)) {
+        int32_t dhId = ConvertString2Int(std::string(dhIdItem->valuestring));
+        ret = SendEnhanceParamToMicClient(dhId, args);
+    } else {
+        DHLOGE("Not found dhId in enhance param.");
+        ret = ERR_DH_AUDIO_SA_PARAM_INVALID;
+    }
+    cJSON_Delete(jParam);
+    return ret;
+}
+
+int32_t DAudioSinkDev::ProcessEnhanceParamValue(const std::string &paramValue)
+{
+    DHLOGI("Enhance param: %{public}s.", paramValue.c_str());
+    if (paramValue == RECORD_SCENE_VALUE) {
+        DHLOGI("High definition record mode enabled on sink device via mic!");
+    }
+    return DH_SUCCESS;
+}
+
+int32_t DAudioSinkDev::SendEnhanceParamToMicClient(const int32_t dhId, const std::string &args)
+{
+    std::shared_ptr<DMicClient> micClient = nullptr;
+    {
+        std::lock_guard<std::mutex> devLck(micClientMutex_);
+        micClient = micClientMap_[dhId];
+    }
+    if (micClient != nullptr) {
+        AudioEvent event(AudioEventType::ENHANCE_PARAM_CHANGE, args);
+        int32_t ret = micClient->SetEnhanceParameter(event);
+        CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret,
+            "Set enhance param to mic client failed, ret: %{public}d.", ret);
+        DHLOGI("Set enhance param to mic client success.");
+        return DH_SUCCESS;
+    }
+    DHLOGI("Mic client not found for dhId: %{public}d.", dhId);
+    return DH_SUCCESS;
+}
+
 int32_t DAudioSinkDev::SendAudioEventToRemote(const AudioEvent &event)
 {
     // because: type: VOLUME_CHANGE / AUDIO_FOCUS_CHANGE / AUDIO_RENDER_STATE_CHANGE
@@ -637,6 +689,8 @@ DAudioSinkDev::SinkEventHandler::SinkEventHandler(const std::shared_ptr<AppExecF
     mapEventFuncs_[static_cast<uint32_t>(VOLUME_CHANGE)] = &DAudioSinkDev::SinkEventHandler::NotifyVolumeChange;
     mapEventFuncs_[static_cast<uint32_t>(SET_PARAM)] = &DAudioSinkDev::SinkEventHandler::NotifySetParam;
     mapEventFuncs_[static_cast<uint32_t>(VOLUME_MUTE_SET)] = &DAudioSinkDev::SinkEventHandler::NotifySetMute;
+    mapEventFuncs_[static_cast<uint32_t>(ENHANCE_PARAM_CHANGE)] =
+        &DAudioSinkDev::SinkEventHandler::NotifyEnhanceParamChange;
     mapEventFuncs_[static_cast<uint32_t>(AUDIO_FOCUS_CHANGE)] = &DAudioSinkDev::SinkEventHandler::NotifyFocusChange;
     mapEventFuncs_[static_cast<uint32_t>(AUDIO_RENDER_STATE_CHANGE)] =
         &DAudioSinkDev::SinkEventHandler::NotifyRenderStateChange;
@@ -673,6 +727,9 @@ void DAudioSinkDev::SinkEventHandler::ProcessEventInner(const AppExecFwk::InnerE
             break;
         case VOLUME_MUTE_SET:
             NotifySetMute(event);
+            break;
+        case ENHANCE_PARAM_CHANGE:
+            NotifyEnhanceParamChange(event);
             break;
         case AUDIO_FOCUS_CHANGE:
             NotifyFocusChange(event);
@@ -719,6 +776,7 @@ void DAudioSinkDev::SinkEventHandler::ProcessEvent(const AppExecFwk::InnerEvent:
         case VOLUME_CHANGE:
         case SET_PARAM:
         case VOLUME_MUTE_SET:
+        case ENHANCE_PARAM_CHANGE:
         case AUDIO_FOCUS_CHANGE:
         case AUDIO_RENDER_STATE_CHANGE:
         case CHANGE_PLAY_STATUS:
@@ -1005,6 +1063,19 @@ void DAudioSinkDev::SinkEventHandler::NotifySetMute(const AppExecFwk::InnerEvent
     CHECK_NULL_VOID(sinkDevObj);
     CHECK_AND_RETURN_LOG(sinkDevObj->TaskSetMute(eventParam) != DH_SUCCESS,
         "%{public}s", "Set mute failed.");
+}
+
+void DAudioSinkDev::SinkEventHandler::NotifyEnhanceParamChange(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    std::string eventParam;
+    if (GetEventParam(event, eventParam) != DH_SUCCESS) {
+        DHLOGE("Failed to get event parameters.");
+        return;
+    }
+    auto sinkDevObj = sinkDev_.lock();
+    CHECK_NULL_VOID(sinkDevObj);
+    CHECK_AND_RETURN_LOG(sinkDevObj->TaskSetEnhanceParam(eventParam) != DH_SUCCESS,
+        "%{public}s", "Set enhance param failed.");
 }
 
 void DAudioSinkDev::SinkEventHandler::NotifyFocusChange(const AppExecFwk::InnerEvent::Pointer &event)

@@ -1578,5 +1578,243 @@ HWTEST_F(DAudioSourceDevTest, ParseValueFromCjson_001, TestSize.Level1)
     result = sourceDev_->ParseValueFromCjson(jsonStr, key);
     EXPECT_EQ(result, ERR_DH_AUDIO_FAILED);
 }
+
+/**
+ * @tc.name: HandleEnhanceParamChange_001
+ * @tc.desc: Verify the HandleEnhanceParamChange function with valid handler.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, HandleEnhanceParamChange_001, TestSize.Level1)
+{
+    AudioEvent event1(AudioEventType::ENHANCE_PARAM_CHANGE, "{\"audio_effect\":\"high-definition-record\"}");
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->HandleEnhanceParamChange(event1));
+    sourceDev_->AwakeAudioDev();
+    AudioEvent event2(AudioEventType::ENHANCE_PARAM_CHANGE, "{\"audio_effect\":\"high-definition-record\"}");
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleEnhanceParamChange(event2));
+    sourceDev_->SleepAudioDev();
+}
+
+/**
+ * @tc.name: TaskEnhanceParamChange_001
+ * @tc.desc: Verify the TaskEnhanceParamChange function with empty args.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, TaskEnhanceParamChange_001, TestSize.Level1)
+{
+    std::string args = "";
+    EXPECT_EQ(ERR_DH_AUDIO_SA_PARAM_INVALID, sourceDev_->TaskEnhanceParamChange(args));
+
+    std::string tempLongStr(DAUDIO_MAX_JSON_LEN + 1, 'a');
+    EXPECT_EQ(ERR_DH_AUDIO_SA_PARAM_INVALID, sourceDev_->TaskEnhanceParamChange(tempLongStr));
+
+    args = "invalid_json";
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->TaskEnhanceParamChange(args));
+
+    args = "{\"dhId\":\"1\",\"audio_effect\":\"high-definition-record\"}";
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->TaskEnhanceParamChange(args));
+}
+
+/**
+ * @tc.name: TaskEnhanceParamChange_002
+ * @tc.desc: Verify the TaskEnhanceParamChange function with valid JSON and mic.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, TaskEnhanceParamChange_002, TestSize.Level1)
+{
+    int32_t dhId = DEFAULT_CAPTURE_ID;
+    std::string devId = DEV_ID;
+    cJSON *jParam = cJSON_CreateObject();
+    CHECK_NULL_VOID(jParam);
+    cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(DEFAULT_CAPTURE_ID).c_str());
+    cJSON_AddStringToObject(jParam, "audio_effect", "high-definition-record");
+    char *jsonString = cJSON_PrintUnformatted(jParam);
+    CHECK_NULL_AND_FREE_VOID(jsonString, jParam);
+    std::string args(jsonString);
+    cJSON_Delete(jParam);
+    cJSON_free(jsonString);
+    auto mic = std::make_shared<DMicDev>(devId, sourceDev_);
+    sourceDev_->deviceMap_[dhId] = mic;
+    mic->micCtrlTrans_ = nullptr;
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sourceDev_->TaskEnhanceParamChange(args));
+}
+
+/**
+ * @tc.name: EnhanceParamChangeCallback_001
+ * @tc.desc: Verify the EnhanceParamChangeCallback function with null event.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, EnhanceParamChangeCallback_001, TestSize.Level1)
+{
+    constexpr uint32_t EVENT_ENHANCE_PARAM_CHANGE = 90;
+    std::shared_ptr<AudioEvent> nullForFail = nullptr;
+    auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_ENHANCE_PARAM_CHANGE, nullForFail, 0);
+    sourceDev_->AwakeAudioDev();
+    EXPECT_NO_FATAL_FAILURE(sourceDev_->handler_->EnhanceParamChangeCallback(msgEvent));
+    sourceDev_->SleepAudioDev();
+}
+
+/**
+ * @tc.name: EnhanceParamChangeCallback_002
+ * @tc.desc: Verify the EnhanceParamChangeCallback function with valid event.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, EnhanceParamChangeCallback_002, TestSize.Level1)
+{
+    constexpr uint32_t EVENT_ENHANCE_PARAM_CHANGE = 90;
+    std::string eventContent = "{\"audio_effect\":\"high-definition-record\",\"dhId\":\"134217728\"}";
+    AudioEvent audioEvent(AudioEventType::ENHANCE_PARAM_CHANGE, eventContent);
+    auto eventParam = std::make_shared<AudioEvent>(audioEvent);
+    auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_ENHANCE_PARAM_CHANGE, eventParam, 0);
+    sourceDev_->AwakeAudioDev();
+    EXPECT_NO_FATAL_FAILURE(sourceDev_->handler_->EnhanceParamChangeCallback(msgEvent));
+    sourceDev_->SleepAudioDev();
+}
+
+/**
+ * @tc.name: IsSpeakerEvent_001
+ * @tc.desc: Verify the IsSpeakerEvent function with speaker event types.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, IsSpeakerEvent_001, TestSize.Level1)
+{
+    EXPECT_EQ(true, sourceDev_->IsSpeakerEvent(AudioEventType::OPEN_SPEAKER));
+    EXPECT_EQ(true, sourceDev_->IsSpeakerEvent(AudioEventType::CLOSE_SPEAKER));
+    EXPECT_EQ(true, sourceDev_->IsSpeakerEvent(AudioEventType::SPEAKER_OPENED));
+    EXPECT_EQ(true, sourceDev_->IsSpeakerEvent(AudioEventType::SPEAKER_CLOSED));
+    EXPECT_EQ(false, sourceDev_->IsSpeakerEvent(AudioEventType::OPEN_MIC));
+    EXPECT_EQ(false, sourceDev_->IsSpeakerEvent(AudioEventType::VOLUME_SET));
+}
+
+/**
+ * @tc.name: IsNotifyRPCEvent_001
+ * @tc.desc: Verify the IsNotifyRPCEvent function with RPC event types.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, IsNotifyRPCEvent_001, TestSize.Level1)
+{
+    EXPECT_EQ(true, sourceDev_->IsNotifyRPCEvent(AudioEventType::NOTIFY_OPEN_SPEAKER_RESULT));
+    EXPECT_EQ(true, sourceDev_->IsNotifyRPCEvent(AudioEventType::NOTIFY_CLOSE_SPEAKER_RESULT));
+    EXPECT_EQ(true, sourceDev_->IsNotifyRPCEvent(AudioEventType::NOTIFY_OPEN_MIC_RESULT));
+    EXPECT_EQ(true, sourceDev_->IsNotifyRPCEvent(AudioEventType::NOTIFY_CLOSE_MIC_RESULT));
+    EXPECT_EQ(true, sourceDev_->IsNotifyRPCEvent(AudioEventType::NOTIFY_OPEN_CTRL_RESULT));
+    EXPECT_EQ(true, sourceDev_->IsNotifyRPCEvent(AudioEventType::NOTIFY_CLOSE_CTRL_RESULT));
+    EXPECT_EQ(false, sourceDev_->IsNotifyRPCEvent(AudioEventType::OPEN_SPEAKER));
+    EXPECT_EQ(false, sourceDev_->IsNotifyRPCEvent(AudioEventType::VOLUME_CHANGE));
+}
+
+/**
+ * @tc.name: ShouldRouteToInnerEvent_001
+ * @tc.desc: Verify the ShouldRouteToInnerEvent function with valid event types.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, ShouldRouteToInnerEvent_001, TestSize.Level1)
+{
+    EXPECT_EQ(true, sourceDev_->ShouldRouteToInnerEvent(AudioEventType::OPEN_MIC));
+    EXPECT_EQ(true, sourceDev_->ShouldRouteToInnerEvent(AudioEventType::CLOSE_MIC));
+    EXPECT_EQ(true, sourceDev_->ShouldRouteToInnerEvent(AudioEventType::MIC_OPENED));
+    EXPECT_EQ(true, sourceDev_->ShouldRouteToInnerEvent(AudioEventType::MIC_CLOSED));
+    EXPECT_EQ(true, sourceDev_->ShouldRouteToInnerEvent(AudioEventType::CTRL_CLOSED));
+    EXPECT_EQ(true, sourceDev_->ShouldRouteToInnerEvent(AudioEventType::VOLUME_SET));
+    EXPECT_EQ(true, sourceDev_->ShouldRouteToInnerEvent(AudioEventType::VOLUME_MUTE_SET));
+    EXPECT_EQ(true, sourceDev_->ShouldRouteToInnerEvent(AudioEventType::VOLUME_CHANGE));
+    EXPECT_EQ(true, sourceDev_->ShouldRouteToInnerEvent(AudioEventType::AUDIO_FOCUS_CHANGE));
+    EXPECT_EQ(true, sourceDev_->ShouldRouteToInnerEvent(AudioEventType::AUDIO_RENDER_STATE_CHANGE));
+    EXPECT_EQ(true, sourceDev_->ShouldRouteToInnerEvent(AudioEventType::CHANGE_PLAY_STATUS));
+    EXPECT_EQ(true, sourceDev_->ShouldRouteToInnerEvent(AudioEventType::ENHANCE_PARAM_CHANGE));
+    EXPECT_EQ(true, sourceDev_->ShouldRouteToInnerEvent(AudioEventType::MMAP_SPK_START));
+    EXPECT_EQ(true, sourceDev_->ShouldRouteToInnerEvent(AudioEventType::MMAP_SPK_STOP));
+    EXPECT_EQ(true, sourceDev_->ShouldRouteToInnerEvent(AudioEventType::MMAP_MIC_START));
+    EXPECT_EQ(true, sourceDev_->ShouldRouteToInnerEvent(AudioEventType::MMAP_MIC_STOP));
+    EXPECT_EQ(false, sourceDev_->ShouldRouteToInnerEvent(AudioEventType::OPEN_SPEAKER));
+    EXPECT_EQ(false, sourceDev_->ShouldRouteToInnerEvent(AudioEventType::NOTIFY_OPEN_SPEAKER_RESULT));
+}
+
+/**
+ * @tc.name: HandleSpeakerEvent_001
+ * @tc.desc: Verify the HandleSpeakerEvent function with various speaker event types.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, HandleSpeakerEvent_001, TestSize.Level1)
+{
+    AudioEvent event1(AudioEventType::OPEN_SPEAKER, "{\"dhId\":\"1\"}");
+    EXPECT_NO_FATAL_FAILURE(sourceDev_->HandleSpeakerEvent(event1));
+    AudioEvent event2(AudioEventType::CLOSE_SPEAKER, "{\"dhId\":\"1\"}");
+    EXPECT_NO_FATAL_FAILURE(sourceDev_->HandleSpeakerEvent(event2));
+    AudioEvent event3(AudioEventType::SPEAKER_OPENED, "{\"dhId\":\"1\"}");
+    EXPECT_NO_FATAL_FAILURE(sourceDev_->HandleSpeakerEvent(event3));
+    AudioEvent event4(AudioEventType::SPEAKER_CLOSED, "{\"dhId\":\"1\"}");
+    EXPECT_NO_FATAL_FAILURE(sourceDev_->HandleSpeakerEvent(event4));
+}
+
+/**
+ * @tc.name: HandleMicEvents_001
+ * @tc.desc: Verify the HandleMicEvents function with various mic event types.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, HandleMicEvents_001, TestSize.Level1)
+{
+    AudioEvent event1(AudioEventType::OPEN_MIC, "{\"dhId\":\"134217728\"}");
+    EXPECT_NO_FATAL_FAILURE(sourceDev_->HandleMicEvents(event1));
+    AudioEvent event2(AudioEventType::CLOSE_MIC, "{\"dhId\":\"134217728\"}");
+    EXPECT_NO_FATAL_FAILURE(sourceDev_->HandleMicEvents(event2));
+    AudioEvent event3(AudioEventType::MIC_OPENED, "{\"dhId\":\"134217728\"}");
+    EXPECT_NO_FATAL_FAILURE(sourceDev_->HandleMicEvents(event3));
+    AudioEvent event4(AudioEventType::MIC_CLOSED, "{\"dhId\":\"134217728\"}");
+    EXPECT_NO_FATAL_FAILURE(sourceDev_->HandleMicEvents(event4));
+    AudioEvent event5(AudioEventType::CTRL_CLOSED, "{\"dhId\":\"134217728\"}");
+    EXPECT_NO_FATAL_FAILURE(sourceDev_->HandleMicEvents(event5));
+}
+
+/**
+ * @tc.name: HandleVolumeAndAudioEvents_001
+ * @tc.desc: Verify the HandleVolumeAndAudioEvents function with various event types.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, HandleVolumeAndAudioEvents_001, TestSize.Level1)
+{
+    AudioEvent event1(AudioEventType::VOLUME_SET, "{\"volume\":50}");
+    EXPECT_NO_FATAL_FAILURE(sourceDev_->HandleVolumeAndAudioEvents(event1));
+    AudioEvent event2(AudioEventType::VOLUME_MUTE_SET, "{\"mute\":true}");
+    EXPECT_NO_FATAL_FAILURE(sourceDev_->HandleVolumeAndAudioEvents(event2));
+    AudioEvent event3(AudioEventType::VOLUME_CHANGE, "{\"volume\":50}");
+    EXPECT_NO_FATAL_FAILURE(sourceDev_->HandleVolumeAndAudioEvents(event3));
+    AudioEvent event4(AudioEventType::AUDIO_FOCUS_CHANGE, "{\"focus\":\"test\"}");
+    EXPECT_NO_FATAL_FAILURE(sourceDev_->HandleVolumeAndAudioEvents(event4));
+    AudioEvent event5(AudioEventType::AUDIO_RENDER_STATE_CHANGE, "{\"state\":\"test\"}");
+    EXPECT_NO_FATAL_FAILURE(sourceDev_->HandleVolumeAndAudioEvents(event5));
+    AudioEvent event6(AudioEventType::CHANGE_PLAY_STATUS, "{\"status\":\"playing\"}");
+    EXPECT_NO_FATAL_FAILURE(sourceDev_->HandleVolumeAndAudioEvents(event6));
+    AudioEvent event7(AudioEventType::ENHANCE_PARAM_CHANGE, "{\"audio_effect\":\"high-definition-record\"}");
+    EXPECT_NO_FATAL_FAILURE(sourceDev_->HandleVolumeAndAudioEvents(event7));
+}
+
+/**
+ * @tc.name: HandleMmapEvents_001
+ * @tc.desc: Verify the HandleMmapEvents function with various mmap event types.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSourceDevTest, HandleMmapEvents_001, TestSize.Level1)
+{
+    AudioEvent event1(AudioEventType::MMAP_SPK_START, "{\"dhId\":\"1\"}");
+    EXPECT_NO_FATAL_FAILURE(sourceDev_->HandleMmapEvents(event1));
+    AudioEvent event2(AudioEventType::MMAP_SPK_STOP, "{\"dhId\":\"1\"}");
+    EXPECT_NO_FATAL_FAILURE(sourceDev_->HandleMmapEvents(event2));
+    AudioEvent event3(AudioEventType::MMAP_MIC_START, "{\"dhId\":\"134217728\"}");
+    EXPECT_NO_FATAL_FAILURE(sourceDev_->HandleMmapEvents(event3));
+    AudioEvent event4(AudioEventType::MMAP_MIC_STOP, "{\"dhId\":\"134217728\"}");
+    EXPECT_NO_FATAL_FAILURE(sourceDev_->HandleMmapEvents(event4));
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -343,5 +343,23 @@ HWTEST_F(DAudioManagerCallbackTest, RefreshAshmemInfo_001, TestSize.Level1)
     manCallback_->callback_ = std::make_shared<MockIDAudioHdiCallback>();
     EXPECT_EQ(HDF_SUCCESS, manCallback_->RefreshAshmemInfo(streamId, fd, ashmemLength, lengthPerTrans));
 }
+
+/**
+ * @tc.name: NotifyEvent_003
+ * @tc.desc: Verify the NotifyEvent function with AUDIO_EVENT_ENHANC.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6H
+ */
+HWTEST_F(DAudioManagerCallbackTest, NotifyEvent_003, TestSize.Level1)
+{
+    ASSERT_TRUE(manCallback_ != nullptr);
+    manCallback_->callback_ = std::make_shared<MockIDAudioHdiCallback>();
+    EXPECT_EQ(HDF_SUCCESS, manCallback_->CreateStream(streamId_));
+    OHOS::HDI::DistributedAudio::Audioext::V3_0::DAudioEvent event;
+    event.type = AudioEventHDF::AUDIO_EVENT_ENHANC;
+    event.content = "{\"audio_effect\":\"high-definition-record\"}";
+    EXPECT_EQ(HDF_SUCCESS, manCallback_->NotifyEvent(streamId_, event));
+    EXPECT_EQ(HDF_SUCCESS, manCallback_->DestroyStream(streamId_));
+}
 } // DistributedHardware
 } // OHOS

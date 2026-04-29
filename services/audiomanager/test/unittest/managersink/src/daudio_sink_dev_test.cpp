@@ -1083,5 +1083,162 @@ HWTEST_F(DAudioSinkDevTest, IsIdenticalAccount_001, TestSize.Level1)
     networkId = "networkId";
     EXPECT_EQ(false, sinkDev_->IsIdenticalAccount(networkId));
 }
+
+/**
+ * @tc.name: TaskSetEnhanceParam_001
+ * @tc.desc: Verify the TaskSetEnhanceParam function with empty args.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkDevTest, TaskSetEnhanceParam_001, TestSize.Level1)
+{
+    std::string args = "";
+    ASSERT_NE(sinkDev_, nullptr);
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sinkDev_->TaskSetEnhanceParam(args));
+}
+
+/**
+ * @tc.name: TaskSetEnhanceParam_002
+ * @tc.desc: Verify the TaskSetEnhanceParam function with invalid JSON.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkDevTest, TaskSetEnhanceParam_002, TestSize.Level1)
+{
+    std::string args = "invalid_json";
+    ASSERT_NE(sinkDev_, nullptr);
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, sinkDev_->TaskSetEnhanceParam(args));
+}
+
+/**
+ * @tc.name: TaskSetEnhanceParam_003
+ * @tc.desc: Verify the TaskSetEnhanceParam function with valid JSON but no dhId.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkDevTest, TaskSetEnhanceParam_003, TestSize.Level1)
+{
+    std::string args = "{\"audio_effect\":\"high-definition-record\"}";
+    ASSERT_NE(sinkDev_, nullptr);
+    EXPECT_EQ(DH_SUCCESS, sinkDev_->TaskSetEnhanceParam(args));
+}
+
+/**
+ * @tc.name: TaskSetEnhanceParam_004
+ * @tc.desc: Verify the TaskSetEnhanceParam function with valid JSON and dhId.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkDevTest, TaskSetEnhanceParam_004, TestSize.Level1)
+{
+    cJSON *jParam = cJSON_CreateObject();
+    CHECK_NULL_VOID(jParam);
+    cJSON_AddStringToObject(jParam, "audio_effect", "high-definition-record");
+    cJSON_AddStringToObject(jParam, KEY_DH_ID, "134217729");
+    char *jsonString = cJSON_PrintUnformatted(jParam);
+    CHECK_NULL_AND_FREE_VOID(jsonString, jParam);
+    std::string args(jsonString);
+    cJSON_Delete(jParam);
+    cJSON_free(jsonString);
+    std::string devId = "devId";
+    int32_t dhId = DEFAULT_CAPTURE_ID;
+    ASSERT_NE(sinkDev_, nullptr);
+    auto micClient = std::make_shared<DMicClient>(devId, dhId, sinkDev_);
+    sinkDev_->micClientMap_.insert(std::make_pair(DEFAULT_CAPTURE_ID, micClient));
+    EXPECT_NE(DH_SUCCESS, sinkDev_->TaskSetEnhanceParam(args));
+}
+
+/**
+ * @tc.name: ProcessEnhanceParamValue_001
+ * @tc.desc: Verify the ProcessEnhanceParamValue function with high-definition-record.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkDevTest, ProcessEnhanceParamValue_001, TestSize.Level1)
+{
+    std::string paramValue = "high-definition-record";
+    ASSERT_NE(sinkDev_, nullptr);
+    EXPECT_EQ(DH_SUCCESS, sinkDev_->ProcessEnhanceParamValue(paramValue));
+}
+
+/**
+ * @tc.name: ProcessEnhanceParamValue_002
+ * @tc.desc: Verify the ProcessEnhanceParamValue function with other value.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkDevTest, ProcessEnhanceParamValue_002, TestSize.Level1)
+{
+    std::string paramValue = "other_value";
+    ASSERT_NE(sinkDev_, nullptr);
+    EXPECT_EQ(DH_SUCCESS, sinkDev_->ProcessEnhanceParamValue(paramValue));
+}
+
+/**
+ * @tc.name: SendEnhanceParamToMicClient_001
+ * @tc.desc: Verify the SendEnhanceParamToMicClient function with no mic client.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkDevTest, SendEnhanceParamToMicClient_001, TestSize.Level1)
+{
+    int32_t dhId = DEFAULT_CAPTURE_ID;
+    std::string args = "{\"audio_effect\":\"high-definition-record\"}";
+    ASSERT_NE(sinkDev_, nullptr);
+    EXPECT_EQ(DH_SUCCESS, sinkDev_->SendEnhanceParamToMicClient(dhId, args));
+}
+
+/**
+ * @tc.name: SendEnhanceParamToMicClient_002
+ * @tc.desc: Verify the SendEnhanceParamToMicClient function with valid mic client.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkDevTest, SendEnhanceParamToMicClient_002, TestSize.Level1)
+{
+    int32_t dhId = DEFAULT_CAPTURE_ID;
+    std::string devId = "devId";
+    std::string args = "{\"audio_effect\":\"high-definition-record\"}";
+    ASSERT_NE(sinkDev_, nullptr);
+    auto micClient = std::make_shared<DMicClient>(devId, dhId, sinkDev_);
+    sinkDev_->micClientMap_.insert(std::make_pair(dhId, micClient));
+    EXPECT_NE(DH_SUCCESS, sinkDev_->SendEnhanceParamToMicClient(dhId, args));
+}
+
+/**
+ * @tc.name: NotifyEnhanceParamChange_001
+ * @tc.desc: Verify the NotifyEnhanceParamChange function with null event.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkDevTest, NotifyEnhanceParamChange_001, TestSize.Level1)
+{
+    int32_t eventType = ENHANCE_PARAM_CHANGE;
+    std::shared_ptr<AudioEvent> nullForFail = nullptr;
+    auto msgEvent = AppExecFwk::InnerEvent::Get(static_cast<uint32_t>(eventType), nullForFail, 0);
+    ASSERT_NE(sinkDev_, nullptr);
+    EXPECT_EQ(DH_SUCCESS, sinkDev_->AwakeAudioDev());
+    ASSERT_NE(sinkDev_->handler_, nullptr);
+    sinkDev_->handler_->NotifyEnhanceParamChange(msgEvent);
+}
+
+/**
+ * @tc.name: NotifyEnhanceParamChange_002
+ * @tc.desc: Verify the NotifyEnhanceParamChange function with valid event.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkDevTest, NotifyEnhanceParamChange_002, TestSize.Level1)
+{
+    int32_t eventType = ENHANCE_PARAM_CHANGE;
+    std::string eventContent = "{\"audio_effect\":\"high-definition-record\",\"dhId\":\"1\"}";
+    AudioEvent audioEvent(eventType, eventContent);
+    auto eventParam = std::make_shared<AudioEvent>(audioEvent);
+    auto msgEvent = AppExecFwk::InnerEvent::Get(static_cast<uint32_t>(audioEvent.type), eventParam, 0);
+    ASSERT_NE(sinkDev_, nullptr);
+    EXPECT_EQ(DH_SUCCESS, sinkDev_->AwakeAudioDev());
+    ASSERT_NE(sinkDev_->handler_, nullptr);
+    sinkDev_->handler_->NotifyEnhanceParamChange(msgEvent);
+}
 } // DistributedHardware
 } // OHOS
