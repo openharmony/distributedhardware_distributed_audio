@@ -67,14 +67,12 @@ public:
     int32_t StopCapture() override;
     void SetAttrs(const std::string &devId, const std::shared_ptr<IAudioEventCallback> &callback) override;
     int32_t SendMessage(uint32_t type, std::string content, std::string dstDevId) override;
-
     void OnReadData(size_t length) override;
     int32_t PauseCapture();
     int32_t ResumeCapture();
     int32_t SetEnhanceParameter(const AudioEvent &event);
 private:
     void CaptureThreadRunning();
-
     int32_t AudioFwkClientSetUp();
     int32_t TransSetUp();
     void AudioFwkCaptureData();

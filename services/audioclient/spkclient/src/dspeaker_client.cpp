@@ -31,6 +31,7 @@ namespace DistributedHardware {
 DSpeakerClient::~DSpeakerClient()
 {
     DHLOGD("Release speaker client.");
+    DumpFileUtil::CloseDumpFile(&dumpFile_);
 }
 
 void DSpeakerClient::OnEngineTransEvent(const AVTransEvent &event)
@@ -182,21 +183,28 @@ int32_t DSpeakerClient::SetUp(const AudioParam &param)
         return ret;
     }
     DumpFileUtil::OpenDumpFile(DUMP_SERVER_PARA, DUMP_DAUDIO_SPK_AFTER_TRANS_NAME, &dumpFile_);
-    CHECK_NULL_RETURN(speakerTrans_, ERR_DH_AUDIO_NULLPTR);
+    if (speakerTrans_ == nullptr) {
+        DHLOGE("Speaker trans is nullptr.");
+        DumpFileUtil::CloseDumpFile(&dumpFile_);
+        return ERR_DH_AUDIO_NULLPTR;
+    }
     ret = speakerTrans_->SetUp(audioParam_, audioParam_, shared_from_this(), CAP_SPK);
     if (ret != DH_SUCCESS) {
         DHLOGE("Speaker trans setup failed.");
+        DumpFileUtil::CloseDumpFile(&dumpFile_);
         return ret;
     }
     ret = speakerTrans_->Start();
     if (ret != DH_SUCCESS) {
         DHLOGE("Speaker trans start failed.");
+        DumpFileUtil::CloseDumpFile(&dumpFile_);
         return ret;
     }
     auto pid = getprocpid();
     ret = AudioStandard::AudioSystemManager::GetInstance()->RegisterVolumeKeyEventCallback(pid, shared_from_this());
     if (ret != DH_SUCCESS) {
         DHLOGE("Failed to register volume key event callback.");
+        DumpFileUtil::CloseDumpFile(&dumpFile_);
         return ret;
     }
     clientStatus_ = AudioStatus::STATUS_READY;
