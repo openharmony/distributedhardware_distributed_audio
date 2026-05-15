@@ -71,6 +71,7 @@ public:
     void OnReadData(size_t length) override;
     int32_t PauseCapture();
     int32_t ResumeCapture();
+    int32_t SetEnhanceParameter(const AudioEvent &event);
 private:
     void CaptureThreadRunning();
 

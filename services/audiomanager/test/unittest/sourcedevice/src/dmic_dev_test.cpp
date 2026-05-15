@@ -729,6 +729,62 @@ HWTEST_F(DMicDevTest, SendMessage_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: SendMessage_002
+ * @tc.desc: Verify the SendMessage function with ENHANCE_PARAM_CHANGE event.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, SendMessage_002, TestSize.Level1)
+{
+    uint32_t type = static_cast<uint32_t>(AudioEventType::ENHANCE_PARAM_CHANGE);
+    std::string content = "{\"audio_effect\":\"high-definition-record\"}";
+    std::string dstDevId = "test_dev_id";
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->SendMessage(type, content, dstDevId));
+}
+
+/**
+ * @tc.name: SendMessage_003
+ * @tc.desc: Verify the SendMessage function with unsupported event type.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, SendMessage_003, TestSize.Level1)
+{
+    uint32_t type = static_cast<uint32_t>(AudioEventType::EVENT_UNKNOWN);
+    std::string content = "test_content";
+    std::string dstDevId = "test_dev_id";
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->SendMessage(type, content, dstDevId));
+}
+
+/**
+ * @tc.name: SendMessage_004
+ * @tc.desc: Verify the SendMessage function with OPEN_MIC event type.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, SendMessage_004, TestSize.Level1)
+{
+    uint32_t type = static_cast<uint32_t>(AudioEventType::OPEN_MIC);
+    std::string content = "test_content";
+    std::string dstDevId = "test_dev_id";
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->SendMessage(type, content, dstDevId));
+}
+
+/**
+ * @tc.name: SendMessage_005
+ * @tc.desc: Verify the SendMessage function with CLOSE_MIC event type.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DMicDevTest, SendMessage_005, TestSize.Level1)
+{
+    uint32_t type = static_cast<uint32_t>(AudioEventType::CLOSE_MIC);
+    std::string content = "test_content";
+    std::string dstDevId = "test_dev_id";
+    EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->SendMessage(type, content, dstDevId));
+}
+
+/**
  * @tc.name: AddToVec001
  * @tc.desc: Verify AddToVec function.
  * @tc.type: FUNC

@@ -156,6 +156,9 @@ int32_t DAudioManagerCallback::NotifyEvent(int32_t streamId,
         case AudioEventHDF::AUDIO_EVENT_STOP:
             newEvent.type = AudioEventType::AUDIO_STOP;
             break;
+        case AudioEventHDF::AUDIO_EVENT_ENHANC:
+            newEvent.type = AudioEventType::ENHANCE_PARAM_CHANGE;
+            break;
         default:
             DHLOGE("Unsupport event tpye.");
             break;

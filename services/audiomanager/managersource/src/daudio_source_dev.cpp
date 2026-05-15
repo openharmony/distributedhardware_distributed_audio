@@ -53,6 +53,7 @@ constexpr uint32_t EVENT_MMAP_MIC_START = 83;
 constexpr uint32_t EVENT_MMAP_MIC_STOP = 84;
 constexpr uint32_t EVENT_DAUDIO_ENABLE = 88;
 constexpr uint32_t EVENT_DAUDIO_DISABLE = 89;
+constexpr uint32_t EVENT_ENHANCE_PARAM_CHANGE = 90;
 }
 
 DAudioSourceDev::DAudioSourceDev(const std::string &devId, const std::shared_ptr<DAudioSourceMgrCallback> &callback)
@@ -79,6 +80,7 @@ DAudioSourceDev::DAudioSourceDev(const std::string &devId, const std::shared_ptr
     memberFuncMap_[AUDIO_FOCUS_CHANGE] = &DAudioSourceDev::HandleFocusChange;
     memberFuncMap_[AUDIO_RENDER_STATE_CHANGE] = &DAudioSourceDev::HandleRenderStateChange;
     memberFuncMap_[CHANGE_PLAY_STATUS] = &DAudioSourceDev::HandlePlayStatusChange;
+    memberFuncMap_[ENHANCE_PARAM_CHANGE] = &DAudioSourceDev::HandleEnhanceParamChange;
     memberFuncMap_[MMAP_SPK_START] = &DAudioSourceDev::HandleSpkMmapStart;
     memberFuncMap_[MMAP_SPK_STOP] = &DAudioSourceDev::HandleSpkMmapStop;
     memberFuncMap_[MMAP_MIC_START] = &DAudioSourceDev::HandleMicMmapStart;
@@ -245,6 +247,13 @@ void DAudioSourceDev::SetThreadStatusFlag(bool flag)
 
 void DAudioSourceDev::NotifyEventInner(const AudioEvent &event)
 {
+    HandleMicEvents(event);
+    HandleVolumeAndAudioEvents(event);
+    HandleMmapEvents(event);
+}
+
+void DAudioSourceDev::HandleMicEvents(const AudioEvent &event)
+{
     switch (event.type) {
         case OPEN_MIC:
             HandleOpenDMic(event);
@@ -261,6 +270,14 @@ void DAudioSourceDev::NotifyEventInner(const AudioEvent &event)
         case CTRL_CLOSED:
             HandleCtrlTransClosed(event);
             break;
+        default:
+            break;
+    }
+}
+
+void DAudioSourceDev::HandleVolumeAndAudioEvents(const AudioEvent &event)
+{
+    switch (event.type) {
         case VOLUME_SET:
         case VOLUME_MUTE_SET:
             HandleVolumeSet(event);
@@ -277,6 +294,17 @@ void DAudioSourceDev::NotifyEventInner(const AudioEvent &event)
         case CHANGE_PLAY_STATUS:
             HandlePlayStatusChange(event);
             break;
+        case ENHANCE_PARAM_CHANGE:
+            HandleEnhanceParamChange(event);
+            break;
+        default:
+            break;
+    }
+}
+
+void DAudioSourceDev::HandleMmapEvents(const AudioEvent &event)
+{
+    switch (event.type) {
         case MMAP_SPK_START:
             HandleSpkMmapStart(event);
             break;
@@ -296,6 +324,29 @@ void DAudioSourceDev::NotifyEventInner(const AudioEvent &event)
 
 void DAudioSourceDev::NotifyEvent(const AudioEvent &event)
 {
+    if (IsSpeakerEvent(event.type)) {
+        HandleSpeakerEvent(event);
+        return;
+    }
+    if (IsNotifyRPCEvent(event.type)) {
+        HandleNotifyRPC(event);
+        return;
+    }
+#ifdef AUDIO_SUPPORT_SHARED_BUFFER
+    if (event.type == AUDIO_START || event.type == AUDIO_STOP) {
+        HandleAudioStatus(event);
+        return;
+    }
+#endif
+    if (ShouldRouteToInnerEvent(event.type)) {
+        NotifyEventInner(event);
+        return;
+    }
+    DHLOGE("Invalid eventType: %{public}d.", event.type);
+}
+
+void DAudioSourceDev::HandleSpeakerEvent(const AudioEvent &event)
+{
     switch (event.type) {
         case OPEN_SPEAKER:
             HandleOpenDSpeaker(event);
@@ -309,41 +360,32 @@ void DAudioSourceDev::NotifyEvent(const AudioEvent &event)
         case SPEAKER_CLOSED:
             HandleDSpeakerClosed(event);
             break;
-        case NOTIFY_OPEN_SPEAKER_RESULT:
-        case NOTIFY_CLOSE_SPEAKER_RESULT:
-        case NOTIFY_OPEN_MIC_RESULT:
-        case NOTIFY_CLOSE_MIC_RESULT:
-        case NOTIFY_OPEN_CTRL_RESULT:
-        case NOTIFY_CLOSE_CTRL_RESULT:
-            HandleNotifyRPC(event);
-            break;
-#ifdef AUDIO_SUPPORT_SHARED_BUFFER
-        case AUDIO_START:
-        case AUDIO_STOP:
-            HandleAudioStatus(event);
-            break;
-#endif
-        case OPEN_MIC:
-        case CLOSE_MIC:
-        case MIC_OPENED:
-        case MIC_CLOSED:
-        case CTRL_CLOSED:
-        case VOLUME_SET:
-        case VOLUME_MUTE_SET:
-        case VOLUME_CHANGE:
-        case AUDIO_FOCUS_CHANGE:
-        case AUDIO_RENDER_STATE_CHANGE:
-        case CHANGE_PLAY_STATUS:
-        case MMAP_SPK_START:
-        case MMAP_SPK_STOP:
-        case MMAP_MIC_START:
-        case MMAP_MIC_STOP:
-            NotifyEventInner(event);
-            break;
         default:
-            DHLOGE("Invalid eventType: %{public}d.", event.type);
             break;
     }
+}
+
+bool DAudioSourceDev::IsSpeakerEvent(const AudioEventType type)
+{
+    return type == OPEN_SPEAKER || type == CLOSE_SPEAKER ||
+           type == SPEAKER_OPENED || type == SPEAKER_CLOSED;
+}
+
+bool DAudioSourceDev::IsNotifyRPCEvent(const AudioEventType type)
+{
+    return type == NOTIFY_OPEN_SPEAKER_RESULT || type == NOTIFY_CLOSE_SPEAKER_RESULT ||
+           type == NOTIFY_OPEN_MIC_RESULT || type == NOTIFY_CLOSE_MIC_RESULT ||
+           type == NOTIFY_OPEN_CTRL_RESULT || type == NOTIFY_CLOSE_CTRL_RESULT;
+}
+
+bool DAudioSourceDev::ShouldRouteToInnerEvent(const AudioEventType type)
+{
+    return type == OPEN_MIC || type == CLOSE_MIC || type == MIC_OPENED ||
+           type == MIC_CLOSED || type == CTRL_CLOSED || type == VOLUME_SET ||
+           type == VOLUME_MUTE_SET || type == VOLUME_CHANGE || type == AUDIO_FOCUS_CHANGE ||
+           type == AUDIO_RENDER_STATE_CHANGE || type == CHANGE_PLAY_STATUS ||
+           type == ENHANCE_PARAM_CHANGE || type == MMAP_SPK_START || type == MMAP_SPK_STOP ||
+           type == MMAP_MIC_START || type == MMAP_MIC_STOP;
 }
 
 #ifdef AUDIO_SUPPORT_SHARED_BUFFER
@@ -674,6 +716,20 @@ int32_t DAudioSourceDev::HandlePlayStatusChange(const AudioEvent &event)
         return ERR_DH_AUDIO_FAILED;
     }
     DHLOGD("Play state change event is sent successfully.");
+    return DH_SUCCESS;
+}
+
+int32_t DAudioSourceDev::HandleEnhanceParamChange(const AudioEvent &event)
+{
+    DHLOGI("Start handle enhance param change, content: %{public}s.", event.content.c_str());
+    CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
+    auto eventParam = std::make_shared<AudioEvent>(event);
+    auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_ENHANCE_PARAM_CHANGE, eventParam, 0);
+    if (!handler_->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
+        DHLOGE("Send event failed.");
+        return ERR_DH_AUDIO_FAILED;
+    }
+    DHLOGI("Enhance param change event is sent successfully.");
     return DH_SUCCESS;
 }
 
@@ -1350,6 +1406,29 @@ int32_t DAudioSourceDev::TaskPlayStatusChange(const std::string &args)
     return DH_SUCCESS;
 }
 
+int32_t DAudioSourceDev::TaskEnhanceParamChange(const std::string &args)
+{
+    DHLOGI("Task enhance param change, content: %{public}s.", args.c_str());
+    if (args.length() > DAUDIO_MAX_JSON_LEN || args.empty()) {
+        DHLOGE("Args length invalid.");
+        return ERR_DH_AUDIO_SA_PARAM_INVALID;
+    }
+    int32_t dhId = ParseDhidFromEvent(args);
+    CHECK_AND_RETURN_RET_LOG(dhId == ERR_DH_AUDIO_FAILED, ERR_DH_AUDIO_FAILED,
+        "%{public}s", "Failed to parse dhardware id from enhance param.");
+    std::shared_ptr<DAudioIoDev> mic = nullptr;
+    {
+        std::lock_guard<std::mutex> devLck(ioDevMtx_);
+        mic = deviceMap_[dhId];
+    }
+    CHECK_NULL_RETURN(mic, ERR_DH_AUDIO_NULLPTR);
+    int32_t ret = mic->SendMessage(static_cast<uint32_t>(ENHANCE_PARAM_CHANGE), args, devId_);
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, ret,
+        "Send enhance param to remote via mic control channel failed, ret: %{public}d.", ret);
+    DHLOGI("Task enhance param change success via mic control channel.");
+    return DH_SUCCESS;
+}
+
 int32_t DAudioSourceDev::SendAudioEventToRemote(const AudioEvent &event)
 {
     // because: type: CHANGE_PLAY_STATUS / VOLUME_MUTE_SET / VOLUME_SET, so speaker
@@ -1591,6 +1670,7 @@ DAudioSourceDev::SourceEventHandler::SourceEventHandler(const std::shared_ptr<Ap
     mapEventFuncs_[EVENT_AUDIO_FOCUS_CHANGE] = &DAudioSourceDev::SourceEventHandler::ChangeFocusCallback;
     mapEventFuncs_[EVENT_AUDIO_RENDER_STATE_CHANGE] = &DAudioSourceDev::SourceEventHandler::ChangeRenderStateCallback;
     mapEventFuncs_[EVENT_CHANGE_PLAY_STATUS] = &DAudioSourceDev::SourceEventHandler::PlayStatusChangeCallback;
+    mapEventFuncs_[EVENT_ENHANCE_PARAM_CHANGE] = &DAudioSourceDev::SourceEventHandler::EnhanceParamChangeCallback;
     mapEventFuncs_[EVENT_MMAP_SPK_START] = &DAudioSourceDev::SourceEventHandler::SpkMmapStartCallback;
     mapEventFuncs_[EVENT_MMAP_SPK_STOP] = &DAudioSourceDev::SourceEventHandler::SpkMmapStopCallback;
     mapEventFuncs_[EVENT_MMAP_MIC_START] = &DAudioSourceDev::SourceEventHandler::MicMmapStartCallback;
@@ -1617,6 +1697,9 @@ void DAudioSourceDev::SourceEventHandler::ProcessEventInner(const AppExecFwk::In
             break;
         case EVENT_CHANGE_PLAY_STATUS:
             PlayStatusChangeCallback(event);
+            break;
+        case EVENT_ENHANCE_PARAM_CHANGE:
+            EnhanceParamChangeCallback(event);
             break;
         case EVENT_MMAP_SPK_START:
             SpkMmapStartCallback(event);
@@ -1666,6 +1749,7 @@ void DAudioSourceDev::SourceEventHandler::ProcessEvent(const AppExecFwk::InnerEv
         case EVENT_AUDIO_FOCUS_CHANGE:
         case EVENT_AUDIO_RENDER_STATE_CHANGE:
         case EVENT_CHANGE_PLAY_STATUS:
+        case EVENT_ENHANCE_PARAM_CHANGE:
         case EVENT_MMAP_SPK_START:
         case EVENT_MMAP_SPK_STOP:
         case EVENT_MMAP_MIC_START:
@@ -1860,6 +1944,22 @@ void DAudioSourceDev::SourceEventHandler::PlayStatusChangeCallback(const AppExec
         return;
     }
     DHLOGD("Processing playing status change event successfully.");
+}
+
+void DAudioSourceDev::SourceEventHandler::EnhanceParamChangeCallback(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    std::string eventParam;
+    if (GetEventParam(event, eventParam) != DH_SUCCESS) {
+        DHLOGE("Failed to get event parameters.");
+        return;
+    }
+    auto sourceDevObj = sourceDev_.lock();
+    CHECK_NULL_VOID(sourceDevObj);
+    if (sourceDevObj->TaskEnhanceParamChange(eventParam) != DH_SUCCESS) {
+        DHLOGE("Failed to process enhance param change event.");
+        return;
+    }
+    DHLOGI("Processing enhance param change event successfully.");
 }
 
 void DAudioSourceDev::SourceEventHandler::SpkMmapStartCallback(const AppExecFwk::InnerEvent::Pointer &event)

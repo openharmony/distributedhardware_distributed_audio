@@ -29,6 +29,8 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+const std::string RECORD_KEY = "audio_effect";
+const std::string RECORD_SCENE = "SCENE";
 DMicClient::~DMicClient()
 {
     if (micTrans_ != nullptr) {
@@ -446,6 +448,46 @@ int32_t DMicClient::ResumeCapture()
 {
     DHLOGI("Resume capture.");
     isPauseStatus_.store(false);
+    return DH_SUCCESS;
+}
+
+int32_t DMicClient::SetEnhanceParameter(const AudioEvent &event)
+{
+    DHLOGI("DMicClient SetEnhanceParameter event content: %{public}s.", event.content.c_str());
+    std::string sceneContent;
+    cJSON *root = cJSON_Parse(event.content.c_str());
+    if (root == nullptr) {
+        DHLOGE("SetEnhanceParameter root nullptr.");
+        return ERR_DH_AUDIO_CLIENT_PARAM_ERROR;
+    }
+    cJSON *audioEffectObj = cJSON_GetObjectItem(root, RECORD_KEY.c_str());
+    if (audioEffectObj != nullptr && cJSON_IsObject(audioEffectObj)) {
+        cJSON *sceneItem = cJSON_GetObjectItem(audioEffectObj, RECORD_SCENE.c_str());
+        if (sceneItem != nullptr && cJSON_IsString(sceneItem)) {
+            DHLOGI("SCENE: %{public}s.", sceneItem->valuestring);
+            sceneContent = sceneItem->valuestring;
+        }
+    }
+    if (sceneContent.empty()) {
+        DHLOGE("SCENE content is empty, skip setting extra parameters.");
+        cJSON_Delete(root);
+        return ERR_DH_AUDIO_CLIENT_PARAM_ERROR;
+    }
+    std::string key = RECORD_KEY.c_str();
+    std::pair<std::string, std::string> pair(RECORD_SCENE, sceneContent);
+    std::vector<std::pair<std::string, std::string>> kvpairs;
+    kvpairs.push_back(pair);
+    DHLOGI("key: %{public}s.", key.c_str());
+    for (const auto &pair : kvpairs) {
+        DHLOGI("Key: %{public}s, Value: %{public}s.", pair.first.c_str(), pair.second.c_str());
+    }
+    int32_t ret = AudioStandard::AudioSystemManager::GetInstance()->SetExtraParameters(key, kvpairs);
+    cJSON_Delete(root);
+    if (ret != DH_SUCCESS) {
+        DHLOGE("SetExtraParameters failed.");
+        return ERR_DH_AUDIO_FAILED;
+    }
+    DHLOGI("AudioStandard::AudioSystemManager::SetExtraParameters end.");
     return DH_SUCCESS;
 }
 } // DistributedHardware

@@ -80,6 +80,7 @@ private:
     int32_t TaskChangeFocus(const std::string &args);
     int32_t TaskChangeRenderState(const std::string &args);
     int32_t TaskPlayStatusChange(const std::string &args);
+    int32_t TaskEnhanceParamChange(const std::string &args);
     int32_t TaskSpkMmapStart(const std::string &args);
     int32_t TaskSpkMmapStop(const std::string &args);
     int32_t TaskMicMmapStart(const std::string &args);
@@ -113,6 +114,7 @@ private:
     int32_t HandleSpkMmapStop(const AudioEvent &event);
     int32_t HandleMicMmapStart(const AudioEvent &event);
     int32_t HandleMicMmapStop(const AudioEvent &event);
+    int32_t HandleEnhanceParamChange(const AudioEvent &event);
     bool CheckAclRight();
     bool GetOsAccountInfo();
 #ifdef AUDIO_SUPPORT_SHARED_BUFFER
@@ -135,6 +137,13 @@ private:
     int32_t CreateMicEngine(std::shared_ptr<DAudioIoDev> mic);
     void SetRegDataType(const std::string &capability);
     void NotifyEventInner(const AudioEvent &event);
+    void HandleSpeakerEvent(const AudioEvent &event);
+    void HandleMicEvents(const AudioEvent &event);
+    void HandleVolumeAndAudioEvents(const AudioEvent &event);
+    void HandleMmapEvents(const AudioEvent &event);
+    bool IsSpeakerEvent(const AudioEventType type);
+    bool IsNotifyRPCEvent(const AudioEventType type);
+    bool ShouldRouteToInnerEvent(const AudioEventType type);
 
 private:
     static constexpr uint8_t RPC_WAIT_SECONDS = 10;
@@ -187,6 +196,7 @@ private:
         void ChangeFocusCallback(const AppExecFwk::InnerEvent::Pointer &event);
         void ChangeRenderStateCallback(const AppExecFwk::InnerEvent::Pointer &event);
         void PlayStatusChangeCallback(const AppExecFwk::InnerEvent::Pointer &event);
+        void EnhanceParamChangeCallback(const AppExecFwk::InnerEvent::Pointer &event);
         void SpkMmapStartCallback(const AppExecFwk::InnerEvent::Pointer &event);
         void SpkMmapStopCallback(const AppExecFwk::InnerEvent::Pointer &event);
         void MicMmapStartCallback(const AppExecFwk::InnerEvent::Pointer &event);
