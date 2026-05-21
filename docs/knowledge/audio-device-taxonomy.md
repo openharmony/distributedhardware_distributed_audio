@@ -49,7 +49,7 @@
 | Sink端打开 | TaskOpenDSpeaker → SetUp renderer | TaskOpenDMic → SetUp capturer |
 | Sink端启动 | StartRender | StartCapture |
 
-关键判断：通过dhId区分设备类型，dhId=1为Speaker，dhId=2为Mic。
+关键判断：通过dhId区分设备类型，dhId=1为Speaker，dhId=134217729为Mic。
 
 ## 反模式/修改前检查
 
