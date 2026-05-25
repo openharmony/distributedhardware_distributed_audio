@@ -6,7 +6,7 @@
 
 | 属性 | Speaker（播放设备） | Mic（录音设备） |
 | --- | --- | --- |
-| 设备编号（dhId） | 1 | 2 |
+| 设备编号（dhId） | 1 | 134217729 |
 | Source端实现 | DSpeakerDev | DMicDev |
 | Sink端实现 | DSpeakerClient | DMicClient |
 | 音频框架类 | AudioRenderer | AudioCapturer |
