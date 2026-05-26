@@ -37,6 +37,7 @@ DMicClient::~DMicClient()
         DHLOGI("Release mic client.");
         StopCapture();
     }
+    DumpFileUtil::CloseDumpFile(&dumpFile_);
 }
 
 void DMicClient::OnEngineTransEvent(const AVTransEvent &event)
@@ -194,7 +195,11 @@ int32_t DMicClient::SetUp(const AudioParam &param)
         param.captureOpts.capturerFlags, param.comParam.frameSize);
     audioParam_ = param;
     DumpFileUtil::OpenDumpFile(DUMP_SERVER_PARA, DUMP_DAUDIO_MIC_BEFORE_TRANS_NAME, &dumpFile_);
-    return AudioFwkClientSetUp();
+    int32_t ret = AudioFwkClientSetUp();
+    if (ret != DH_SUCCESS) {
+        DumpFileUtil::CloseDumpFile(&dumpFile_);
+    }
+    return ret;
 }
 
 int32_t DMicClient::SendMessage(uint32_t type, std::string content, std::string dstDevId)
