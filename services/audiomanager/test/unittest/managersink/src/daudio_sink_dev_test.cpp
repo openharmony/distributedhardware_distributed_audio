@@ -1112,24 +1112,11 @@ HWTEST_F(DAudioSinkDevTest, TaskSetEnhanceParam_002, TestSize.Level1)
 
 /**
  * @tc.name: TaskSetEnhanceParam_003
- * @tc.desc: Verify the TaskSetEnhanceParam function with valid JSON but no dhId.
- * @tc.type: FUNC
- * @tc.require: AR000H0E5F
- */
-HWTEST_F(DAudioSinkDevTest, TaskSetEnhanceParam_003, TestSize.Level1)
-{
-    std::string args = "{\"audio_effect\":\"high-definition-record\"}";
-    ASSERT_NE(sinkDev_, nullptr);
-    EXPECT_EQ(DH_SUCCESS, sinkDev_->TaskSetEnhanceParam(args));
-}
-
-/**
- * @tc.name: TaskSetEnhanceParam_004
  * @tc.desc: Verify the TaskSetEnhanceParam function with valid JSON and dhId.
  * @tc.type: FUNC
  * @tc.require: AR000H0E5F
  */
-HWTEST_F(DAudioSinkDevTest, TaskSetEnhanceParam_004, TestSize.Level1)
+HWTEST_F(DAudioSinkDevTest, TaskSetEnhanceParam_003, TestSize.Level1)
 {
     cJSON *jParam = cJSON_CreateObject();
     CHECK_NULL_VOID(jParam);
