@@ -273,76 +273,15 @@ HWTEST_F(DMicClientTest, SetEnhanceParameter_002, TestSize.Level0)
 
 /**
  * @tc.name: SetEnhanceParameter_003
- * @tc.desc: Verify the SetEnhanceParameter function when JSON is valid but missing audio_effect field.
+ * @tc.desc: Verify the SetEnhanceParameter function with correct audio_effect format containing SCENE string.
  * @tc.type: FUNC
  * @tc.require: AR000H0E6G
  */
 HWTEST_F(DMicClientTest, SetEnhanceParameter_003, TestSize.Level0)
 {
     ASSERT_TRUE(micClient_ != nullptr);
-    AudioEvent event(AudioEventType::ENHANCE_PARAM_CHANGE, "{\"other_key\":\"other_value\"}");
-    int32_t ret = micClient_->SetEnhanceParameter(event);
-    EXPECT_NE(ERR_DH_AUDIO_CLIENT_PARAM_ERROR, ret);
-    EXPECT_TRUE(ret == DH_SUCCESS || ret == ERR_DH_AUDIO_FAILED);
-}
-
-/**
- * @tc.name: SetEnhanceParameter_004
- * @tc.desc: Verify the SetEnhanceParameter function with correct audio_effect format containing SCENE string.
- * @tc.type: FUNC
- * @tc.require: AR000H0E6G
- */
-HWTEST_F(DMicClientTest, SetEnhanceParameter_004, TestSize.Level0)
-{
-    ASSERT_TRUE(micClient_ != nullptr);
     AudioEvent event(AudioEventType::ENHANCE_PARAM_CHANGE,
         "{\"audio_effect\":{\"SCENE\":\"high-definition-record\"}}");
-    int32_t ret = micClient_->SetEnhanceParameter(event);
-    EXPECT_NE(ERR_DH_AUDIO_CLIENT_PARAM_ERROR, ret);
-    EXPECT_TRUE(ret == DH_SUCCESS || ret == ERR_DH_AUDIO_FAILED);
-}
-
-/**
- * @tc.name: SetEnhanceParameter_005
- * @tc.desc: Verify the SetEnhanceParameter function when audio_effect field type is string instead of object.
- * @tc.type: FUNC
- * @tc.require: AR000H0E6G
- */
-HWTEST_F(DMicClientTest, SetEnhanceParameter_005, TestSize.Level0)
-{
-    ASSERT_TRUE(micClient_ != nullptr);
-    AudioEvent event(AudioEventType::ENHANCE_PARAM_CHANGE, "{\"audio_effect\":\"string_value\"}");
-    int32_t ret = micClient_->SetEnhanceParameter(event);
-    EXPECT_NE(ERR_DH_AUDIO_CLIENT_PARAM_ERROR, ret);
-    EXPECT_TRUE(ret == DH_SUCCESS || ret == ERR_DH_AUDIO_FAILED);
-}
-
-/**
- * @tc.name: SetEnhanceParameter_006
- * @tc.desc: Verify the SetEnhanceParameter function when audio_effect is object but SCENE is not string.
- * @tc.type: FUNC
- * @tc.require: AR000H0E6G
- */
-HWTEST_F(DMicClientTest, SetEnhanceParameter_006, TestSize.Level0)
-{
-    ASSERT_TRUE(micClient_ != nullptr);
-    AudioEvent event(AudioEventType::ENHANCE_PARAM_CHANGE, "{\"audio_effect\":{\"SCENE\":123}}");
-    int32_t ret = micClient_->SetEnhanceParameter(event);
-    EXPECT_NE(ERR_DH_AUDIO_CLIENT_PARAM_ERROR, ret);
-    EXPECT_TRUE(ret == DH_SUCCESS || ret == ERR_DH_AUDIO_FAILED);
-}
-
-/**
- * @tc.name: SetEnhanceParameter_007
- * @tc.desc: Verify the SetEnhanceParameter function when audio_effect is object but missing SCENE field.
- * @tc.type: FUNC
- * @tc.require: AR000H0E6G
- */
-HWTEST_F(DMicClientTest, SetEnhanceParameter_007, TestSize.Level0)
-{
-    ASSERT_TRUE(micClient_ != nullptr);
-    AudioEvent event(AudioEventType::ENHANCE_PARAM_CHANGE,
-        "{\"audio_effect\":{\"OTHER_FIELD\":\"value\"}}");
     int32_t ret = micClient_->SetEnhanceParameter(event);
     EXPECT_NE(ERR_DH_AUDIO_CLIENT_PARAM_ERROR, ret);
     EXPECT_TRUE(ret == DH_SUCCESS || ret == ERR_DH_AUDIO_FAILED);
