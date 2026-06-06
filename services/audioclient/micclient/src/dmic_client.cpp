@@ -30,7 +30,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 const std::string RECORD_KEY = "audio_effect";
-const std::string RECORD_SCENE = "SCENE";
+const std::string RECORD_SCENE = "RECORD_SCENE";
 DMicClient::~DMicClient()
 {
     if (micTrans_ != nullptr) {

@@ -273,7 +273,7 @@ HWTEST_F(DMicClientTest, SetEnhanceParameter_002, TestSize.Level0)
 
 /**
  * @tc.name: SetEnhanceParameter_003
- * @tc.desc: Verify the SetEnhanceParameter function with correct audio_effect format containing SCENE string.
+ * @tc.desc: Verify the SetEnhanceParameter function with correct audio_effect format containing RECORD_SCENE string.
  * @tc.type: FUNC
  * @tc.require: AR000H0E6G
  */
@@ -281,7 +281,7 @@ HWTEST_F(DMicClientTest, SetEnhanceParameter_003, TestSize.Level0)
 {
     ASSERT_TRUE(micClient_ != nullptr);
     AudioEvent event(AudioEventType::ENHANCE_PARAM_CHANGE,
-        "{\"audio_effect\":{\"SCENE\":\"high-definition-record\"}}");
+        "{\"audio_effect\":{\"RECORD_SCENE\":\"high-definition-record\"}}");
     int32_t ret = micClient_->SetEnhanceParameter(event);
     EXPECT_NE(ERR_DH_AUDIO_CLIENT_PARAM_ERROR, ret);
     EXPECT_TRUE(ret == DH_SUCCESS || ret == ERR_DH_AUDIO_FAILED);
