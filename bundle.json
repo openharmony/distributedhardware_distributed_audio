@@ -48,6 +48,7 @@
                 "hitrace",
                 "hilog",
                 "init",
+                "media_foundation",
                 "ipc",
                 "os_account",
                 "player_framework",
