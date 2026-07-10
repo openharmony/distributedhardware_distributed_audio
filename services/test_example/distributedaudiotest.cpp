@@ -565,6 +565,10 @@ static void Capture()
             std::cout << "CaptureFrame failed, ret: " << ret << std::endl;
             return;
         }
+        if (g_micFile == nullptr) {
+            std::cout << "g_micFile is nullptr." << std::endl;
+            return;
+        }
         size_t writeCnt = fwrite(data.data(), 1, RENDER_FRAME_SIZE, g_micFile);
         if (static_cast<int32_t>(writeCnt) != RENDER_FRAME_SIZE) {
             std::cout << "fwrite data failed." << std::endl;
