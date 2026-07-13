@@ -24,6 +24,7 @@ config("decode_transport_pub_config") {
 }
 
 ohos_shared_library("distributed_audio_decode_transport") {
+  branch_protector_ret = "pac_ret"
   sanitize = {
     boundary_sanitize = true
     cfi = true
