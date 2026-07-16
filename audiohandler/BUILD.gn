@@ -21,7 +21,6 @@ ohos_shared_library("distributed_audio_handler") {
     boundary_sanitize = true
     integer_overflow = true
     ubsan = true
-    sanitize = {
     cfi = true
     cfi_cross_dso = true
     debug = false
