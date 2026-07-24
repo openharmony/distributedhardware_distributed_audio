@@ -42,6 +42,7 @@ void SinkServiceInitSinkFuzzTest(const uint8_t* data, size_t size)
     sptr<DAudioSinkIpcCallback> dAudioSinkIpcCallback(new DAudioSinkIpcCallback());
 
     dAudioSinkService->InitSink(params, dAudioSinkIpcCallback);
+    dAudioSinkService->ReleaseSink();
 }
 }
 }
