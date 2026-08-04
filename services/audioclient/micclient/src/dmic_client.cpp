@@ -265,19 +265,19 @@ int32_t DMicClient::StartCapture()
             "daudio init failed or mic status wrong.");
         return ERR_DH_AUDIO_SA_STATUS_ERR;
     }
-    if (!audioCapturer_->Start()) {
-        DHLOGE("Audio capturer start failed.");
-        audioCapturer_->Release();
-        DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_OPT_FAIL,
-            ERR_DH_AUDIO_CLIENT_CAPTURER_START_FAILED, "daudio capturer start failed.");
-        return ERR_DH_AUDIO_CLIENT_CAPTURER_START_FAILED;
-    }
     int32_t ret = micTrans_->Start();
     if (ret != DH_SUCCESS) {
         DHLOGE("Mic trans start failed.");
         micTrans_->Release();
         DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_OPT_FAIL, ret, "daudio mic trans start failed.");
         return ret;
+    }
+    if (!audioCapturer_->Start()) {
+        DHLOGE("Audio capturer start failed.");
+        audioCapturer_->Release();
+        DAudioHisysevent::GetInstance().SysEventWriteFault(DAUDIO_OPT_FAIL,
+            ERR_DH_AUDIO_CLIENT_CAPTURER_START_FAILED, "daudio capturer start failed.");
+        return ERR_DH_AUDIO_CLIENT_CAPTURER_START_FAILED;
     }
     clientStatus_ = AudioStatus::STATUS_START;
     return DH_SUCCESS;
