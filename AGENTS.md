@@ -1,5 +1,7 @@
 # 分布式音频指引
 
+> **本仓库AGENTS.md定位**：全局架构索引 + 规则约束 + 高频变更指引。子模块细节请查阅子目录AGENTS.md（如有）。
+
 ## 项目定位
 
 本仓库对应 OpenHarmony `foundation/distributedhardware/distributed_audio`，实现跨设备音频协同使用能力（Speaker播音、Mic录音）。分布式音频不直接向应用提供接口，应用通过音频框架接口调用，使用方式与本地音频一致。
@@ -21,15 +23,15 @@
 
 ### 核心目录
 
-- `audiohandler/`：硬件信息上报、设备状态通知，由分布式硬件管理框架加载
-- `services/audiomanager/`：Source/Sink双端服务管理，SA入口和设备管理器
-  - `managersource/`：主控端管理器（DAudioSourceManager、DAudioSourceDev）
-  - `managersink/`：被控端管理器（DAudioSinkManager、DAudioSinkDev）
+- `audiohandler/`：硬件信息上报、设备状态通知，由分布式硬件管理框架加载 **[高频变更]**
+- `services/audiomanager/`：Source/Sink双端服务管理，SA入口和设备管理器 **[最高频变更]**
+  - `managersource/`：主控端管理器（DAudioSourceManager、DAudioSourceDev） **[最高频变更]**
+  - `managersink/`：被控端管理器（DAudioSinkManager、DAudioSinkDev） **[高频变更]**
   - `servicesource/`：主控端服务（DAudioSourceService）
   - `servicesink/`：被控端服务（DAudioSinkService）
-- `services/audioclient/`：Speaker/Mic客户端，与音频框架交互
-  - `spkclient/`：Speaker客户端（DSpeakerClient）
-  - `micclient/`：Mic客户端（DMicClient）
+- `services/audioclient/`：Speaker/Mic客户端，与音频框架交互 **[高频变更]**
+  - `spkclient/`：Speaker客户端（DSpeakerClient） **[高频变更]**
+  - `micclient/`：Mic客户端（DMicClient） **[高频变更]**
 - `services/audiotransport/`：数据传输组件
   - `audioctrltransport/`：控制通道（DAudioSourceCtrlTrans、DAudioSinkCtrlTrans）
   - `senderengine/`：编码发送引擎（AVSenderEngineTransport）
@@ -133,6 +135,26 @@
 | HDI代理 | DAudioHdiHandlerTest | `services/audiohdiproxy/test` |
 | IPC代理 | DAudioSourceProxyTest / DAudioSinkProxyTest | `interfaces/inner_kits/native_cpp/test` |
 
+### 测试执行命令
+
+```sh
+# 执行所有单元测试
+./test/unittest/daudio_unit_test
+
+# 执行指定模块测试
+./test/unittest/daudio_source_dev_test
+./test/unittest/daudio_sink_dev_test
+```
+
+### Done定义
+
+任务完成标准（必须全部满足）：
+
+- [ ] 构建通过：`./build.sh --product-name rk3568 --build-target distributed_audio --ccache` 执行成功
+- [ ] 测试通过：所有相关单元测试执行成功
+- [ ] Lint通过：代码格式检查无错误
+- [ ] 提交规范：使用 `git commit -s` 签名提交
+
 ## 知识索引
 
 稳定背景知识放在 `docs/knowledge/`。改动前按场景读取对应文件：
@@ -144,6 +166,80 @@
 | 新增事件类型或处理逻辑 | `docs/knowledge/audio-event-pipeline.md` |
 | Speaker/Mic差异化处理 | `docs/knowledge/audio-device-taxonomy.md` |
 | 修改传输或编解码逻辑 | `docs/knowledge/audio-transport-pipeline.md` |
+
+### 路径触发规则
+
+修改以下路径时，**必须先读**对应知识文档：
+
+| 文件路径模式 | 必读文档 |
+| --- | --- |
+| `services/audiomanager/managersource/**` | `audio-source-sink-architecture.md` + `audio-device-lifecycle.md` |
+| `services/audiomanager/managersink/**` | `audio-source-sink-architecture.md` + `audio-device-lifecycle.md` |
+| `services/audioclient/**` | `audio-device-taxonomy.md` + `audio-transport-pipeline.md` |
+| `services/audiotransport/**` | `audio-transport-pipeline.md` |
+| `audiohandler/**` | `audio-device-lifecycle.md` |
+| `interfaces/inner_kits/**` | `audio-source-sink-architecture.md` |
+
+### 领域术语触发规则
+
+讨论或修改涉及以下术语时，**必须先读**对应知识文档：
+
+| 术语 | 必读文档 |
+| --- | --- |
+| Source / 主控端 | `audio-source-sink-architecture.md` |
+| Sink / 被控端 | `audio-source-sink-architecture.md` |
+| Speaker / 播音设备 | `audio-device-taxonomy.md` |
+| Mic / 录音设备 | `audio-device-taxonomy.md` |
+| EnableDevice / 设备启用 | `audio-device-lifecycle.md` |
+| DisableDevice / 设备禁用 | `audio-device-lifecycle.md` |
+| AudioEvent / 事件 | `audio-event-pipeline.md` |
+| AudioStatus / 状态机 | `audio-device-lifecycle.md` |
+| CtrlTrans / 控制通道 | `audio-transport-pipeline.md` |
+| Engine / 编解码引擎 | `audio-transport-pipeline.md` |
+| IPC / DAudioNotify | `audio-source-sink-architecture.md` |
+
+## 子目录AGENTS.md编写指引
+
+子目录（如`audiohandler/`、`services/audiomanager/`等）可根据需要创建AGENTS.md，格式如下：
+
+### 子目录AGENTS.md模板
+
+```markdown
+# {模块名}模块指引
+
+## 模块定位
+
+（1-2句话说明本模块在分布式音频中的角色）
+
+## 目录结构
+
+（列出本模块的子目录和关键文件）
+
+## 核心类索引
+
+（列出本模块的核心类及其职责）
+
+## 修改前必读
+
+（引用本仓库`docs/knowledge/`中的相关文档）
+
+## 约束和反模式
+
+（本模块特有的约束，可引用根AGENTS.md）
+```
+
+### 编写建议
+
+1. **定位清晰**：明确模块职责，避免与根AGENTS.md重复
+2. **引用知识**：使用相对路径引用`docs/knowledge/`文档
+3. **聚焦约束**：只写本模块特有的约束，通用约束引用根AGENTS.md
+4. **保持同步**：模块重构时同步更新子目录AGENTS.md
+
+### 不需要创建子AGENTS.md的情况
+
+- 模块代码量小（<2000行）
+- 模块职责简单（<5个核心类）
+- 模块变更频率低（<20次/年）
 
 ## 关键类和接口索引
 
@@ -277,6 +373,48 @@ ReceiverEngine接收 → OnDecodeTransDataDone → 本地音频框架
 - **禁止**在Source端未初始化SinkProxy时调用RegisterDistributedHardware。检查sinkServiceMap是否包含目标设备。
 - **禁止**跳过DAudioNotify直接发送事件。必须通过IPC通道保证可靠性。
 - **禁止**在崩溃恢复中遗漏清理audioDevMap。检查对应devId的条目是否已移除。
+
+## IPC接口兼容性约束
+
+### 接口版本管理
+
+- **禁止**删除已有IPC接口方法。如需废弃，添加`@Deprecated`注解并保留至少2个版本周期。
+- **禁止**修改已有IPC接口的参数类型或返回值。如需变更，必须新增接口方法。
+- **禁止**修改`interfaces/inner_kits/native_cpp/`下的接口定义文件。新增参数需添加默认值。
+
+### 跨版本兼容
+
+- **修改IPC接口前**：检查对端服务版本是否支持新接口。Source和Sink版本必须匹配。
+- **新增IPC方法**：必须同步更新DAudioSourceProxy和DAudioSinkProxy，并在两端的Stub类实现。
+- **序列化兼容**：修改MessageParcel数据结构时，新增字段追加到末尾，禁止插入或删除中间字段。
+
+### 接口变更检查清单
+
+- [ ] 接口定义文件已同步更新（.h和.idl）
+- [ ] Proxy和Stub两端均已实现新接口
+- [ ] 已添加版本号检查逻辑（如需要）
+- [ ] 已更新接口文档和注释
+
+## 权限安全协议兼容性约束
+
+### 权限声明
+
+- **新增权限**：必须在`bundle.json`的`req_permissions`中声明。
+- **敏感权限**：如`OH_PERMISSION_DISTRIBUTED_DATASYNC`，需在代码中动态申请并检查授权状态。
+- **权限检查**：IPC接口入口处必须检查调用者权限，使用`AccessTokenKit::VerifyAccessToken()`。
+
+### 安全协议变更
+
+- **禁止**绕过SoftBus安全通道直接建立连接。所有跨设备通信必须通过SoftBus加密通道。
+- **禁止**在日志中输出敏感数据（如设备密钥、用户音频内容）。使用`DH_LOGI`输出调试信息时脱敏。
+- **禁止**在未校验设备身份的情况下响应IPC请求。检查`DeviceManager::CheckDeviceId()`。
+
+### 权限变更检查清单
+
+- [ ] 新增权限已在`bundle.json`声明
+- [ ] 敏感权限已添加动态申请逻辑
+- [ ] IPC接口已添加权限校验
+- [ ] 日志输出已脱敏处理
 
 ## 常见问题和调试技巧
 
