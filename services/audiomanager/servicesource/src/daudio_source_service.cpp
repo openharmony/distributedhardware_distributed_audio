@@ -105,6 +105,8 @@ int32_t DAudioSourceService::RegisterDistributedHardware(const std::string &devI
         dhId.c_str());
     std::string version = param.sinkVersion;
     std::string attrs = param.sinkAttrs;
+    CHECK_AND_RETURN_RET_LOG(attrs.length() > DAUDIO_MAX_JSON_LEN, ERR_DH_AUDIO_SA_PARAM_INVALID,
+        "Parameter length check failed.");
     auto callerTokenId = GetFirstCallerTokenID();
     DAudioSourceManager::GetInstance().SetCallerTokenId(callerTokenId);
     return DAudioSourceManager::GetInstance().EnableDAudio(devId, dhId, version, attrs, reqId);

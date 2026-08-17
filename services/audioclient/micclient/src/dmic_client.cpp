@@ -301,6 +301,7 @@ void DMicClient::CalcMicDataPts()
 void DMicClient::AudioFwkCaptureData()
 {
     std::shared_ptr<AudioData> audioData = std::make_shared<AudioData>(audioParam_.comParam.frameSize);
+    CHECK_NULL_VOID(audioData);
     size_t bytesRead = 0;
     bool errorFlag = false;
     int64_t startTime = GetNowTimeUs();
@@ -379,6 +380,7 @@ void DMicClient::OnReadData(size_t length)
     CHECK_NULL_VOID(bufDesc.buffer);
 
     std::shared_ptr<AudioData> audioData = std::make_shared<AudioData>(audioParam_.comParam.frameSize);
+    CHECK_NULL_VOID(audioData);
     if (audioData->Capacity() != bufDesc.bufLength) {
         uint64_t capacity = static_cast<uint64_t>(audioData->Capacity());
         uint64_t bufLength = static_cast<uint64_t>(bufDesc.bufLength);

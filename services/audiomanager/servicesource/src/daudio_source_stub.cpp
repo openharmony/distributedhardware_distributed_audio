@@ -16,6 +16,7 @@
 #include "daudio_source_stub.h"
 
 #include "accesstoken_kit.h"
+#include "ashmem.h"
 #include "ipc_skeleton.h"
 #include "tokenid_kit.h"
 
@@ -197,8 +198,12 @@ int32_t DAudioSourceStub::UpdateDAudioWorkModeInner(MessageParcel &data, Message
         params.sharedMemLen = data.ReadInt32();
         params.scene = data.ReadUint32();
         params.isAVsync = data.ReadInt32();
+        int32_t ashmemRealsize = AshmemGetSize(params.fd);
+        CHECK_AND_RETURN_RET_LOG(ashmemRealsize <= 0 || params.sharedMemLen > ashmemRealsize,
+            ERR_DH_AUDIO_SA_DEVID_ILLEGAL, "sharedMemLen exceeds actual ashmem size");
         CHECK_AND_RETURN_RET_LOG(devId.length() > DAUDIO_MAX_DEVICE_ID_LEN || dhId.length() > DAUDIO_MAX_DEVICE_ID_LEN
-            || params.fd < 0 || params.sharedMemLen < DAUDIO_MIN_SHAREDMEMLEN_LEN, ERR_DH_AUDIO_SA_DEVID_ILLEGAL,
+            || params.fd < 0 || params.sharedMemLen < DAUDIO_MIN_SHAREDMEMLEN_LEN
+            || params.sharedMemLen > ASHMEM_MAX_LEN, ERR_DH_AUDIO_SA_DEVID_ILLEGAL,
             "Update Workmode param is illegal.");
         ret = UpdateDistributedHardwareWorkMode(devId, dhId, params);
         DHLOGI("DistributedAudioSourceStub UpdateDistributedHardwareWorkMode %{public}d", ret);
