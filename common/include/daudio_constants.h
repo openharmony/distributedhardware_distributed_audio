@@ -62,10 +62,11 @@ constexpr uint32_t STR_TERM_LEN = 1;
 constexpr uint32_t DAUDIO_MAX_SESSION_NAME_LEN = 50;
 constexpr uint32_t DAUDIO_MAX_DEVICE_ID_LEN = 100;
 constexpr uint32_t DAUDIO_MAX_TASKQUEUE_LEN = 100;
-constexpr uint32_t DAUDIO_MIN_SHAREDMEMLEN_LEN = 72;
+constexpr int32_t DAUDIO_MIN_SHAREDMEMLEN_LEN = 72;
 constexpr uint32_t DAUDIO_MAX_RECV_DATA_LEN = 104857600;
 constexpr uint32_t DAUDIO_MAX_JSON_LEN = 1024;
 constexpr uint32_t MAX_ONLINE_DEVICE_SIZE = 1024;
+constexpr int32_t ASHMEM_MAX_LEN = 2 * 4096;
 
 static constexpr int64_t AUDIO_OFFSET_FRAME_NUM = 10;
 static constexpr int64_t LOW_LATENCY_CLIENT_INTERVAL_NS = 20000000;
