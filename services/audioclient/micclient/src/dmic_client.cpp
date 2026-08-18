@@ -36,6 +36,12 @@ DMicClient::~DMicClient()
     if (micTrans_ != nullptr) {
         DHLOGI("Release mic client.");
         StopCapture();
+    } else {
+        isBlocking_.store(false);
+        isCaptureReady_.store(false);
+        if (captureDataThread_.joinable()) {
+            captureDataThread_.join();
+        }
     }
     DumpFileUtil::CloseDumpFile(&dumpFile_);
 }
