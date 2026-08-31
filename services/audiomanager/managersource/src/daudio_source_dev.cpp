@@ -1094,11 +1094,12 @@ int32_t DAudioSourceDev::ParseDhidFromEvent(std::string args)
 
 int32_t DAudioSourceDev::ConvertString2Int(std::string val)
 {
-    if (!CheckIsNum(val)) {
+    int32_t value = 0;
+    if (!ConvertToInt32(val, value)) {
         DHLOGE("String is not number. str:%{public}s.", val.c_str());
         return ERR_DH_AUDIO_FAILED;
     }
-    return std::atoi(val.c_str());
+    return value;
 }
 
 int32_t DAudioSourceDev::OpenDSpeakerInner(std::shared_ptr<DAudioIoDev> &speaker, const int32_t dhId)

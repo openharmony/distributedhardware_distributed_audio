@@ -15,8 +15,10 @@
 
 #include "daudio_util.h"
 
+#include <charconv>
 #include <cstddef>
 #include <ctime>
+#include <system_error>
 #include <iomanip>
 #include <map>
 #include <ostream>
@@ -268,11 +270,10 @@ int32_t GetAudioParamInt(const std::string &params, const std::string &key, int3
         DHLOGE("Get audio param string fail, error code %{public}d.", ret);
         return ret;
     }
-    if (!CheckIsNum(val)) {
+    if (!ConvertToInt32(val, value)) {
         DHLOGE("String is not number. str:%{public}s.", val.c_str());
         return ERR_DH_AUDIO_NOT_SUPPORT;
     }
-    value = std::atoi(val.c_str());
     return DH_SUCCESS;
 }
 
@@ -430,6 +431,20 @@ bool CheckIsNum(const std::string &jsonString)
             return false;
         }
     }
+    return true;
+}
+
+bool ConvertToInt32(const std::string &str, int32_t &value)
+{
+    if (!CheckIsNum(str)) {
+        return false;
+    }
+    int32_t parsed = 0;
+    auto [ptr, ec] = std::from_chars(str.data(), str.data() + str.size(), parsed);
+    if (ec != std::errc{} || ptr != str.data() + str.size()) {
+        return false;
+    }
+    value = parsed;
     return true;
 }
 
