@@ -63,9 +63,14 @@ DAudioSinkManager::~DAudioSinkManager()
 
 int32_t DAudioSinkManager::Init(const sptr<IDAudioSinkIpcCallback> &sinkCallback)
 {
+    std::lock_guard<std::mutex> lock(initMutex_);
+    if (isInitialized_) {
+        DHLOGW("Audio sink manager already initialized.");
+        return DH_SUCCESS;
+    }
     DHLOGI("Init audio sink manager.");
     {
-        std::lock_guard<std::mutex> lock(ipcCallbackMutex_);
+        std::lock_guard<std::mutex> ipcLock(ipcCallbackMutex_);
         initCallback_ = std::make_shared<DeviceInitCallback>();
         ipcSinkCallback_ = sinkCallback;
     }
@@ -95,11 +100,17 @@ int32_t DAudioSinkManager::Init(const sptr<IDAudioSinkIpcCallback> &sinkCallback
     ctrlListener_ = std::make_shared<DaudioCtrlChannelListener>(ctrlListenerCallback_);
     CHECK_AND_RETURN_RET_LOG(ctrlListener_->Init() != DH_SUCCESS, ERR_DH_AUDIO_FAILED, "ctrlListener init failed");
     DHLOGI("Load ctrl trans success.");
+    isInitialized_ = true;
     return DH_SUCCESS;
 }
 
 int32_t DAudioSinkManager::UnInit()
 {
+    std::lock_guard<std::mutex> lock(initMutex_);
+    if (!isInitialized_) {
+        DHLOGW("Audio sink manager not initialized, skip uninit.");
+        return DH_SUCCESS;
+    }
     DHLOGI("UnInit audio sink manager.");
     UnloadAVSenderEngineProvider();
     UnloadAVReceiverEngineProvider();
@@ -124,7 +135,11 @@ int32_t DAudioSinkManager::UnInit()
     if (devClearThread_.joinable()) {
         devClearThread_.join();
     }
-    ipcSinkCallback_ = nullptr;
+    {
+        std::lock_guard<std::mutex> ipcLock(ipcCallbackMutex_);
+        ipcSinkCallback_ = nullptr;
+    }
+    isInitialized_ = false;
     return DH_SUCCESS;
 }
 

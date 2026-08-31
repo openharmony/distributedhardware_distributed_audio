@@ -117,6 +117,8 @@ private:
     sptr<IDAudioSinkIpcCallback> ipcSinkCallback_ = nullptr;
     std::shared_ptr<DmInitCallback> initCallback_ = nullptr;
     uint64_t callerTokenId_ = 0;
+    std::mutex initMutex_;
+    bool isInitialized_ = false;
 };
 } // DistributedHardware
 } // OHOS
