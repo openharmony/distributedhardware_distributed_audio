@@ -547,11 +547,12 @@ void DAudioSinkDev::SetDevLevelStatus(bool checkStatus)
 
 int32_t DAudioSinkDev::ConvertString2Int(std::string val)
 {
-    if (!CheckIsNum(val)) {
+    int32_t value = 0;
+    if (!ConvertToInt32(val, value)) {
         DHLOGE("String is not number. str:%{public}s.", val.c_str());
         return ERR_DH_AUDIO_FAILED;
     }
-    return std::atoi(val.c_str());
+    return value;
 }
 
 void DAudioSinkDev::PullUpPage()
