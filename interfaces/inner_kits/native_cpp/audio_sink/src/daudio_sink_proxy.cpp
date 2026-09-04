@@ -265,5 +265,31 @@ int32_t DAudioSinkProxy::SetAuthorizationResult(const std::string &requestId, bo
         data, reply, option);
     return reply.ReadInt32();
 }
+
+int32_t DAudioSinkProxy::ConfigDistributedHardware(const std::string &devId, const std::string &dhId,
+    const std::string &key, const std::string &value)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        return ERR_DH_AUDIO_SA_WRITE_INTERFACE_TOKEN_FAILED;
+    }
+    if (devId.length() > DAUDIO_MAX_DEVICE_ID_LEN || dhId.length() > DAUDIO_MAX_DEVICE_ID_LEN) {
+        return ERR_DH_AUDIO_SA_DEVID_ILLEGAL;
+    }
+    if (!data.WriteString(devId) || !data.WriteString(dhId) || !data.WriteString(key) || !data.WriteString(value)) {
+        return ERR_DH_AUDIO_SA_WRITE_PARAM_FAIED;
+    }
+
+    if (Remote() == nullptr) {
+        DHLOGE("remote service is null.");
+        return ERR_DH_AUDIO_NULLPTR;
+    }
+    Remote()->SendRequest(static_cast<uint32_t>(IDAudioSinkInterfaceCode::CONFIG_DISTRIBUTED_HARDWARE),
+        data, reply, option);
+    int32_t ret = reply.ReadInt32();
+    return ret;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

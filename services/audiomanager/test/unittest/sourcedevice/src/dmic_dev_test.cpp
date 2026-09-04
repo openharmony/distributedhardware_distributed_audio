@@ -1407,5 +1407,75 @@ HWTEST_F(DMicDevTest, SetParameters_003, TestSize.Level1)
     EXPECT_EQ(DH_SUCCESS, mic_->SetParameters(streamId_, param));
     EXPECT_EQ(AudioCodecType::AUDIO_CODEC_OPUS, mic_->param_.comParam.codecType);
 }
+HWTEST_F(DMicDevTest, ParseTriggerFirstTokenIdFromExt_001, TestSize.Level1)
+{
+    std::string ext = "";
+    mic_->triggerFirstTokenId_ = 999;
+    mic_->ParseTriggerFirstTokenIdFromExt(ext);
+    EXPECT_EQ(999u, mic_->triggerFirstTokenId_);
+}
+
+HWTEST_F(DMicDevTest, ParseTriggerFirstTokenIdFromExt_002, TestSize.Level1)
+{
+    std::string ext = "triggerFirstTokenId=67890";
+    mic_->triggerFirstTokenId_ = 0;
+    mic_->ParseTriggerFirstTokenIdFromExt(ext);
+    EXPECT_EQ(67890u, mic_->triggerFirstTokenId_);
+}
+
+HWTEST_F(DMicDevTest, ParseTriggerFirstTokenIdFromExt_003, TestSize.Level1)
+{
+    std::string ext = "key1=val1;triggerFirstTokenId=54321;key2=val2";
+    mic_->triggerFirstTokenId_ = 0;
+    mic_->ParseTriggerFirstTokenIdFromExt(ext);
+    EXPECT_EQ(54321u, mic_->triggerFirstTokenId_);
+}
+
+HWTEST_F(DMicDevTest, ParseTriggerFirstTokenIdFromExt_004, TestSize.Level1)
+{
+    std::string ext = "no_token_id_here";
+    mic_->triggerFirstTokenId_ = 999;
+    mic_->ParseTriggerFirstTokenIdFromExt(ext);
+    EXPECT_EQ(999u, mic_->triggerFirstTokenId_);
+}
+
+HWTEST_F(DMicDevTest, ParseTriggerFirstTokenIdFromExt_005, TestSize.Level1)
+{
+    std::string ext = "triggerFirstTokenId=abc";
+    mic_->triggerFirstTokenId_ = 999;
+    mic_->ParseTriggerFirstTokenIdFromExt(ext);
+    EXPECT_EQ(999u, mic_->triggerFirstTokenId_);
+}
+
+HWTEST_F(DMicDevTest, ParseTriggerFirstTokenIdFromExt_006, TestSize.Level1)
+{
+    std::string ext = "triggerFirstTokenId=0";
+    mic_->triggerFirstTokenId_ = 999;
+    mic_->ParseTriggerFirstTokenIdFromExt(ext);
+    EXPECT_EQ(0u, mic_->triggerFirstTokenId_);
+}
+
+HWTEST_F(DMicDevTest, ParseTriggerFirstTokenIdFromExt_007, TestSize.Level1)
+{
+    std::string ext = "triggerFirstTokenId=12345 ";
+    mic_->triggerFirstTokenId_ = 0;
+    mic_->ParseTriggerFirstTokenIdFromExt(ext);
+    EXPECT_EQ(12345u, mic_->triggerFirstTokenId_);
+}
+
+HWTEST_F(DMicDevTest, CreateStream_TriggerFirstTokenId_001, TestSize.Level1)
+{
+    mic_->triggerFirstTokenId_ = 12345;
+    int32_t streamId = 0;
+    EXPECT_NO_FATAL_FAILURE(mic_->CreateStream(streamId));
+}
+
+HWTEST_F(DMicDevTest, CreateStream_TriggerFirstTokenId_002, TestSize.Level1)
+{
+    mic_->triggerFirstTokenId_ = 0;
+    int32_t streamId = 0;
+    EXPECT_NO_FATAL_FAILURE(mic_->CreateStream(streamId));
+}
+
 } // namespace DistributedHardware
 } // namespace OHOS

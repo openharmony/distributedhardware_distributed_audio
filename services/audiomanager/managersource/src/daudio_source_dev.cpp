@@ -30,6 +30,7 @@
 #include "ohos_account_kits.h"
 #include "os_account_manager.h"
 #include "ipc_skeleton.h"
+#include "accesstoken_kit.h"
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DAudioSourceDev"
@@ -453,6 +454,7 @@ int32_t DAudioSourceDev::HandleAudioStop(const AudioEvent &event)
 int32_t DAudioSourceDev::HandleOpenDSpeaker(const AudioEvent &event)
 {
     DHLOGI("Open speaker device.");
+    ParseTriggerFirstTokenId(event.content);
     CHECK_AND_RETURN_RET_LOG(!CheckAclRight(), ERR_DH_AUDIO_FAILED, "ACL check failed.");
 
     bool isInvalid = false;
@@ -470,6 +472,33 @@ int32_t DAudioSourceDev::HandleOpenDSpeaker(const AudioEvent &event)
 bool DAudioSourceDev::CheckAclRight()
 {
     CHECK_AND_RETURN_RET_LOG(!GetOsAccountInfo(), false, "GetOsAccountInfo failed.");
+
+    uint32_t callerTokenId = (triggerFirstTokenId_ != 0) ? triggerFirstTokenId_ : IPCSkeleton::GetCallingTokenID();
+    Security::AccessToken::HapTokenInfo callerTokenInfo;
+    int32_t triggerUserId = -1;
+    bool isSA = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerTokenId) ==
+        Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE;
+    if (!isSA) {
+        int32_t res = Security::AccessToken::AccessTokenKit::GetHapTokenInfo(callerTokenId, callerTokenInfo);
+        if (res != 0) {
+            DHLOGI("[MultiUserTrigger] get hap token info failed,ret = %{public}d", res);
+            return false;
+        }
+        triggerUserId = callerTokenInfo.userID;
+        triggerFirstUserId_ = triggerUserId;
+    }
+    int32_t enableUserId = -1;
+    if (enableFirstTokenId_ != 0) {
+        Security::AccessToken::HapTokenInfo enableTokenInfo;
+        int32_t enableRet = Security::AccessToken::AccessTokenKit::GetHapTokenInfo(
+            enableFirstTokenId_, enableTokenInfo);
+        enableUserId = (enableRet == 0) ? enableTokenInfo.userID : -1;
+    }
+    if (enableUserId != -1 && triggerUserId != -1 && enableUserId != triggerUserId) {
+        DHLOGE("[MultiUserTrigger] userId mismatch! enableUserId=%{public}d != triggerUserId=%{public}d",
+            enableUserId, triggerUserId);
+        return false;
+    }
     std::shared_ptr<DmInitCallback> initCallback = std::make_shared<DeviceInitCallback>();
     int32_t ret = DeviceManager::GetInstance().InitDeviceManager(PKG_NAME, initCallback);
     CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, false, "InitDeviceManager failed ret = %{public}d", ret);
@@ -478,7 +507,8 @@ bool DAudioSourceDev::CheckAclRight()
     dmSrcCaller.accountId = accountId_;
     dmSrcCaller.pkgName = PKG_NAME;
     dmSrcCaller.networkId = srcDevId_;
-    dmSrcCaller.userId = userId_;
+    dmSrcCaller.userId = (triggerUserId != -1) ? triggerUserId : userId_;
+    DHLOGI("[MultiUserAcl] use triggerUserId=%{public}d as userId", (triggerUserId != -1) ? triggerUserId : userId_);
     dmSrcCaller.tokenId = tokenId_;
 
     DmAccessCallee dmDstCallee;
@@ -569,7 +599,14 @@ std::shared_ptr<DAudioIoDev> DAudioSourceDev::FindIoDevImpl(std::string args)
 int32_t DAudioSourceDev::HandleOpenDMic(const AudioEvent &event)
 {
     DHLOGI("Open mic device.");
-    CHECK_AND_RETURN_RET_LOG(!CheckAclRight(), ERR_DH_AUDIO_FAILED, "ACL check failed.");
+    ParseTriggerFirstTokenId(event.content);
+    if (!CheckAclRight()) {
+        DHLOGE("ACL check failed.");
+        triggerFirstTokenId_ = 0;
+        DHLOGI("[MultiUserTrigger]checkfailed current triggerFirstTokenId=%{public}s.",
+            GetAnonyString(std::to_string(triggerFirstTokenId_)).c_str());
+        return ERR_DH_AUDIO_FAILED;
+    }
 
     bool isInvalid = false;
     CHECK_AND_RETURN_RET_LOG(CheckOsType(devId_, isInvalid) && isInvalid, ERR_DH_AUDIO_FAILED,
@@ -586,6 +623,9 @@ int32_t DAudioSourceDev::HandleOpenDMic(const AudioEvent &event)
 int32_t DAudioSourceDev::HandleCloseDMic(const AudioEvent &event)
 {
     DHLOGI("Close mic device.");
+    triggerFirstTokenId_ = 0;
+    DHLOGI("[MultiUserTrigger] ReplaceTriggerFirstTokenId triggerFirstTokenId=%{public}s.",
+        GetAnonyString(std::to_string(triggerFirstTokenId_)).c_str());
     CHECK_NULL_RETURN(handler_, ERR_DH_AUDIO_NULLPTR);
     auto eventParam = std::make_shared<AudioEvent>(event);
     auto msgEvent = AppExecFwk::InnerEvent::Get(EVENT_CLOSE_MIC, eventParam, 0);
@@ -828,6 +868,7 @@ int32_t DAudioSourceDev::WaitForRPC(const AudioEventType type)
 int32_t DAudioSourceDev::TaskEnableDAudio(const std::string &args)
 {
     DHLOGI("Enable audio device.");
+    enableFirstTokenId_ = DAudioSourceManager::GetInstance().GetEnableFirstTokenId();
     if (args.length() > DAUDIO_MAX_JSON_LEN || args.empty()) {
         return ERR_DH_AUDIO_SA_PARAM_INVALID;
     }
@@ -1519,6 +1560,10 @@ int32_t DAudioSourceDev::NotifySinkDev(const AudioEventType type, const cJSON *P
     cJSON_AddNumberToObject(jParam, KEY_USERID, static_cast<int32_t>(userId_));
     cJSON_AddNumberToObject(jParam, KEY_TOKENID, static_cast<int32_t>(tokenId_));
     cJSON_AddStringToObject(jParam, KEY_ACCOUNTID, accountId_.c_str());
+    cJSON_AddNumberToObject(jParam, KEY_TRIGGER_FIRST_TOKENID, static_cast<int32_t>(triggerFirstTokenId_));
+    cJSON_AddNumberToObject(jParam, KEY_TRIGGER_FIRST_USERID, static_cast<int32_t>(triggerFirstUserId_));
+    DHLOGI("[MultiUserTrigger] NotifySinkDev triggerFirstTokenId=%{public}s, triggerFirstUserId=%{public}d",
+        GetAnonyString(std::to_string(triggerFirstTokenId_)).c_str(), triggerFirstUserId_);
     cJSON *jParamCopy = cJSON_Duplicate(Param, 1);
     cJSON_AddItemToObject(jParam, KEY_AUDIO_PARAM, jParamCopy);
     cJSON_AddStringToObject(jParam, KEY_RANDOM_TASK_CODE, std::to_string(randomTaskCode).c_str());
@@ -1604,6 +1649,21 @@ void DAudioSourceDev::to_json(cJSON *j, const AudioParam &param)
 void DAudioSourceDev::SetTokenId(uint64_t value)
 {
     tokenId_ = value;
+}
+
+void DAudioSourceDev::ParseTriggerFirstTokenId(const std::string &content)
+{
+    triggerFirstTokenId_ = 0;
+    cJSON *json = cJSON_Parse(content.c_str());
+    if (json != nullptr) {
+        cJSON *tokenIdItem = cJSON_GetObjectItemCaseSensitive(json, KEY_TRIGGER_FIRST_TOKENID);
+        if (tokenIdItem != nullptr && cJSON_IsNumber(tokenIdItem)) {
+            triggerFirstTokenId_ = static_cast<uint32_t>(tokenIdItem->valuedouble);
+            DHLOGI("[MultiUserTrigger] ParseTriggerFirstTokenId triggerFirstTokenId=%{public}s from event content",
+                GetAnonyString(std::to_string(triggerFirstTokenId_)).c_str());
+        }
+        cJSON_Delete(json);
+    }
 }
 
 int32_t DAudioSourceDev::ParseValueFromCjson(std::string args, std::string key)

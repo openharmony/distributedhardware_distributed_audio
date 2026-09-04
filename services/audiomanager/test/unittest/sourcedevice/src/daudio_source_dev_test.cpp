@@ -15,6 +15,7 @@
 
 #include "daudio_source_dev_test.h"
 #include "cJSON.h"
+#include "daudio_source_manager.h"
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DAudioSourceDevTest"
@@ -1816,5 +1817,120 @@ HWTEST_F(DAudioSourceDevTest, HandleMmapEvents_001, TestSize.Level1)
     AudioEvent event4(AudioEventType::MMAP_MIC_STOP, "{\"dhId\":\"134217728\"}");
     EXPECT_NO_FATAL_FAILURE(sourceDev_->HandleMmapEvents(event4));
 }
+
+HWTEST_F(DAudioSourceDevTest, ParseTriggerFirstTokenId_001, TestSize.Level1)
+{
+    std::string content = "{\"triggerFirstTokenId\":12345}";
+    sourceDev_->triggerFirstTokenId_ = 0;
+    sourceDev_->ParseTriggerFirstTokenId(content);
+    EXPECT_EQ(12345u, sourceDev_->triggerFirstTokenId_);
+}
+
+HWTEST_F(DAudioSourceDevTest, ParseTriggerFirstTokenId_002, TestSize.Level1)
+{
+    std::string content = "{\"otherKey\":\"value\"}";
+    sourceDev_->triggerFirstTokenId_ = 999;
+    sourceDev_->ParseTriggerFirstTokenId(content);
+    EXPECT_EQ(0u, sourceDev_->triggerFirstTokenId_);
+}
+
+HWTEST_F(DAudioSourceDevTest, ParseTriggerFirstTokenId_003, TestSize.Level1)
+{
+    std::string content = "invalid_json";
+    sourceDev_->triggerFirstTokenId_ = 999;
+    sourceDev_->ParseTriggerFirstTokenId(content);
+    EXPECT_EQ(0u, sourceDev_->triggerFirstTokenId_);
+}
+
+HWTEST_F(DAudioSourceDevTest, ParseTriggerFirstTokenId_004, TestSize.Level1)
+{
+    std::string content = "{\"triggerFirstTokenId\":\"not_a_number\"}";
+    sourceDev_->triggerFirstTokenId_ = 999;
+    sourceDev_->ParseTriggerFirstTokenId(content);
+    EXPECT_EQ(0u, sourceDev_->triggerFirstTokenId_);
+}
+
+HWTEST_F(DAudioSourceDevTest, ParseTriggerFirstTokenId_005, TestSize.Level1)
+{
+    std::string content = "";
+    sourceDev_->triggerFirstTokenId_ = 999;
+    sourceDev_->ParseTriggerFirstTokenId(content);
+    EXPECT_EQ(0u, sourceDev_->triggerFirstTokenId_);
+}
+
+HWTEST_F(DAudioSourceDevTest, HandleOpenDMic_TriggerFirstTokenId_001, TestSize.Level1)
+{
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->AwakeAudioDev());
+    sourceDev_->triggerFirstTokenId_ = 555;
+    AudioEvent event(OPEN_MIC, "{\"triggerFirstTokenId\":12345}");
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->HandleOpenDMic(event));
+    EXPECT_EQ(0u, sourceDev_->triggerFirstTokenId_);
+}
+
+HWTEST_F(DAudioSourceDevTest, HandleOpenDMic_TriggerFirstTokenId_002, TestSize.Level1)
+{
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->AwakeAudioDev());
+    AudioEvent event(OPEN_MIC, "{\"dhId\":\"134217728\"}");
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->HandleOpenDMic(event));
+}
+
+HWTEST_F(DAudioSourceDevTest, HandleCloseDMic_TriggerFirstTokenId_001, TestSize.Level1)
+{
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->AwakeAudioDev());
+    sourceDev_->triggerFirstTokenId_ = 888;
+    AudioEvent event(CLOSE_MIC, "{\"dhId\":\"134217728\"}");
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleCloseDMic(event));
+    EXPECT_EQ(0u, sourceDev_->triggerFirstTokenId_);
+}
+
+HWTEST_F(DAudioSourceDevTest, HandleCloseDMic_TriggerFirstTokenId_002, TestSize.Level1)
+{
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->AwakeAudioDev());
+    sourceDev_->triggerFirstTokenId_ = 0;
+    AudioEvent event(CLOSE_MIC, "{\"dhId\":\"134217728\"}");
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->HandleCloseDMic(event));
+    EXPECT_EQ(0u, sourceDev_->triggerFirstTokenId_);
+}
+
+HWTEST_F(DAudioSourceDevTest, HandleOpenDSpeaker_TriggerFirstTokenId_001, TestSize.Level1)
+{
+    EXPECT_EQ(DH_SUCCESS, sourceDev_->AwakeAudioDev());
+    AudioEvent event(OPEN_SPEAKER, "{\"triggerFirstTokenId\":777}");
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->HandleOpenDSpeaker(event));
+}
+
+HWTEST_F(DAudioSourceDevTest, CheckAclRight_TriggerFirstTokenId_001, TestSize.Level1)
+{
+    sourceDev_->triggerFirstTokenId_ = 0;
+    EXPECT_NO_FATAL_FAILURE(sourceDev_->CheckAclRight());
+}
+
+HWTEST_F(DAudioSourceDevTest, CheckAclRight_TriggerFirstTokenId_002, TestSize.Level1)
+{
+    sourceDev_->triggerFirstTokenId_ = 12345;
+    EXPECT_NO_FATAL_FAILURE(sourceDev_->CheckAclRight());
+}
+
+HWTEST_F(DAudioSourceDevTest, CheckAclRight_EnableFirstTokenId_001, TestSize.Level1)
+{
+    sourceDev_->enableFirstTokenId_ = 0;
+    EXPECT_NO_FATAL_FAILURE(sourceDev_->CheckAclRight());
+}
+
+HWTEST_F(DAudioSourceDevTest, CheckAclRight_EnableFirstTokenId_002, TestSize.Level1)
+{
+    sourceDev_->enableFirstTokenId_ = 99999;
+    EXPECT_NO_FATAL_FAILURE(sourceDev_->CheckAclRight());
+}
+
+HWTEST_F(DAudioSourceDevTest, NotifySinkDev_TriggerFirstTokenId_001, TestSize.Level1)
+{
+    sourceDev_->triggerFirstTokenId_ = 12345;
+    sourceDev_->triggerFirstUserId_ = 100;
+    cJSON *param = cJSON_CreateObject();
+    EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->NotifySinkDev(OPEN_CTRL, param, DH_ID_SPK));
+    cJSON_Delete(param);
+}
+
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -24,6 +24,7 @@
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
 #include "daudio_log.h"
+#include "daudio_util.h"
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DAudioManagerCallback"
@@ -114,6 +115,22 @@ int32_t DAudioManagerCallback::SetParameters(int32_t streamId, const AudioParame
         DHLOGE("Get audio HDF param failed.");
         return HDF_FAILURE;
     }
+
+    if (!paramHDF.ext.empty()) {
+        std::string extStr = paramHDF.ext;
+        std::string tokenKey = TRIGGER_FIRST_TOKENID_PREFIX;
+        size_t pos = extStr.find(tokenKey);
+        if (pos != std::string::npos) {
+            std::string tokenIdStr = extStr.substr(pos + tokenKey.length());
+            size_t endPos = tokenIdStr.find_first_of(EXT_PARAM_DELIMITERS);
+            if (endPos != std::string::npos) {
+                tokenIdStr = tokenIdStr.substr(0, endPos);
+            }
+            DHLOGI("[MultiUserTrigger] DAudioManagerCallback::SetParameters parsed triggerFirstTokenId from ext: "
+                "%{public}s", GetAnonyString(tokenIdStr).c_str());
+        }
+    }
+
     ret = callback_->SetParameters(streamId, paramHDF);
     if (ret != DH_SUCCESS) {
         DHLOGE("Call hdi callback failed.");

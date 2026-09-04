@@ -219,5 +219,18 @@ int32_t DAudioSinkHandler::SetAuthorizationResult(const std::string &requestId, 
     CHECK_NULL_RETURN(dAudioSinkProxy_, ERR_DH_AUDIO_SA_PROXY_NOT_INIT);
     return dAudioSinkProxy_->SetAuthorizationResult(requestId, granted);
 }
+
+int32_t DAudioSinkHandler::ConfigDistributedHardware(const std::string &dhId,
+    const std::string &key, const std::string &value)
+{
+    DHLOGI("Config distributed hardware, dhId: %{public}s.", dhId.c_str());
+    std::lock_guard<std::mutex> lock(sinkProxyMutex_);
+    CHECK_NULL_RETURN(dAudioSinkProxy_, ERR_DH_AUDIO_SA_PROXY_NOT_INIT);
+    if (dhId.length() > DAUDIO_MAX_DEVICE_ID_LEN) {
+        return ERR_DH_AUDIO_SA_DEVID_ILLEGAL;
+    }
+    std::string reduceDhId = dhId;
+    return dAudioSinkProxy_->ConfigDistributedHardware("", reduceDhId, key, value);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

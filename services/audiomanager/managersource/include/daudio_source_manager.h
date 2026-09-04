@@ -54,6 +54,8 @@ public:
     IAVEngineProvider *getSenderProvider();
     IAVEngineProvider *getReceiverProvider();
     void SetCallerTokenId(uint64_t tokenId);
+    void SetEnableFirstTokenId(uint32_t tokenId);
+    uint32_t GetEnableFirstTokenId();
     int32_t UpdateWorkModeParam(const std::string &devId, const std::string &dhId, const AudioAsyncParam &param);
 
 private:
@@ -98,6 +100,7 @@ private:
     void *pRHandler_ = nullptr;
     std::atomic<bool> isHicollieRunning_ = true;
     uint64_t callerTokenId_ = 0;
+    uint32_t enableFirstTokenId_ = 0;
 
     class SourceManagerHandler : public AppExecFwk::EventHandler {
     public:

@@ -28,9 +28,9 @@
 #include "daudio_log.h"
 #include "daudio_radar.h"
 #include "daudio_source_manager.h"
-#include "daudio_util.h"
 
-#include "token_setproc.h"
+#include "cJSON.h"
+#include "daudio_util.h"
 
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "DAudioSourceService"
@@ -107,8 +107,6 @@ int32_t DAudioSourceService::RegisterDistributedHardware(const std::string &devI
     std::string attrs = param.sinkAttrs;
     CHECK_AND_RETURN_RET_LOG(attrs.length() > DAUDIO_MAX_JSON_LEN, ERR_DH_AUDIO_SA_PARAM_INVALID,
         "Parameter length check failed.");
-    auto callerTokenId = GetFirstCallerTokenID();
-    DAudioSourceManager::GetInstance().SetCallerTokenId(callerTokenId);
     return DAudioSourceManager::GetInstance().EnableDAudio(devId, dhId, version, attrs, reqId);
 }
 
@@ -127,6 +125,19 @@ int32_t DAudioSourceService::ConfigDistributedHardware(const std::string &devId,
 {
     DHLOGI("Config distributed audio device, devId: %{public}s, dhId: %{public}s.", GetAnonyString(devId).c_str(),
         dhId.c_str());
+    if (key == KEY_ENABLE_INIT_PARAM) {
+        cJSON *jValue = cJSON_Parse(value.c_str());
+        if (jValue != nullptr) {
+            cJSON *enableFirstTokenIdItem = cJSON_GetObjectItemCaseSensitive(jValue, KEY_TOKENID);
+            if (enableFirstTokenIdItem != nullptr && cJSON_IsNumber(enableFirstTokenIdItem)) {
+                uint32_t enableFirstTokenId = static_cast<uint32_t>(enableFirstTokenIdItem->valuedouble);
+                DAudioSourceManager::GetInstance().SetEnableFirstTokenId(enableFirstTokenId);
+                DHLOGI("[MultiUserEnable] ConfigDistributedHardware enableFirstTokenId=%{public}s",
+                    GetAnonyString(std::to_string(enableFirstTokenId)).c_str());
+            }
+            cJSON_Delete(jValue);
+        }
+    }
     return DH_SUCCESS;
 }
 

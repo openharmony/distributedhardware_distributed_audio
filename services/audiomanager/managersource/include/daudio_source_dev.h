@@ -117,6 +117,7 @@ private:
     int32_t HandleEnhanceParamChange(const AudioEvent &event);
     bool CheckAclRight();
     bool GetOsAccountInfo();
+    void ParseTriggerFirstTokenId(const std::string &content);
 #ifdef AUDIO_SUPPORT_SHARED_BUFFER
     void HandleAudioStatus(const AudioEvent &event);
     int32_t HandleAudioStart(const AudioEvent &event);
@@ -175,6 +176,9 @@ private:
     int32_t userId_ = -1;
     std::string srcDevId_ = "";
     uint64_t tokenId_ = 0;
+    uint32_t enableFirstTokenId_ = 0;
+    uint32_t triggerFirstTokenId_ = 0;
+    int32_t triggerFirstUserId_ = -1;
 
     class SourceEventHandler : public AppExecFwk::EventHandler {
     public:

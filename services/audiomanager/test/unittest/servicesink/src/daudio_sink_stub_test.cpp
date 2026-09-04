@@ -163,5 +163,27 @@ HWTEST_F(DAudioSinkStubTest, SetAuthorizationResultInner_001, TestSize.Level1)
     MessageOption option;
     EXPECT_EQ(ERR_DH_AUDIO_SA_PERMISSION_FAIED, sinkStub_->SetAuthorizationResultInner(data, reply, option));
 }
+
+HWTEST_F(DAudioSinkStubTest, ConfigDistributedHardwareInner_001, TestSize.Level1)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    EXPECT_EQ(ERR_DH_AUDIO_SA_PERMISSION_FAIED,
+        sinkStub_->ConfigDistributedHardwareInner(data, reply, option));
+}
+
+HWTEST_F(DAudioSinkStubTest, ConfigDistributedHardwareInner_002, TestSize.Level1)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    data.WriteString("networkId");
+    data.WriteString("dhId");
+    data.WriteString("key");
+    data.WriteString("value");
+    EXPECT_EQ(ERR_DH_AUDIO_SA_PERMISSION_FAIED,
+        sinkStub_->ConfigDistributedHardwareInner(data, reply, option));
+}
 } // DistributedHardware
 } // OHOS

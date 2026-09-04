@@ -185,5 +185,26 @@ int32_t DAudioSinkService::SetAuthorizationResult(const std::string &requestId, 
     DAudioSinkManager::GetInstance().SetAuthorizationResult(requestId, granted);
     return DH_SUCCESS;
 }
+
+int32_t DAudioSinkService::ConfigDistributedHardware(const std::string &devId, const std::string &dhId,
+    const std::string &key, const std::string &value)
+{
+    DHLOGI("Config distributed audio device, devId: %{public}s, dhId: %{public}s.", GetAnonyString(devId).c_str(),
+        dhId.c_str());
+    if (key == KEY_ENABLE_INIT_PARAM) {
+        cJSON *jValue = cJSON_Parse(value.c_str());
+        if (jValue != nullptr) {
+            cJSON *enableFirstTokenIdItem = cJSON_GetObjectItemCaseSensitive(jValue, KEY_TOKENID);
+            if (enableFirstTokenIdItem != nullptr && cJSON_IsNumber(enableFirstTokenIdItem)) {
+                uint32_t enableFirstTokenId = static_cast<uint32_t>(enableFirstTokenIdItem->valuedouble);
+                DAudioSinkManager::GetInstance().SetEnableFirstTokenId(enableFirstTokenId);
+                DHLOGI("[MultiUserEnable] ConfigDistributedHardware enableFirstTokenId=%{public}s",
+                    GetAnonyString(std::to_string(enableFirstTokenId)).c_str());
+            }
+            cJSON_Delete(jValue);
+        }
+    }
+    return DH_SUCCESS;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

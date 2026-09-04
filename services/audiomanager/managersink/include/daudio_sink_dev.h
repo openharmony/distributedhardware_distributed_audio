@@ -61,6 +61,7 @@ public:
     void SetTokenId(int32_t value);
     void SetAccountId(string value);
     bool CheckAclRight();
+    bool ResolveEnableUser(int32_t &userId, uint32_t &enableTokenId);
     void SetSinkTokenId(uint64_t value);
     bool IsIdenticalAccount(const std::string &networkId);
 
@@ -118,6 +119,8 @@ private:
     uint64_t tokenId_ = 0;
     uint64_t sinkTokenId_ = 0;
     std::string accountId_ = "";
+    uint32_t sourceTrigFirstTokenId_ = 0;
+    int32_t sourceTrigFirstUserId_ = -1;
 
     class SinkEventHandler : public AppExecFwk::EventHandler {
     public:

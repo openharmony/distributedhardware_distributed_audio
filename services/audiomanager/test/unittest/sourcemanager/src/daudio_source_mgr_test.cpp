@@ -1327,5 +1327,25 @@ HWTEST_F(DAudioSourceMgrTest, StressTest_002, TestSize.Level1)
     // Cleanup
     EXPECT_EQ(DH_SUCCESS, sourceMgr.UnInit());
 }
+
+HWTEST_F(DAudioSourceMgrTest, SetEnableFirstTokenId_001, TestSize.Level1)
+{
+    DAudioSourceManager &mgr = DAudioSourceManager::GetInstance();
+    mgr.SetEnableFirstTokenId(0);
+    EXPECT_EQ(0u, mgr.GetEnableFirstTokenId());
+    mgr.SetEnableFirstTokenId(12345);
+    EXPECT_EQ(12345u, mgr.GetEnableFirstTokenId());
+    mgr.SetEnableFirstTokenId(0);
+    EXPECT_EQ(0u, mgr.GetEnableFirstTokenId());
+}
+
+HWTEST_F(DAudioSourceMgrTest, SetEnableFirstTokenId_002, TestSize.Level1)
+{
+    DAudioSourceManager &mgr = DAudioSourceManager::GetInstance();
+    uint32_t tokenId = 99999;
+    mgr.SetEnableFirstTokenId(tokenId);
+    EXPECT_EQ(tokenId, mgr.GetEnableFirstTokenId());
+    mgr.SetEnableFirstTokenId(0);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

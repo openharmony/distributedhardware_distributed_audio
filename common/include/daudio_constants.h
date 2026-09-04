@@ -129,6 +129,13 @@ constexpr const char *KEY_USERID = "userId";
 constexpr const char *KEY_TOKENID = "tokenId";
 constexpr const char *KEY_ACCOUNTID = "accountId";
 constexpr const char *KEY_OS_TYPE = "OS_TYPE";
+constexpr const char *KEY_ENABLE_FIRST_TOKENID = "enableFirstTokenId";
+constexpr const char *KEY_TRIGGER_FIRST_TOKENID = "triggerFirstTokenId";
+constexpr const char *KEY_TRIGGER_FIRST_USERID = "triggerFirstUserId";
+constexpr const char *KEY_ENABLE_INIT_PARAM = "enable_init_params";
+constexpr const char *TRIGGER_FIRST_TOKENID_PREFIX = "triggerFirstTokenId=";
+constexpr const char *EXT_PARAM_DELIMITERS = ";& ";
+constexpr const int32_t DECIMAL_BASE = 10;
 
 constexpr const char *KEY_SAMPLING_RATE = "samplingRate";
 constexpr const char *KEY_CHANNELS = "channels";

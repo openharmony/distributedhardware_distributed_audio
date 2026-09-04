@@ -260,6 +260,11 @@ int32_t DMicDev::CreateStream(const int32_t streamId)
     cJSON *jParam = cJSON_CreateObject();
     CHECK_NULL_RETURN(jParam, ERR_DH_AUDIO_NULLPTR);
     cJSON_AddStringToObject(jParam, KEY_DH_ID, std::to_string(dhId_).c_str());
+    if (triggerFirstTokenId_ > 0) {
+        cJSON_AddNumberToObject(jParam, KEY_TRIGGER_FIRST_TOKENID, static_cast<double>(triggerFirstTokenId_));
+        DHLOGI("[MultiUserTrigger] DMicDev::CreateStream add triggerFirstTokenId=%{public}s to event",
+            GetAnonyString(std::to_string(triggerFirstTokenId_)).c_str());
+    }
     char *jsonData = cJSON_PrintUnformatted(jParam);
     if (jsonData == nullptr) {
         cJSON_Delete(jParam);
@@ -319,6 +324,8 @@ int32_t DMicDev::SetParameters(const int32_t streamId, const AudioParamHDF &para
     curPort_ = dhId_;
     paramHDF_ = param;
 
+    ParseTriggerFirstTokenIdFromExt(param.ext);
+
     param_.comParam.sampleRate = paramHDF_.sampleRate;
     param_.comParam.channelMask = paramHDF_.channelMask;
     param_.comParam.bitFormat = paramHDF_.bitFormat;
@@ -342,6 +349,30 @@ int32_t DMicDev::SetParameters(const int32_t streamId, const AudioParamHDF &para
     }
     DHLOGI("codecType : %{public}d.", static_cast<int>(param_.comParam.codecType));
     return DH_SUCCESS;
+}
+
+void DMicDev::ParseTriggerFirstTokenIdFromExt(const std::string &ext)
+{
+    if (!ext.empty()) {
+        std::string extStr = ext;
+        std::string tokenKey = TRIGGER_FIRST_TOKENID_PREFIX;
+        size_t pos = extStr.find(tokenKey);
+        if (pos != std::string::npos) {
+            std::string tokenIdStr = extStr.substr(pos + tokenKey.length());
+            size_t endPos = tokenIdStr.find_first_of(EXT_PARAM_DELIMITERS);
+            if (endPos != std::string::npos) {
+                tokenIdStr = tokenIdStr.substr(0, endPos);
+            }
+            errno = 0;
+            char *endPtr = nullptr;
+            unsigned long tokenIdVal = strtoul(tokenIdStr.c_str(), &endPtr, DECIMAL_BASE);
+            if (endPtr != tokenIdStr.c_str() && *endPtr == '\0' && errno == 0) {
+                triggerFirstTokenId_ = static_cast<uint32_t>(tokenIdVal);
+                DHLOGI("[MultiUserTrigger] DMicDev::SetParameters parsed triggerFirstTokenId=%{public}s from ext",
+                    GetAnonyString(std::to_string(triggerFirstTokenId_)).c_str());
+            }
+        }
+    }
 }
 
 int32_t DMicDev::NotifyEvent(const int32_t streamId, const AudioEvent &event)
