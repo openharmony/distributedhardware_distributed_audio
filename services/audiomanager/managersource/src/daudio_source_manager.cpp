@@ -581,6 +581,16 @@ void DAudioSourceManager::SetCallerTokenId(uint64_t tokenId)
     callerTokenId_ = tokenId;
 }
 
+void DAudioSourceManager::SetEnableFirstTokenId(uint32_t tokenId)
+{
+    enableFirstTokenId_ = tokenId;
+}
+
+uint32_t DAudioSourceManager::GetEnableFirstTokenId()
+{
+    return enableFirstTokenId_;
+}
+
 int32_t DAudioSourceManager::UpdateWorkModeParam(const std::string &devId, const std::string &dhId,
     const AudioAsyncParam &param)
 {

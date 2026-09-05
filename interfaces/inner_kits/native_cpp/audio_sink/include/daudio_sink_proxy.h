@@ -41,6 +41,8 @@ public:
         const std::string &pkgName) override;
     int32_t RemoveAccessListener(const std::string &pkgName) override;
     int32_t SetAuthorizationResult(const std::string &requestId, bool granted) override;
+    int32_t ConfigDistributedHardware(const std::string &devId, const std::string &dhId, const std::string &key,
+        const std::string &value) override;
 
 private:
     static inline BrokerDelegator<DAudioSinkProxy> delegator_;

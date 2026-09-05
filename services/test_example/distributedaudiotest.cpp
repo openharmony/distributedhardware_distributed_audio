@@ -30,6 +30,8 @@
 #include "distributedaudiotest.h"
 #include "daudio_errorcode.h"
 #include "daudio_log.h"
+#include "token_setproc.h"
+#include "accesstoken_kit.h"
 
 using OHOS::HDI::DistributedAudio::Audio::V2_0::IAudioAdapter;
 using OHOS::HDI::DistributedAudio::Audio::V2_0::AudioAdapterDescriptor;
@@ -97,6 +99,7 @@ const int32_t CMD_START_MIC = 7;
 const int32_t CMD_STOP_MIC = 8;
 const int32_t CMD_SET_VOL = 11;
 const int32_t CMD_GET_VOL = 12;
+const int32_t CMD_INPUT_TOKENID = 13;
 
 const char DEV_TYPE_SPK = '1';
 const char DEV_TYPE_MIC = '2';
@@ -138,12 +141,23 @@ static std::vector<uint8_t*> renderData;
 static DeviceStatus g_spkStatus = DeviceStatus::DEVICE_IDLE;
 static DeviceStatus g_micStatus = DeviceStatus::DEVICE_IDLE;
 
+uint64_t g_inputTokenId = 0;
+
 static std::thread g_playingThread;
 static std::thread g_capingThread;
 FILE *g_micFile = nullptr;
 
 static void CloseSpk();
 static void CloseMic();
+
+static void InputTokenId()
+{
+    std::cout << "Please input tokenId." << std::endl;
+    int ret = scanf_s("%llu", &g_inputTokenId);
+    if (ret != 1) {
+        std::cout << "get input error" << std::endl;
+    }
+}
 
 static int64_t GetNowTimeUs()
 {
@@ -522,6 +536,12 @@ static void OpenMic(const std::string &devId)
     if (g_adapter == nullptr) {
         return;
     }
+    // int32_t SetExtraParams(AudioExtParamKey key, const std::string &condition, const std::string &value) override;
+    if (g_inputTokenId >= 0) {
+        std::string tokenIdStr = "TokenIds=" + std::to_string(g_inputTokenId);
+        g_adapter->SetExtraParams(AudioExtParamKey::AUDIO_EXT_PARAM_KEY_NONE, tokenIdStr, tokenIdStr);
+        std::cout << "[MultiUserTrigger] SetExtraParams TokenIds=" <<  g_inputTokenId << std::endl;
+    }
     int32_t ret = g_adapter->CreateCapture(captureDesc, captureAttr, g_capture, g_captureId);
     if (ret != DH_SUCCESS || g_capture == nullptr) {
         std::cout << "Open MIC device failed." << std::endl;
@@ -563,10 +583,6 @@ static void Capture()
         int32_t ret = g_capture->CaptureFrame(data, size);
         if (ret != DH_SUCCESS) {
             std::cout << "CaptureFrame failed, ret: " << ret << std::endl;
-            return;
-        }
-        if (g_micFile == nullptr) {
-            std::cout << "g_micFile is nullptr." << std::endl;
             return;
         }
         size_t writeCnt = fwrite(data.data(), 1, RENDER_FRAME_SIZE, g_micFile);
@@ -740,6 +756,9 @@ static void HandleAudioEvent(const int32_t cmd)
         case CMD_GET_VOL:
             GetVolume();
             break;
+        case CMD_INPUT_TOKENID:
+            InputTokenId();
+            break;
         default:
             std::cout << "Unkown opeartion." << std::endl;
             break;
@@ -761,6 +780,7 @@ static void PrintInteractiveUsage()
     std::cout <<  "\t enter 9 to manullt find device. " << std::endl;
     std::cout <<  "\t enter 11 to set volume. " << std::endl;
     std::cout <<  "\t enter 12 to get volume. " << std::endl;
+    std::cout <<  "\t enter 13 to input tokenId. " << std::endl;
     std::cout <<  "\t enter 0 to exit. " << std::endl;
 }
 }
@@ -772,6 +792,9 @@ int main(int argc, char *argv[])
     }
     while (true) {
         PrintInteractiveUsage();
+        std::cout << g_inputTokenId << std::endl;
+        SetSelfTokenID(g_inputTokenId);
+        OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
         int32_t cmd = GetUserInput();
         if (cmd == CMD_QUIT) {
             CloseSpk();

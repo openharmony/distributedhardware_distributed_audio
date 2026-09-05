@@ -73,6 +73,8 @@ public:
     int32_t ResumeDistributedHardware(const std::string &networkId);
     int32_t StopDistributedHardware(const std::string &networkId);
     void SetCallerTokenId(uint64_t tokenId);
+    void SetEnableFirstTokenId(uint32_t tokenId);
+    uint32_t GetEnableFirstTokenId();
     int32_t CheckOsType(const std::string &networkId, bool &isInvalid);
     void SetAccessListener(const sptr<IAccessListener> &listener, int32_t timeOut,
         const std::string &pkgName);
@@ -117,6 +119,7 @@ private:
     sptr<IDAudioSinkIpcCallback> ipcSinkCallback_ = nullptr;
     std::shared_ptr<DmInitCallback> initCallback_ = nullptr;
     uint64_t callerTokenId_ = 0;
+    uint32_t enableFirstTokenId_ = 0;
     std::mutex initMutex_;
     bool isInitialized_ = false;
 };

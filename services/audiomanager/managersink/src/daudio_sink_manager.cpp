@@ -635,6 +635,16 @@ void DAudioSinkManager::SetCallerTokenId(uint64_t tokenId)
     callerTokenId_ = tokenId;
 }
 
+void DAudioSinkManager::SetEnableFirstTokenId(uint32_t tokenId)
+{
+    enableFirstTokenId_ = tokenId;
+}
+
+uint32_t DAudioSinkManager::GetEnableFirstTokenId()
+{
+    return enableFirstTokenId_;
+}
+
 void DAudioSinkManager::SetAccessListener(const sptr<IAccessListener> &listener, int32_t timeOut,
     const std::string &pkgName)
 {

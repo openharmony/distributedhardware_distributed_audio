@@ -109,6 +109,7 @@ private:
     uint32_t GetQueSize();
     bool IsAVsync();
     int32_t AVsyncMacthScene(std::shared_ptr<AudioData> &data);
+    void ParseTriggerFirstTokenIdFromExt(const std::string &ext);
 
 private:
     static constexpr uint8_t CHANNEL_WAIT_SECONDS = 5;
@@ -190,6 +191,7 @@ private:
     std::mutex avSyncMutex_;
     uint32_t scene_ = DATA_QUEUE_HALF_SIZE;
     std::atomic<bool> isStartStatus_ = true;
+    uint32_t triggerFirstTokenId_ = 0;
     sptr<Ashmem> avsyncAshmem_ = nullptr;
     constexpr static int64_t TIME_CONVERSION_NTOU = 1000;
     constexpr static int64_t TIME_CONVERSION_STOU = 1000000;

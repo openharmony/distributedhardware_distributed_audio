@@ -25,7 +25,9 @@
 
 #include "ohos_account_kits.h"
 #include "os_account_manager.h"
+#include "os_account_info.h"
 #include "ipc_skeleton.h"
+#include "accesstoken_kit.h"
 #include "token_setproc.h"
 
 #undef DH_LOG_TAG
@@ -829,6 +831,17 @@ void DAudioSinkDev::SinkEventHandler::NotifyOpenSpeaker(const AppExecFwk::InnerE
     sinkDevObj->SetUserId(ret == ERR_DH_AUDIO_FAILED ? -1 : ret);
     sinkDevObj->SetTokenId(ParseValueFromEvent(eventParam, KEY_TOKENID));
     sinkDevObj->SetAccountId(ParseStringFromEvent(eventParam, KEY_ACCOUNTID));
+    int32_t sourceTrigFirstTokenId = ParseValueFromEvent(eventParam, KEY_TRIGGER_FIRST_TOKENID);
+    if (sourceTrigFirstTokenId != ERR_DH_AUDIO_FAILED) {
+        sinkDevObj->sourceTrigFirstTokenId_ = static_cast<uint32_t>(sourceTrigFirstTokenId);
+    }
+    int32_t sourceTrigFirstUserId = ParseValueFromEvent(eventParam, KEY_TRIGGER_FIRST_USERID);
+    if (sourceTrigFirstUserId != ERR_DH_AUDIO_FAILED) {
+        sinkDevObj->sourceTrigFirstUserId_ = sourceTrigFirstUserId;
+    }
+    DHLOGI("[MultiUserSink] Sink received sourceTrigFirstTokenId=%{public}s, sourceTrigFirstUserId=%{public}d",
+        GetAnonyString(std::to_string(sinkDevObj->sourceTrigFirstTokenId_)).c_str(),
+        sinkDevObj->sourceTrigFirstUserId_);
     ret = sinkDevObj->TaskOpenDSpeaker(eventParam);
     sinkDevObj->NotifySourceDev(NOTIFY_OPEN_SPEAKER_RESULT, std::to_string(dhId), ret);
     DHLOGI("Open speaker device task end, notify source ret %{public}d.", ret);
@@ -860,33 +873,70 @@ bool DAudioSinkDev::CheckAclRight()
     std::vector<int32_t> ids;
     ret = AccountSA::OsAccountManager::QueryActiveOsAccountIds(ids);
     CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, false, "Get userId fail, ret: %{public}d", ret);
-    int32_t userId = -1;
-    userId = ids.empty() ? 0 : ids[0];
+    int32_t userId = ids.empty() ? 0 : ids[0];
     AccountSA::OhosAccountInfo osAccountInfo;
     ret = AccountSA::OhosAccountKits::GetInstance().GetOhosAccountInfo(osAccountInfo);
     CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, false, "Get accountId fail, ret: %{public}d", ret);
     std::string accountId = osAccountInfo.uid_;
 #endif
+    uint32_t enableTokenId = 0;
+    if (!ResolveEnableUser(userId, enableTokenId)) {
+        return false;
+    }
     std::shared_ptr<DmInitCallback> initCallback = std::make_shared<DeviceInitCallback>();
     ret = DeviceManager::GetInstance().InitDeviceManager(PKG_NAME, initCallback);
     CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, false, "InitDeviceManager failed ret = %{public}d", ret);
-
-    DmAccessCaller dmSrcCaller;
-    dmSrcCaller.accountId = accountId_;
-    dmSrcCaller.pkgName = PKG_NAME;
-    dmSrcCaller.networkId = devId_;
-    dmSrcCaller.userId = userId_;
-    dmSrcCaller.tokenId = tokenId_;
-
-    DmAccessCallee dmDstCallee;
-    dmDstCallee.accountId = accountId;
-    dmDstCallee.networkId = sinkDevId;
-    dmDstCallee.pkgName = PKG_NAME;
-    dmDstCallee.userId = userId;
-    dmDstCallee.tokenId = sinkTokenId_;
+    DmAccessCaller dmSrcCaller = {
+        .accountId = accountId_, .pkgName = PKG_NAME, .networkId = devId_,
+        .userId = userId_, .tokenId = (sourceTrigFirstTokenId_ != 0) ? sourceTrigFirstTokenId_ : tokenId_,
+    };
+    DmAccessCallee dmDstCallee = {
+        .accountId = accountId, .networkId = sinkDevId, .pkgName = PKG_NAME,
+        .userId = userId, .tokenId = enableTokenId,
+    };
     DHLOGI("CheckAclRight srcDevId: %{public}s, accountId: %{public}s, sinkDevId: %{public}s",
         GetAnonyString(devId_).c_str(), GetAnonyString(accountId).c_str(), GetAnonyString(sinkDevId).c_str());
     return DeviceManager::GetInstance().CheckSinkAccessControl(dmSrcCaller, dmDstCallee);
+}
+
+bool DAudioSinkDev::ResolveEnableUser(int32_t &userId, uint32_t &enableTokenId)
+{
+    enableTokenId = DAudioSinkManager::GetInstance().GetEnableFirstTokenId();
+    DHLOGI("[MultiUserAcl] enableTokenId=%{public}d", enableTokenId);
+    Security::AccessToken::HapTokenInfo enableTokenInfo;
+    int32_t enableUserId = -1;
+    bool isSA = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(enableTokenId) ==
+        Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE;
+    if (!isSA && enableTokenId != 0) {
+        int32_t res = Security::AccessToken::AccessTokenKit::GetHapTokenInfo(enableTokenId, enableTokenInfo);
+        if (res != 0) {
+            DHLOGI("[MultiUserTrigger] get hap token info failed,ret = %{public}d", res);
+            return false;
+        }
+        enableUserId = enableTokenInfo.userID;
+    }
+
+    int32_t matchedUserId = -1;
+    if (enableUserId != -1) {
+#ifdef OS_ACCOUNT_PART
+        std::vector<int32_t> activeIds;
+        AccountSA::OsAccountManager::QueryActiveOsAccountIds(activeIds);
+        for (auto &localId : activeIds) {
+            if (localId == enableUserId) {
+                matchedUserId = localId;
+                break;
+            }
+        }
+#endif
+        if (matchedUserId == -1) {
+            DHLOGE("[MultiUserSink] no active match for sourceTrigFirstUserId=%{public}d",
+                sourceTrigFirstUserId_);
+            return false;
+        }
+        userId = matchedUserId;
+    }
+    DHLOGI("[MultiUserAcl] use userId_=%{public}d, userId=%{public}d", userId_, userId);
+    return true;
 }
 
 bool DAudioSinkDev::IsIdenticalAccount(const std::string &networkId)
@@ -972,6 +1022,17 @@ void DAudioSinkDev::SinkEventHandler::NotifyOpenMic(const AppExecFwk::InnerEvent
     sinkDevObj->SetUserId(ret == ERR_DH_AUDIO_FAILED ? -1 : ret);
     sinkDevObj->SetTokenId(ParseValueFromEvent(eventParam, KEY_TOKENID));
     sinkDevObj->SetAccountId(ParseStringFromEvent(eventParam, KEY_ACCOUNTID));
+    int32_t sourceTrigFirstTokenId = ParseValueFromEvent(eventParam, KEY_TRIGGER_FIRST_TOKENID);
+    if (sourceTrigFirstTokenId != ERR_DH_AUDIO_FAILED) {
+        sinkDevObj->sourceTrigFirstTokenId_ = static_cast<uint32_t>(sourceTrigFirstTokenId);
+    }
+    int32_t sourceTrigFirstUserId = ParseValueFromEvent(eventParam, KEY_TRIGGER_FIRST_USERID);
+    if (sourceTrigFirstUserId != ERR_DH_AUDIO_FAILED) {
+        sinkDevObj->sourceTrigFirstUserId_ = sourceTrigFirstUserId;
+    }
+    DHLOGI("[MultiUserSink] Sink received sourceTrigFirstTokenId=%{public}s, sourceTrigFirstUserId=%{public}d",
+        GetAnonyString(std::to_string(sinkDevObj->sourceTrigFirstTokenId_)).c_str(),
+        sinkDevObj->sourceTrigFirstUserId_);
     ret = sinkDevObj->TaskOpenDMic(eventParam);
     cJSON *dhIdItem = cJSON_GetObjectItem(jParam, KEY_DH_ID);
     CHECK_AND_FREE_RETURN_LOG(dhIdItem == NULL || !cJSON_IsString(dhIdItem), jParam, "Get dhId from cjson failed.");

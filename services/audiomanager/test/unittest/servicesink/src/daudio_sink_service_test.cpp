@@ -18,6 +18,7 @@
 #include "audio_event.h"
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
+#include "daudio_sink_manager.h"
 #include "iservice_registry.h"
 #include "daudio_sink_ipc_callback_proxy.h"
 #include "daudio_sink_load_callback.h"
@@ -244,5 +245,66 @@ HWTEST_F(DAudioSinkServiceTest, SetAuthorizationResult_001, TestSize.Level1)
     granted = true;
     EXPECT_EQ(DH_SUCCESS, sinkSrv_->SetAuthorizationResult(requestId, granted));
 }
+HWTEST_F(DAudioSinkServiceTest, ConfigDistributedHardware_001, TestSize.Level1)
+{
+    std::string devId = "devId";
+    std::string dhId = "1";
+    std::string key = "enable_init_params";
+    std::string value = "{\"tokenId\":12345}";
+    EXPECT_EQ(DH_SUCCESS, sinkSrv_->ConfigDistributedHardware(devId, dhId, key, value));
+    EXPECT_EQ(12345u, DAudioSinkManager::GetInstance().GetEnableFirstTokenId());
+    DAudioSinkManager::GetInstance().SetEnableFirstTokenId(0);
+}
+
+HWTEST_F(DAudioSinkServiceTest, ConfigDistributedHardware_002, TestSize.Level1)
+{
+    std::string devId = "devId";
+    std::string dhId = "1";
+    std::string key = "enable_init_params";
+    std::string value = "invalid_json";
+    EXPECT_EQ(DH_SUCCESS, sinkSrv_->ConfigDistributedHardware(devId, dhId, key, value));
+    EXPECT_EQ(0u, DAudioSinkManager::GetInstance().GetEnableFirstTokenId());
+}
+
+HWTEST_F(DAudioSinkServiceTest, ConfigDistributedHardware_003, TestSize.Level1)
+{
+    std::string devId = "devId";
+    std::string dhId = "1";
+    std::string key = "enable_init_params";
+    std::string value = "{\"otherKey\":999}";
+    EXPECT_EQ(DH_SUCCESS, sinkSrv_->ConfigDistributedHardware(devId, dhId, key, value));
+    EXPECT_EQ(0u, DAudioSinkManager::GetInstance().GetEnableFirstTokenId());
+}
+
+HWTEST_F(DAudioSinkServiceTest, ConfigDistributedHardware_004, TestSize.Level1)
+{
+    std::string devId = "devId";
+    std::string dhId = "1";
+    std::string key = "other_key";
+    std::string value = "{\"tokenId\":12345}";
+    EXPECT_EQ(DH_SUCCESS, sinkSrv_->ConfigDistributedHardware(devId, dhId, key, value));
+    EXPECT_EQ(0u, DAudioSinkManager::GetInstance().GetEnableFirstTokenId());
+}
+
+HWTEST_F(DAudioSinkServiceTest, ConfigDistributedHardware_005, TestSize.Level1)
+{
+    std::string devId = "devId";
+    std::string dhId = "1";
+    std::string key = "enable_init_params";
+    std::string value = "{\"tokenId\":\"not_a_number\"}";
+    EXPECT_EQ(DH_SUCCESS, sinkSrv_->ConfigDistributedHardware(devId, dhId, key, value));
+    EXPECT_EQ(0u, DAudioSinkManager::GetInstance().GetEnableFirstTokenId());
+}
+
+HWTEST_F(DAudioSinkServiceTest, ConfigDistributedHardware_006, TestSize.Level1)
+{
+    std::string devId = "";
+    std::string dhId = "";
+    std::string key = "enable_init_params";
+    std::string value = "{\"tokenId\":0}";
+    EXPECT_EQ(DH_SUCCESS, sinkSrv_->ConfigDistributedHardware(devId, dhId, key, value));
+    EXPECT_EQ(0u, DAudioSinkManager::GetInstance().GetEnableFirstTokenId());
+}
+
 } // DistributedHardware
 } // OHOS

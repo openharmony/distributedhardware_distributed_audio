@@ -16,7 +16,9 @@
 #include "daudio_source_service_test.h"
 
 #include "audio_event.h"
+#include "daudio_constants.h"
 #include "daudio_errorcode.h"
+#include "daudio_source_manager.h"
 
 using namespace testing::ext;
 
@@ -124,6 +126,57 @@ HWTEST_F(DAudioSourceServiceTest, Dump_001, TestSize.Level1)
     order = u"--illegal";
     args.push_back(order);
     EXPECT_EQ(DH_SUCCESS, sourceSrv_->Dump(fd, args));
+}
+
+HWTEST_F(DAudioSourceServiceTest, ConfigDistributedHardware_002, TestSize.Level1)
+{
+    std::string devId = "devId";
+    std::string dhId = "1";
+    std::string key = "enable_init_params";
+    std::string value = "{\"tokenId\":54321}";
+    EXPECT_EQ(DH_SUCCESS, sourceSrv_->ConfigDistributedHardware(devId, dhId, key, value));
+    EXPECT_EQ(54321u, DAudioSourceManager::GetInstance().GetEnableFirstTokenId());
+    DAudioSourceManager::GetInstance().SetEnableFirstTokenId(0);
+}
+
+HWTEST_F(DAudioSourceServiceTest, ConfigDistributedHardware_003, TestSize.Level1)
+{
+    std::string devId = "devId";
+    std::string dhId = "1";
+    std::string key = "enable_init_params";
+    std::string value = "invalid_json";
+    EXPECT_EQ(DH_SUCCESS, sourceSrv_->ConfigDistributedHardware(devId, dhId, key, value));
+    EXPECT_EQ(0u, DAudioSourceManager::GetInstance().GetEnableFirstTokenId());
+}
+
+HWTEST_F(DAudioSourceServiceTest, ConfigDistributedHardware_004, TestSize.Level1)
+{
+    std::string devId = "devId";
+    std::string dhId = "1";
+    std::string key = "enable_init_params";
+    std::string value = "{\"otherKey\":999}";
+    EXPECT_EQ(DH_SUCCESS, sourceSrv_->ConfigDistributedHardware(devId, dhId, key, value));
+    EXPECT_EQ(0u, DAudioSourceManager::GetInstance().GetEnableFirstTokenId());
+}
+
+HWTEST_F(DAudioSourceServiceTest, ConfigDistributedHardware_005, TestSize.Level1)
+{
+    std::string devId = "devId";
+    std::string dhId = "1";
+    std::string key = "enable_init_params";
+    std::string value = "{\"tokenId\":\"not_a_number\"}";
+    EXPECT_EQ(DH_SUCCESS, sourceSrv_->ConfigDistributedHardware(devId, dhId, key, value));
+    EXPECT_EQ(0u, DAudioSourceManager::GetInstance().GetEnableFirstTokenId());
+}
+
+HWTEST_F(DAudioSourceServiceTest, ConfigDistributedHardware_006, TestSize.Level1)
+{
+    std::string devId = "devId";
+    std::string dhId = "1";
+    std::string key = "other_key";
+    std::string value = "{\"tokenId\":12345}";
+    EXPECT_EQ(DH_SUCCESS, sourceSrv_->ConfigDistributedHardware(devId, dhId, key, value));
+    EXPECT_EQ(0u, DAudioSourceManager::GetInstance().GetEnableFirstTokenId());
 }
 } // DistributedHardware
 } // OHOS

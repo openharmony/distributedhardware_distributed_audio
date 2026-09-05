@@ -19,6 +19,7 @@
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
 #include "daudio_log.h"
+#include "daudio_sink_manager.h"
 #include "iservice_registry.h"
 #include "daudio_sink_ipc_callback_proxy.h"
 #include "daudio_sink_load_callback.h"
@@ -1227,5 +1228,81 @@ HWTEST_F(DAudioSinkDevTest, NotifyEnhanceParamChange_002, TestSize.Level1)
     ASSERT_NE(sinkDev_->handler_, nullptr);
     sinkDev_->handler_->NotifyEnhanceParamChange(msgEvent);
 }
+
+HWTEST_F(DAudioSinkDevTest, ResolveEnableUser_001, TestSize.Level1)
+{
+    ASSERT_NE(sinkDev_, nullptr);
+    DAudioSinkManager::GetInstance().SetEnableFirstTokenId(0);
+    int32_t userId = 100;
+    uint32_t enableTokenId = 999;
+    EXPECT_EQ(true, sinkDev_->ResolveEnableUser(userId, enableTokenId));
+    EXPECT_EQ(0u, enableTokenId);
+    EXPECT_EQ(100, userId);
+}
+
+HWTEST_F(DAudioSinkDevTest, ResolveEnableUser_002, TestSize.Level1)
+{
+    ASSERT_NE(sinkDev_, nullptr);
+    DAudioSinkManager::GetInstance().SetEnableFirstTokenId(1);
+    int32_t userId = 100;
+    uint32_t enableTokenId = 0;
+    bool ret = sinkDev_->ResolveEnableUser(userId, enableTokenId);
+    DAudioSinkManager::GetInstance().SetEnableFirstTokenId(0);
+    EXPECT_EQ(false, ret);
+}
+
+HWTEST_F(DAudioSinkDevTest, ResolveEnableUser_003, TestSize.Level1)
+{
+    ASSERT_NE(sinkDev_, nullptr);
+    DAudioSinkManager::GetInstance().SetEnableFirstTokenId(0);
+    sinkDev_->sourceTrigFirstUserId_ = -1;
+    int32_t userId = 50;
+    uint32_t enableTokenId = 0;
+    EXPECT_EQ(true, sinkDev_->ResolveEnableUser(userId, enableTokenId));
+    EXPECT_EQ(50, userId);
+}
+
+HWTEST_F(DAudioSinkDevTest, ResolveEnableUser_004, TestSize.Level1)
+{
+    ASSERT_NE(sinkDev_, nullptr);
+    DAudioSinkManager::GetInstance().SetEnableFirstTokenId(0);
+    sinkDev_->sourceTrigFirstUserId_ = 100;
+    int32_t userId = 50;
+    uint32_t enableTokenId = 0;
+    EXPECT_EQ(true, sinkDev_->ResolveEnableUser(userId, enableTokenId));
+    EXPECT_EQ(50, userId);
+}
+
+HWTEST_F(DAudioSinkDevTest, ResolveEnableUser_005, TestSize.Level1)
+{
+    ASSERT_NE(sinkDev_, nullptr);
+    DAudioSinkManager::GetInstance().SetEnableFirstTokenId(1);
+    sinkDev_->sourceTrigFirstTokenId_ = 12345;
+    sinkDev_->sourceTrigFirstUserId_ = 100;
+    int32_t userId = 50;
+    uint32_t enableTokenId = 0;
+    bool ret = sinkDev_->ResolveEnableUser(userId, enableTokenId);
+    DAudioSinkManager::GetInstance().SetEnableFirstTokenId(0);
+    sinkDev_->sourceTrigFirstTokenId_ = 0;
+    sinkDev_->sourceTrigFirstUserId_ = -1;
+    EXPECT_EQ(false, ret);
+}
+
+HWTEST_F(DAudioSinkDevTest, CheckAclRight_ResolveEnableUser_001, TestSize.Level1)
+{
+    ASSERT_NE(sinkDev_, nullptr);
+    sinkDev_->userId_ = -1;
+    EXPECT_EQ(true, sinkDev_->CheckAclRight());
+}
+
+HWTEST_F(DAudioSinkDevTest, CheckAclRight_ResolveEnableUser_002, TestSize.Level1)
+{
+    ASSERT_NE(sinkDev_, nullptr);
+    sinkDev_->userId_ = 100;
+    DAudioSinkManager::GetInstance().SetEnableFirstTokenId(1);
+    EXPECT_EQ(false, sinkDev_->CheckAclRight());
+    DAudioSinkManager::GetInstance().SetEnableFirstTokenId(0);
+}
+
 } // DistributedHardware
 } // OHOS

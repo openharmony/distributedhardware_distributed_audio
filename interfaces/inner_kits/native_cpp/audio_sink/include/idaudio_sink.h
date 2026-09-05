@@ -40,6 +40,8 @@ public:
         const std::string &pkgName) = 0;
     virtual int32_t RemoveAccessListener(const std::string &pkgName) = 0;
     virtual int32_t SetAuthorizationResult(const std::string &requestId, bool granted) = 0;
+    virtual int32_t ConfigDistributedHardware(const std::string &devId, const std::string &dhId,
+        const std::string &key, const std::string &value) = 0;
 };
 } // DistributedHardware
 } // OHOS

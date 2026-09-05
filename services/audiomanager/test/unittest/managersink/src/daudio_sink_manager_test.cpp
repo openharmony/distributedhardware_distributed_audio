@@ -563,5 +563,25 @@ HWTEST_F(DAudioSinkManagerTest, SetAuthorizationResult_001, TestSize.Level1)
     // Verify no fatal failure during set authorization result
     EXPECT_NO_FATAL_FAILURE(daudioSinkManager.SetAuthorizationResult(requestId, granted));
 }
+
+HWTEST_F(DAudioSinkManagerTest, SetEnableFirstTokenId_001, TestSize.Level1)
+{
+    DAudioSinkManager &mgr = DAudioSinkManager::GetInstance();
+    mgr.SetEnableFirstTokenId(0);
+    EXPECT_EQ(0u, mgr.GetEnableFirstTokenId());
+    mgr.SetEnableFirstTokenId(54321);
+    EXPECT_EQ(54321u, mgr.GetEnableFirstTokenId());
+    mgr.SetEnableFirstTokenId(0);
+    EXPECT_EQ(0u, mgr.GetEnableFirstTokenId());
+}
+
+HWTEST_F(DAudioSinkManagerTest, SetEnableFirstTokenId_002, TestSize.Level1)
+{
+    DAudioSinkManager &mgr = DAudioSinkManager::GetInstance();
+    uint32_t tokenId = 88888;
+    mgr.SetEnableFirstTokenId(tokenId);
+    EXPECT_EQ(tokenId, mgr.GetEnableFirstTokenId());
+    mgr.SetEnableFirstTokenId(0);
+}
 } // DistributedHardware
 } // OHOS

@@ -18,6 +18,7 @@
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 
+#include "cJSON.h"
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
 #include "daudio_hdf_operate.h"
