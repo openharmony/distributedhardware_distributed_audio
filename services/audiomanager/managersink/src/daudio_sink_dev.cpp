@@ -874,15 +874,19 @@ bool DAudioSinkDev::CheckAclRight()
     ret = AccountSA::OsAccountManager::QueryActiveOsAccountIds(ids);
     CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, false, "Get userId fail, ret: %{public}d", ret);
     int32_t userId = ids.empty() ? 0 : ids[0];
-    AccountSA::OhosAccountInfo osAccountInfo;
-    ret = AccountSA::OhosAccountKits::GetInstance().GetOhosAccountInfo(osAccountInfo);
-    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, false, "Get accountId fail, ret: %{public}d", ret);
-    std::string accountId = osAccountInfo.uid_;
 #endif
     uint32_t enableTokenId = 0;
     if (!ResolveEnableUser(userId, enableTokenId)) {
         return false;
     }
+#ifdef OS_ACCOUNT_PART
+    AccountSA::OhosAccountInfo osAccountInfo;
+    ret = AccountSA::OhosAccountKits::GetInstance().GetOsAccountDistributedInfo(userId, osAccountInfo);
+    CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, false, "Get accountId fail, ret: %{public}d", ret);
+    std::string accountId = osAccountInfo.uid_;
+    DHLOGI("[MultiUserSink] GetOsAccountDistributedInfo userId=%{public}d, accountId=%{public}s",
+        userId, GetAnonyString(accountId).c_str());
+#endif
     std::shared_ptr<DmInitCallback> initCallback = std::make_shared<DeviceInitCallback>();
     ret = DeviceManager::GetInstance().InitDeviceManager(PKG_NAME, initCallback);
     CHECK_AND_RETURN_RET_LOG(ret != DH_SUCCESS, false, "InitDeviceManager failed ret = %{public}d", ret);
