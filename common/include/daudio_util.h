@@ -38,6 +38,7 @@ int64_t GetNowTimeUs();
 int32_t GetAudioParamStr(const std::string &params, const std::string &key, std::string &value);
 int32_t GetAudioParamBool(const std::string &params, const std::string &key, bool &value);
 int32_t GetAudioParamInt(const std::string &params, const std::string &key, int32_t &value);
+bool ConvertToInt32(const std::string &str, int32_t &value);
 bool CJsonParamCheck(const cJSON *jsonObj, const std::initializer_list<std::string> &keys);
 bool IsString(const cJSON *jsonObj, const std::string &key);
 bool IsInt32(const cJSON *jsonObj, const std::string &key);
