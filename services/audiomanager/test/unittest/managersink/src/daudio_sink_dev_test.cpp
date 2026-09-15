@@ -1229,6 +1229,79 @@ HWTEST_F(DAudioSinkDevTest, NotifyEnhanceParamChange_002, TestSize.Level1)
     sinkDev_->handler_->NotifyEnhanceParamChange(msgEvent);
 }
 
+/**
+ * @tc.name: IsHardwareAccessGranted_001
+ * @tc.desc: Verify the IsHardwareAccessGranted function without authorization decision.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkDevTest, IsHardwareAccessGranted_001, TestSize.Level1)
+{
+    ASSERT_NE(sinkDev_, nullptr);
+    bool result = sinkDev_->IsHardwareAccessGranted();
+    EXPECT_EQ(false, result);
+}
+
+/**
+ * @tc.name: IsEventAllowedByHardwareAccess_001
+ * @tc.desc: Verify IsEventAllowedByHardwareAccess with OPEN_SPEAKER event.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkDevTest, IsEventAllowedByHardwareAccess_001, TestSize.Level1)
+{
+    int32_t eventType = OPEN_SPEAKER;
+    std::string eventContent = "{\"dhId\":\"1\"}";
+    AudioEvent audioEvent(eventType, eventContent);
+    auto eventParam = std::make_shared<AudioEvent>(audioEvent);
+    auto msgEvent = AppExecFwk::InnerEvent::Get(static_cast<uint32_t>(audioEvent.type), eventParam, 0);
+    ASSERT_NE(sinkDev_, nullptr);
+    EXPECT_EQ(DH_SUCCESS, sinkDev_->AwakeAudioDev());
+    ASSERT_NE(sinkDev_->handler_, nullptr);
+    sinkDev_->handler_->ProcessEvent(msgEvent);
+    ASSERT_NE(sinkDev_->handler_, nullptr);
+}
+
+/**
+ * @tc.name: IsEventAllowedByHardwareAccess_002
+ * @tc.desc: Verify IsEventAllowedByHardwareAccess with OPEN_MIC event.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkDevTest, IsEventAllowedByHardwareAccess_002, TestSize.Level1)
+{
+    int32_t eventType = OPEN_MIC;
+    std::string eventContent = "{\"dhId\":\"1\"}";
+    AudioEvent audioEvent(eventType, eventContent);
+    auto eventParam = std::make_shared<AudioEvent>(audioEvent);
+    auto msgEvent = AppExecFwk::InnerEvent::Get(static_cast<uint32_t>(audioEvent.type), eventParam, 0);
+    ASSERT_NE(sinkDev_, nullptr);
+    EXPECT_EQ(DH_SUCCESS, sinkDev_->AwakeAudioDev());
+    ASSERT_NE(sinkDev_->handler_, nullptr);
+    sinkDev_->handler_->ProcessEvent(msgEvent);
+    ASSERT_NE(sinkDev_->handler_, nullptr);
+}
+
+/**
+ * @tc.name: IsEventAllowedByHardwareAccess_003
+ * @tc.desc: Verify IsEventAllowedByHardwareAccess with other event type.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E5F
+ */
+HWTEST_F(DAudioSinkDevTest, IsEventAllowedByHardwareAccess_003, TestSize.Level1)
+{
+    int32_t eventType = VOLUME_SET;
+    std::string eventContent = "{\"dhId\":\"1\"}";
+    AudioEvent audioEvent(eventType, eventContent);
+    auto eventParam = std::make_shared<AudioEvent>(audioEvent);
+    auto msgEvent = AppExecFwk::InnerEvent::Get(static_cast<uint32_t>(audioEvent.type), eventParam, 0);
+    ASSERT_NE(sinkDev_, nullptr);
+    EXPECT_EQ(DH_SUCCESS, sinkDev_->AwakeAudioDev());
+    ASSERT_NE(sinkDev_->handler_, nullptr);
+    sinkDev_->handler_->ProcessEvent(msgEvent);
+    ASSERT_NE(sinkDev_->handler_, nullptr);
+}
+
 HWTEST_F(DAudioSinkDevTest, ResolveEnableUser_001, TestSize.Level1)
 {
     ASSERT_NE(sinkDev_, nullptr);

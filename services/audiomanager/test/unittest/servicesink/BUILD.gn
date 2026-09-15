@@ -67,6 +67,7 @@ ohos_unittest("DaudioSinkServiceTest") {
     "distributed_hardware_fwk:distributedhardwareutils",
     "distributed_hardware_fwk:libdhfwk_sdk",
     "dsoftbus:softbus_client",
+    "eventhandler:libeventhandler",
     "googletest:gmock",
     "hilog:libhilog",
     "hisysevent:libhisysevent",

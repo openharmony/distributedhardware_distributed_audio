@@ -74,6 +74,7 @@ ohos_unittest("DaudioSourceServiceTest") {
     "drivers_interface_distributed_audio:libdaudio_proxy_2.0",
     "drivers_interface_distributed_audio:libdaudioext_proxy_3.0",
     "dsoftbus:softbus_client",
+    "eventhandler:libeventhandler",
     "googletest:gmock",
     "hilog:libhilog",
     "hisysevent:libhisysevent",

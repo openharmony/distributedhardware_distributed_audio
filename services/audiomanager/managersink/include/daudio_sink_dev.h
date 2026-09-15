@@ -64,6 +64,7 @@ public:
     bool ResolveEnableUser(int32_t &userId, uint32_t &enableTokenId);
     void SetSinkTokenId(uint64_t value);
     bool IsIdenticalAccount(const std::string &networkId);
+    bool IsHardwareAccessGranted();
 
 private:
     int32_t TaskOpenDSpeaker(const std::string &args);
@@ -149,6 +150,7 @@ private:
         void NotifyRenderStateChange(const AppExecFwk::InnerEvent::Pointer &event);
         void NotifyPlayStatusChange(const AppExecFwk::InnerEvent::Pointer &event);
         int32_t GetEventParam(const AppExecFwk::InnerEvent::Pointer &event, std::string &eventParam);
+        bool IsEventAllowedByHardwareAccess(const AppExecFwk::InnerEvent::Pointer &event);
         void ProcessEventInner(const AppExecFwk::InnerEvent::Pointer &event);
         int32_t ParseValueFromEvent(std::string args, std::string key);
         std::string ParseStringFromEvent(std::string args, std::string key);

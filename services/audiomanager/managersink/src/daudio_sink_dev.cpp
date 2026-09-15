@@ -23,6 +23,7 @@
 #include "daudio_sink_manager.h"
 #include "daudio_util.h"
 
+#include "av_sync_utils.h"
 #include "ohos_account_kits.h"
 #include "os_account_manager.h"
 #include "os_account_info.h"
@@ -747,9 +748,25 @@ void DAudioSinkDev::SinkEventHandler::ProcessEventInner(const AppExecFwk::InnerE
     }
 }
 
+bool DAudioSinkDev::SinkEventHandler::IsEventAllowedByHardwareAccess(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event->GetInnerEventId() == OPEN_SPEAKER || event->GetInnerEventId() == OPEN_MIC) {
+        return true;
+    }
+    auto sinkDevObj = sinkDev_.lock();
+    if (sinkDevObj != nullptr && !sinkDevObj->IsHardwareAccessGranted()) {
+        DHLOGE("Event Id=%{public}d hardwareAccess fail", event->GetInnerEventId());
+        return false;
+    }
+    return true;
+}
+
 void DAudioSinkDev::SinkEventHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
     CHECK_NULL_VOID(event);
+    if (!IsEventAllowedByHardwareAccess(event)) {
+        return;
+    }
     DHLOGD("Event Id=%{public}d", event->GetInnerEventId());
     switch (event->GetInnerEventId()) {
         case CTRL_OPENED:
@@ -897,6 +914,18 @@ bool DAudioSinkDev::CheckAclRight()
     DHLOGI("CheckAclRight srcDevId: %{public}s, accountId: %{public}s, sinkDevId: %{public}s",
         GetAnonyString(devId_).c_str(), GetAnonyString(accountId).c_str(), GetAnonyString(sinkDevId).c_str());
     return DeviceManager::GetInstance().CheckSinkAccessControl(dmSrcCaller, dmDstCallee);
+}
+
+bool DAudioSinkDev::IsHardwareAccessGranted()
+{
+    if (!DAudioAccessConfigManager::GetInstance().HasAuthorizationDecision(devId_)) {
+        DHLOGI("No authorization decision yet for devId: %{public}s.", GetAnonyString(devId_).c_str());
+        return false;
+    }
+    bool granted = DAudioAccessConfigManager::GetInstance().IsAuthorizationGranted(devId_);
+    DHLOGI("Hardware success authorization result for devId: %{public}s, granted: %{public}d.",
+        GetAnonyString(devId_).c_str(), granted);
+    return granted;
 }
 
 bool DAudioSinkDev::ResolveEnableUser(int32_t &userId, uint32_t &enableTokenId)
