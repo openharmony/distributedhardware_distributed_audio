@@ -131,9 +131,41 @@ ohos_unittest("DAudioSinkManagerTest") {
   }
 }
 
+## UnitTest daudio_sink_config_loader_test
+ohos_unittest("DAudioSinkConfigLoaderTest") {
+  module_out_path = module_out_path
+
+  sources = [ "${services_path}/audiomanager/test/unittest/managersink/src/daudio_sink_config_loader_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "${innerkits_path}/native_cpp/audio_sink:distributed_audio_sink_sdk",
+    "${services_path}/audiomanager/servicesink:distributed_audio_sink",
+    "${services_path}/common:distributed_audio_utils",
+  ]
+
+  external_deps = [
+    "cJSON:cjson",
+    "c_utils:utils",
+    "config_policy:configpolicy_util",
+    "device_manager:devicemanagersdk",
+    "distributed_hardware_fwk:distributedhardwareutils",
+    "dsoftbus:softbus_client",
+    "eventhandler:libeventhandler",
+    "googletest:gmock",
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
+    "ipc:ipc_core",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+  ]
+}
+
 group("manager_sink_test") {
   testonly = true
   deps = [
+    ":DAudioSinkConfigLoaderTest",
     ":DAudioSinkManagerTest",
     ":DaudioSinkDevTest",
   ]

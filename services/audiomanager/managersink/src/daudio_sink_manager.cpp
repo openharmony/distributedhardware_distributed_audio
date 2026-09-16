@@ -23,6 +23,7 @@
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
 #include "daudio_log.h"
+#include "daudio_sink_config_loader.h"
 #include "daudio_util.h"
 #include "device_manager.h"
 
@@ -69,6 +70,7 @@ int32_t DAudioSinkManager::Init(const sptr<IDAudioSinkIpcCallback> &sinkCallback
         return DH_SUCCESS;
     }
     DHLOGI("Init audio sink manager.");
+    DAudioSinkConfigLoader::GetInstance().Init();
     {
         std::lock_guard<std::mutex> ipcLock(ipcCallbackMutex_);
         initCallback_ = std::make_shared<DeviceInitCallback>();
