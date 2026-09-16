@@ -20,6 +20,7 @@
 #include "daudio_constants.h"
 #include "daudio_errorcode.h"
 #include "daudio_log.h"
+#include "daudio_sink_config_loader.h"
 #include "daudio_sink_manager.h"
 #include "daudio_util.h"
 
@@ -131,6 +132,10 @@ int32_t DAudioSinkDev::TaskDisableDevice(const std::string &args)
 int32_t DAudioSinkDev::TaskOpenDSpeaker(const std::string &args)
 {
     DHLOGI("Open speaker device");
+    if (!DAudioSinkConfigLoader::GetInstance().IsSpeakerSinkEnabled()) {
+        DHLOGE("Speaker sink is disabled by config.");
+        return ERR_DH_AUDIO_FAILED;
+    }
     if (args.length() > DAUDIO_MAX_JSON_LEN || args.empty()) {
         return ERR_DH_AUDIO_SA_PARAM_INVALID;
     }
@@ -288,6 +293,10 @@ int32_t DAudioSinkDev::TaskStartRender(const std::string &args)
 int32_t DAudioSinkDev::TaskOpenDMic(const std::string &args)
 {
     DHLOGI("Open mic device.");
+    if (!DAudioSinkConfigLoader::GetInstance().IsMicSinkEnabled()) {
+        DHLOGE("Mic sink is disabled by config.");
+        return ERR_DH_AUDIO_FAILED;
+    }
     if (!isDevLevelStatus_) {
         DHLOGI("Dev security level status is false.");
         return ERR_DH_AUDIO_FAILED;
@@ -305,8 +314,7 @@ int32_t DAudioSinkDev::TaskOpenDMic(const std::string &args)
     CHECK_AND_FREE_RETURN_RET_LOG(ret != DH_SUCCESS, ret, jParam,
         "Get audio param from cjson failed, error code %{public}d.", ret);
     int32_t dhId = ParseDhidFromEvent(args);
-    CHECK_AND_FREE_RETURN_RET_LOG(dhId == -1, ERR_DH_AUDIO_NULLPTR, jParam,
-        "%{public}s", "Parse dhId error.");
+    CHECK_AND_FREE_RETURN_RET_LOG(dhId == -1, ERR_DH_AUDIO_NULLPTR, jParam, "%{public}s", "Parse dhId error.");
     cJSON_Delete(jParam);
     micDhId_ = std::to_string(dhId);
     std::shared_ptr<DMicClient> micClient = nullptr;
