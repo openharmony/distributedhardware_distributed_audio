@@ -846,7 +846,7 @@ int32_t DMicDev::NotifyHdfAudioEvent(const AudioEvent &event, const int32_t port
         DHLOGE("Notify event: %{public}d, result: %{public}s, streamId: %{public}d.",
             event.type, event.content.c_str(), streamId_);
     }
-    return DH_SUCCESS;
+    return ret;
 }
 
 int32_t DMicDev::OnStateChange(const AudioEventType type)
@@ -923,7 +923,13 @@ int32_t DMicDev::AVsyncRefreshAshmem(int32_t fd, int32_t ashmemLength)
         ashmemLength_ = ashmemLength;
         DHLOGD("Create ashmem success. fd:%{public}d, ashmem length: %{public}d", fd, ashmemLength_);
         bool mapRet = avsyncAshmem_->MapReadAndWriteAshmem();
-        CHECK_AND_RETURN_RET_LOG(!mapRet, ERR_DH_AUDIO_NULLPTR, "Mmap ashmem failed.");
+        if (!mapRet) {
+            DHLOGE("Mmap ashmem failed, cleaning up.");
+            AVsyncDeintAshmem();
+            avSyncParam_.fd = -1;
+            avSyncParam_.sharedMemLen = 0;
+            return ERR_DH_AUDIO_NULLPTR;
+        }
     }
     return DH_SUCCESS;
 }

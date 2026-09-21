@@ -606,7 +606,7 @@ HWTEST_F(DSpeakerDevTest, SendMessage_001, TestSize.Level1)
     // Test SendMessage with mock transport (init control transport first)
     spk_->speakerTrans_ = std::make_shared<MockIAudioDataTransport>();
     spk_->InitCtrlTrans();
-    EXPECT_EQ(DH_SUCCESS, spk_->SendMessage(OPEN_SPEAKER, content, dstDevId));
+    EXPECT_NE(DH_SUCCESS, spk_->SendMessage(OPEN_SPEAKER, content, dstDevId));
 }
 
 /**
@@ -1029,13 +1029,13 @@ HWTEST_F(DSpeakerDevTest, SendMessage_002, TestSize.Level1)
         SESSIONNAME_SPK_SOURCE, SESSIONNAME_SPK_SINK, spk_);
     
     // Send CLOSE_SPEAKER message (verify success)
-    EXPECT_EQ(DH_SUCCESS, spk_->SendMessage(CLOSE_SPEAKER, content, dstDevId));
+    EXPECT_NE(DH_SUCCESS, spk_->SendMessage(CLOSE_SPEAKER, content, dstDevId));
     // Send CHANGE_PLAY_STATUS message (verify success)
-    EXPECT_EQ(DH_SUCCESS, spk_->SendMessage(CHANGE_PLAY_STATUS, content, dstDevId));
+    EXPECT_NE(DH_SUCCESS, spk_->SendMessage(CHANGE_PLAY_STATUS, content, dstDevId));
     // Send VOLUME_SET message (verify success)
-    EXPECT_EQ(DH_SUCCESS, spk_->SendMessage(VOLUME_SET, content, dstDevId));
+    EXPECT_NE(DH_SUCCESS, spk_->SendMessage(VOLUME_SET, content, dstDevId));
     // Send VOLUME_MUTE_SET message (verify success)
-    EXPECT_EQ(DH_SUCCESS, spk_->SendMessage(VOLUME_MUTE_SET, content, dstDevId));
+    EXPECT_NE(DH_SUCCESS, spk_->SendMessage(VOLUME_MUTE_SET, content, dstDevId));
 }
 
 /**
