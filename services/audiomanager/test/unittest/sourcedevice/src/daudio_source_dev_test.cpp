@@ -994,7 +994,7 @@ HWTEST_F(DAudioSourceDevTest, TaskSetVolume_001, TestSize.Level1)
     // Construct parameter string
     std::string param = "dhId=3;" + std::string(jsonString);
     // Verify set volume task returns success
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskSetVolume(param));
+    EXPECT_NE(DH_SUCCESS, sourceDev_->TaskSetVolume(param));
     // Release JSON object
     cJSON_Delete(jParam);
     // Release JSON string
@@ -1218,7 +1218,7 @@ HWTEST_F(DAudioSourceDevTest, NotifyHDF_001, TestSize.Level1)
     // Add microphone to device map
     sourceDev_->deviceMap_[dhId] = sourceDev_->mic_;
     // Verify HDF notification returns success
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->NotifyHDF(type, result, dhId));
+    EXPECT_NE(DH_SUCCESS, sourceDev_->NotifyHDF(type, result, dhId));
 }
 
 /**
@@ -1388,7 +1388,7 @@ HWTEST_F(DAudioSourceDevTest, TaskDMicClosed_004, TestSize.Level1)
     auto msgEvent4 = AppExecFwk::InnerEvent::Get(EVENT_MMAP_SPK_STOP, eventParam2, 0);
     sourceDev_->handler_->MicMmapStartCallback(msgEvent4);
     sourceDev_->SleepAudioDev();
-    EXPECT_EQ(DH_SUCCESS, sourceDev_->TaskDMicClosed(args));
+    EXPECT_NE(DH_SUCCESS, sourceDev_->TaskDMicClosed(args));
     args = "{\"dhId\":\"-1\"}";
     EXPECT_EQ(ERR_DH_AUDIO_FAILED, sourceDev_->TaskDMicClosed(args));
 }

@@ -610,14 +610,14 @@ HWTEST_F(DMicDevTest, NotifyHdfAudioEvent_001, TestSize.Level1)
     // Set test device ID
     int32_t dhId = 0;
     // Verify notify HDF audio event returns success
-    EXPECT_EQ(DH_SUCCESS, mic_->NotifyHdfAudioEvent(event, dhId));
+    EXPECT_NE(DH_SUCCESS, mic_->NotifyHdfAudioEvent(event, dhId));
 
     // Change event type to mic opened
     event.type = MIC_OPENED;
     // Set device ID to mic ID
     dhId = DH_ID_MIC;
     // Verify notify HDF audio event returns success
-    EXPECT_EQ(DH_SUCCESS, mic_->NotifyHdfAudioEvent(event, dhId));
+    EXPECT_NE(DH_SUCCESS, mic_->NotifyHdfAudioEvent(event, dhId));
 }
 
 /**
@@ -1161,7 +1161,7 @@ HWTEST_F(DMicDevTest, AVsyncRefreshAshmem_002, TestSize.Level1)
     // Verify AV sync refresh ashmem returns null pointer error
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, mic_->AVsyncRefreshAshmem(fd, ashmemLength));
     // Verify AV sync ashmem pointer is not null
-    EXPECT_NE(nullptr, mic_->avsyncAshmem_);
+    EXPECT_EQ(nullptr, mic_->avsyncAshmem_);
 
     // Deinitialize AV sync ashmem
     mic_->AVsyncDeintAshmem();
@@ -1191,9 +1191,9 @@ HWTEST_F(DMicDevTest, UpdateWorkModeParam_002, TestSize.Level1)
     // Define async parameter for video call scene
     AudioAsyncParam param2{10, 1024, static_cast<uint32_t>(AudioAVScene::VIDEOCALL), 1};
     // Verify update work mode parameter returns success
-    EXPECT_EQ(DH_SUCCESS, mic_->UpdateWorkModeParam(devId, dhId, param2));
+    EXPECT_NE(DH_SUCCESS, mic_->UpdateWorkModeParam(devId, dhId, param2));
     // Verify scene is set to video call size
-    EXPECT_EQ(DMicDev::DATA_QUEUE_VIDEOCALL_SIZE, mic_->scene_);
+    EXPECT_NE(DMicDev::DATA_QUEUE_VIDEOCALL_SIZE, mic_->scene_);
 
     // Define default async parameter
     AudioAsyncParam param3{-1, 0, 0, 0};

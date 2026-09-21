@@ -255,5 +255,21 @@ HWTEST_F(DSpeakerClientTest, SendMessage_001, TestSize.Level0)
     speakerClient_->speakerCtrlTrans_ = nullptr;
     EXPECT_EQ(ERR_DH_AUDIO_NULLPTR, speakerClient_->SendMessage(NOTIFY_OPEN_SPEAKER_RESULT, content, dstDevId));
 }
+
+/**
+ * @tc.name: ReleaseRendererResource_001
+ * @tc.desc: Verify the ReleaseRendererResource function.
+ * @tc.type: FUNC
+ * @tc.require: AR000H0E6G
+ */
+HWTEST_F(DSpeakerClientTest, ReleaseRendererResource_001, TestSize.Level0)
+{
+    ASSERT_TRUE(speakerClient_ != nullptr);
+    speakerClient_->audioRenderer_ = nullptr;
+    speakerClient_->dumpFile_ = nullptr;
+    speakerClient_->ReleaseRendererResource();
+    EXPECT_EQ(nullptr, speakerClient_->audioRenderer_);
+    EXPECT_EQ(nullptr, speakerClient_->dumpFile_);
+}
 } // DistributedHardware
 } // OHOS
