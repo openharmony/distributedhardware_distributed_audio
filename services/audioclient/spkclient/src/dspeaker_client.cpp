@@ -185,30 +185,48 @@ int32_t DSpeakerClient::SetUp(const AudioParam &param)
     DumpFileUtil::OpenDumpFile(DUMP_SERVER_PARA, DUMP_DAUDIO_SPK_AFTER_TRANS_NAME, &dumpFile_);
     if (speakerTrans_ == nullptr) {
         DHLOGE("Speaker trans is nullptr.");
-        DumpFileUtil::CloseDumpFile(&dumpFile_);
+        ReleaseRendererResource();
         return ERR_DH_AUDIO_NULLPTR;
     }
     ret = speakerTrans_->SetUp(audioParam_, audioParam_, shared_from_this(), CAP_SPK);
     if (ret != DH_SUCCESS) {
         DHLOGE("Speaker trans setup failed.");
-        DumpFileUtil::CloseDumpFile(&dumpFile_);
+        ReleaseRendererResource();
         return ret;
     }
     ret = speakerTrans_->Start();
     if (ret != DH_SUCCESS) {
         DHLOGE("Speaker trans start failed.");
-        DumpFileUtil::CloseDumpFile(&dumpFile_);
+        ReleaseRendererResource();
         return ret;
     }
     auto pid = getprocpid();
     ret = AudioStandard::AudioSystemManager::GetInstance()->RegisterVolumeKeyEventCallback(pid, shared_from_this());
     if (ret != DH_SUCCESS) {
         DHLOGE("Failed to register volume key event callback.");
-        DumpFileUtil::CloseDumpFile(&dumpFile_);
+        ReleaseRendererResource();
+        if (speakerTrans_ != nullptr) {
+            if (speakerTrans_->Stop() != DH_SUCCESS) {
+                DHLOGE("Speaker trans stop failed.");
+            }
+            if (speakerTrans_->Release() != DH_SUCCESS) {
+                DHLOGE("Speaker trans release failed.");
+            }
+            speakerTrans_ = nullptr;
+        }
         return ret;
     }
     clientStatus_.store(AudioStatus::STATUS_READY);
     return DH_SUCCESS;
+}
+
+void DSpeakerClient::ReleaseRendererResource()
+{
+    DumpFileUtil::CloseDumpFile(&dumpFile_);
+    if (audioRenderer_ != nullptr) {
+        audioRenderer_->Release();
+        audioRenderer_ = nullptr;
+    }
 }
 
 int32_t DSpeakerClient::Release()
@@ -618,6 +636,7 @@ int32_t DSpeakerClient::SetMute(const AudioEvent &event)
 void DSpeakerClient::Pause()
 {
     DHLOGI("Pause and flush");
+    std::lock_guard<std::mutex> lck(devMtx_);
     FlushJitterQueue();
     if (audioParam_.renderOpts.renderFlags != MMAP_MODE) {
         isRenderReady_.store(false);
@@ -640,6 +659,7 @@ void DSpeakerClient::Pause()
 void DSpeakerClient::ReStart()
 {
     DHLOGI("ReStart");
+    std::lock_guard<std::mutex> lck(devMtx_);
     if (speakerTrans_ == nullptr || speakerTrans_->Restart(audioParam_, audioParam_) != DH_SUCCESS) {
         DHLOGE("Speaker trans Restart failed.");
     }
@@ -648,8 +668,10 @@ void DSpeakerClient::ReStart()
         auto self = shared_from_this();
         renderDataThread_ = std::thread([self]() { self->PlayThreadRunning(); });
     }
-    if (audioRenderer_ != nullptr) {
-        audioRenderer_->Start();
+    CHECK_NULL_VOID(audioRenderer_);
+    if (!audioRenderer_->Start()) {
+        DHLOGE("Audio renderer restart failed.");
+        return ;
     }
     clientStatus_.store(AudioStatus::STATUS_START);
 }

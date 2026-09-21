@@ -93,6 +93,7 @@ private:
     void FillJitterQueue();
     void FlushJitterQueue();
     int32_t CreateAudioRenderer(const AudioParam &param);
+    void ReleaseRendererResource();
 
 private:
     constexpr static size_t DATA_QUEUE_MAX_SIZE = 12;

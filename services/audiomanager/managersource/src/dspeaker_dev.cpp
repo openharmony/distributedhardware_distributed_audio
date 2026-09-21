@@ -508,8 +508,7 @@ int32_t DSpeakerDev::SendMessage(uint32_t type, std::string content, std::string
         return ERR_DH_AUDIO_NULLPTR;
     }
     CHECK_NULL_RETURN(speakerCtrlTrans_, ERR_DH_AUDIO_NULLPTR);
-    speakerCtrlTrans_->SendAudioEvent(type, content, dstDevId);
-    return DH_SUCCESS;
+    return speakerCtrlTrans_->SendAudioEvent(type, content, dstDevId);
 }
 
 int32_t DSpeakerDev::NotifyHdfAudioEvent(const AudioEvent &event, const int32_t portId)
