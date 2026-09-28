@@ -33,6 +33,7 @@
                 "accessibility",
                 "audio_framework",
                 "av_codec",
+                "config_policy",
                 "cJSON",
                 "c_utils",
                 "device_security_level",
